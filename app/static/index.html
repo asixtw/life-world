@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf3e9">
+  <title>Life World · 把每一步，種成自己的世界</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="#world" class="brand" aria-label="Life World 首頁"><span class="brand-symbol">✳</span><span>Life World<small>讓努力，有一個家。</small></span></a>
+      <nav id="nav" aria-label="主要導覽"></nav>
+      <div class="sidebar-bottom"><span class="status-dot"></span> 本機開發版<span>你的世界，從真實的一小步開始。</span></div>
+    </aside>
+    <main>
+      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header>
+      <div id="notice" role="status" aria-live="polite"></div>
+      <div id="app" class="content"><p>正在打開你的世界…</p></div>
+      <footer>透過現實中的努力，打造一個屬於自己的世界。<span>你可以暫時離開，這裡永遠歡迎你回來。</span></footer>
+    </main>
+  </div>
+  <dialog id="account-dialog" aria-labelledby="account-heading"><div id="account-content"></div><button class="text-button close-dialog" data-action="close-account">關閉</button></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

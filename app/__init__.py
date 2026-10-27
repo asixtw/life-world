@@ -1,0 +1,1 @@
+"""Life World local application."""

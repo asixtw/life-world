@@ -1,0 +1,581 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                  [100%]
+=================================== FAILURES ===================================
+___________ test_goal_needs_evidence_and_explicit_human_confirmation ___________
+tests/test_evidence_notes.py:16: in test_goal_needs_evidence_and_explicit_human_confirmation
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________________ test_duplicate_upload_reuses_evidence _____________________
+tests/test_evidence_notes.py:33: in test_duplicate_upload_reuses_evidence
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_invalid_upload[-empty.png-image/png-422] _________________
+tests/test_evidence_notes.py:41: in test_invalid_upload
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_invalid_upload[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-large.png-image/png-413] _
+tests/test_evidence_notes.py:41: in test_invalid_upload
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______ test_invalid_upload[<script>bad</script>-fake.png-image/png-415] _______
+tests/test_evidence_notes.py:41: in test_invalid_upload
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_invalid_upload[\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x04\x00\x00\x00\xb5\x1c\x0c\x02\x00\x00\x00\x0bIDATx\xdac\xfc\xff\x1f\x00\x03\x03\x02\x00\xef\x9a\x17W\x00\x00\x00\x00IEND\xaeB`\x82-../../secret.png-image/png-422] _
+tests/test_evidence_notes.py:41: in test_invalid_upload
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_invalid_upload[\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x04\x00\x00\x00\xb5\x1c\x0c\x02\x00\x00\x00\x0bIDATx\xdac\xfc\xff\x1f\x00\x03\x03\x02\x00\xef\x9a\x17W\x00\x00\x00\x00IEND\xaeB`\x82-file.svg-image/svg+xml-415] _
+tests/test_evidence_notes.py:41: in test_invalid_upload
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_invalid_upload[\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x04\x00\x00\x00\xb5-broken.png-image/png-415] _
+tests/test_evidence_notes.py:41: in test_invalid_upload
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_other_goal_and_other_owner_evidence_rejected _______________
+tests/test_evidence_notes.py:47: in test_other_goal_and_other_owner_evidence_rejected
+    _, goal = onboard(client); evidence = upload(client, goal).json()
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___ test_completed_goal_contribution_policy_is_explicit_and_preserves_draft ____
+tests/test_evidence_notes.py:59: in test_completed_goal_contribution_policy_is_explicit_and_preserves_draft
+    _, goal = onboard(client); d = draft(client, goal); e = upload(client, goal).json()
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________ test_creative_notes_never_change_reality[preparation] _____________
+tests/test_evidence_notes.py:69: in test_creative_notes_never_change_reality
+    onboard(client); register(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_creative_notes_never_change_reality[simulation] _____________
+tests/test_evidence_notes.py:69: in test_creative_notes_never_change_reality
+    onboard(client); register(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_creative_notes_never_change_reality[message] _______________
+tests/test_evidence_notes.py:69: in test_creative_notes_never_change_reality
+    onboard(client); register(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________________ test_data_survives_new_app_instance ______________________
+tests/test_evidence_notes.py:82: in test_data_survives_new_app_instance
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________ test_draft_and_suggestion_never_award_or_overwrite_raw ____________
+tests/test_experiences.py:10: in test_draft_and_suggestion_never_award_or_overwrite_raw
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______ test_confirm_partial_contribution_backdate_tasks_and_idempotency _______
+tests/test_experiences.py:21: in test_confirm_partial_contribution_backdate_tasks_and_idempotency
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______________ test_new_request_cannot_confirm_same_draft_twice _______________
+tests/test_experiences.py:42: in test_new_request_cannot_confirm_same_draft_twice
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+__________________ test_same_key_changed_payload_is_conflict ___________________
+tests/test_experiences.py:50: in test_same_key_changed_payload_is_conflict
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________________ test_bad_contribution_has_no_side_effects[0] _________________
+tests/test_experiences.py:58: in test_bad_contribution_has_no_side_effects
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_bad_contribution_has_no_side_effects[-1] _________________
+tests/test_experiences.py:58: in test_bad_contribution_has_no_side_effects
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_bad_contribution_has_no_side_effects[NaN] ________________
+tests/test_experiences.py:58: in test_bad_contribution_has_no_side_effects
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_bad_contribution_has_no_side_effects[Infinity] ______________
+tests/test_experiences.py:58: in test_bad_contribution_has_no_side_effects
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_bad_contribution_has_no_side_effects[0.0000001] _____________
+tests/test_experiences.py:58: in test_bad_contribution_has_no_side_effects
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________ test_bad_contribution_has_no_side_effects[1000000000001] ___________
+tests/test_experiences.py:58: in test_bad_contribution_has_no_side_effects
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_invalid_event_time[2026-10-28T12:00:00+08:00] ______________
+tests/test_experiences.py:67: in test_invalid_event_time
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________________ test_invalid_event_time[2026-10-26T12:00:00] _________________
+tests/test_experiences.py:67: in test_invalid_event_time
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________________ test_invalid_event_time[not-a-date] ______________________
+tests/test_experiences.py:67: in test_invalid_event_time
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_very_old_event_is_allowed_and_gets_points ________________
+tests/test_experiences.py:72: in test_very_old_event_is_allowed_and_gets_points
+    _, goal = onboard(client); d = draft(client, goal, occurred_at='2001-01-01T00:01:00+08:00')
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_decimal_sum_is_exact_and_never_completes_goal ______________
+tests/test_experiences.py:79: in test_decimal_sum_is_exact_and_never_completes_goal
+    _, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_unlinked_event_is_valid_after_first_goal _________________
+tests/test_experiences.py:89: in test_unlinked_event_is_valid_after_first_goal
+    _, goal = onboard(client); d = draft(client, goal, goal_id=None, contributions=[])
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_draft_edit_revision_and_confirm_conflict _________________
+tests/test_experiences.py:95: in test_draft_edit_revision_and_confirm_conflict
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________ test_guest_person_gate_preserves_draft_and_claim_resumes ___________
+tests/test_experiences.py:106: in test_guest_person_gate_preserves_draft_and_claim_resumes
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________________ test_cross_owner_access_and_action_injection _________________
+tests/test_experiences.py:120: in test_cross_owner_access_and_action_injection
+    _, goal = onboard(client); d = draft(client, goal); register(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________ test_confirmation_rolls_back_all_writes_on_database_failure __________
+tests/test_experiences.py:134: in test_confirmation_rolls_back_all_writes_on_database_failure
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________________ test_concurrent_retries_commit_once ______________________
+tests/test_experiences.py:150: in test_concurrent_retries_commit_once
+    _, goal = onboard(client); d = draft(client, goal)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________________________ test_unauthenticated_access __________________________
+tests/test_identity_goals.py:10: in test_unauthenticated_access
+    assert client.get('/api/auth/me').status_code == 401
+E   AssertionError: assert 404 == 401
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = get('/api/auth/me')
+E    +      where get = <starlette.testclient.TestClient object at 0x7fb4808ab250>.get
+__________ test_first_goal_is_mandatory_and_lumi_is_born_after_commit __________
+tests/test_identity_goals.py:15: in test_first_goal_is_mandatory_and_lumi_is_born_after_commit
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________ test_guest_start_is_idempotent_and_goal_request_retries ____________
+tests/test_identity_goals.py:30: in test_guest_start_is_idempotent_and_goal_request_retries
+    me, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_invalid_goal_does_not_hatch_lumi[two_actions] ______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_invalid_goal_does_not_hatch_lumi[four_actions] ______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_invalid_goal_does_not_hatch_lumi[empty_title] ______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______________ test_invalid_goal_does_not_hatch_lumi[bad_level] _______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________ test_invalid_goal_does_not_hatch_lumi[bad_day] ________________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_invalid_goal_does_not_hatch_lumi[repeated_day] ______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______________ test_invalid_goal_does_not_hatch_lumi[zero_target] ______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______________ test_invalid_goal_does_not_hatch_lumi[nonfinite] _______________
+tests/test_identity_goals.py:42: in test_invalid_goal_does_not_hatch_lumi
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________________________ test_profile_validation ____________________________
+tests/test_identity_goals.py:58: in test_profile_validation
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+__________________ test_csrf_and_cross_origin_writes_rejected __________________
+tests/test_identity_goals.py:63: in test_csrf_and_cross_origin_writes_rejected
+    guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_claim_rotates_session_and_keeps_owner_and_goal ______________
+tests/test_identity_goals.py:70: in test_claim_rotates_session_and_keeps_owner_and_goal
+    me, goal = onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________________________ test_claim_validation[x-short] ________________________
+tests/test_identity_goals.py:82: in test_claim_validation
+    onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______________ test_claim_validation[bad name-a-good-password] ________________
+tests/test_identity_goals.py:82: in test_claim_validation
+    onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________________ test_claim_validation[valid_name-short] ____________________
+tests/test_identity_goals.py:82: in test_claim_validation
+    onboard(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________________ test_logout_revokes_and_login_restores ____________________
+tests/test_identity_goals.py:88: in test_logout_revokes_and_login_restores
+    _, goal = onboard(client); register(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____________ test_existing_account_conflict_never_merges_guest_data ____________
+tests/test_identity_goals.py:100: in test_existing_account_conflict_never_merges_guest_data
+    onboard(client); register(client)
+tests/conftest.py:36: in onboard
+    me = guest(client)
+tests/conftest.py:24: in guest
+    assert result.status_code in (200, 201), result.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 in (200, 201)
+E    +  where 404 = <Response [404 Not Found]>.status_code
+__________________ test_page_and_static_assets_are_available ___________________
+tests/test_identity_goals.py:111: in test_page_and_static_assets_are_available
+    assert client.get('/').status_code == 200
+E   AssertionError: assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = get('/')
+E    +      where get = <starlette.testclient.TestClient object at 0x7fb4605cc0d0>.get
+=========================== short test summary info ============================
+FAILED tests/test_evidence_notes.py::test_goal_needs_evidence_and_explicit_human_confirmation
+FAILED tests/test_evidence_notes.py::test_duplicate_upload_reuses_evidence - ...
+FAILED tests/test_evidence_notes.py::test_invalid_upload[-empty.png-image/png-422]
+FAILED tests/test_evidence_notes.py::test_invalid_upload[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-large.png-image/png-413]
+FAILED tests/test_evidence_notes.py::test_invalid_upload[<script>bad</script>-fake.png-image/png-415]
+FAILED tests/test_evidence_notes.py::test_invalid_upload[\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x04\x00\x00\x00\xb5\x1c\x0c\x02\x00\x00\x00\x0bIDATx\xdac\xfc\xff\x1f\x00\x03\x03\x02\x00\xef\x9a\x17W\x00\x00\x00\x00IEND\xaeB`\x82-../../secret.png-image/png-422]
+FAILED tests/test_evidence_notes.py::test_invalid_upload[\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x04\x00\x00\x00\xb5\x1c\x0c\x02\x00\x00\x00\x0bIDATx\xdac\xfc\xff\x1f\x00\x03\x03\x02\x00\xef\x9a\x17W\x00\x00\x00\x00IEND\xaeB`\x82-file.svg-image/svg+xml-415]
+FAILED tests/test_evidence_notes.py::test_invalid_upload[\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x04\x00\x00\x00\xb5-broken.png-image/png-415]
+FAILED tests/test_evidence_notes.py::test_other_goal_and_other_owner_evidence_rejected
+FAILED tests/test_evidence_notes.py::test_completed_goal_contribution_policy_is_explicit_and_preserves_draft
+FAILED tests/test_evidence_notes.py::test_creative_notes_never_change_reality[preparation]
+FAILED tests/test_evidence_notes.py::test_creative_notes_never_change_reality[simulation]
+FAILED tests/test_evidence_notes.py::test_creative_notes_never_change_reality[message]
+FAILED tests/test_evidence_notes.py::test_data_survives_new_app_instance - As...
+FAILED tests/test_experiences.py::test_draft_and_suggestion_never_award_or_overwrite_raw
+FAILED tests/test_experiences.py::test_confirm_partial_contribution_backdate_tasks_and_idempotency
+FAILED tests/test_experiences.py::test_new_request_cannot_confirm_same_draft_twice
+FAILED tests/test_experiences.py::test_same_key_changed_payload_is_conflict
+FAILED tests/test_experiences.py::test_bad_contribution_has_no_side_effects[0]
+FAILED tests/test_experiences.py::test_bad_contribution_has_no_side_effects[-1]
+FAILED tests/test_experiences.py::test_bad_contribution_has_no_side_effects[NaN]
+FAILED tests/test_experiences.py::test_bad_contribution_has_no_side_effects[Infinity]
+FAILED tests/test_experiences.py::test_bad_contribution_has_no_side_effects[0.0000001]
+FAILED tests/test_experiences.py::test_bad_contribution_has_no_side_effects[1000000000001]
+FAILED tests/test_experiences.py::test_invalid_event_time[2026-10-28T12:00:00+08:00]
+FAILED tests/test_experiences.py::test_invalid_event_time[2026-10-26T12:00:00]
+FAILED tests/test_experiences.py::test_invalid_event_time[not-a-date] - Asser...
+FAILED tests/test_experiences.py::test_very_old_event_is_allowed_and_gets_points
+FAILED tests/test_experiences.py::test_decimal_sum_is_exact_and_never_completes_goal
+FAILED tests/test_experiences.py::test_unlinked_event_is_valid_after_first_goal
+FAILED tests/test_experiences.py::test_draft_edit_revision_and_confirm_conflict
+FAILED tests/test_experiences.py::test_guest_person_gate_preserves_draft_and_claim_resumes
+FAILED tests/test_experiences.py::test_cross_owner_access_and_action_injection
+FAILED tests/test_experiences.py::test_confirmation_rolls_back_all_writes_on_database_failure
+FAILED tests/test_experiences.py::test_concurrent_retries_commit_once - Asser...
+FAILED tests/test_identity_goals.py::test_unauthenticated_access - AssertionE...
+FAILED tests/test_identity_goals.py::test_first_goal_is_mandatory_and_lumi_is_born_after_commit
+FAILED tests/test_identity_goals.py::test_guest_start_is_idempotent_and_goal_request_retries
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[two_actions]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[four_actions]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[empty_title]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[bad_level]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[bad_day]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[repeated_day]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[zero_target]
+FAILED tests/test_identity_goals.py::test_invalid_goal_does_not_hatch_lumi[nonfinite]
+FAILED tests/test_identity_goals.py::test_profile_validation - AssertionError...
+FAILED tests/test_identity_goals.py::test_csrf_and_cross_origin_writes_rejected
+FAILED tests/test_identity_goals.py::test_claim_rotates_session_and_keeps_owner_and_goal
+FAILED tests/test_identity_goals.py::test_claim_validation[x-short] - Asserti...
+FAILED tests/test_identity_goals.py::test_claim_validation[bad name-a-good-password]
+FAILED tests/test_identity_goals.py::test_claim_validation[valid_name-short]
+FAILED tests/test_identity_goals.py::test_logout_revokes_and_login_restores
+FAILED tests/test_identity_goals.py::test_existing_account_conflict_never_merges_guest_data
+FAILED tests/test_identity_goals.py::test_page_and_static_assets_are_available
+55 failed in 0.44s
