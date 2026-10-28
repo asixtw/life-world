@@ -1,4 +1,4 @@
-# 交付進度（2026-10-28 16:47 UTC）
+# 交付進度（2026-10-28，最新測試見十三類盤點）
 
 ## 已實作與已驗證
 
@@ -7,7 +7,7 @@
 - `src/contracts.ts`：Persona、Scenario、DialogueTurn、SimulationSession、SourceRef、AssetRef、LiveAdapter、HatchEvent 型別；`src/engine.ts`：腳本分支、session 隔離、匯出與即時模式未設定錯誤。
 - `src/components.tsx`、`src/Hatch.tsx`、`src/FlowSamples.tsx`、`src/App.tsx`、`src/styles.css`：獨立 gallery 的按鈕、表單、排程、Dialog、Quiet／減少動效、孵化、登入／目標／世界／關係／回饋構圖、附件與錄音狀態展示；`src/Theater.tsx` 為待內容注入的劇場元件。
 - 本機執行 `tsc -b`、`vite build`、`vitest run`：build 通過；2 個測試檔、8 個案例通過。
-- Chrome 本機展示實際開啟；桌面總覽、元件、紀錄和 Quiet，以及 390×844 手機孵化頁已檢視。孵化開始→跳過→完成、減少動效切換已操作；Dialog 初始焦點與 Escape 返回已操作；錄音失敗後文字仍保留。可見按鈕均 ≥44 CSS px，手機無水平溢位。完整逐頁手機視覺與鍵盤巡檢尚未執行。
+- Chrome 本機展示實際開啟；390×844 手機五頁逐頁檢查，1280×800 桌面紀錄頁檢查，無水平溢位，所有可見按鈕均 ≥44 CSS px。孵化開始→跳過→完成、Quiet／減少動效切換、Dialog／BottomSheet 初始焦點和 Escape 返回已操作；錄音與附件失敗後文字仍保留。新增狀態 Gallery 的 loading／empty／error／permission／success、重試、Toast 與停用／載入輸入。詳見 [十三類盤點](13_CATEGORY_AUDIT.md)。
 
 ## 卡點與未完成
 
