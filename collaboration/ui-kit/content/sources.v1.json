@@ -1,0 +1,152 @@
+[
+  {
+    "id": "src-sgz-wei",
+    "title": "三國志·魏書·武帝紀",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "魏書一",
+    "url": "https://ctext.org/sanguozhi/1",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-sgz-shu",
+    "title": "三國志·蜀書·先主傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "蜀書二",
+    "url": "https://ctext.org/sanguozhi/32",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-sgz-zhuge",
+    "title": "三國志·蜀書·諸葛亮傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "蜀書五",
+    "url": "https://ctext.org/sanguozhi/35",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-sgz-wu",
+    "title": "三國志·吳書·吳主傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "吳書二",
+    "url": "https://ctext.org/sanguozhi/47",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-sgz-zhou",
+    "title": "三國志·吳書·周瑜傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "吳書九",
+    "url": "https://ctext.org/sanguozhi/54",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-us-2024",
+    "title": "Statement to the 2024 NPT PrepCom Cluster 2 Specific Issue",
+    "creator": "U.S. Department of State",
+    "date": "2024-07-29",
+    "locator": "Iran portion",
+    "url": "https://2021-2025.state.gov/statement-to-the-2024-npt-prepcom-cluster-2-specific-issue/",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-un-2231",
+    "title": "Security Council resolution 2231 background",
+    "creator": "United Nations Security Council",
+    "date": "2015-07-20",
+    "locator": "Resolution 2231 overview",
+    "url": "https://main.un.org/securitycouncil/en/content/2231/background",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-un-charter",
+    "title": "UN Charter Chapter VI",
+    "creator": "United Nations",
+    "date": null,
+    "locator": "Articles 33–38",
+    "url": "https://www.un.org/en/about-us/un-charter/chapter-6",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-iaea",
+    "title": "IAEA and Iran Board Reports",
+    "creator": "International Atomic Energy Agency",
+    "date": null,
+    "locator": "Report index; date varies by report",
+    "url": "https://www.iaea.org/newscenter/focus/iran/iaea-and-iran-iaea-board-reports",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-imo",
+    "title": "Red Sea area maritime security",
+    "creator": "International Maritime Organization",
+    "date": null,
+    "locator": "Red Sea Project",
+    "url": "https://www.imo.org/en/mediacentre/hottopics/pages/red-sea.aspx",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-plato-apology",
+    "title": "Apology",
+    "creator": "Plato",
+    "date": null,
+    "locator": "Perseus text catalogue",
+    "url": "https://www.perseus.tufts.edu/hopper/",
+    "evidence": "literary_account",
+    "reviewed": false
+  },
+  {
+    "id": "src-analects",
+    "title": "論語·學而、為政、子路",
+    "creator": "傳統歸孔子弟子編纂",
+    "date": null,
+    "locator": "學而／為政／子路",
+    "url": "https://ctext.org/analects/zh",
+    "evidence": "literary_account",
+    "reviewed": false
+  },
+  {
+    "id": "src-zhuangzi",
+    "title": "莊子",
+    "creator": "傳統歸莊周及後學",
+    "date": null,
+    "locator": "內篇",
+    "url": "https://ctext.org/zhuangzi/zh",
+    "evidence": "literary_account",
+    "reviewed": false
+  },
+  {
+    "id": "src-nietzsche",
+    "title": "Thus Spake Zarathustra",
+    "creator": "Friedrich Nietzsche",
+    "date": "1883–1885",
+    "locator": "Project Gutenberg ebook 1998",
+    "url": "https://www.gutenberg.org/ebooks/1998",
+    "evidence": "source_fact",
+    "reviewed": false
+  },
+  {
+    "id": "src-plato-republic",
+    "title": "Republic",
+    "creator": "Plato",
+    "date": null,
+    "locator": "Perseus text catalogue",
+    "url": "https://www.perseus.tufts.edu/hopper/",
+    "evidence": "literary_account",
+    "reviewed": false
+  }
+]

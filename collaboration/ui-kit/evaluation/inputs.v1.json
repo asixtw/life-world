@@ -1,0 +1,272 @@
+[
+  {
+    "id": "hold-tk-caocao-1",
+    "personaId": "tk-caocao",
+    "prompt": "新情境：一份提案主張追求能延續的秩序，同時承受遠征風險。，但沒有列出受影響者與退出條件。請以曹操的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-caocao-2",
+    "personaId": "tk-caocao",
+    "prompt": "新情境：兩位參與者對先問兵糧、地形與人心；快速決斷可能低估水戰不確定性。有相反解讀，且必須在有限時間提出下一步。請用曹操的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-liubei-1",
+    "personaId": "tk-liubei",
+    "prompt": "新情境：一份提案主張希望維持追隨者生存與政治正當性。，但沒有列出受影響者與退出條件。請以劉備的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-liubei-2",
+    "personaId": "tk-liubei",
+    "prompt": "新情境：兩位參與者對重視信任和共同威脅，也可能高估盟約的情感基礎。有相反解讀，且必須在有限時間提出下一步。請用劉備的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhuge-1",
+    "personaId": "tk-zhuge",
+    "prompt": "新情境：一份提案主張在有限兵力下爭取可驗證的結盟。，但沒有列出受影響者與退出條件。請以諸葛亮的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhuge-2",
+    "personaId": "tk-zhuge",
+    "prompt": "新情境：兩位參與者對重視比較優勢和對方選項，可能把複雜人心化為可推演條件。有相反解讀，且必須在有限時間提出下一步。請用諸葛亮的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-sunquan-1",
+    "personaId": "tk-sunquan",
+    "prompt": "新情境：一份提案主張維護江東自主與部屬的持續支持。，但沒有列出受影響者與退出條件。請以孫權的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-sunquan-2",
+    "personaId": "tk-sunquan",
+    "prompt": "新情境：兩位參與者對偏好保留選項，對不可逆承諾謹慎。有相反解讀，且必須在有限時間提出下一步。請用孫權的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhouyu-1",
+    "personaId": "tk-zhouyu",
+    "prompt": "新情境：一份提案主張讓軍事判斷與聯盟承諾可落地。，但沒有列出受影響者與退出條件。請以周瑜的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhouyu-2",
+    "personaId": "tk-zhouyu",
+    "prompt": "新情境：兩位參與者對重視水軍條件與指揮權，可能偏向速度勝於冗長協商。有相反解讀，且必須在有限時間提出下一步。請用周瑜的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-us-1",
+    "personaId": "int-us",
+    "prompt": "新情境：一份提案主張尋求可核查的安全安排並向自身制度交代。，但沒有列出受影響者與退出條件。請以美方代表的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-us-2",
+    "personaId": "int-us",
+    "prompt": "新情境：兩位參與者對偏好分階段、可驗證承諾；對模糊字眼敏感。有相反解讀，且必須在有限時間提出下一步。請用美方代表的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-iran-1",
+    "personaId": "int-iran",
+    "prompt": "新情境：一份提案主張希望安全、尊嚴與可履行的對等步驟同時被討論。，但沒有列出受影響者與退出條件。請以伊方代表的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-iran-2",
+    "personaId": "int-iran",
+    "prompt": "新情境：兩位參與者對對單方要求敏感，重視安排的互惠與措辭。有相反解讀，且必須在有限時間提出下一步。請用伊方代表的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-mediator-1",
+    "personaId": "int-mediator",
+    "prompt": "新情境：一份提案主張讓分歧變成可確認的小步驟。，但沒有列出受影響者與退出條件。請以中立調停者的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-mediator-2",
+    "personaId": "int-mediator",
+    "prompt": "新情境：兩位參與者對偏好對稱議程，可能低估各方權力落差。有相反解讀，且必須在有限時間提出下一步。請用中立調停者的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-observer-1",
+    "personaId": "int-observer",
+    "prompt": "新情境：一份提案主張保護查核與紀錄的可信度。，但沒有列出受影響者與退出條件。請以國際組織觀察員的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-observer-2",
+    "personaId": "int-observer",
+    "prompt": "新情境：兩位參與者對重視可重複觀測和範圍界定。有相反解讀，且必須在有限時間提出下一步。請用國際組織觀察員的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-shipping-1",
+    "personaId": "int-shipping",
+    "prompt": "新情境：一份提案主張確保船員安全與航線資訊可預測。，但沒有列出受影響者與退出條件。請以航運方代表的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-shipping-2",
+    "personaId": "int-shipping",
+    "prompt": "新情境：兩位參與者對以營運中斷與風險通報衡量方案。有相反解讀，且必須在有限時間提出下一步。請用航運方代表的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-socrates-1",
+    "personaId": "ph-socrates",
+    "prompt": "新情境：一份提案主張追問自以為知道的定義是否能經得起反例。，但沒有列出受影響者與退出條件。請以蘇格拉底的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-socrates-2",
+    "personaId": "ph-socrates",
+    "prompt": "新情境：兩位參與者對偏好對話式澄清，可能使急需行動的人感到迂迴。有相反解讀，且必須在有限時間提出下一步。請用蘇格拉底的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-confucius-1",
+    "personaId": "ph-confucius",
+    "prompt": "新情境：一份提案主張讓個人修養與關係中的責任相互支撐。，但沒有列出受影響者與退出條件。請以孔子的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-confucius-2",
+    "personaId": "ph-confucius",
+    "prompt": "新情境：兩位參與者對重視語言與行動相稱，可能先看角色義務。有相反解讀，且必須在有限時間提出下一步。請用孔子的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-zhuangzi-1",
+    "personaId": "ph-zhuangzi",
+    "prompt": "新情境：一份提案主張減少人被單一定義與外在評比困住。，但沒有列出受影響者與退出條件。請以莊子的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-zhuangzi-2",
+    "personaId": "ph-zhuangzi",
+    "prompt": "新情境：兩位參與者對善於換位與寓言，可能弱化制度責任的急迫性。有相反解讀，且必須在有限時間提出下一步。請用莊子的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-nietzsche-1",
+    "personaId": "ph-nietzsche",
+    "prompt": "新情境：一份提案主張追問價值是否由自己承擔而非只沿襲。，但沒有列出受影響者與退出條件。請以尼采的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-nietzsche-2",
+    "personaId": "ph-nietzsche",
+    "prompt": "新情境：兩位參與者對懷疑從眾的安慰，也可能過度尖銳。有相反解讀，且必須在有限時間提出下一步。請用尼采的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-plato-1",
+    "personaId": "ph-plato",
+    "prompt": "新情境：一份提案主張尋找個人選擇與共同秩序之間可辯護的原則。，但沒有列出受影響者與退出條件。請以柏拉圖的詮釋視角回應，不引用未核對原話。",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-plato-2",
+    "personaId": "ph-plato",
+    "prompt": "新情境：兩位參與者對偏好定義、結構與教育，可能低估特殊個案。有相反解讀，且必須在有限時間提出下一步。請用柏拉圖的詮釋視角提出可核對程序。",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "usageScope": "demo"
+  }
+]

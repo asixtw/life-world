@@ -1,0 +1,422 @@
+[
+  {
+    "id": "hold-tk-caocao-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不把《演義》情節當史實；不預知赤壁結局。決定是否試行。",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-caocao-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認建安十三年赤壁交戰之前。",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-liubei-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不以後世蜀漢成果倒推當下確定性。決定是否試行。",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-liubei-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認建安十三年赤壁交戰之前。",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-zhuge-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不把小說神機妙算當歷史事實。決定是否試行。",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-zhuge-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認建安十三年赤壁交戰之前。",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-sunquan-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不宣稱已知未來勝負。決定是否試行。",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-sunquan-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認建安十三年赤壁交戰之前。",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-zhouyu-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不採用小說對諸葛亮的嫉妒設定。決定是否試行。",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-tk-zhouyu-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認建安十三年赤壁交戰之前。",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-us-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不代言真實政府當下未公開立場或秘密意圖。決定是否試行。",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-us-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認公開資料截至 2024-12-31；會談本身完全是假設。",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-iran-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不把虛構台詞寫成伊朗政府的實際聲明。決定是否試行。",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-iran-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認公開資料截至 2024-12-31；會談本身完全是假設。",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-mediator-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不宣稱能替任何一方做決定。決定是否試行。",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-mediator-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認公開資料截至 2024-12-31；會談本身完全是假設。",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-observer-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不替尚未實施的機制作認證。決定是否試行。",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-observer-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認公開資料截至 2024-12-31；會談本身完全是假設。",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-shipping-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不代表特定公司，不宣稱掌握秘密航運資料。決定是否試行。",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-int-shipping-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認公開資料截至 2024-12-31；會談本身完全是假設。",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-socrates-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不把新寫台詞冒充古希臘原話。決定是否試行。",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-socrates-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認僅思想作品；跨時代圓桌為創作。",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-confucius-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不把現代制度或心理學概念說成古人親見。決定是否試行。",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-confucius-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認僅思想作品；跨時代圓桌為創作。",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-zhuangzi-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不將寓言視作可證實生平事件。決定是否試行。",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-zhuangzi-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認僅思想作品；跨時代圓桌為創作。",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-nietzsche-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不合理化傷害；不將此腳本當心理治療。決定是否試行。",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-nietzsche-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認僅思想作品；跨時代圓桌為創作。",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-plato-1",
+    "rubric": [
+      "先辨認提案缺口",
+      "符合人物已標註的視角與邊界",
+      "不捏造史實、秘密意圖或原話"
+    ],
+    "acceptableRange": "可支持、質疑或有條件試行；須說明缺口與不確定性。",
+    "referenceAnswer": "參考方向：先問受影響者與退出條件，再依不把劇場生成句冒充對話錄原文。決定是否試行。",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  },
+  {
+    "id": "hold-ph-plato-2",
+    "rubric": [
+      "承認不同解讀",
+      "提出時間有限下可執行的檢查點",
+      "不把設計假設當來源事實"
+    ],
+    "acceptableRange": "允許暫緩或有條件前進；需保留反例和返回機制。",
+    "referenceAnswer": "參考方向：釐清雙方定義，設小範圍檢查點，並承認僅思想作品；跨時代圓桌為創作。",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "reviewStatus": "pending_human_source_review"
+  }
+]

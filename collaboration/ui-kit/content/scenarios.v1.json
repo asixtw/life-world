@@ -1,0 +1,1430 @@
+[
+  {
+    "id": "tk-red-cliff",
+    "packId": "three-kingdoms",
+    "title": "赤壁前夕：聯盟與風險",
+    "description": "建安十三年交戰前，玩家代表協商者提出聯盟框架。結果未知。",
+    "knowledgeCutoff": "赤壁交戰之前",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "startNodeId": "tk-red-cliff-start",
+    "nodes": [
+      {
+        "id": "tk-red-cliff-start",
+        "lines": [
+          {
+            "id": "tk-red-cliff-intro",
+            "speaker": "narrator",
+            "text": "建安十三年交戰前，玩家代表協商者提出聯盟框架。結果未知。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-red-cliff-choice-1",
+            "label": "把兵糧與撤退門檻寫入共同紀錄",
+            "reply": [
+              {
+                "id": "tk-red-cliff-reply-1",
+                "speaker": "persona",
+                "text": "我先把「把兵糧與撤退門檻寫入共同紀錄」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-route-1"
+          },
+          {
+            "id": "tk-red-cliff-choice-2",
+            "label": "先交換水陸部署的可驗證資訊",
+            "reply": [
+              {
+                "id": "tk-red-cliff-reply-2",
+                "speaker": "persona",
+                "text": "我先把「先交換水陸部署的可驗證資訊」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-route-2"
+          },
+          {
+            "id": "tk-red-cliff-choice-3",
+            "label": "暫緩結盟並保留通報窗口",
+            "reply": [
+              {
+                "id": "tk-red-cliff-reply-3",
+                "speaker": "persona",
+                "text": "我先把「暫緩結盟並保留通報窗口」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-route-3"
+          }
+        ]
+      },
+      {
+        "id": "tk-red-cliff-route-1",
+        "lines": [
+          {
+            "id": "tk-red-cliff-route-1-line",
+            "speaker": "narrator",
+            "text": "議程轉向：把兵糧與撤退門檻寫入共同紀錄。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-red-cliff-route-1-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "tk-red-cliff-route-1-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-end-1"
+          },
+          {
+            "id": "tk-red-cliff-route-1-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "tk-red-cliff-route-1-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-end-1"
+          }
+        ]
+      },
+      {
+        "id": "tk-red-cliff-end-1",
+        "lines": [
+          {
+            "id": "tk-red-cliff-end-1-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成帶補給門檻的有限聯盟。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成帶補給門檻的有限聯盟"
+      },
+      {
+        "id": "tk-red-cliff-route-2",
+        "lines": [
+          {
+            "id": "tk-red-cliff-route-2-line",
+            "speaker": "narrator",
+            "text": "議程轉向：先交換水陸部署的可驗證資訊。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-red-cliff-route-2-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "tk-red-cliff-route-2-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-end-2"
+          },
+          {
+            "id": "tk-red-cliff-route-2-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "tk-red-cliff-route-2-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-end-2"
+          }
+        ]
+      },
+      {
+        "id": "tk-red-cliff-end-2",
+        "lines": [
+          {
+            "id": "tk-red-cliff-end-2-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成情報互換但未承諾作戰。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成情報互換但未承諾作戰"
+      },
+      {
+        "id": "tk-red-cliff-route-3",
+        "lines": [
+          {
+            "id": "tk-red-cliff-route-3-line",
+            "speaker": "narrator",
+            "text": "議程轉向：暫緩結盟並保留通報窗口。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-red-cliff-route-3-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "tk-red-cliff-route-3-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-end-3"
+          },
+          {
+            "id": "tk-red-cliff-route-3-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "tk-red-cliff-route-3-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-red-cliff-end-3"
+          }
+        ]
+      },
+      {
+        "id": "tk-red-cliff-end-3",
+        "lines": [
+          {
+            "id": "tk-red-cliff-end-3-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：保留接觸渠道，沒有聯盟。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "保留接觸渠道，沒有聯盟"
+      }
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "tk-grain",
+    "packId": "three-kingdoms",
+    "title": "假設糧運與撤軍協商",
+    "description": "虛構的後勤危機，不對應史書中的一場確定會談。",
+    "knowledgeCutoff": "赤壁交戰之前",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "startNodeId": "tk-grain-start",
+    "nodes": [
+      {
+        "id": "tk-grain-start",
+        "lines": [
+          {
+            "id": "tk-grain-intro",
+            "speaker": "narrator",
+            "text": "虛構的後勤危機，不對應史書中的一場確定會談。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-grain-choice-1",
+            "label": "用分批糧運換取撤退時間",
+            "reply": [
+              {
+                "id": "tk-grain-reply-1",
+                "speaker": "persona",
+                "text": "我先把「用分批糧運換取撤退時間」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-route-1"
+          },
+          {
+            "id": "tk-grain-choice-2",
+            "label": "公開運輸缺口並要求聯軍分擔",
+            "reply": [
+              {
+                "id": "tk-grain-reply-2",
+                "speaker": "persona",
+                "text": "我先把「公開運輸缺口並要求聯軍分擔」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-route-2"
+          },
+          {
+            "id": "tk-grain-choice-3",
+            "label": "拒絕運糧，優先保全本隊",
+            "reply": [
+              {
+                "id": "tk-grain-reply-3",
+                "speaker": "persona",
+                "text": "我先把「拒絕運糧，優先保全本隊」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-route-3"
+          }
+        ]
+      },
+      {
+        "id": "tk-grain-route-1",
+        "lines": [
+          {
+            "id": "tk-grain-route-1-line",
+            "speaker": "narrator",
+            "text": "議程轉向：用分批糧運換取撤退時間。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-grain-route-1-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "tk-grain-route-1-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-end-1"
+          },
+          {
+            "id": "tk-grain-route-1-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "tk-grain-route-1-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-end-1"
+          }
+        ]
+      },
+      {
+        "id": "tk-grain-end-1",
+        "lines": [
+          {
+            "id": "tk-grain-end-1-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：達成分批運補與撤退時間表。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "達成分批運補與撤退時間表"
+      },
+      {
+        "id": "tk-grain-route-2",
+        "lines": [
+          {
+            "id": "tk-grain-route-2-line",
+            "speaker": "narrator",
+            "text": "議程轉向：公開運輸缺口並要求聯軍分擔。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-grain-route-2-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "tk-grain-route-2-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-end-2"
+          },
+          {
+            "id": "tk-grain-route-2-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "tk-grain-route-2-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-end-2"
+          }
+        ]
+      },
+      {
+        "id": "tk-grain-end-2",
+        "lines": [
+          {
+            "id": "tk-grain-end-2-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：共同盤點後再決定路線。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "共同盤點後再決定路線"
+      },
+      {
+        "id": "tk-grain-route-3",
+        "lines": [
+          {
+            "id": "tk-grain-route-3-line",
+            "speaker": "narrator",
+            "text": "議程轉向：拒絕運糧，優先保全本隊。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "tk-grain-route-3-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "tk-grain-route-3-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-end-3"
+          },
+          {
+            "id": "tk-grain-route-3-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "tk-grain-route-3-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "tk-grain-end-3"
+          }
+        ]
+      },
+      {
+        "id": "tk-grain-end-3",
+        "lines": [
+          {
+            "id": "tk-grain-end-3-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：無共同運補，保留人員安全通報。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "無共同運補，保留人員安全通報"
+      }
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "int-ceasefire",
+    "packId": "international-dialogue",
+    "title": "假設停火與議程",
+    "description": "2024 年公開文件作背景；參與者及談判均為設計假設。",
+    "knowledgeCutoff": "2024-12-31 的公開背景，非即時新聞",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "startNodeId": "int-ceasefire-start",
+    "nodes": [
+      {
+        "id": "int-ceasefire-start",
+        "lines": [
+          {
+            "id": "int-ceasefire-intro",
+            "speaker": "narrator",
+            "text": "2024 年公開文件作背景；參與者及談判均為設計假設。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-ceasefire-choice-1",
+            "label": "先談民用通道與停火核查",
+            "reply": [
+              {
+                "id": "int-ceasefire-reply-1",
+                "speaker": "persona",
+                "text": "我先把「先談民用通道與停火核查」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-route-1"
+          },
+          {
+            "id": "int-ceasefire-choice-2",
+            "label": "先定查核權限與爭議處理",
+            "reply": [
+              {
+                "id": "int-ceasefire-reply-2",
+                "speaker": "persona",
+                "text": "我先把「先定查核權限與爭議處理」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-route-2"
+          },
+          {
+            "id": "int-ceasefire-choice-3",
+            "label": "先交換公開可核對的承諾清單",
+            "reply": [
+              {
+                "id": "int-ceasefire-reply-3",
+                "speaker": "persona",
+                "text": "我先把「先交換公開可核對的承諾清單」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-route-3"
+          }
+        ]
+      },
+      {
+        "id": "int-ceasefire-route-1",
+        "lines": [
+          {
+            "id": "int-ceasefire-route-1-line",
+            "speaker": "narrator",
+            "text": "議程轉向：先談民用通道與停火核查。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-ceasefire-route-1-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "int-ceasefire-route-1-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-end-1"
+          },
+          {
+            "id": "int-ceasefire-route-1-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "int-ceasefire-route-1-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-end-1"
+          }
+        ]
+      },
+      {
+        "id": "int-ceasefire-end-1",
+        "lines": [
+          {
+            "id": "int-ceasefire-end-1-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：得到限定期限的人道通道草案。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "得到限定期限的人道通道草案"
+      },
+      {
+        "id": "int-ceasefire-route-2",
+        "lines": [
+          {
+            "id": "int-ceasefire-route-2-line",
+            "speaker": "narrator",
+            "text": "議程轉向：先定查核權限與爭議處理。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-ceasefire-route-2-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "int-ceasefire-route-2-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-end-2"
+          },
+          {
+            "id": "int-ceasefire-route-2-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "int-ceasefire-route-2-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-end-2"
+          }
+        ]
+      },
+      {
+        "id": "int-ceasefire-end-2",
+        "lines": [
+          {
+            "id": "int-ceasefire-end-2-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：得到查核程序草案但核心停火待議。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "得到查核程序草案但核心停火待議"
+      },
+      {
+        "id": "int-ceasefire-route-3",
+        "lines": [
+          {
+            "id": "int-ceasefire-route-3-line",
+            "speaker": "narrator",
+            "text": "議程轉向：先交換公開可核對的承諾清單。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-ceasefire-route-3-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "int-ceasefire-route-3-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-end-3"
+          },
+          {
+            "id": "int-ceasefire-route-3-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "int-ceasefire-route-3-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-ceasefire-end-3"
+          }
+        ]
+      },
+      {
+        "id": "int-ceasefire-end-3",
+        "lines": [
+          {
+            "id": "int-ceasefire-end-3-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：得到公開條件表，未形成停火。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "得到公開條件表，未形成停火"
+      }
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "int-shipping",
+    "packId": "international-dialogue",
+    "title": "航運安全與查核協商",
+    "description": "假設的海上安全會議，不指涉真實秘密談判。",
+    "knowledgeCutoff": "2024-12-31 的公開背景，非即時新聞",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "startNodeId": "int-shipping-start",
+    "nodes": [
+      {
+        "id": "int-shipping-start",
+        "lines": [
+          {
+            "id": "int-shipping-intro",
+            "speaker": "narrator",
+            "text": "假設的海上安全會議，不指涉真實秘密談判。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-shipping-choice-1",
+            "label": "設定船員危險通報與回應時限",
+            "reply": [
+              {
+                "id": "int-shipping-reply-1",
+                "speaker": "persona",
+                "text": "我先把「設定船員危險通報與回應時限」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-route-1"
+          },
+          {
+            "id": "int-shipping-choice-2",
+            "label": "制定獨立事故查核程序",
+            "reply": [
+              {
+                "id": "int-shipping-reply-2",
+                "speaker": "persona",
+                "text": "我先把「制定獨立事故查核程序」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-route-2"
+          },
+          {
+            "id": "int-shipping-choice-3",
+            "label": "建立替代航線與商船資訊窗口",
+            "reply": [
+              {
+                "id": "int-shipping-reply-3",
+                "speaker": "persona",
+                "text": "我先把「建立替代航線與商船資訊窗口」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-route-3"
+          }
+        ]
+      },
+      {
+        "id": "int-shipping-route-1",
+        "lines": [
+          {
+            "id": "int-shipping-route-1-line",
+            "speaker": "narrator",
+            "text": "議程轉向：設定船員危險通報與回應時限。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-shipping-route-1-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "int-shipping-route-1-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-end-1"
+          },
+          {
+            "id": "int-shipping-route-1-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "int-shipping-route-1-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-end-1"
+          }
+        ]
+      },
+      {
+        "id": "int-shipping-end-1",
+        "lines": [
+          {
+            "id": "int-shipping-end-1-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成通報時限與聯絡人名冊。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成通報時限與聯絡人名冊"
+      },
+      {
+        "id": "int-shipping-route-2",
+        "lines": [
+          {
+            "id": "int-shipping-route-2-line",
+            "speaker": "narrator",
+            "text": "議程轉向：制定獨立事故查核程序。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-shipping-route-2-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "int-shipping-route-2-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-end-2"
+          },
+          {
+            "id": "int-shipping-route-2-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "int-shipping-route-2-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-end-2"
+          }
+        ]
+      },
+      {
+        "id": "int-shipping-end-2",
+        "lines": [
+          {
+            "id": "int-shipping-end-2-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成事故查核範圍草案。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成事故查核範圍草案"
+      },
+      {
+        "id": "int-shipping-route-3",
+        "lines": [
+          {
+            "id": "int-shipping-route-3-line",
+            "speaker": "narrator",
+            "text": "議程轉向：建立替代航線與商船資訊窗口。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "int-shipping-route-3-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "int-shipping-route-3-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-end-3"
+          },
+          {
+            "id": "int-shipping-route-3-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "int-shipping-route-3-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "int-shipping-end-3"
+          }
+        ]
+      },
+      {
+        "id": "int-shipping-end-3",
+        "lines": [
+          {
+            "id": "int-shipping-end-3-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：只形成航線資訊交換機制。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "只形成航線資訊交換機制"
+      }
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "ph-success",
+    "packId": "philosophy",
+    "title": "成功與自由",
+    "description": "五位思想人物的跨時代圓桌，所有對話都是創作性轉述。",
+    "knowledgeCutoff": "跨時代思想圓桌，無真實時間線",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "startNodeId": "ph-success-start",
+    "nodes": [
+      {
+        "id": "ph-success-start",
+        "lines": [
+          {
+            "id": "ph-success-intro",
+            "speaker": "narrator",
+            "text": "五位思想人物的跨時代圓桌，所有對話都是創作性轉述。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-success-choice-1",
+            "label": "用可自行承擔的目標定義成功",
+            "reply": [
+              {
+                "id": "ph-success-reply-1",
+                "speaker": "persona",
+                "text": "我先把「用可自行承擔的目標定義成功」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-route-1"
+          },
+          {
+            "id": "ph-success-choice-2",
+            "label": "用關係責任檢視自由的邊界",
+            "reply": [
+              {
+                "id": "ph-success-reply-2",
+                "speaker": "persona",
+                "text": "我先把「用關係責任檢視自由的邊界」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-route-2"
+          },
+          {
+            "id": "ph-success-choice-3",
+            "label": "拒絕單一量尺，允許暫時未知",
+            "reply": [
+              {
+                "id": "ph-success-reply-3",
+                "speaker": "persona",
+                "text": "我先把「拒絕單一量尺，允許暫時未知」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-route-3"
+          }
+        ]
+      },
+      {
+        "id": "ph-success-route-1",
+        "lines": [
+          {
+            "id": "ph-success-route-1-line",
+            "speaker": "narrator",
+            "text": "議程轉向：用可自行承擔的目標定義成功。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-success-route-1-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "ph-success-route-1-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-end-1"
+          },
+          {
+            "id": "ph-success-route-1-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "ph-success-route-1-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-end-1"
+          }
+        ]
+      },
+      {
+        "id": "ph-success-end-1",
+        "lines": [
+          {
+            "id": "ph-success-end-1-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：得出可修訂的個人目標。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "得出可修訂的個人目標"
+      },
+      {
+        "id": "ph-success-route-2",
+        "lines": [
+          {
+            "id": "ph-success-route-2-line",
+            "speaker": "narrator",
+            "text": "議程轉向：用關係責任檢視自由的邊界。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-success-route-2-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "ph-success-route-2-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-end-2"
+          },
+          {
+            "id": "ph-success-route-2-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "ph-success-route-2-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-end-2"
+          }
+        ]
+      },
+      {
+        "id": "ph-success-end-2",
+        "lines": [
+          {
+            "id": "ph-success-end-2-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：得出兼顧他人的行動承諾。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "得出兼顧他人的行動承諾"
+      },
+      {
+        "id": "ph-success-route-3",
+        "lines": [
+          {
+            "id": "ph-success-route-3-line",
+            "speaker": "narrator",
+            "text": "議程轉向：拒絕單一量尺，允許暫時未知。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-success-route-3-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "ph-success-route-3-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-end-3"
+          },
+          {
+            "id": "ph-success-route-3-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "ph-success-route-3-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-success-end-3"
+          }
+        ]
+      },
+      {
+        "id": "ph-success-end-3",
+        "lines": [
+          {
+            "id": "ph-success-end-3-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：保留開放問題與下一次觀察。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "保留開放問題與下一次觀察"
+      }
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "ph-promise",
+    "packId": "philosophy",
+    "title": "承諾、責任與選擇",
+    "description": "虛構個人抉擇；不構成心理或法律建議。",
+    "knowledgeCutoff": "跨時代思想圓桌，無真實時間線",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "startNodeId": "ph-promise-start",
+    "nodes": [
+      {
+        "id": "ph-promise-start",
+        "lines": [
+          {
+            "id": "ph-promise-intro",
+            "speaker": "narrator",
+            "text": "虛構個人抉擇；不構成心理或法律建議。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-promise-choice-1",
+            "label": "向受影響者說明承諾與限制",
+            "reply": [
+              {
+                "id": "ph-promise-reply-1",
+                "speaker": "persona",
+                "text": "我先把「向受影響者說明承諾與限制」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-route-1"
+          },
+          {
+            "id": "ph-promise-choice-2",
+            "label": "先檢視承諾的前提是否仍成立",
+            "reply": [
+              {
+                "id": "ph-promise-reply-2",
+                "speaker": "persona",
+                "text": "我先把「先檢視承諾的前提是否仍成立」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-route-2"
+          },
+          {
+            "id": "ph-promise-choice-3",
+            "label": "暫緩決定，蒐集被忽略的觀點",
+            "reply": [
+              {
+                "id": "ph-promise-reply-3",
+                "speaker": "persona",
+                "text": "我先把「暫緩決定，蒐集被忽略的觀點」視為待確認提案。請說清楚誰負責記錄、何時回頭檢查；這是本場景的生成台詞。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-route-3"
+          }
+        ]
+      },
+      {
+        "id": "ph-promise-route-1",
+        "lines": [
+          {
+            "id": "ph-promise-route-1-line",
+            "speaker": "narrator",
+            "text": "議程轉向：向受影響者說明承諾與限制。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-promise-route-1-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "ph-promise-route-1-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-end-1"
+          },
+          {
+            "id": "ph-promise-route-1-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "ph-promise-route-1-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-end-1"
+          }
+        ]
+      },
+      {
+        "id": "ph-promise-end-1",
+        "lines": [
+          {
+            "id": "ph-promise-end-1-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成可履行的分段承諾。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成可履行的分段承諾"
+      },
+      {
+        "id": "ph-promise-route-2",
+        "lines": [
+          {
+            "id": "ph-promise-route-2-line",
+            "speaker": "narrator",
+            "text": "議程轉向：先檢視承諾的前提是否仍成立。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-promise-route-2-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "ph-promise-route-2-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-end-2"
+          },
+          {
+            "id": "ph-promise-route-2-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "ph-promise-route-2-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-end-2"
+          }
+        ]
+      },
+      {
+        "id": "ph-promise-end-2",
+        "lines": [
+          {
+            "id": "ph-promise-end-2-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成重新協商的條件。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成重新協商的條件"
+      },
+      {
+        "id": "ph-promise-route-3",
+        "lines": [
+          {
+            "id": "ph-promise-route-3-line",
+            "speaker": "narrator",
+            "text": "議程轉向：暫緩決定，蒐集被忽略的觀點。在下一輪，你可以要求具體期限，或先記下未解的風險。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [
+          {
+            "id": "ph-promise-route-3-deadline",
+            "label": "請提出具體期限與檢查點",
+            "reply": [
+              {
+                "id": "ph-promise-route-3-deadline-reply",
+                "speaker": "persona",
+                "text": "若走這條路，應把期限和異議寫在同一份紀錄；任何一方仍可在檢查點重新提出疑問。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-end-3"
+          },
+          {
+            "id": "ph-promise-route-3-risk",
+            "label": "先列出仍未解決的風險",
+            "reply": [
+              {
+                "id": "ph-promise-route-3-risk-reply",
+                "speaker": "persona",
+                "text": "我們先記錄風險與缺口，不把暫時沉默當成同意。",
+                "evidence": "generated_scene",
+                "sourceRefs": []
+              }
+            ],
+            "nextNodeId": "ph-promise-end-3"
+          }
+        ]
+      },
+      {
+        "id": "ph-promise-end-3",
+        "lines": [
+          {
+            "id": "ph-promise-end-3-line",
+            "speaker": "narrator",
+            "text": "本輪暫定結果：形成資訊蒐集與回訪計畫。這只是虛構情境的分支結果，並非史實或真實外交進展。",
+            "evidence": "generated_scene",
+            "sourceRefs": []
+          }
+        ],
+        "choices": [],
+        "ending": "形成資訊蒐集與回訪計畫"
+      }
+    ],
+    "usageScope": "demo"
+  }
+]

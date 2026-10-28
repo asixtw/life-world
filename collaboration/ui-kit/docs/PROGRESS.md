@@ -1,28 +1,20 @@
-# 交付進度（2026-10-28，最新測試見十三類盤點）
+# 交付進度（2026-10-28）
 
-## 已實作與已驗證
+共同來源 commit `1c9d502f32688bcc3c73e4b99a2cc3724c179047`；分支 `work/ousang-full-kit`，僅改 `collaboration/ui-kit/`。使用者已選 A：本套件用文件指定十五人；沈知衡屬另一套原創長版卡。
 
-- 來源共同 commit `1c9d502f32688bcc3c73e4b99a2cc3724c179047`；本地分支 `work/ousang-full-kit`。只新增 `collaboration/ui-kit/`，正式 App／DB 未修改。
-- `package.json`、`pnpm-lock.yaml`、Vite／React／TypeScript 專案可建置。Node 24.22.1、pnpm 12.16.1、Vite 7.1.12、TypeScript 5.9.3。
-- `src/contracts.ts`：Persona、Scenario、DialogueTurn、SimulationSession、SourceRef、AssetRef、LiveAdapter、HatchEvent 型別；`src/engine.ts`：腳本分支、session 隔離、匯出與即時模式未設定錯誤。
-- `src/components.tsx`、`src/Hatch.tsx`、`src/FlowSamples.tsx`、`src/App.tsx`、`src/styles.css`：獨立 gallery 的按鈕、表單、排程、Dialog、Quiet／減少動效、孵化、登入／目標／世界／關係／回饋構圖、附件與錄音狀態展示；`src/Theater.tsx` 為待內容注入的劇場元件。
-- 本機執行 `tsc -b`、`vite build`、`vitest run`：build 通過；2 個測試檔、8 個案例通過。
-- Chrome 本機展示實際開啟；390×844 手機五頁逐頁檢查，1280×800 桌面紀錄頁檢查，無水平溢位，所有可見按鈕均 ≥44 CSS px。孵化開始→跳過→完成、Quiet／減少動效切換、Dialog／BottomSheet 初始焦點和 Escape 返回已操作；錄音與附件失敗後文字仍保留。新增狀態 Gallery 的 loading／empty／error／permission／success、重試、Toast 與停用／載入輸入。詳見 [十三類盤點](13_CATEGORY_AUDIT.md)。
+## 已實作
 
-## 卡點與未完成
+- `content/personas.v1.json` 三組各五人，固定 ID、版本、時間界線、動力／視角／語言／邊界及來源 ID。`content/scenarios.v1.json` 六場各三條不同主路徑，每條再有兩個次選擇，均可到達結尾。
+- `content/examples.v1.json` 45 段四回合生成示例；`evaluation/inputs.v1.json` 30 個新情境，與 `evaluation/reference.v1.json` 的評分規則／參考方向物理分檔。所有示例、劇情均明示生成或詮釋，沒有冒充引文。
+- `content/sources.v1.json` 收錄史書、哲學文本、聯合國／IAEA／IMO／美國國務院公開材料；`reviewed=false`，仍待人工逐條核對。國際組為虛構職務代表，場景是假設，公開背景截止 2024-12-31。
+- 共用圖像兩 ZIP 經使用者手動下載至 `C:\Users\t6vmp\Downloads\`。runtime SHA256 `10bd8f58f04739587f8478fc9a4afec0a871022f95277f19f73382373d7ab363`；originals SHA256 `a603a9d32e1d534f71163563a6120ce53689ee75b4e96b12a4943942ef6d35d0`。54 檔安全合併至 `assets/shared-art/`；清單中的 35 個原稿／輸出檔 SHA256 全數吻合，來源 manifest 雜湊 `9086464441b2b0b322c74fb81e4c7cf9b38ff5862b017546cfcdc247363102af`。原稿與輸出、來源紀錄分開保存。
+- `AssetGallery` 可切換八項實際 PNG；孵化畫面接靜置、微光、初裂、深裂與 Lumi。App favicon／分享圖已進 `public/`。open 階段顯示深裂圖並明示分離蛋殼缺件，不虛稱圖已完成。
+- `src/contracts.ts`、`engine.ts`、`Theater.tsx` 支援選角、選場、來源、分支、回顧、返回、重設、手動匯出與未設定 live adapter 退路；全部與正式資料隔離。
 
-- 人物名單：規格文件列三國歷史人物／職務代表／哲學家；使用者已核准的長版測試卡則為原創沈知衡。Boyi 正在決定採哪一套。`content/catalog.ts` 暫留空，不把任一名單擅自視為定案。十五位肖像、三封面、六場景、45 段例子和 30 個保留情境均待名單決議。
-- 共用插畫由父任務製作。`Hatch.tsx` 目前用程式圖層供狀態測試，實際生成圖未接入；manifest、原稿與尺寸輸出未完成，不應標資產驗收通過。
-- 協作圖像工作流回報八張共用插畫原稿已生成；`shellsplit`、`completion`、獨立養分光效、`world-base` 四項生成遭工具阻擋，沒有輸出。目前不得標完成或以占位圖充數；需另取得可行且獲准的資產途徑後再驗收。
-- 八張原稿與衍生檔的兩份 Library ZIP 已定位，並取得可驗證傳輸資訊；在本機 Windows 使用官方傳輸 helper 時因 `os.setxattr` 不存在而失敗，目標目錄沒有建立 ZIP。因此尚無任何原稿本地接入。傳輸資訊暫存已清理。此動作是環境不支援而失敗，不是使用者拒絕；結果已確定未安裝。
-- 即時 AI 端點未指定，`LiveAdapter` 可替換但未驗真實服務。
+## 驗證與缺口
 
-## 共用插畫接入檔名與錨點
+最近一次 `tsc -b`、`vite build`、`vitest run` 通過：41 模組、3 個測試檔、12 個案例。瀏覽器已驗選角、來源面板、兩輪分支結尾與返回；新接入的蛋、分享圖及圖示裁切在 390×844 均載入，劇場和畫廊無水平溢位或小於 44 CSS px 的可見按鈕。匯出已重試成功，`Downloads/simulation-7b36f892-9310-41a0-a28c-be530d52c958.json` 可讀，包含 `usageScope=demo`、`channel=script`、`exportKind=life-world-simulation`、`importToRealExperience=false`。實際截圖檔、全部新畫面的跨瀏覽器檢查仍待補。
 
-請提供透明背景的 `assets/originals/lumi.png`（Lumi 正面全身）、`assets/originals/egg-idle.png`、`assets/originals/egg-glow.png`、`assets/originals/egg-crack.png`、`assets/originals/egg-open.png`（分離蛋殼）、`assets/originals/hatch-complete.png`（Lumi／蛋殼定格）及 `assets/originals/app-icon.png`（1024 方形）。若原稿為整張分層 sheet，請同時附狀態區域與錨點座標；可由本地裁切。孵化主畫面使用約 300×300 CSS px 容器，視覺中心錨點 `(0.5, 0.5)`，蛋底部約在容器 80% 高；手機約 270px 高。原稿最好 ≥1024×1024，便於產生 512／192／180／48 等縮圖。共用角色維持暖奶白圓蛋身、雙葉芽、深綠直橢圓眼、金黃小喙及薄荷翅膀。每份原稿請附生成工具、提示詞摘要與日期，供 manifest 紀錄。
-
-尚待的分享圖 1200×630、方形縮圖、房間／世界基底、正向回饋插畫可合併於共用批次，路徑建議放 `assets/originals/`，本地會產生 `assets/display/` 與 `assets/manifest.json`。
-
-## 階段性打包
-
-本地 WIP 原始碼壓縮包：`C:\Users\t6vmp\Documents\Codex\2026-10-29\task\life-world-ui-kit-wip.zip`。它只包含已提交的程式、契約、鎖定檔與文件，**不包含**未取得的插畫、十五位人物或六場劇情，不能當最終交付。瀏覽器畫面已實際目視檢查，但因目前工具沒有可寫入套件的截圖儲存路徑，尚無檔案化截圖證據。
+- 十五肖像、三封面尚未交付；`assets/expected-persona-art.v1.json` 記需求而不放空路徑。四項共用美術 `shellsplit`／`completion`／獨立 nourishment 光效／`world-base` 曾遭圖像工具阻擋，沒有檔案，不能標完成。
+- 即時 AI 端點、正式 App／DB、實際麥克風／附件上傳未接；Boyi／Jerry 尚未審查。來源的 `reviewed=false` 不等於已人工驗證。
+- Library 原生 materialize 在 Windows 缺 `os.setxattr` 而失敗；本次依使用者明確提供的本地 ZIP 讀取，保留原 Library ID `libfile_c1337d18a09081918aaa69c3951f8e1c` 和 `libfile_5fb88fe851e8819198ee4243b4e37f07`，不宣稱本機 xattr 已寫入。

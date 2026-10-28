@@ -1,0 +1,31 @@
+[
+  {
+    "id": "lw-egg-shellsplit-v1",
+    "refs": [
+      "lw-egg-deepcrack-v1"
+    ],
+    "prompt": "Use case: precise-object-edit. Input image is edit target, canonical Life World egg. Create shellsplit state: break this exact egg along its middle zigzag crack into TWO clearly separated large pieces. Lower cream shell bowl remains centered in lower half of canvas with the same sage painted sprout on front; the upper cream cap lifts to upper-left, angled gently about 15 degrees. Large transparent gap between pieces for a mascot to appear later. Keep exact same soft warm ivory, pale border and minimal 2D shading. No face, no Lumi, no wings, no real leaves, no glow, no shadows, no background or text. Square transparent PNG, ample empty transparent border on all sides; bottom bowl bottom about y=820 of1024. Both shells fully in frame, no crumbs."
+  },
+  {
+    "id": "lw-lumi-completion-v1",
+    "refs": [
+      "lw-lumi-companion-v1",
+      "lw-egg-rest-v1"
+    ],
+    "prompt": "Use case: compositing. Input1 is Lumi identity reference; input2 is exact egg shell style reference. Create Life World hatch completion static state on transparent background: SAME cream egg-body Lumi with sage double leaf sprout, darkgreen vertical oval eyes, tiny gold oval beak, mint-sage short wings; both wings gently open in a welcoming pose. Full body, no feet. Two small broken ivory shell fragments resting beside body lower left and lower right, preserve shell colors and sprout motif fragment. Keep simple warm 2D illustration and restrained internal shading. No glow, no confetti, no background, no shadow, no text. Entire composition fully visible inside square 1024 canvas x=220..804 y=190..850. Lumi body grounded at y=820, centered x=512. No narrative claim or score, just safe joyful presence."
+  },
+  {
+    "id": "lw-effects-nourishment-v1",
+    "refs": [
+      "lw-egg-softglow-v1"
+    ],
+    "prompt": "Use case: precise-object-edit. Input is style and palette reference only. Create a SEPARATE transparent compositable effect layer for Life World: only a subtle warm golden and pale mint aura surrounding an EMPTY oval space in center, with three tiny gold four-point star glints at upper-left, middle-right, lower-left. NO egg, NO mascot, NO shell, NO leaves, no solid oval interior, no ground, no backdrop, no text. The transparent center must let an underlying egg or Lumi remain visible. Minimal warm 2D, soft diffuse outer glow fading fully to alpha, not fiery or neon. Square1024, oval aura center x512 y550, bounds approximately x260..764 y210..890. Entire effects comfortably within canvas."
+  },
+  {
+    "id": "lw-world-base-v1",
+    "refs": [
+      "lw-lumi-companion-v1"
+    ],
+    "prompt": "Use case: illustration-story. Input image is palette and minimal2D style reference only; do not include the character. Create a simple Life World reusable empty room / little-world base illustration, wide16:9. Warm cream and muted sage green calm corner: large softly arched window at left showing quiet pale sage rolling hills, warm ivory floor with a pale mint oval rug centered in lower-middle; one small sage plant pot on far right. The center and foreground are EMPTY, reserved for compositing Lumi later. Extremely restrained clean warm2D illustration, soft fine borders and very subtle shading, no realism, no complex detail, no extra props, no lettering, no UI, no people, no animals, no eggs, no awards or numbers. Palette #f7f8f2 #fffefb #eaf0e1 #b4c59a #526f4d and small muted gold. Opaque background, landscape wide framing."
+  }
+]

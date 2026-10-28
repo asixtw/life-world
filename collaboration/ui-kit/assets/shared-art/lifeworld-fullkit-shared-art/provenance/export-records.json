@@ -1,0 +1,522 @@
+[
+  {
+    "path": "exports/lw-app-icon-v1@1024.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGB",
+    "bytes": 608096,
+    "sha256": "be6a8ced52b8b784a521aca189a3714a8dd532c999920e33d95cf20cdbf72b67",
+    "transform": {
+      "operation": "full-frame resize",
+      "from": [
+        1254,
+        1254
+      ],
+      "to": [
+        1024,
+        1024
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-app-icon-v1@512.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGB",
+    "bytes": 192257,
+    "sha256": "2695146db5fbdd3ffef78193b7a42f0533cd5fb4b29b8dc69334d51d29a17242",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-app-icon-v1@192.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 192,
+    "height": 192,
+    "mode": "RGB",
+    "bytes": 27157,
+    "sha256": "7be8620b6995354b411bfa70598ea63cfcd30e49514254a6e40657f5b2c09230",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        192,
+        192
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-app-icon-v1@180.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 180,
+    "height": 180,
+    "mode": "RGB",
+    "bytes": 23755,
+    "sha256": "d8350526954bacc61961320a5ef9c3c95039de02db7be0665dd66e7bde0161dd",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        180,
+        180
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-app-icon-v1@48.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 48,
+    "height": 48,
+    "mode": "RGB",
+    "bytes": 2188,
+    "sha256": "c3f967a494db5878e6f1b7902c8cab440f78efb47d1456ace15edad923cdb9b7",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        48,
+        48
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-app-icon-v1@32.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 32,
+    "height": 32,
+    "mode": "RGB",
+    "bytes": 1216,
+    "sha256": "e013b3247edcf65c3e1a0416879fb61ab250ffd1905b9460ca92e2e9585bb64d",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        32,
+        32
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-app-icon-v1@16.png",
+    "source": "lw-app-icon-v1.png",
+    "width": 16,
+    "height": 16,
+    "mode": "RGB",
+    "bytes": 465,
+    "sha256": "8165eb9c96fdf84c5580a886707cc1df7937fd0d9bcb0fc59b07f69c146ee2c9",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        16,
+        16
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-deepcrack-v1@1024.png",
+    "source": "lw-egg-deepcrack-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "bytes": 241594,
+    "sha256": "549dba103805d21f9215b91176e7e9b1a47d577809ad075981581576ad039931",
+    "transform": {
+      "operation": "uniform resize and transparent-canvas placement",
+      "scale": 0.66,
+      "offset": [
+        98,
+        107
+      ],
+      "anchor": [
+        512,
+        820
+      ],
+      "no_alpha_cleanup": true
+    }
+  },
+  {
+    "path": "exports/lw-egg-deepcrack-v1@512.png",
+    "source": "lw-egg-deepcrack-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 70822,
+    "sha256": "94265cd4661a02e5e0003590ced7daf92630474cb1cb4c2b2e9656d1ee4e9ea5",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-deepcrack-v1@256.png",
+    "source": "lw-egg-deepcrack-v1.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "bytes": 21122,
+    "sha256": "dbf069d34aa845dc8972b1b783e6a083dcccd79eab102dd81b6067a2a97b3da0",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        256,
+        256
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-initialcrack-v1@1024.png",
+    "source": "lw-egg-initialcrack-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "bytes": 227918,
+    "sha256": "37a9234dc1cb392c5d50f3441a53413642c557a5232277398aabe38944036d43",
+    "transform": {
+      "operation": "uniform resize and transparent-canvas placement",
+      "scale": 0.66,
+      "offset": [
+        98,
+        107
+      ],
+      "anchor": [
+        512,
+        820
+      ],
+      "no_alpha_cleanup": true
+    }
+  },
+  {
+    "path": "exports/lw-egg-initialcrack-v1@512.png",
+    "source": "lw-egg-initialcrack-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 65859,
+    "sha256": "8cff24a20eba12fabfcf81a972a1b79c0d126f9fd38aee2e21d3106a4217372d",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-initialcrack-v1@256.png",
+    "source": "lw-egg-initialcrack-v1.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "bytes": 18943,
+    "sha256": "70e2568268b04305115e8dcee1345b93c214d665c25ba56746a6d9765ed541f8",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        256,
+        256
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-rest-v1@1024.png",
+    "source": "lw-egg-rest-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "bytes": 211192,
+    "sha256": "94030f73e258c946a73b1cceea21153c9f305ca8c5cf283780a155137bc1708c",
+    "transform": {
+      "operation": "uniform resize and transparent-canvas placement",
+      "scale": 0.66,
+      "offset": [
+        98,
+        107
+      ],
+      "anchor": [
+        512,
+        820
+      ],
+      "no_alpha_cleanup": true
+    }
+  },
+  {
+    "path": "exports/lw-egg-rest-v1@512.png",
+    "source": "lw-egg-rest-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 63321,
+    "sha256": "2538d6cd4920a633056688ad1d473ddc77120fd4328a81c0478033bf18a0d97a",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-rest-v1@256.png",
+    "source": "lw-egg-rest-v1.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "bytes": 18333,
+    "sha256": "e3ff799b08fd1ef8fa1caa162c8ec75fa16496eb842a2ee65e5566a6ea495cbf",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        256,
+        256
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-softglow-v1@1024.png",
+    "source": "lw-egg-softglow-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "bytes": 341018,
+    "sha256": "eb703cf00080748a3e17f469ef5b1f4b43ea47b376c2dcd65db420c7f27bf9f3",
+    "transform": {
+      "operation": "uniform resize and transparent-canvas placement",
+      "scale": 0.66,
+      "offset": [
+        98,
+        107
+      ],
+      "anchor": [
+        512,
+        820
+      ],
+      "no_alpha_cleanup": true
+    }
+  },
+  {
+    "path": "exports/lw-egg-softglow-v1@512.png",
+    "source": "lw-egg-softglow-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 97427,
+    "sha256": "1342bd1d4c26d9a80fd96ed27ecf57d9f15b4025fd74159c91b4e0c48317150c",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-egg-softglow-v1@256.png",
+    "source": "lw-egg-softglow-v1.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "bytes": 26291,
+    "sha256": "0de01a655c2232728331b37b726d252be4ad536b5125a32a91b84655b4b4914e",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        256,
+        256
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-lumi-companion-v1@1024.png",
+    "source": "lw-lumi-companion-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "bytes": 243754,
+    "sha256": "f9a3718531f2e65a6223cf5f87447ed56461b46e825bb2c968eacbc54cf1ffce",
+    "transform": {
+      "operation": "uniform resize and transparent-canvas placement",
+      "scale": 0.82,
+      "offset": [
+        -2,
+        -25
+      ],
+      "anchor": [
+        512,
+        820
+      ],
+      "no_alpha_cleanup": true
+    }
+  },
+  {
+    "path": "exports/lw-lumi-companion-v1@512.png",
+    "source": "lw-lumi-companion-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 75838,
+    "sha256": "063bf5ecdd59b99693bd76643cd3afaf42cfc58529bab538de28a877db40b190",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-lumi-companion-v1@256.png",
+    "source": "lw-lumi-companion-v1.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "bytes": 22446,
+    "sha256": "2a066f2d0ec59934720db3f1ab282acb8a37d728a1f8e1f20c73cb32d9e090c2",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        256,
+        256
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-lumi-quiet-v1@1024.png",
+    "source": "lw-lumi-quiet-v1.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "bytes": 261117,
+    "sha256": "981f696b5b855f5bd218708fc52c5a606e4ba066d8e3d80a7eb5cfce49cbc419",
+    "transform": {
+      "operation": "uniform resize and transparent-canvas placement",
+      "scale": 0.82,
+      "offset": [
+        -2,
+        -25
+      ],
+      "anchor": [
+        512,
+        820
+      ],
+      "no_alpha_cleanup": true
+    }
+  },
+  {
+    "path": "exports/lw-lumi-quiet-v1@512.png",
+    "source": "lw-lumi-quiet-v1.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 75383,
+    "sha256": "5cda7eeaf7945ca461a8cdd7c06308cfd5ac3093faad079f99ab1f14f39211f2",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        512,
+        512
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-lumi-quiet-v1@256.png",
+    "source": "lw-lumi-quiet-v1.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "bytes": 21825,
+    "sha256": "5186aaeda2c3677f091a14f66c6b05df4bbf2b981431f32d8b7d60145b8086a1",
+    "transform": {
+      "operation": "resize normalized 1024 master",
+      "to": [
+        256,
+        256
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-share-illustration-v1@1200x630.png",
+    "source": "lw-share-illustration-v1.png",
+    "width": 1200,
+    "height": 630,
+    "mode": "RGB",
+    "bytes": 515536,
+    "sha256": "656200b99cfe2951f6b3d23f94fa76014f528bf3a1123806147debd111dcfdd3",
+    "transform": {
+      "operation": "center crop and resize",
+      "crop": [
+        0,
+        0,
+        1731,
+        909
+      ]
+    }
+  },
+  {
+    "path": "exports/lw-share-illustration-v1@600x315.png",
+    "source": "lw-share-illustration-v1.png",
+    "width": 600,
+    "height": 315,
+    "mode": "RGB",
+    "bytes": 154434,
+    "sha256": "e6b6f117ed38a51adb93cb9c623bfb71061ddd5bb8173281120b489deebf3aad",
+    "transform": {
+      "operation": "resize 1200x630 export to 600x315"
+    }
+  },
+  {
+    "path": "previews/lw-app-icon-circle-preview.png",
+    "source": "lw-app-icon-v1@1024.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 198911,
+    "sha256": "f413d66b600adbbac5637a59e074786dd329471fadab310281b7e7cfeab842b0",
+    "transform": {
+      "operation": "requested crop preview",
+      "shape": "circle"
+    }
+  },
+  {
+    "path": "previews/lw-app-icon-rounded-preview.png",
+    "source": "lw-app-icon-v1@1024.png",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "bytes": 220004,
+    "sha256": "5466c72ee7bfdef2c04e34503f93ce078c4e427e7d68dc7866cdc80ec34adbc0",
+    "transform": {
+      "operation": "requested crop preview",
+      "shape": "rounded"
+    }
+  },
+  {
+    "path": "previews/lw-transparent-states-day.png",
+    "source": "normalized exports",
+    "width": 1200,
+    "height": 860,
+    "mode": "RGB",
+    "bytes": 224198,
+    "sha256": "71bb8a3deda6fcd216c5c47f59e307eb90f1e819ef8d535aa0a07018977f40e9",
+    "transform": {
+      "operation": "QA contact sheet on day background"
+    }
+  },
+  {
+    "path": "previews/lw-transparent-states-quiet.png",
+    "source": "normalized exports",
+    "width": 1200,
+    "height": 860,
+    "mode": "RGB",
+    "bytes": 231944,
+    "sha256": "2aa7a5ef05e4455e42c22d8609d59421b4292d16a4ee739b46f1de657e659ae8",
+    "transform": {
+      "operation": "QA contact sheet on quiet background"
+    }
+  }
+]

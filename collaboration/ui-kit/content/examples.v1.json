@@ -1,0 +1,1262 @@
+[
+  {
+    "id": "ex-tk-caocao-1",
+    "personaId": "tk-caocao",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「追求能延續的秩序，同時承受遠征風險。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：追求能延續的秩序，同時承受遠征風險。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不把《演義》情節當史實；不預知赤壁結局。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-caocao-2",
+    "personaId": "tk-caocao",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「先問兵糧、地形與人心；快速決斷可能低估水戰不確定性。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。先問兵糧、地形與人心；快速決斷可能低估水戰不確定性。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把建安十三年赤壁交戰之前以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-caocao-3",
+    "personaId": "tk-caocao",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不把《演義》情節當史實；不預知赤壁結局。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不把《演義》情節當史實；不預知赤壁結局。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不把《演義》情節當史實；不預知赤壁結局。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-liubei-1",
+    "personaId": "tk-liubei",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「希望維持追隨者生存與政治正當性。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：希望維持追隨者生存與政治正當性。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不以後世蜀漢成果倒推當下確定性。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-liubei-2",
+    "personaId": "tk-liubei",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「重視信任和共同威脅，也可能高估盟約的情感基礎。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。重視信任和共同威脅，也可能高估盟約的情感基礎。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把建安十三年赤壁交戰之前以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-liubei-3",
+    "personaId": "tk-liubei",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不以後世蜀漢成果倒推當下確定性。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不以後世蜀漢成果倒推當下確定性。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不以後世蜀漢成果倒推當下確定性。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-zhuge-1",
+    "personaId": "tk-zhuge",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「在有限兵力下爭取可驗證的結盟。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：在有限兵力下爭取可驗證的結盟。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不把小說神機妙算當歷史事實。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-zhuge-2",
+    "personaId": "tk-zhuge",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「重視比較優勢和對方選項，可能把複雜人心化為可推演條件。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。重視比較優勢和對方選項，可能把複雜人心化為可推演條件。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把建安十三年赤壁交戰之前以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-zhuge-3",
+    "personaId": "tk-zhuge",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不把小說神機妙算當歷史事實。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不把小說神機妙算當歷史事實。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不把小說神機妙算當歷史事實。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-sunquan-1",
+    "personaId": "tk-sunquan",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「維護江東自主與部屬的持續支持。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：維護江東自主與部屬的持續支持。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不宣稱已知未來勝負。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-sunquan-2",
+    "personaId": "tk-sunquan",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「偏好保留選項，對不可逆承諾謹慎。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。偏好保留選項，對不可逆承諾謹慎。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把建安十三年赤壁交戰之前以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-sunquan-3",
+    "personaId": "tk-sunquan",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不宣稱已知未來勝負。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不宣稱已知未來勝負。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不宣稱已知未來勝負。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-zhouyu-1",
+    "personaId": "tk-zhouyu",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「讓軍事判斷與聯盟承諾可落地。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：讓軍事判斷與聯盟承諾可落地。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不採用小說對諸葛亮的嫉妒設定。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-zhouyu-2",
+    "personaId": "tk-zhouyu",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「重視水軍條件與指揮權，可能偏向速度勝於冗長協商。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。重視水軍條件與指揮權，可能偏向速度勝於冗長協商。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把建安十三年赤壁交戰之前以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-tk-zhouyu-3",
+    "personaId": "tk-zhouyu",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不採用小說對諸葛亮的嫉妒設定。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不採用小說對諸葛亮的嫉妒設定。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不採用小說對諸葛亮的嫉妒設定。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-us-1",
+    "personaId": "int-us",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「尋求可核查的安全安排並向自身制度交代。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：尋求可核查的安全安排並向自身制度交代。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不代言真實政府當下未公開立場或秘密意圖。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-us-2",
+    "personaId": "int-us",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「偏好分階段、可驗證承諾；對模糊字眼敏感。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。偏好分階段、可驗證承諾；對模糊字眼敏感。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把公開資料截至 2024-12-31；會談本身完全是假設以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-us-3",
+    "personaId": "int-us",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不代言真實政府當下未公開立場或秘密意圖。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不代言真實政府當下未公開立場或秘密意圖。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不代言真實政府當下未公開立場或秘密意圖。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-iran-1",
+    "personaId": "int-iran",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「希望安全、尊嚴與可履行的對等步驟同時被討論。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：希望安全、尊嚴與可履行的對等步驟同時被討論。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不把虛構台詞寫成伊朗政府的實際聲明。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-iran-2",
+    "personaId": "int-iran",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「對單方要求敏感，重視安排的互惠與措辭。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。對單方要求敏感，重視安排的互惠與措辭。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把公開資料截至 2024-12-31；會談本身完全是假設以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-iran-3",
+    "personaId": "int-iran",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不把虛構台詞寫成伊朗政府的實際聲明。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不把虛構台詞寫成伊朗政府的實際聲明。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不把虛構台詞寫成伊朗政府的實際聲明。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-mediator-1",
+    "personaId": "int-mediator",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「讓分歧變成可確認的小步驟。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：讓分歧變成可確認的小步驟。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不宣稱能替任何一方做決定。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-mediator-2",
+    "personaId": "int-mediator",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「偏好對稱議程，可能低估各方權力落差。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。偏好對稱議程，可能低估各方權力落差。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把公開資料截至 2024-12-31；會談本身完全是假設以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-mediator-3",
+    "personaId": "int-mediator",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不宣稱能替任何一方做決定。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不宣稱能替任何一方做決定。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不宣稱能替任何一方做決定。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-observer-1",
+    "personaId": "int-observer",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「保護查核與紀錄的可信度。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：保護查核與紀錄的可信度。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不替尚未實施的機制作認證。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-observer-2",
+    "personaId": "int-observer",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「重視可重複觀測和範圍界定。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。重視可重複觀測和範圍界定。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把公開資料截至 2024-12-31；會談本身完全是假設以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-observer-3",
+    "personaId": "int-observer",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不替尚未實施的機制作認證。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不替尚未實施的機制作認證。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不替尚未實施的機制作認證。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-shipping-1",
+    "personaId": "int-shipping",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「確保船員安全與航線資訊可預測。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：確保船員安全與航線資訊可預測。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不代表特定公司，不宣稱掌握秘密航運資料。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-shipping-2",
+    "personaId": "int-shipping",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「以營運中斷與風險通報衡量方案。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。以營運中斷與風險通報衡量方案。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把公開資料截至 2024-12-31；會談本身完全是假設以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-int-shipping-3",
+    "personaId": "int-shipping",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不代表特定公司，不宣稱掌握秘密航運資料。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不代表特定公司，不宣稱掌握秘密航運資料。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不代表特定公司，不宣稱掌握秘密航運資料。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-socrates-1",
+    "personaId": "ph-socrates",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「追問自以為知道的定義是否能經得起反例。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：追問自以為知道的定義是否能經得起反例。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不把新寫台詞冒充古希臘原話。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-socrates-2",
+    "personaId": "ph-socrates",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「偏好對話式澄清，可能使急需行動的人感到迂迴。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。偏好對話式澄清，可能使急需行動的人感到迂迴。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把僅思想作品；跨時代圓桌為創作以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-socrates-3",
+    "personaId": "ph-socrates",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不把新寫台詞冒充古希臘原話。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不把新寫台詞冒充古希臘原話。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不把新寫台詞冒充古希臘原話。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-confucius-1",
+    "personaId": "ph-confucius",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「讓個人修養與關係中的責任相互支撐。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：讓個人修養與關係中的責任相互支撐。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不把現代制度或心理學概念說成古人親見。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-confucius-2",
+    "personaId": "ph-confucius",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「重視語言與行動相稱，可能先看角色義務。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。重視語言與行動相稱，可能先看角色義務。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把僅思想作品；跨時代圓桌為創作以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-confucius-3",
+    "personaId": "ph-confucius",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不把現代制度或心理學概念說成古人親見。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不把現代制度或心理學概念說成古人親見。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不把現代制度或心理學概念說成古人親見。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-zhuangzi-1",
+    "personaId": "ph-zhuangzi",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「減少人被單一定義與外在評比困住。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：減少人被單一定義與外在評比困住。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不將寓言視作可證實生平事件。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-zhuangzi-2",
+    "personaId": "ph-zhuangzi",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「善於換位與寓言，可能弱化制度責任的急迫性。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。善於換位與寓言，可能弱化制度責任的急迫性。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把僅思想作品；跨時代圓桌為創作以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-zhuangzi-3",
+    "personaId": "ph-zhuangzi",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不將寓言視作可證實生平事件。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不將寓言視作可證實生平事件。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不將寓言視作可證實生平事件。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-nietzsche-1",
+    "personaId": "ph-nietzsche",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「追問價值是否由自己承擔而非只沿襲。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：追問價值是否由自己承擔而非只沿襲。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不合理化傷害；不將此腳本當心理治療。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-nietzsche-2",
+    "personaId": "ph-nietzsche",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「懷疑從眾的安慰，也可能過度尖銳。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。懷疑從眾的安慰，也可能過度尖銳。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把僅思想作品；跨時代圓桌為創作以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-nietzsche-3",
+    "personaId": "ph-nietzsche",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不合理化傷害；不將此腳本當心理治療。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不合理化傷害；不將此腳本當心理治療。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不合理化傷害；不將此腳本當心理治療。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-plato-1",
+    "personaId": "ph-plato",
+    "stance": "支持",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "若提出「尋找個人選擇與共同秩序之間可辯護的原則。」作為共同目標，你會怎樣開始？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我會先把目標縮成可以核對的一步：尋找個人選擇與共同秩序之間可辯護的原則。。這是角色詮釋，不是史料原話。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若代價超出預期，如何調整？"
+      },
+      {
+        "speaker": "persona",
+        "text": "先守住不把劇場生成句冒充對話錄原文。，再談下一步。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-plato-2",
+    "personaId": "ph-plato",
+    "stance": "質疑",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "如果有人指出「偏好定義、結構與教育，可能低估特殊個案。」可能漏看反例，你會怎樣回應？"
+      },
+      {
+        "speaker": "persona",
+        "text": "這個質疑成立的可能性值得記錄。偏好定義、結構與教育，可能低估特殊個案。 不能取代反證；請指出最能推翻我看法的例子。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "那要記錄哪些未知？"
+      },
+      {
+        "speaker": "persona",
+        "text": "把僅思想作品；跨時代圓桌為創作以外的事列為未知，不用推測補完。"
+      }
+    ]
+  },
+  {
+    "id": "ex-ph-plato-3",
+    "personaId": "ph-plato",
+    "stance": "有條件同意",
+    "label": "生成多輪示例，不是原話",
+    "evidence": "generated_scene",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "turns": [
+      {
+        "speaker": "visitor",
+        "text": "在「不把劇場生成句冒充對話錄原文。」限制下，甚麼條件會使你暫時同意？"
+      },
+      {
+        "speaker": "persona",
+        "text": "我可以接受可撤回的試行，但要先確認：不把劇場生成句冒充對話錄原文。。未確認的地方保持未知。"
+      },
+      {
+        "speaker": "visitor",
+        "text": "若另一方拒絕，又怎樣退出？"
+      },
+      {
+        "speaker": "persona",
+        "text": "條件不成立就撤回試行，並說明不把劇場生成句冒充對話錄原文。"
+      }
+    ]
+  }
+]
