@@ -1,0 +1,8 @@
+LifeWorld v0.2.0 — 2026-10-27 Asia/Taipei
+Recorded result of the actual completed test run (not a new execution).
+
+Command: .venv/bin/python -m pytest -q
+Result: 81 passed in 4.76s
+
+Includes all 63 existing backend tests and 18 new people-flow cases.
+Initial failing run: PEOPLE_TDD_RED.txt

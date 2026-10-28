@@ -61,3 +61,23 @@ Cookie `lw_session` 為 HttpOnly。先呼叫 guest 或 login，再以回傳 `csr
 - 500：操作完整回滾，沒有成功回執；請沿用同一提交 ID 重試。
 
 參考實作方式：[FastAPI Testing](https://fastapi.tiangolo.com/tutorial/testing/)、[Request Files](https://fastapi.tiangolo.com/tutorial/request-files/)。
+
+
+## v0.2：人物 360 與互動來源
+
+- `GET /api/people`：共用星圖／收藏冊查詢，支援 q、category、followed_only、sort、limit／offset。排序 priority 依關注、進行中目標、最近互動、名稱／ID；含已確認的維度標籤搜尋。
+- `PATCH /api/people/{id}`：expected_revision 加欲更新的 name／roles／tags／category／followed／notes／common_context；舊 role 字串仍回傳以相容初版。
+- `GET /api/people/{id}/overview`：person、stats、四組 facts、fact_history、interactions、goals、tasks、connections、notes。
+- `GET /api/people/{id}/interactions`：可用 kind 篩選 in_person／call／message／other／unknown。
+- `POST /api/people/{id}/facts`：request_id、dimension、value、description、evidence_type、source_experience_ids、confirmed=true，可指定 conflicts_with。來源必須是可存取且與該人物相關的已確認經歷。
+- `GET /api/people/{id}/facts/{fact_id}/evidence`：回傳人物資訊及原文、摘要、發生時間、證據類型。
+- `POST /api/people/{id}/facts/{fact_id}/resolve`：expected_revision；明確採用這項資訊，其他同組衝突保留為 archived。
+- `POST /api/people/{id}/facts/{fact_id}/sources/revoke`：expected_revision、experience_id；撤回此項資訊的來源引用，保留原始經歷；沒有有效來源時資訊不列為已知。
+- `POST /api/people/{id}/goals`：request_id、goal_id、label；手動關聯不宣稱對方已承諾合作。
+- `POST /api/people/{id}/connections`：request_id、other_person_id、label、source_experience_ids；明確建立共同關係，不自動推論。
+- `PATCH /api/interactions/{id}`：expected_revision、kind；分類不改積分。
+- `POST /api/interactions/{id}/merge`：request_id、expected_revision、source_event_ids；保留主要事件日期與類型，多筆原經歷不刪除，積分不重算。
+
+經歷 Confirm 增加 interaction_type（預設 unknown）、interaction_event_id（關聯同一次互動）、person_updates（只有 selected=true 才更新的四維度候選）。人物資訊、互動、經歷與積分共用交易及 owner 驗證；舊請求的預設欄位不改動原去重指紋。
+
+私人筆記增加 source_experience_ids；來源由後端檢查。筆記、模擬與訊息草稿不呼叫真實經歷確認與記帳。

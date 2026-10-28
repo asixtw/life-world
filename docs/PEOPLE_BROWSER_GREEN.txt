@@ -1,0 +1,10 @@
+LifeWorld v0.2.0 — 2026-10-27 Asia/Taipei
+Recorded result of the actual completed test run (not a new execution).
+
+Command: .venv/bin/python -m pytest browser_tests -q -x --tb=short
+Actual browser: Playwright Chromium
+Viewports: 390x844 mobile and 1440x1050 desktop
+Result: 7 passed in 25.89s
+
+Includes the 3 existing journeys and 4 people-flow cases.
+Screenshots and source-image mapping: PEOPLE_RESTORATION.md

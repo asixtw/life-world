@@ -1,28 +1,30 @@
-<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#edf3e9">
-  <title>Life World · 把每一步，種成自己的世界</title>
-  <link rel="stylesheet" href="/static/styles.css">
-  <script src="/static/app.js" defer></script>
-</head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <a href="#world" class="brand" aria-label="Life World 首頁"><span class="brand-symbol">✳</span><span>Life World<small>讓努力，有一個家。</small></span></a>
-      <nav id="nav" aria-label="主要導覽"></nav>
-      <div class="sidebar-bottom"><span class="status-dot"></span> 本機開發版<span>你的世界，從真實的一小步開始。</span></div>
-    </aside>
-    <main>
-      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header>
-      <div id="notice" role="status" aria-live="polite"></div>
-      <div id="app" class="content"><p>正在打開你的世界…</p></div>
-      <footer>透過現實中的努力，打造一個屬於自己的世界。<span>你可以暫時離開，這裡永遠歡迎你回來。</span></footer>
-    </main>
-  </div>
-  <dialog id="account-dialog" aria-labelledby="account-heading"><div id="account-content"></div><button class="text-button close-dialog" data-action="close-account">關閉</button></dialog>
-  <div id="toast" role="status" aria-live="polite"></div>
-</body>
-</html>
+<!doctype html> <!-- 宣告 HTML5 文件格式 -->
+<html lang="zh-Hant"> <!-- 宣告頁面語言，供瀏覽器與輔助工具辨識 -->
+<head> <!-- 建立頁面結構容器 -->
+  <meta charset="utf-8"> <!-- 使用 UTF-8 正確顯示中文 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 以裝置寬度呈現手機與桌面版面 -->
+  <meta name="theme-color" content="#edf3e9"> <!-- 設定瀏覽器工具列的品牌背景色 -->
+  <title>Life World · 把每一步，種成自己的世界</title> <!-- 設定瀏覽器分頁標題 -->
+  <link rel="stylesheet" href="/static/styles.css"> <!-- 載入共用或人物流程樣式 -->
+  <link rel="stylesheet" href="/static/relationships.css"> <!-- 載入共用或人物流程樣式 -->
+  <script src="/static/relationships.js" defer></script> <!-- 延後執行，先載入人物模組再啟動 App -->
+  <script src="/static/app.js" defer></script> <!-- 延後執行，先載入人物模組再啟動 App -->
+</head> <!-- 結束此頁面結構區塊 -->
+<body> <!-- 建立頁面結構容器 -->
+  <div class="app-shell"> <!-- 包住桌面側欄與主內容的應用程式外殼 -->
+    <aside class="sidebar"> <!-- 桌面側欄，手機改為底部主導覽 -->
+      <a href="#world" class="brand" aria-label="Life World 首頁"><span class="brand-symbol">✳</span><span>Life World<small>讓努力，有一個家。</small></span></a> <!-- 可返回世界首頁的品牌連結 -->
+      <nav id="nav" aria-label="主要導覽"></nav> <!-- 四主分頁導覽由前端依登入狀態產生 -->
+      <div class="sidebar-bottom"><span class="status-dot"></span> 本機開發版<span>你的世界，從真實的一小步開始。</span></div> <!-- 標示本機開發模式 -->
+    </aside> <!-- 結束此頁面結構區塊 -->
+    <main> <!-- 宣告頁面主要內容區域 -->
+      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
+      <div id="notice" role="status" aria-live="polite"></div> <!-- 以無障礙即時區域顯示錯誤與狀態 -->
+      <div id="app" class="content"><p>正在打開你的世界…</p></div> <!-- 依目前路由置換的主內容容器 -->
+      <footer>透過現實中的努力，打造一個屬於自己的世界。<span>你可以暫時離開，這裡永遠歡迎你回來。</span></footer> <!-- 頁尾陪伴文字與底部留白 -->
+    </main> <!-- 結束此頁面結構區塊 -->
+  </div> <!-- 結束此頁面結構區塊 -->
+  <dialog id="account-dialog" aria-labelledby="account-heading"><div id="account-content"></div><button class="text-button close-dialog" data-action="close-account">關閉</button></dialog> <!-- 帳號與人物編輯共用的原生模態對話框 -->
+  <div id="toast" role="status" aria-live="polite"></div> <!-- 顯示短暫操作結果並供輔助工具朗讀 -->
+</body> <!-- 結束此頁面結構區塊 -->
+</html> <!-- 結束此頁面結構區塊 -->

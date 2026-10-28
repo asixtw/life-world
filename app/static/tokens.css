@@ -1,1 +1,3 @@
-:root{--paper:#f7f8f2;--white:#fffefb;--ink:#334431;--muted:#68725f;--green:#526f4d;--mint:#eaf0e1;--line:#e5e9dc;--gold:#c1a465}
+:root{
+  --paper:#f7f8f2;--white:#fffefb;--ink:#334431;--muted:#68725f;--green:#526f4d;--mint:#eaf0e1;--line:#e5e9dc;--gold:#c1a465
+} /* 定義紙張、文字、主色、薄荷、邊框與金色色彩變數 */

@@ -1,0 +1,305 @@
+.view-switch,.person-tabs {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; background:#e9eee2; padding:5px; border-radius:12px; margin-bottom:22px;
+} /* 設定星圖與收藏冊切換的外觀、狀態或排列 */
+.view-switch a,.person-tabs a {
+  min-height:44px; display:grid; place-items:center; padding:10px; border-radius:8px; font-size:14px; color:var(--muted);
+} /* 設定星圖與收藏冊切換的外觀、狀態或排列 */
+.view-switch [aria-selected=true],.person-tabs [aria-selected=true] {
+  background:white; color:var(--green); box-shadow:0 2px 7px #293d2410; font-weight:600;
+} /* 設定星圖與收藏冊切換的外觀、狀態或排列 */
+.people-filters .field {
+  margin-bottom:12px;
+} /* 設定人物搜尋區的外觀、狀態或排列 */
+.filter-controls {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+} /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+.filter-controls select {
+  width:auto; flex:1; min-width:130px;
+} /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+.filter-controls .check-line {
+  white-space:nowrap;
+} /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+.relationship-map {
+  width:100%; display:block; max-height:480px;
+} /* 設定星圖畫布的外觀、狀態或排列 */
+.map-card {
+  background:#eef2e8; padding:15px;
+} /* 設定星圖容器的外觀、狀態或排列 */
+.star-line {
+  stroke:#a8b79d; stroke-width:2;
+} /* 設定中心人物與星點的連線的外觀、狀態或排列 */
+.self-star {
+  fill:#cee5d7; stroke:#91b69c; stroke-width:3;
+} /* 設定中心的「我」星點的外觀、狀態或排列 */
+.self-label {
+  fill:#39583f; font-size:23px; font-weight:600;
+} /* 設定中心文字的外觀、狀態或排列 */
+.star-node {
+  cursor:pointer;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.star-node>circle {
+  fill:var(--node-color,#dce5de); stroke:#fffdf4; stroke-width:3;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.star-node>text {
+  fill:#60715a; font-size:21px; pointer-events:none;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.star-node .selection-ring {
+  fill:none; stroke:#5279ae; stroke-width:4;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.star-node:focus {
+  outline:none;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.star-node:focus>circle:first-child {
+  stroke:#426d92; stroke-width:5;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.category-business {
+  --node-color:#d9caed;
+} /* 設定業務分類顏色的外觀、狀態或排列 */
+.category-life {
+  --node-color:#eacfc8;
+} /* 設定生活分類顏色的外觀、狀態或排列 */
+.category-learning {
+  --node-color:#c5d9ea;
+} /* 設定學習與健身分類顏色的外觀、狀態或排列 */
+.category-other {
+  --node-color:#e2dfc2;
+} /* 設定未分類顏色的外觀、狀態或排列 */
+.map-legend {
+  display:flex; gap:15px; flex-wrap:wrap; color:var(--muted); font-size:12px; margin:10px 6px;
+} /* 設定星圖分類圖例的外觀、狀態或排列 */
+.map-legend>span {
+  border-bottom:3px solid var(--node-color); padding-bottom:3px;
+} /* 設定星圖分類圖例的外觀、狀態或排列 */
+.mini-map {
+  max-height:205px;
+} /* 設定世界首頁匿名星圖的外觀、狀態或排列 */
+.people-cards {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px;
+} /* 設定人物收藏冊網格的外觀、狀態或排列 */
+.person-card {
+  display:flex; align-items:flex-start; gap:14px; color:var(--ink); text-align:left; font:inherit; min-width:0; width:100%;
+} /* 設定人物摘要卡片的外觀、狀態或排列 */
+.person-card.selected {
+  border:2px solid #5279ae;
+} /* 設定人物摘要卡片的外觀、狀態或排列 */
+.person-card>span:last-child {
+  min-width:0; overflow-wrap:anywhere;
+} /* 設定人物摘要卡片的外觀、狀態或排列 */
+.person-card-line {
+  display:block; margin-top:5px;
+} /* 設定人物摘要卡片的外觀、狀態或排列 */
+.person-avatar {
+  display:grid; place-items:center; flex-shrink:0; background:var(--node-color,#e3eadb); border-radius:50%; width:48px; height:48px; font-size:23px; color:#4e6147;
+} /* 設定人物稱呼頭像的外觀、狀態或排列 */
+.person-summary {
+  margin-top:20px; background:#fffef9; box-shadow:0 6px 24px #2639230a;
+} /* 設定已選人物摘要的外觀、狀態或排列 */
+.person-summary p {
+  margin-bottom:10px;
+} /* 設定已選人物摘要的外觀、狀態或排列 */
+.person-profile {
+  max-width:900px; margin:0 auto;
+} /* 設定人物完整頁容器的外觀、狀態或排列 */
+.person-heading {
+  display:flex; align-items:center; gap:18px; margin:12px 0 24px; flex-wrap:wrap;
+} /* 設定人物標頭的外觀、狀態或排列 */
+.person-heading .person-avatar {
+  width:68px; height:68px; font-size:30px;
+} /* 設定人物標頭的外觀、狀態或排列 */
+.person-heading h1 {
+  font-size:27px; margin-bottom:3px;
+} /* 設定人物標頭的外觀、狀態或排列 */
+.person-heading p {
+  font-size:13px; color:var(--muted); margin-bottom:7px;
+} /* 設定人物標頭的外觀、狀態或排列 */
+.person-heading>.secondary {
+  margin-left:auto;
+} /* 設定人物標頭的外觀、狀態或排列 */
+.person-stats {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:22px;
+} /* 設定三項互動統計的外觀、狀態或排列 */
+.person-stats>div {
+  text-align:center; background:white; border:1px solid var(--line); border-radius:12px; padding:14px 5px;
+} /* 設定三項互動統計的外觀、狀態或排列 */
+.person-stats b {
+  display:block; font-size:23px; font-weight:600;
+} /* 設定三項互動統計的外觀、狀態或排列 */
+.person-stats small {
+  display:block; color:var(--muted); font-size:11px;
+} /* 設定三項互動統計的外觀、狀態或排列 */
+.person-tabs {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+} /* 設定人物三分頁的外觀、狀態或排列 */
+.person-tabs a {
+  font-size:13px;
+} /* 設定人物三分頁的外觀、狀態或排列 */
+.person-tab-panel {
+  min-height:300px;
+} /* 設定人物分頁內容區的外觀、狀態或排列 */
+.dimension {
+  margin:12px 0; padding:17px 20px;
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension>summary {
+  list-style:none; cursor:pointer;
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension>summary::-webkit-details-marker {
+  display:none;
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension>summary>span {
+  display:block; font-weight:600;
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension>summary>span::after {
+  content:'⌄'; float:right; color:var(--muted);
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension[open]>summary>span::after {
+  content:'⌃';
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension-tags {
+  display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.dimension-body {
+  margin-top:15px;
+} /* 設定四個人物維度的外觀、狀態或排列 */
+.fact-detail {
+  border-top:1px solid var(--line); padding:14px 0 0; margin-top:12px;
+} /* 設定已確認人物資訊的外觀、狀態或排列 */
+.fact-detail p {
+  margin:7px 0; overflow-wrap:anywhere;
+} /* 設定已確認人物資訊的外觀、狀態或排列 */
+.conflict-label {
+  color:#935b2b; font-size:12px;
+} /* 設定人物資訊衝突提示的外觀、狀態或排列 */
+.person-actions {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px; background:var(--paper); padding:16px 0; position:sticky; bottom:0; border-top:1px solid var(--line); margin-top:25px; z-index:2;
+} /* 設定人物頁底部兩個主要操作的外觀、狀態或排列 */
+.person-actions a {
+  white-space:normal; text-align:center;
+} /* 設定人物頁底部兩個主要操作的外觀、狀態或排列 */
+.person-tab-panel>.section-title {
+  flex-wrap:wrap;
+} /* 設定人物分頁內容區的外觀、狀態或排列 */
+.person-tab-panel>.section-title select {
+  width:auto;
+} /* 設定人物分頁內容區的外觀、狀態或排列 */
+.interaction-card select {
+  width:auto; max-width:155px; font-size:12px;
+} /* 設定互動事件卡片的外觀、狀態或排列 */
+.event-experience {
+  padding:12px 0; border-bottom:1px solid var(--line);
+} /* 設定同事件的原始經歷的外觀、狀態或排列 */
+.event-experience h3 {
+  overflow-wrap:anywhere;
+} /* 設定同事件的原始經歷的外觀、狀態或排列 */
+.theater-modes {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px;
+} /* 設定四用途小劇場入口的外觀、狀態或排列 */
+.theater-mode {
+  padding:20px;
+} /* 設定小劇場用途卡片的外觀、狀態或排列 */
+.theater-mode b {
+  display:block; font-size:17px; margin-bottom:8px;
+} /* 設定小劇場用途卡片的外觀、狀態或排列 */
+.theater-mode span {
+  display:block; font-size:12px; color:var(--muted);
+} /* 設定小劇場用途卡片的外觀、狀態或排列 */
+.theater-mode.active {
+  border-color:#7b9868; background:#eff4e8;
+} /* 設定小劇場用途卡片的外觀、狀態或排列 */
+.candidate-row {
+  border-top:1px solid var(--line); margin-top:15px; padding-top:5px;
+} /* 設定逐項人工確認候選的外觀、狀態或排列 */
+.candidate-row>input,.candidate-row>select {
+  margin-bottom:10px;
+} /* 設定逐項人工確認候選的外觀、狀態或排列 */
+@media(max-width:680px) { /* 依視窗尺寸或減少動態偏好調整介面 */
+  .filter-controls {
+    gap:8px;
+  } /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+  .filter-controls select {
+    min-width:110px; font-size:12px;
+  } /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+  .people-cards {
+    gap:10px;
+  } /* 設定人物收藏冊網格的外觀、狀態或排列 */
+  .person-card {
+    display:block; padding:15px 13px;
+  } /* 設定人物摘要卡片的外觀、狀態或排列 */
+  .person-card .person-avatar {
+    margin-bottom:10px; width:40px; height:40px; font-size:20px;
+  } /* 設定人物摘要卡片的外觀、狀態或排列 */
+  .person-card b {
+    font-size:16px;
+  } /* 設定人物摘要卡片的外觀、狀態或排列 */
+  .person-card-line {
+    font-size:11px;
+  } /* 設定人物摘要卡片的外觀、狀態或排列 */
+  .person-summary {
+    position:relative; margin-top:14px; box-shadow:0 5px 24px #24351c10; padding:19px;
+  } /* 設定已選人物摘要的外觀、狀態或排列 */
+  .people-filters {
+    display:grid; grid-template-columns:1fr 1fr auto; gap:8px; align-items:center;
+  } /* 設定人物搜尋區的外觀、狀態或排列 */
+  .people-filters>.field {
+    grid-column:1/3; grid-row:1; margin:0;
+  } /* 設定人物搜尋區的外觀、狀態或排列 */
+  .people-filters>.field>label {
+    position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden;
+  } /* 設定人物搜尋區的外觀、狀態或排列 */
+  .filter-controls {
+    display:contents;
+  } /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+  .filter-controls>.primary {
+    grid-column:3; grid-row:1;
+  } /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+  .filter-controls>select {
+    grid-row:2; min-width:0; width:100%;
+  } /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+  .filter-controls>.check-line {
+    grid-column:3; grid-row:2; margin:0; font-size:11px;
+  } /* 設定排序、分類與關注篩選的外觀、狀態或排列 */
+  .person-heading {
+    gap:12px;
+  } /* 設定人物標頭的外觀、狀態或排列 */
+  .person-heading .person-avatar {
+    width:55px; height:55px;
+  } /* 設定人物標頭的外觀、狀態或排列 */
+  .person-heading h1 {
+    font-size:24px;
+  } /* 設定人物標頭的外觀、狀態或排列 */
+  .person-heading>.secondary {
+    margin-left:0;
+  } /* 設定人物標頭的外觀、狀態或排列 */
+  .person-stats {
+    gap:7px;
+  } /* 設定三項互動統計的外觀、狀態或排列 */
+  .person-stats b {
+    font-size:22px;
+  } /* 設定三項互動統計的外觀、狀態或排列 */
+  .person-actions {
+    bottom:72px; padding:12px 0;
+  } /* 設定人物頁底部兩個主要操作的外觀、狀態或排列 */
+  .dimension {
+    padding:16px;
+  } /* 設定四個人物維度的外觀、狀態或排列 */
+  .theater-mode {
+    padding:17px 13px;
+  } /* 設定小劇場用途卡片的外觀、狀態或排列 */
+  .theater-mode b {
+    font-size:16px;
+  } /* 設定小劇場用途卡片的外觀、狀態或排列 */
+  .map-card {
+    padding:8px;
+  } /* 設定星圖容器的外觀、狀態或排列 */
+} /* 依視窗尺寸或減少動態偏好調整介面 */
+.star-node .star-hit {
+  fill:transparent; stroke:none;
+} /* 設定可互動人物星點的外觀、狀態或排列 */
+.fact-history summary {
+  cursor:pointer; font-size:13px; color:var(--muted);
+} /* 設定人物資訊歷史的外觀、狀態或排列 */
+.content[aria-busy="true"] {
+  cursor:progress;
+} /* 設定主內容載入狀態的外觀、狀態或排列 */
+.content[aria-busy="true"] input,.content[aria-busy="true"] select {
+  opacity:.65;
+} /* 設定主內容載入狀態的外觀、狀態或排列 */

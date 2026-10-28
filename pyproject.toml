@@ -1,25 +1,25 @@
-[project]
-name = "lifeworld-local"
-version = "0.1.0"
-description = "Life World local Python application"
-requires-python = ">=3.9"
-dependencies = ["fastapi>=0.115,<1", "pydantic>=2.7,<3", "uvicorn>=0.30,<1", "python-multipart>=0.0.18", "pwdlib[argon2]>=0.2", "Pillow>=10"]
+[project] # 專案名稱、版本與 Python 相依套件
+name = "lifeworld-local" # 本機套件名稱
+version = "0.2.0" # 目前 App 版本
+description = "Life World local Python application" # 專案簡介
+requires-python = ">=3.9" # 最低 Python 版本
+dependencies = ["fastapi>=0.115,<1", "pydantic>=2.7,<3", "uvicorn>=0.30,<1", "python-multipart>=0.0.18", "pwdlib[argon2]>=0.2", "Pillow>=10"] # 執行 App 所需套件與相容版本範圍
 
-[project.optional-dependencies]
-test = ["pytest>=8,<10", "httpx>=0.27,<1"]
-browser = ["playwright>=1.40,<2"]
+[project.optional-dependencies] # 測試與瀏覽器驗收的選用相依套件
+test = ["pytest>=8,<10", "httpx>=0.27,<1"] # 後端測試所需套件
+browser = ["playwright>=1.40,<2"] # 真實瀏覽器驗收所需套件
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]
-addopts = "-ra"
+[tool.pytest.ini_options] # pytest 預設測試位置與匯入路徑
+testpaths = ["tests"] # 預設執行後端測試；瀏覽器測試須明確指定
+pythonpath = ["."] # 將專案根目錄加入匯入路徑
+addopts = "-ra" # 顯示未通過與跳過測試的摘要
 
-[build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
+[build-system] # Python 套件建置工具
+requires = ["setuptools>=68"] # 建置環境需要的工具
+build-backend = "setuptools.build_meta" # 使用 setuptools 建置 Python 套件
 
-[tool.setuptools.packages.find]
-include = ["app*"]
+[tool.setuptools.packages.find] # 打包時只收錄 App 模組
+include = ["app*"] # 只打包 app 開頭的 Python 模組
 
-[tool.setuptools.package-data]
-app = ["static/*", "migrations/*.sql"]
+[tool.setuptools.package-data] # 隨 Python 套件一併打包的靜態檔與遷移
+app = ["static/*", "migrations/*.sql"] # 保留頁面、樣式、腳本及 SQL 遷移

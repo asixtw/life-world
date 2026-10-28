@@ -1,0 +1,144 @@
+FFFFFFFFFFFFFFFFF                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_rich_person_and_optimistic_update ____________________
+tests/test_people.py:38: in test_rich_person_and_optimistic_update
+    p = person(client, roles=['客戶', '跑步夥伴'], tags=['音樂'], category='business', followed=True)
+tests/test_people.py:13: in person
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["roles","tags","category","followed"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________________ test_search_and_priority_shared_by_both_views _________________
+tests/test_people.py:52: in test_search_and_priority_shared_by_both_views
+    a = person(client, '阿雅', roles=['朋友'], tags=['音樂'], followed=True)
+tests/test_people.py:13: in person
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["roles","tags","followed"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+______________ test_overview_empty_dimensions_are_not_fabricated _______________
+tests/test_people.py:69: in test_overview_empty_dimensions_are_not_fabricated
+    data = overview(client, p)
+tests/test_people.py:32: in overview
+    assert r.status_code == 200, r.text
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____ test_distinct_event_stats_classification_and_merge_preserve_rewards ______
+tests/test_people.py:77: in test_distinct_event_stats_classification_and_merge_preserve_rewards
+    a = event(client, goal, p, 'one', 'in_person')
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________________ test_attach_multiple_experiences_to_same_event ________________
+tests/test_people.py:102: in test_attach_multiple_experiences_to_same_event
+    a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+__________________ test_classify_legacy_unknown_without_award __________________
+tests/test_people.py:110: in test_classify_legacy_unknown_without_award
+    r = event(client, goal, p, kind='unknown')
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________________ test_fact_provenance_dedup_and_no_extra_points ________________
+tests/test_people.py:122: in test_fact_provenance_dedup_and_no_extra_points
+    a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_____________ test_fact_conflict_resolution_and_source_revocation ______________
+tests/test_people.py:142: in test_fact_conflict_resolution_and_source_revocation
+    a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_____ test_fact_requires_explicit_confirmation_and_valid_evidence[change0] _____
+tests/test_people.py:160: in test_fact_requires_explicit_confirmation_and_valid_evidence
+    _, goal = onboard(client); register(client); p = person(client); a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_____ test_fact_requires_explicit_confirmation_and_valid_evidence[change1] _____
+tests/test_people.py:160: in test_fact_requires_explicit_confirmation_and_valid_evidence
+    _, goal = onboard(client); register(client); p = person(client); a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_____ test_fact_requires_explicit_confirmation_and_valid_evidence[change2] _____
+tests/test_people.py:160: in test_fact_requires_explicit_confirmation_and_valid_evidence
+    _, goal = onboard(client); register(client); p = person(client); a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_____ test_fact_requires_explicit_confirmation_and_valid_evidence[change3] _____
+tests/test_people.py:160: in test_fact_requires_explicit_confirmation_and_valid_evidence
+    _, goal = onboard(client); register(client); p = person(client); a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_______ test_confirmation_only_writes_explicitly_selected_person_updates _______
+tests/test_people.py:171: in test_confirmation_only_writes_explicitly_selected_person_updates
+    assert client.post('/api/drafts/' + d['id'] + '/confirm', json=body).status_code == 201
+E   AssertionError: assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+E    +    where <Response [422 Unprocessable Entity]> = post((('/api/drafts/' + '1e89760d-2f22-4924-94fe-c855c312e932') + '/confirm'), json={'contributions': [{'action_id': '42243d41-bf03-4b8f-8eaa-dc53b0611626', 'quantity': '0.5'}], 'expected_revision': 1, ... [{'description': '本人陳述', 'dimension': 'interests', 'evidence_type': 'stated_by_person', 'selected': False, ...}], ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fe5489ea670>.post
+______________ test_goal_context_connections_and_private_sources _______________
+tests/test_people.py:181: in test_goal_context_connections_and_private_sources
+    a = event(client, goal, p)
+tests/test_people.py:21: in event
+    assert r.status_code == 201, r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["interaction_type"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+______________ test_guest_gates_and_cross_owner_all_new_resources ______________
+tests/test_people.py:198: in test_guest_gates_and_cross_owner_all_new_resources
+    assert client.get('/api/people').json()['items'] == []
+E   KeyError: 'items'
+______________ test_person_update_failure_rolls_back_confirmation ______________
+tests/test_people.py:217: in test_person_update_failure_rolls_back_confirmation
+    monkeypatch.setattr(app.state.service, '_apply_person_updates', fail)
+E   AttributeError: <app.service.LifeWorld object at 0x7fe548c97d60> has no attribute '_apply_person_updates'
+___ test_upgrade_migrates_legacy_without_inventing_facts_or_changing_rewards ___
+tests/test_people.py:239: in test_upgrade_migrates_legacy_without_inventing_facts_or_changing_rewards
+    data = app.state.service.person_overview('u','p')
+E   AttributeError: 'LifeWorld' object has no attribute 'person_overview'
+=========================== short test summary info ============================
+FAILED tests/test_people.py::test_rich_person_and_optimistic_update - Asserti...
+FAILED tests/test_people.py::test_search_and_priority_shared_by_both_views - ...
+FAILED tests/test_people.py::test_overview_empty_dimensions_are_not_fabricated
+FAILED tests/test_people.py::test_distinct_event_stats_classification_and_merge_preserve_rewards
+FAILED tests/test_people.py::test_attach_multiple_experiences_to_same_event
+FAILED tests/test_people.py::test_classify_legacy_unknown_without_award - Ass...
+FAILED tests/test_people.py::test_fact_provenance_dedup_and_no_extra_points
+FAILED tests/test_people.py::test_fact_conflict_resolution_and_source_revocation
+FAILED tests/test_people.py::test_fact_requires_explicit_confirmation_and_valid_evidence[change0]
+FAILED tests/test_people.py::test_fact_requires_explicit_confirmation_and_valid_evidence[change1]
+FAILED tests/test_people.py::test_fact_requires_explicit_confirmation_and_valid_evidence[change2]
+FAILED tests/test_people.py::test_fact_requires_explicit_confirmation_and_valid_evidence[change3]
+FAILED tests/test_people.py::test_confirmation_only_writes_explicitly_selected_person_updates
+FAILED tests/test_people.py::test_goal_context_connections_and_private_sources
+FAILED tests/test_people.py::test_guest_gates_and_cross_owner_all_new_resources
+FAILED tests/test_people.py::test_person_update_failure_rolls_back_confirmation
+FAILED tests/test_people.py::test_upgrade_migrates_legacy_without_inventing_facts_or_changing_rewards
+17 failed in 1.20s
