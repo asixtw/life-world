@@ -81,11 +81,11 @@
   },
   {
     "id": "src-iaea",
-    "title": "IAEA and Iran Board Reports",
+    "title": "IAEA GOV/2024/61: Verification and monitoring in Iran",
     "creator": "International Atomic Energy Agency",
-    "date": null,
-    "locator": "Report index; date varies by report",
-    "url": "https://www.iaea.org/newscenter/focus/iran/iaea-and-iran-iaea-board-reports",
+    "date": "2024-11-19",
+    "locator": "GOV/2024/61，封面與第1段；2024-11-21公開",
+    "url": "https://www.iaea.org/sites/default/files/24/11/gov2024-61.pdf",
     "evidence": "source_fact",
     "reviewed": false
   },
@@ -104,8 +104,8 @@
     "title": "Apology",
     "creator": "Plato",
     "date": null,
-    "locator": "Perseus text catalogue",
-    "url": "https://www.perseus.tufts.edu/hopper/",
+    "locator": "Apology；Stephanus 17a–42a；Perseus CTS urn:cts:greekLit:tlg0059.tlg002",
+    "url": "https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg002",
     "evidence": "literary_account",
     "reviewed": false
   },
@@ -144,8 +144,8 @@
     "title": "Republic",
     "creator": "Plato",
     "date": null,
-    "locator": "Perseus text catalogue",
-    "url": "https://www.perseus.tufts.edu/hopper/",
+    "locator": "Republic VII 514a–517a；Perseus CTS urn:cts:greekLit:tlg0059.tlg030",
+    "url": "https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg030",
     "evidence": "literary_account",
     "reviewed": false
   }

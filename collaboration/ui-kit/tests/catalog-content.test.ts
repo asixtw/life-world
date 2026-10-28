@@ -14,6 +14,9 @@ describe('十五人資料與六場劇場', () => { // 明確覆蓋任務數量�
     expect(new Set(personas.map(item => item.id)).size).toBe(15) // 固定人物 ID 唯一。
     for (const pack of ['three-kingdoms', 'international-dialogue', 'philosophy']) expect(personas.filter(item => item.packId === pack)).toHaveLength(5) // 每組都有五位。
     expect(scenarios).toHaveLength(6) // 每組有兩場。
+    expect(personas.every(item => item.fieldEvidence.length === 6 && item.fieldEvidence.every(field => field.evidence === 'interpretation' || field.evidence === 'design_assumption'))).toBe(true) // 六項人物自我設定均標來源層級。
+    expect(personas.filter(item => item.kind === 'role').every(item => item.fieldEvidence.every(field => field.evidence === 'design_assumption'))).toBe(true) // 虛構外交職務不冒充真人內心。
+    expect(sources.every(item => !item.reviewed)).toBe(true) // 機器定位不假填人工通過。
   }) // 名單定版。
   it('keeps 45 distinct multi-turn examples and 30 held-out cases separate', () => { // 參考答案不載入 UI。
     expect(examples).toHaveLength(45) // 每人三段。
@@ -39,6 +42,14 @@ describe('十五人資料與六場劇場', () => { // 明確覆蓋任務數量�
       expect(new Set(endings).size).toBe(3) // 三條有不同結果。
     } // 所有劇場可回顧。
   }) // 完整路徑驗證。
+  it('changes the actual speaker and reply when a different persona enters the same scene', () => { // 選角必須影響劇情內容。
+    for (const scenario of scenarios) { // 每場抽同一首選與追問。
+      const candidates = personas.filter(item => item.packId === scenario.packId) // 同組五人皆可入場。
+      const opening = scenario.nodes.find(item => item.id === scenario.startNodeId)!.choices[0] // 固定同一分支。
+      const replies = candidates.map(persona => { const first = choose(startSession(persona.id, scenario), scenario, opening.id); const followup = scenario.nodes.find(item => item.id === first.nodeId)!.choices[0]; const end = choose(first, scenario, followup.id); const spoken = end.turns.filter(turn => turn.speaker === 'persona'); expect(spoken).toHaveLength(2); expect(spoken.every(turn => turn.speakerId === persona.id)).toBe(true); return spoken.map(turn => turn.text).join('|') }) // 身分綁定且追問也不同。
+      expect(new Set(replies).size).toBe(candidates.length) // 同場選不同人物不能只換頭像。
+    } // 六場均驗。
+  }) // 避免其他人物台詞被誤標成選角人物。
   it('links all portraits and covers to verified local demo files', () => { // ID、路徑與雜湊需一致。
     expect(personaArt).toHaveLength(15) // 十五位頭像均有實檔。
     expect(artManifest.personaArt).toHaveLength(18) // 三組封面亦在清單。

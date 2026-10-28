@@ -12,7 +12,7 @@
 
 React＋TypeScript／Vite 專案、鎖定檔與啟動方法見 [README](../README.md)。`content/` 放十五人、六場、45 示例與來源；`evaluation/inputs.v1.json` 和 `reference.v1.json` 分離 30 題的模型輸入與參考；`assets/manifest.json` 指到已驗證的共用原稿與輸出。十五頭像與三封面已接入，映射見 `assets/persona-art-map.v1.json`。
 
-最近一次 `tsc -b`、`vite build`、`vitest run` 通過，61 模組與 12 案例。Chrome 已操作選角、來源、分支結尾、返回與手動匯出；匯出 JSON 已在 `Downloads` 讀回並核對 `demo` 隔離欄位。390×844 新劇場與美術頁無水平溢位、小按鈕或破圖；先前五頁及 1280×800 桌面基本檢查通過。未測實機、Safari、真實 AI 或正式服務；沒有可寫入套件的瀏覽器截圖檔。
+最近一次 `tsc -b`、`vite build`、`vitest run` 通過，64 模組與 16 案例。Chrome 已操作選角、來源、分支結尾、返回與手動匯出；匯出 JSON 已在 `Downloads` 讀回並核對 `demo` 隔離欄位。390×844 新劇場與美術頁無水平溢位、小按鈕或破圖；先前五頁及 1280×800 桌面基本檢查通過。未測實機、Safari、真實 AI 或正式服務；沒有可寫入套件的瀏覽器截圖檔。
 
 ## Jerry 接入要點
 

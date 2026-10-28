@@ -81,29 +81,13 @@
           {
             "id": "tk-red-cliff-route-1-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "tk-red-cliff-route-1-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-red-cliff-end-1"
           },
           {
             "id": "tk-red-cliff-route-1-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "tk-red-cliff-route-1-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-red-cliff-end-1"
           }
         ]
@@ -137,29 +121,13 @@
           {
             "id": "tk-red-cliff-route-2-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "tk-red-cliff-route-2-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-red-cliff-end-2"
           },
           {
             "id": "tk-red-cliff-route-2-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "tk-red-cliff-route-2-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-red-cliff-end-2"
           }
         ]
@@ -193,29 +161,13 @@
           {
             "id": "tk-red-cliff-route-3-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "tk-red-cliff-route-3-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-red-cliff-end-3"
           },
           {
             "id": "tk-red-cliff-route-3-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "tk-red-cliff-route-3-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-red-cliff-end-3"
           }
         ]
@@ -319,29 +271,13 @@
           {
             "id": "tk-grain-route-1-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "tk-grain-route-1-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-grain-end-1"
           },
           {
             "id": "tk-grain-route-1-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "tk-grain-route-1-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-grain-end-1"
           }
         ]
@@ -375,29 +311,13 @@
           {
             "id": "tk-grain-route-2-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "tk-grain-route-2-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-grain-end-2"
           },
           {
             "id": "tk-grain-route-2-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "tk-grain-route-2-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-grain-end-2"
           }
         ]
@@ -431,29 +351,13 @@
           {
             "id": "tk-grain-route-3-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "tk-grain-route-3-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-grain-end-3"
           },
           {
             "id": "tk-grain-route-3-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "tk-grain-route-3-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "tk-grain-end-3"
           }
         ]
@@ -557,29 +461,13 @@
           {
             "id": "int-ceasefire-route-1-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "int-ceasefire-route-1-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-ceasefire-end-1"
           },
           {
             "id": "int-ceasefire-route-1-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "int-ceasefire-route-1-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-ceasefire-end-1"
           }
         ]
@@ -613,29 +501,13 @@
           {
             "id": "int-ceasefire-route-2-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "int-ceasefire-route-2-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-ceasefire-end-2"
           },
           {
             "id": "int-ceasefire-route-2-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "int-ceasefire-route-2-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-ceasefire-end-2"
           }
         ]
@@ -669,29 +541,13 @@
           {
             "id": "int-ceasefire-route-3-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "int-ceasefire-route-3-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-ceasefire-end-3"
           },
           {
             "id": "int-ceasefire-route-3-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "int-ceasefire-route-3-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-ceasefire-end-3"
           }
         ]
@@ -795,29 +651,13 @@
           {
             "id": "int-shipping-route-1-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "int-shipping-route-1-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-shipping-end-1"
           },
           {
             "id": "int-shipping-route-1-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "int-shipping-route-1-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-shipping-end-1"
           }
         ]
@@ -851,29 +691,13 @@
           {
             "id": "int-shipping-route-2-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "int-shipping-route-2-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-shipping-end-2"
           },
           {
             "id": "int-shipping-route-2-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "int-shipping-route-2-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-shipping-end-2"
           }
         ]
@@ -907,29 +731,13 @@
           {
             "id": "int-shipping-route-3-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "int-shipping-route-3-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-shipping-end-3"
           },
           {
             "id": "int-shipping-route-3-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "int-shipping-route-3-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "int-shipping-end-3"
           }
         ]
@@ -1033,29 +841,13 @@
           {
             "id": "ph-success-route-1-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "ph-success-route-1-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-success-end-1"
           },
           {
             "id": "ph-success-route-1-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "ph-success-route-1-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-success-end-1"
           }
         ]
@@ -1089,29 +881,13 @@
           {
             "id": "ph-success-route-2-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "ph-success-route-2-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-success-end-2"
           },
           {
             "id": "ph-success-route-2-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "ph-success-route-2-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-success-end-2"
           }
         ]
@@ -1145,29 +921,13 @@
           {
             "id": "ph-success-route-3-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "ph-success-route-3-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-success-end-3"
           },
           {
             "id": "ph-success-route-3-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "ph-success-route-3-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-success-end-3"
           }
         ]
@@ -1271,29 +1031,13 @@
           {
             "id": "ph-promise-route-1-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "ph-promise-route-1-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-promise-end-1"
           },
           {
             "id": "ph-promise-route-1-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "ph-promise-route-1-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-promise-end-1"
           }
         ]
@@ -1327,29 +1071,13 @@
           {
             "id": "ph-promise-route-2-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "ph-promise-route-2-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-promise-end-2"
           },
           {
             "id": "ph-promise-route-2-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "ph-promise-route-2-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-promise-end-2"
           }
         ]
@@ -1383,29 +1111,13 @@
           {
             "id": "ph-promise-route-3-deadline",
             "label": "請提出具體期限與檢查點",
-            "reply": [
-              {
-                "id": "ph-promise-route-3-deadline-reply",
-                "speaker": "persona",
-                "text": "先指定可核對的交付物與期限，並明列此路線尚未取得的同意。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-promise-end-3"
           },
           {
             "id": "ph-promise-route-3-risk",
             "label": "先列出仍未解決的風險",
-            "reply": [
-              {
-                "id": "ph-promise-route-3-risk-reply",
-                "speaker": "persona",
-                "text": "請將本路線的資料缺口、受影響者與退出條件列入紀錄，再決定是否推進。",
-                "evidence": "generated_scene",
-                "sourceRefs": []
-              }
-            ],
+            "reply": [],
             "nextNodeId": "ph-promise-end-3"
           }
         ]

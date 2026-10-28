@@ -1,4 +1,8 @@
 import type { DialogueChoice, DialogueTurn, LiveAdapter, LiveRequest, LiveResponse, Scenario, SimulationSession } from './contracts' // 使用公開契約避免引擎暗改資料。
+import scriptVoices from '../content/script-voices.v1.json' // 每位人物對各場主路線的獨立預寫反應。
+
+type VoiceSet = Record<string, string[] | string> & { deadline: string; risk: string } // 路線反應與追問依人物索引。
+const voices = scriptVoices as unknown as Record<string, VoiceSet> // JSON 保留版本化內容，不依賴即時模型。
 
 export class ScriptError extends Error {} // 場景格式或操作錯誤給 UI 可讀退路。
 export class AdapterNotConfiguredError extends Error { constructor() { super('即時 AI 尚未設定；請改用預寫腳本。') } } // 不把腳本偽裝成即時 AI。
@@ -42,7 +46,14 @@ export function choose(session: SimulationSession, scenario: Scenario, choiceId:
   if (!choice) throw new ScriptError('這個選項已不可使用') // 讓 UI 能保留與返回。
   const next = getNode(scenario, choice.nextNodeId) // 目的地必須存在。
   const visitor: DialogueTurn = { id: `${session.id}:${choice.id}`, speaker: 'visitor', text: choice.label, evidence: 'generated_scene', sourceRefs: [] } // 使用者選擇也只屬演練。
-  return { ...session, nodeId: next.id, path: [...session.path, next.id], turns: [...session.turns, visitor, ...choice.reply, ...next.lines], status: next.ending ? 'ended' : 'active', endedAt: next.ending ? now.toISOString() : undefined } // 只有結尾節點結束。
+  const voice = voices[session.personaId] // 無專屬內容時保留通用引擎契約。
+  const sceneLines = voice?.[scenario.id] // 同一場三條路線各有不同角色反應。
+  const firstChoiceIndex = getNode(scenario, scenario.startNodeId).choices.findIndex(item => item.id === choice.id) // 首輪以固定選項 ID 對位。
+  const rootChoice = getNode(scenario, scenario.startNodeId).choices.find(item => item.nextNodeId === node.id) // 追問沿用本條路線的議題。
+  const wording = firstChoiceIndex >= 0 && Array.isArray(sceneLines) ? sceneLines[firstChoiceIndex] : rootChoice && voice ? `針對「${rootChoice.label}」，${choice.id.endsWith('-deadline') ? voice.deadline : voice.risk}` : undefined // 角色語氣、議題與後續選項共同決定發話。
+  const authored: DialogueTurn[] = wording ? [{ id: `${session.id}:${choice.id}:persona`, speaker: 'persona', speakerId: session.personaId, text: wording, evidence: 'generated_scene', sourceRefs: [] }] : [] // 只把當前人物自己的話標成其肖像。
+  const scripted = wording ? choice.reply.filter(turn => turn.speaker !== 'persona') : choice.reply // 取代重複通用回覆，保留有名字的旁白轉述。
+  return { ...session, nodeId: next.id, path: [...session.path, next.id], turns: [...session.turns, visitor, ...scripted, ...authored, ...next.lines], status: next.ending ? 'ended' : 'active', endedAt: next.ending ? now.toISOString() : undefined } // 只有結尾節點結束。
 }
 
 export function exportSession(session: SimulationSession): string { // 匯出只供使用者手動下載。

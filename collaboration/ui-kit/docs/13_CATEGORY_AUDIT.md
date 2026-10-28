@@ -9,7 +9,7 @@
 | 3 輸入 | 元件頁：文字、長文、密碼、數字、日期時間、搜尋、下拉、checkbox、radio、switch；說明、錯誤、停用、載入中 | 可操作 fixture；正式資料驗證與提交未接 |
 | 4 導覽與卡片 | Gallery 五頁導覽、流程 tabs、返回、人物／目標／故事卡概念、進度及排程格 | 部分；人物選角已可操作，正式四主分頁待正式 App 接入；肖像卡已接美術 |
 | 5 面板與回饋 | `Dialog`、BottomSheet、Toast、狀態切換、重試、草稿／確認回執 fixture；Escape 關閉後焦點返回已測 | 部分；劇場來源資料與連結已接入，來源人工核對待做 |
-| 6 多模態 UI | 紀錄頁五種附件入口、預覽、上傳、取消、失敗、重試／回執；八種錄音狀態及文字退路 | 可操作 fixture；無麥克風、實際檔案上傳、辨識或後端回執 |
+| 6 多模態 UI | 紀錄頁五種附件入口、本地 SVG／文字檔預覽、模擬進度、取消、失敗、重試／回執；八種錄音狀態及文字退路 | 可操作 fixture；無麥克風、實際檔案上傳、辨識或後端回執 |
 | 7 App 代表圖 | `assets/manifest.json` 連到實際原稿、PNG 輸出與裁切預覽，`public/` 含 favicon／分享圖 | 部分；原生向量未交 |
 | 8 Lumi／世界 | 陪伴／Quiet Lumi 原稿和顯示輸出，Quiet 可切換 | 部分；世界基底缺件 |
 | 9 目標蛋 | `Hatch.tsx` 固定狀態、開始／發光／初裂／破殼／完成邏輯 | 部分；四階段蛋圖已接入，`shellsplit`／`completion` 無輸出 |
@@ -20,7 +20,7 @@
 
 ## 實測範圍
 
-- `tsc -b`、`vite build`、`vitest run` 通過：3 個測試檔、12 個案例；內容與圖片缺項不由這些測試宣稱通過。
+- `tsc -b`、`vite build`、`vitest run` 通過：3 個測試檔、16 個案例；內容與圖片缺項不由這些測試宣稱通過。
 - Chrome 390×844：總覽、元件、孵化、紀錄、劇場逐頁檢查，`documentElement.scrollWidth - clientWidth = 0`，可見按鈕沒有小於 44 CSS px 的目標。BottomSheet 初始焦點為關閉鍵，Escape 後返回開啟鍵。Quiet／減少動效及 Toast 可切換。紀錄頁附件和錄音失敗後，草稿文字仍保留。
 - Chrome 1280×800：紀錄頁無水平溢位或小於 44 CSS px 的可見按鈕。重啟 Vite 前瀏覽器出現 HMR WebSocket 連線錯誤；重啟後頁面可載入，未發現應用程式例外。
 - 新資料接入後在 Chrome 390×844 實測劇場和共用美術頁無水平溢位、小按鈕或破圖；蛋 512 px 原圖、分享圖及三種圖示裁切載入成功。國際組選角、選場、來源連結、Escape／焦點返回、手動下載 JSON 已驗，匯出標示 `usageScope=demo`、`importToRealExperience=false`。

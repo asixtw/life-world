@@ -15,7 +15,45 @@
       "src-sgz-wei"
     ],
     "avatarId": "portrait-three-kingdoms-caocao",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-wei"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-wei"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-wei"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "tk-liubei",
@@ -33,7 +71,45 @@
       "src-sgz-shu"
     ],
     "avatarId": "portrait-three-kingdoms-liubei",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-shu"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-shu"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-shu"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "tk-zhuge",
@@ -51,7 +127,45 @@
       "src-sgz-zhuge"
     ],
     "avatarId": "portrait-three-kingdoms-zhugeliang",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-zhuge"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-zhuge"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-zhuge"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "tk-sunquan",
@@ -69,7 +183,45 @@
       "src-sgz-wu"
     ],
     "avatarId": "portrait-three-kingdoms-sunquan",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-wu"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-wu"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-wu"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "tk-zhouyu",
@@ -87,7 +239,45 @@
       "src-sgz-zhou"
     ],
     "avatarId": "portrait-three-kingdoms-zhouyu",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-zhou"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-zhou"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-sgz-zhou"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "int-us",
@@ -105,7 +295,39 @@
       "src-us-2024"
     ],
     "avatarId": "portrait-international-dialogue-us-representative",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "motivation",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "perspective",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "int-iran",
@@ -123,7 +345,39 @@
       "src-un-2231"
     ],
     "avatarId": "portrait-international-dialogue-iran-representative",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "motivation",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "perspective",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "int-mediator",
@@ -141,7 +395,39 @@
       "src-un-charter"
     ],
     "avatarId": "portrait-international-dialogue-neutral-mediator",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "motivation",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "perspective",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "int-observer",
@@ -159,7 +445,39 @@
       "src-iaea"
     ],
     "avatarId": "portrait-international-dialogue-international-observer",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "motivation",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "perspective",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "int-shipping",
@@ -177,7 +495,39 @@
       "src-imo"
     ],
     "avatarId": "portrait-international-dialogue-shipping-representative",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "motivation",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "perspective",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "ph-socrates",
@@ -195,7 +545,45 @@
       "src-plato-apology"
     ],
     "avatarId": "portrait-philosophy-socrates",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-plato-apology"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-plato-apology"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-plato-apology"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "ph-confucius",
@@ -213,7 +601,45 @@
       "src-analects"
     ],
     "avatarId": "portrait-philosophy-confucius",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-analects"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-analects"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-analects"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "ph-zhuangzi",
@@ -231,7 +657,45 @@
       "src-zhuangzi"
     ],
     "avatarId": "portrait-philosophy-zhuangzi",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-zhuangzi"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-zhuangzi"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-zhuangzi"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "ph-nietzsche",
@@ -249,7 +713,45 @@
       "src-nietzsche"
     ],
     "avatarId": "portrait-philosophy-nietzsche",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-nietzsche"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-nietzsche"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-nietzsche"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   },
   {
     "id": "ph-plato",
@@ -267,6 +769,44 @@
       "src-plato-republic"
     ],
     "avatarId": "portrait-philosophy-plato",
-    "usageScope": "demo"
+    "usageScope": "demo",
+    "fieldEvidence": [
+      {
+        "field": "summary",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-plato-republic"
+        ]
+      },
+      {
+        "field": "motivation",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-plato-republic"
+        ]
+      },
+      {
+        "field": "perspective",
+        "evidence": "interpretation",
+        "sourceRefs": [
+          "src-plato-republic"
+        ]
+      },
+      {
+        "field": "voice",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "boundary",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      },
+      {
+        "field": "knowledgeCutoff",
+        "evidence": "design_assumption",
+        "sourceRefs": []
+      }
+    ]
   }
 ]
