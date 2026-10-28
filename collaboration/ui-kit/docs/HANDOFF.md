@@ -27,6 +27,9 @@
 
 ## 已知限制與接入事項
 
-人物名單決議前 `content/catalog.ts` 保持空白，六場景、評估、肖像與封面未完成。共用插畫由父任務製作中，所需檔名與錨點見 [PROGRESS.md](PROGRESS.md)。現行孵化視覺為程式狀態圖層，不能替代規格要求的實際圖像原稿。
+人物名單決議前 `content/catalog.ts` 保持空白，六場景、評估、肖像與封面未完成。共用插畫由協作圖像工作流製作中，所需檔名與錨點見 [PROGRESS.md](PROGRESS.md)。現行孵化視覺為程式狀態圖層，不能替代規格要求的實際圖像原稿。
+
+Library 美術包在 Windows 官方傳輸 helper 的 `os.setxattr` 步驟失敗，無本地檔案可接入。這是環境不支援，結果確定未安裝；需能保留 Library 身分與雜湊驗證的 Windows 傳入途徑。四項圖像生成另遭工具阻擋，並非已產出。
 
 Jerry 接入時需：確認示範入口及使用權限；審查每個 ID／source／asset 引用；由宿主注入 `LiveAdapter`，處理權限、取消與後端金鑰；將 `Hatch` 的 `confirmedReceiptId` 接到唯一後端確認回執；避免在元件中呼叫正式計分、收藏或經歷寫入。所有回饋視覺僅反映既有回執。
+
