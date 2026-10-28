@@ -1,0 +1,60 @@
+F
+=================================== FAILURES ===================================
+_________ test_connections_source_matching_persistence_and_return[390] _________
+browser_tests/test_connections.py:41: in test_connections_source_matching_persistence_and_return
+    expect(page.locator('#connections-explorer')).to_be_visible()  # 星圖已由交會取代
+E   AssertionError: Locator expected to be visible
+E   Actual value: - complementary:
+E     - navigation "主要導覽":
+E       - link "世界":
+E         - /url: "#world"
+E       - link "目標":
+E         - /url: "#goals"
+E       - link "紀錄":
+E         - /url: "#history"
+E       - link "關係":
+E         - /url: "#people"
+E   - main:
+E     - text: 我的小小宇宙 ／ 我的關係
+E     - button "帳號設定": 測
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "我的人際關係" [level=1]
+E     - paragraph: 從星圖探索，也能用收藏冊快速找到人。
+E     - button "＋ 新增人物"
+E     - tablist "人物檢視方式":
+E       - tab "星圖" [selected]: ✧ 星圖
+E       - tab "收藏冊": ▦ 收藏冊
+E     - text: 搜尋人物、角色、目標或標籤
+E     - textbox "搜尋人物、角色、目標或標籤":
+E       - /placeholder: 輸入姓名、目標或標籤
+E     - combobox "視覺排序":
+E       - option "綜合優先度" [selected]
+E       - option "最近互動"
+E       - option "姓名"
+E     - combobox "人物分類":
+E       - option "全部分類" [selected]
+E       - option "業務"
+E       - option "生活"
+E       - option "學習／健身"
+E       - option "未分類"
+E     - checkbox "只看關注"
+E     - text: 只看關注
+E     - button "搜尋"
+E     - paragraph: 綜合優先度：關注 → 關聯進行中目標 → 最近互動。星點位置不代表親密度。共 4 位。
+E     - group "關係星圖；位置為視覺排序，不代表親密度":
+E       - text: 我
+E       - button "選取小安": ✦
+E       - button "選取阿哲": ✦
+E       - button "選取怡君": ✦
+E       - button "選取怡君": ✦
+E     - text: ● 業務 ● 生活 ● 學習／健身 ● 未分類 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for locator("#connections-explorer")
+=========================== short test summary info ============================
+FAILED browser_tests/test_connections.py::test_connections_source_matching_persistence_and_return[390]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 6.43s

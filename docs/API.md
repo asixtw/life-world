@@ -1,5 +1,21 @@
 # 本機 API
 
+## v0.3 交會 API
+
+草稿／確認新增選填 `story`，包含標題、多位參與者（`person_id`／`interacted`）及原文提及（`name`／`start`／`end`／選填人工 `person_id`）。正式確認另需 `story_reviewed: true`；位置按 Unicode 字元而非 UTF-16 計算。省略新欄位維持舊確認去重指紋。
+
+| 方法 | 路徑 | 用途 |
+|---|---|---|
+| GET | `/api/connections` | 同帳號、人物焦點、角色分流、時間排序與分頁 |
+| GET | `/api/connections/stories/{id}` | 原文、摘要、參與、提及；`manage=true` 為本人管理模式 |
+| PUT | `/api/connections/stories/{id}/people` | 人工確認／更正角色，不重發積分 |
+| POST | `/api/connections/mentions/{id}/match` | 人工配對、取消或拒絕，不改參與身分 |
+| POST | `/api/connections/stories/{id}/availability` | 撤回／恢復探索展示，不刪原文 |
+
+寫入攜帶 `request_id`、`expected_revision`，角色及身分核對另需 `confirmed: true`。舊版本或同 key 不同內容回 409，無效片段回 422，不可存取或已撤回的探索來源回 404。完整邊界見 [CONNECTIONS](CONNECTIONS.md)，實際 schema 見 [openapi.json](openapi.json)。
+
+## 既有 API
+
 完整 schema 與錯誤型別以 `openapi.json` 為準。API prefix 為 `/api`。
 
 | 方法 | 路徑 | 用途 |

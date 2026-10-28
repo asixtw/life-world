@@ -1,0 +1,77 @@
+F.....FFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+________________ test_draft_roundtrip_confirm_and_durable_match ________________
+tests/test_connections.py:50: in test_draft_roundtrip_confirm_and_durable_match
+    receipt, d, body = saved_story(client, p)  # 保存未配對提及
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_________ test_unicode_mentions_multiple_occurrences_and_only_mentions _________
+tests/test_connections.py:87: in test_unicode_mentions_multiple_occurrences_and_only_mentions
+    receipt, _, _ = saved_story(client, p, raw=raw, participants=[], mentions=[{'name': '怡君', 'start': 1, 'end': 3}, {'name': '怡君', 'start': 8, 'end': 10}])  # 分別保存兩處未配對人名
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_______ test_participation_without_direct_interaction_and_merged_sources _______
+tests/test_connections.py:96: in test_participation_without_direct_interaction_and_merged_sources
+    a, _, _ = saved_story(client, p, participants=[{'person_id': p[0]['id'], 'interacted': True}, {'person_id': p[1]['id'], 'interacted': False}])  # 第二人只有同場
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_______________ test_match_conflicts_unmatch_reject_and_history ________________
+tests/test_connections.py:106: in test_match_conflicts_unmatch_reject_and_history
+    p = people(client); receipt, _, _ = saved_story(client, p)  # 建立待配對來源
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________ test_withdrawal_hides_source_and_paths_but_preserves_original _________
+tests/test_connections.py:122: in test_withdrawal_hides_source_and_paths_but_preserves_original
+    p = people(client); receipt, _, _ = saved_story(client, p)  # 建立可探索故事
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+___________________ test_cross_account_access_and_guest_gate ___________________
+tests/test_connections.py:136: in test_cross_account_access_and_guest_gate
+    p = people(client); receipt, _, _ = saved_story(client, p)  # 第一個帳號的私人故事
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+______________ test_legacy_review_and_empty_story_do_not_reaward _______________
+tests/test_connections.py:152: in test_legacy_review_and_empty_story_do_not_reaward
+    assert client.get('/api/connections').json()['total'] == 0  # 不推測共同參與
+E   KeyError: 'total'
+____________________ test_stable_pagination_and_draft_edit _____________________
+tests/test_connections.py:165: in test_stable_pagination_and_draft_edit
+    first, d, _ = saved_story(client, p)  # 第一份已確認故事
+tests/test_connections.py:28: in saved_story
+    assert response.status_code == 201, response.text  # 驗證新草稿契約可用
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_______________ test_migration_preserves_legacy_rows_and_rewards _______________
+tests/test_connections.py:196: in test_migration_preserves_legacy_rows_and_rewards
+    assert c.execute("SELECT reviewed FROM experience_stories WHERE experience_id='x'").fetchone()[0] == 0  # 舊故事只標待確認
+E   sqlite3.OperationalError: no such table: experience_stories
+=========================== short test summary info ============================
+FAILED tests/test_connections.py::test_draft_roundtrip_confirm_and_durable_match
+FAILED tests/test_connections.py::test_unicode_mentions_multiple_occurrences_and_only_mentions
+FAILED tests/test_connections.py::test_participation_without_direct_interaction_and_merged_sources
+FAILED tests/test_connections.py::test_match_conflicts_unmatch_reject_and_history
+FAILED tests/test_connections.py::test_withdrawal_hides_source_and_paths_but_preserves_original
+FAILED tests/test_connections.py::test_cross_account_access_and_guest_gate - ...
+FAILED tests/test_connections.py::test_legacy_review_and_empty_story_do_not_reaward
+FAILED tests/test_connections.py::test_stable_pagination_and_draft_edit - Ass...
+FAILED tests/test_connections.py::test_migration_preserves_legacy_rows_and_rewards
+9 failed, 5 passed in 1.47s

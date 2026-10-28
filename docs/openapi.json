@@ -3,7 +3,7 @@
   "info": {
     "title": "Life World Local API",
     "description": "本機開發版；開發設定不是正式產品規則。",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "paths": {
     "/api/health": {
@@ -1263,6 +1263,307 @@
         }
       }
     },
+    "/api/connections": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Stories",
+        "operationId": "stories_api_connections_get",
+        "parameters": [
+          {
+            "name": "person_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Person Id"
+            }
+          },
+          {
+            "name": "involvement",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "participant",
+                "mention",
+                "legacy"
+              ],
+              "type": "string",
+              "default": "participant",
+              "title": "Involvement"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "recent",
+                "oldest"
+              ],
+              "type": "string",
+              "default": "recent",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/connections/stories/{experience_id}": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Story",
+        "operationId": "story_api_connections_stories__experience_id__get",
+        "parameters": [
+          {
+            "name": "experience_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experience Id"
+            }
+          },
+          {
+            "name": "manage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Manage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/connections/stories/{experience_id}/people": {
+      "put": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Story People",
+        "operationId": "story_people_api_connections_stories__experience_id__people_put",
+        "parameters": [
+          {
+            "name": "experience_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experience Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryPeopleEdit"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/connections/mentions/{mention_id}/match": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Mention Match",
+        "operationId": "mention_match_api_connections_mentions__mention_id__match_post",
+        "parameters": [
+          {
+            "name": "mention_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Mention Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MentionMatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/connections/stories/{experience_id}/availability": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Story Availability",
+        "operationId": "story_availability_api_connections_stories__experience_id__availability_post",
+        "parameters": [
+          {
+            "name": "experience_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experience Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryAvailability"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/goals/{goal_id}/evidence": {
       "post": {
         "tags": [
@@ -1669,6 +1970,21 @@
             "type": "array",
             "maxItems": 30,
             "title": "Person Updates"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "story_reviewed": {
+            "type": "boolean",
+            "title": "Story Reviewed",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -1805,6 +2121,16 @@
               }
             ],
             "title": "Person Id"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -1859,6 +2185,16 @@
               }
             ],
             "title": "Person Id"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "expected_revision": {
             "type": "integer",
@@ -2120,6 +2456,57 @@
           "password"
         ],
         "title": "Login"
+      },
+      "MentionMatch": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "request_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "matched",
+              "unmatched",
+              "rejected"
+            ],
+            "title": "Status"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "request_id",
+          "status",
+          "confirmed"
+        ],
+        "title": "MentionMatch"
       },
       "NoteCreate": {
         "properties": {
@@ -2472,6 +2859,156 @@
           "experience_id"
         ],
         "title": "SourceRevoke"
+      },
+      "StoryAvailability": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "request_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "request_id",
+          "available"
+        ],
+        "title": "StoryAvailability"
+      },
+      "StoryInput": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Title",
+            "default": ""
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/StoryParticipant"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Participants"
+          },
+          "mentions": {
+            "items": {
+              "$ref": "#/components/schemas/StoryMention"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Mentions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "StoryInput"
+      },
+      "StoryMention": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "start": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Start"
+          },
+          "end": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "End"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "start",
+          "end"
+        ],
+        "title": "StoryMention"
+      },
+      "StoryParticipant": {
+        "properties": {
+          "person_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Person Id"
+          },
+          "interacted": {
+            "type": "boolean",
+            "title": "Interacted",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "person_id"
+        ],
+        "title": "StoryParticipant"
+      },
+      "StoryPeopleEdit": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "request_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "story": {
+            "$ref": "#/components/schemas/StoryInput"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "request_id",
+          "story",
+          "confirmed"
+        ],
+        "title": "StoryPeopleEdit"
       },
       "TaskEdit": {
         "properties": {

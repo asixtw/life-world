@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright, expect  # 以實際 Chromium �
 
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGNkaGBgYGBgYmBgYGBgAAAGKgCE5tEtPAAAAABJRU5ErkJggg==')  # 準備供上傳驗收使用的有效虛構圖片
 BASE = os.environ.get('LIFEWORLD_TEST_URL', 'http://127.0.0.1:8001')  # 透過實際測試用戶端操作 API 並保留回應
-ARTIFACTS = Path(__file__).resolve().parent.parent / 'docs' / 'artifacts'  # 準備手機與桌面驗收截圖的輸出目錄
+ARTIFACTS = Path(__file__).resolve().parent.parent / 'docs' / 'artifacts' / 'connections' / 'regression'  # 準備手機與桌面驗收截圖的輸出目錄
 
 
 @pytest.fixture  # 註冊可由 pytest 注入並清理的測試資源

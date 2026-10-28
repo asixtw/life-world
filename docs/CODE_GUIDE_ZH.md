@@ -1,5 +1,9 @@
 # 程式碼註解與 prototype 入口
 
+2026-10-28 交會整合更新：App 現為 v0.3.0，[connections.py](../app/connections.py)與[connections.js](../app/static/connections.js)負責逐經歷角色、配對與故事探索，[003 遷移](../app/migrations/003_connections.sql)保持舊內容相容。最新 100／14 測試與體驗量測見[交會驗收](CONNECTIONS_ACCEPTANCE.md)；下方「本次未重跑」及 81／7 是早前文件整理與 v0.2 的歷史記載。
+
+2026-10-28 文件入口更新：未來新增及修改的自有程式、測試與腳本，逐行加入有意義的繁體中文註解，優先放行末；跨行字串、模板及不支援註解的格式使用相鄰合法說明，不污染資料與畫面。空白行、第三方與自動產生檔不直接加註解。完整八點 TDD 紀律見[共同研發指引](PRODUCT_GUIDE.md)，版本與原型現況見[功能演進](EVOLUTION.md)。下方保留原註解交付及當時測試結果，本次沒有重新執行產品測試。
+
 2026-10-27：本次替 `LifeWorld_App` 的 34 個自有程式與設定檔補上繁體中文註解，包含 Python、JavaScript、CSS、HTML、SQL、pytest、工具腳本、macOS 啟動器與 `pyproject.toml`。依賴套件、生成的 OpenAPI JSON、資料庫內容及歷史交接包維持原樣。
 
 ## 從哪裡閱讀程式
@@ -21,6 +25,7 @@
 
 ## Prototype 在哪裡
 
+- **Connections v0.3**：完整本機工作區中的 `LifeWorld_Connections_v0.3/prototype.html`，可離線開啟；來源與限制見[演進紀錄](EVOLUTION.md)。此為虛構前端示範，配對僅頁面暫存，並非 App v0.3。
 - **新版可操作 App**：[http://127.0.0.1:8000](http://127.0.0.1:8000)。需先啟動本機 Python 服務，使用 SQLite 保存資料。
 - **先前暖白互動 prototype**：工作區根目錄下 `LifeWorld_Workspace_2026-10-27/01_目前工作區/互動原型_待依最新決策修訂/index.html`。此為獨立 HTML 原型，資料與新版 App 分開。
 - **原交接包人物卡原型**：工作區根目錄下 `LifeWorld_Master_Handoff_v1.1_AUTH_DRAFT/person360.html`。

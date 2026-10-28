@@ -1,0 +1,240 @@
+{
+  "date": "2026-10-28 Asia/Taipei",
+  "browser": "Playwright Chromium headless",
+  "navigation": [
+    {
+      "data": "small",
+      "condition": "local",
+      "route": "world",
+      "median_ms": 16.6,
+      "max_ms": 16.8
+    },
+    {
+      "data": "small",
+      "condition": "local",
+      "route": "goals",
+      "median_ms": 16.6,
+      "max_ms": 16.6
+    },
+    {
+      "data": "small",
+      "condition": "local",
+      "route": "history",
+      "median_ms": 16.7,
+      "max_ms": 16.9
+    },
+    {
+      "data": "small",
+      "condition": "local",
+      "route": "connections",
+      "median_ms": 25.1,
+      "max_ms": 33.3
+    },
+    {
+      "data": "small",
+      "condition": "local",
+      "route": "collection",
+      "median_ms": 25.1,
+      "max_ms": 25.8
+    },
+    {
+      "data": "small",
+      "condition": "local",
+      "route": "record",
+      "median_ms": 17.1,
+      "max_ms": 24.1
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "world",
+      "median_ms": 24.5,
+      "max_ms": 26.0
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "goals",
+      "median_ms": 16.9,
+      "max_ms": 16.9
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "history",
+      "median_ms": 16.6,
+      "max_ms": 17.1
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "connections",
+      "median_ms": 215.5,
+      "max_ms": 217.3
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "collection",
+      "median_ms": 192.1,
+      "max_ms": 199.2
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "record",
+      "median_ms": 26.1,
+      "max_ms": 26.2
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "route": "world",
+      "median_ms": 16.7,
+      "max_ms": 16.9
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "route": "goals",
+      "median_ms": 17.2,
+      "max_ms": 17.4
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "route": "history",
+      "median_ms": 25.1,
+      "max_ms": 25.4
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "route": "connections",
+      "median_ms": 25.0,
+      "max_ms": 25.2
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "route": "collection",
+      "median_ms": 42.3,
+      "max_ms": 42.7
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "route": "record",
+      "median_ms": 16.8,
+      "max_ms": 23.2
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "world",
+      "median_ms": 33.0,
+      "max_ms": 33.5
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "goals",
+      "median_ms": 16.3,
+      "max_ms": 16.5
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "history",
+      "median_ms": 58.9,
+      "max_ms": 59.4
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "connections",
+      "median_ms": 240.8,
+      "max_ms": 242.7
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "collection",
+      "median_ms": 224.5,
+      "max_ms": 226.1
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "route": "record",
+      "median_ms": 32.8,
+      "max_ms": 37.0
+    }
+  ],
+  "api": [
+    {
+      "data": "small",
+      "endpoint": "/api/state",
+      "local_median_ms": 4.0,
+      "local_max_ms": 4.8
+    },
+    {
+      "data": "small",
+      "endpoint": "/api/connections?limit=8",
+      "local_median_ms": 3.6,
+      "local_max_ms": 4.2
+    },
+    {
+      "data": "small",
+      "endpoint": "/api/people?limit=12",
+      "local_median_ms": 3.1,
+      "local_max_ms": 3.4
+    },
+    {
+      "data": "300_people_103_stories",
+      "endpoint": "/api/state",
+      "local_median_ms": 37.2,
+      "local_max_ms": 46.7
+    },
+    {
+      "data": "300_people_103_stories",
+      "endpoint": "/api/connections?limit=8",
+      "local_median_ms": 4.0,
+      "local_max_ms": 4.6
+    },
+    {
+      "data": "300_people_103_stories",
+      "endpoint": "/api/people?limit=12",
+      "local_median_ms": 20.2,
+      "local_max_ms": 20.9
+    }
+  ],
+  "limits": "每條路由各三次，非正式負載／實機／Safari 測試；CPU 與網路設定為模擬。",
+  "long_tasks": [
+    {
+      "data": "small",
+      "condition": "local",
+      "count": 0,
+      "max_ms": 0
+    },
+    {
+      "data": "small",
+      "condition": "150ms_latency_4x_cpu",
+      "count": 0,
+      "max_ms": 0
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "local",
+      "count": 0,
+      "max_ms": 0
+    },
+    {
+      "data": "300_people_103_stories",
+      "condition": "150ms_latency_4x_cpu",
+      "count": 0,
+      "max_ms": 0
+    }
+  ],
+  "javascript_errors": []
+}

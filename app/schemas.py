@@ -110,12 +110,40 @@ class WithContributions(Model):  # 含去重貢獻清單的共用輸入
         return self  # 回傳拒絕在同次貢獻中重複列入同一行動的結果
 
 
+class StoryParticipant(Model):  # 明確參與者與直接互動旗標
+    person_id: str = Field(min_length=1, max_length=128)  # 使用固定人物 ID，不依名字合併
+    interacted: bool = Field(default=False, strict=True)  # 同場預設不算直接互動
+
+
+class StoryMention(Model):  # 尚未配對或已人工指定的原文提及
+    model_config = ConfigDict(extra='forbid', str_strip_whitespace=False)  # 保留原文字元與空白
+    name: str = Field(min_length=1, max_length=100)  # 精確對應來源字串
+    start: StrictInt = Field(ge=0)  # 原文 Unicode 起點
+    end: StrictInt = Field(gt=0)  # 原文 Unicode 終點，不包含此位置
+    person_id: Optional[str] = Field(default=None, min_length=1, max_length=128)  # 只有使用者選定才保存人物身分
+
+
+class StoryInput(Model):  # 草稿與正式人物核對共用資料
+    title: str = Field(default='', max_length=160)  # 可另取故事標題
+    participants: List[StoryParticipant] = Field(default_factory=list, max_length=100)  # 每筆經歷最多一百位參與者
+    mentions: List[StoryMention] = Field(default_factory=list, max_length=100)  # 每個原文位置獨立配對
+
+    @model_validator(mode='after')  # 驗證跨項目的唯一性
+    def distinct_links(self):  # 拒絕重複人物與重複提及位置
+        ids = [p.person_id for p in self.participants]  # 取得固定人物識別碼
+        spans = [(m.start, m.end) for m in self.mentions]  # 取得原文範圍
+        if len(ids) != len(set(ids)) or len(spans) != len(set(spans)):  # 重複輸入不能默默覆寫
+            raise ValueError('參與者與提及位置不可重複')  # 讓介面要求人工修正
+        return self  # 回傳唯一且合法的角色資料
+
+
 class DraftCreate(WithContributions):  # 尚未確認的原始經歷輸入
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=False)  # 設定輸入欄位驗證策略
     raw_text: str = Field(min_length=1, max_length=20000)  # 設定原始經歷文字（保留空白與換行）的型別、預設值與輸入限制
     occurred_at: datetime  # 設定帶時區的實際發生時間的型別、預設值與輸入限制
     goal_id: Optional[str] = Field(default=None, max_length=128)  # 設定關聯目標識別碼的型別、預設值與輸入限制
     person_id: Optional[str] = Field(default=None, max_length=128)  # 設定關聯人物識別碼的型別、預設值與輸入限制
+    story: Optional[StoryInput] = None  # 保存未審閱的多人整理，舊用戶端可省略
 
     @field_validator('raw_text')  # 將下方驗證函式綁定到指定輸入欄位
     @classmethod  # 以模型類別呼叫欄位驗證
@@ -154,6 +182,8 @@ class Confirm(WithContributions):  # 將草稿正式確認為經歷的輸入
     interaction_type: Literal['in_person', 'call', 'message', 'other', 'unknown'] = 'unknown'  # 設定真實互動類型（不預設見面）的型別、預設值與輸入限制
     interaction_event_id: Optional[str] = None  # 設定要沿用的既有互動事件識別碼的型別、預設值與輸入限制
     person_updates: List[PersonUpdateCandidate] = Field(default_factory=list, max_length=30)  # 設定逐項確認的人物資訊候選的型別、預設值與輸入限制
+    story: Optional[StoryInput] = None  # 正式確認每筆經歷的人物角色
+    story_reviewed: bool = Field(default=False, strict=True)  # 核對與配對必須由使用者明確接受
 
     @field_validator('tasks')  # 將下方驗證函式綁定到指定輸入欄位
     @classmethod  # 以模型類別呼叫欄位驗證
@@ -284,3 +314,37 @@ class NoteCreate(Model):  # 私人筆記與引用來源輸入
 
 class TaskEdit(Model):  # 只更新待辦勾選狀態的輸入
     done: bool  # 設定待辦完成狀態（不代表行動貢獻）的型別、預設值與輸入限制
+
+
+class StoryPeopleEdit(Revision):  # 版本化更正人物，不重新發放經歷積分
+    request_id: str = Field(min_length=1, max_length=128)  # 重送去重識別碼
+    story: StoryInput  # 使用者核對後的人物清單
+    confirmed: Literal[True]  # 明確接受整份整理
+
+    @field_validator('confirmed', mode='before')  # 拒絕數字等模糊確認
+    @classmethod  # 由模型呼叫驗證
+    def explicit_true(cls, value):  # 必須是 JSON true
+        return FactCreate.explicit_true(value)  # 沿用既有明確確認規則
+
+
+class MentionMatch(Revision):  # 只核對身分，不改參與角色
+    request_id: str = Field(min_length=1, max_length=128)  # 配對的重送識別碼
+    status: Literal['matched', 'unmatched', 'rejected']  # 允許確認、取消與拒絕
+    person_id: Optional[str] = Field(default=None, min_length=1, max_length=128)  # 可留待核對
+    confirmed: Literal[True]  # 使用者明確核對身分
+
+    @field_validator('confirmed', mode='before')  # 使用相同的真值限制
+    @classmethod  # 由模型呼叫驗證
+    def explicit_true(cls, value):  # 不接受隱式型別轉換
+        return FactCreate.explicit_true(value)  # 沿用人工確認驗證
+
+    @model_validator(mode='after')  # 檢查配對狀態與人物的一致性
+    def matching_person(self):  # 只有已配對狀態需要人物
+        if (self.status == 'matched') != (self.person_id is not None):  # 拒絕矛盾的狀態
+            raise ValueError('配對狀態與人物不一致')  # 保留原名待核對，不猜測
+        return self  # 回傳一致配對內容
+
+
+class StoryAvailability(Revision):  # 撤回或恢復交會展示
+    request_id: str = Field(min_length=1, max_length=128)  # 保存可重送操作
+    available: bool = Field(strict=True)  # 不刪除原始經歷

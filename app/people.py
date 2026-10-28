@@ -114,7 +114,9 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
         row = c.execute('SELECT * FROM experiences WHERE id=? AND owner_id=?', (experience_id, owner)).fetchone()  # 執行目前交易中的參數化查詢
         require(row is not None, 404, 'not_found', '找不到可引用的已確認經歷。')  # 驗證限制：找不到可引用的已確認經歷。
         if person_ids is not None:  # 依人物選擇或人物資料狀態套用限制
-            require(row['person_id'] in person_ids, 422, 'unrelated_source', '來源必須是與這位人物有關的已確認經歷。')  # 驗證限制：來源必須是與這位人物有關的已確認經歷。
+            story = c.execute('SELECT reviewed FROM experience_stories WHERE experience_id=?', (experience_id,)).fetchone()  # 新故事以逐筆角色檢查來源
+            linked = [r[0] for r in c.execute('SELECT person_id FROM experience_participants WHERE experience_id=?', (experience_id,))] if story and story['reviewed'] else [row['person_id']]  # 舊關聯不自動變成新事實
+            require(any(pid in linked for pid in person_ids), 422, 'unrelated_source', '來源必須是與這位人物有關的已確認經歷。')  # 不能引用其他人的故事作本人陳述
         return row  # 回傳要求來源是同帳號且與人物相關的已確認經歷的結果
 
     def _events(self, c, owner, person_id):  # 以事件分組共同經歷，避免多筆原文重複算見面
@@ -304,6 +306,11 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
                                     'source_experience_ids':json.loads(row['source_experience_ids'])})  # 將目前資料加入結果清單
             tasks = [dict(r) for r in c.execute('''SELECT t.* FROM tasks t JOIN experiences x ON x.id=t.experience_id
                        WHERE t.owner_id=? AND x.person_id=? ORDER BY t.id''', (owner, person_id))]  # 查詢下一步待辦；值以參數傳入
+            story_ids = c.execute('''SELECT s.experience_id FROM experience_stories s JOIN experience_participants p ON p.experience_id=s.experience_id
+                JOIN experiences x ON x.id=s.experience_id WHERE s.owner_id=? AND s.reviewed=1 AND s.available=1 AND p.person_id=? ORDER BY x.occurred_at DESC,x.id DESC LIMIT 20''', (owner, person_id)).fetchall()  # 參與故事不要求有直接互動
+            mention_ids = c.execute('''SELECT DISTINCT s.experience_id,x.occurred_at FROM experience_stories s JOIN experience_mentions m ON m.experience_id=s.experience_id
+                JOIN experiences x ON x.id=s.experience_id WHERE s.owner_id=? AND s.reviewed=1 AND s.available=1 AND m.person_id=? AND m.status='matched' ORDER BY x.occurred_at DESC,s.experience_id DESC LIMIT 20''', (owner, person_id)).fetchall()  # 只將人工配對的提及列到人物卡
             return {'person':person, 'stats':person['stats'], 'facts':facts, 'interactions':self._events(c, owner, person_id),
                     'goals':self._person_goals(c, owner, person_id), 'tasks':tasks, 'connections':connections,
-                    'notes':self._notes(c, owner, person_id), 'fact_history':fact_history}  # 回傳組合人物三分頁需要的事實、來源與互動資料的結果
+                    'notes':self._notes(c, owner, person_id), 'fact_history':fact_history,
+                    'stories':[self._story_detail(c, owner, r[0]) for r in story_ids], 'mentions':[self._story_detail(c, owner, r[0]) for r in mention_ids]}  # 共同參與與提及分流，彼此不改統計

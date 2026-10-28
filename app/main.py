@@ -23,7 +23,7 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
     policy = policy or DemoPolicy()  # 準備本機開發設定
     data_dir = data_dir or os.environ.get('LIFEWORLD_DATA_DIR') or Path(__file__).resolve().parent.parent / 'data'  # 準備本次 App 使用的資料目錄
     service = LifeWorld(Database(data_dir), policy, clock)  # 準備負責交易與領域規則的服務物件
-    app = FastAPI(title='Life World Local API', version='0.2.0', description='本機開發版；開發設定不是正式產品規則。')  # 準備本機 FastAPI 應用程式
+    app = FastAPI(title='Life World Local API', version='0.3.0', description='本機開發版；開發設定不是正式產品規則。')  # 交會正式整合的增量版本
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver', '[::1]'])  # 執行此模組的共用工具操作
 
@@ -204,6 +204,26 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
     @app.post('/api/interactions/{event_id}/merge', tags=['People'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def merge_interactions(event_id: str, request: Request, data: schemas.InteractionMerge):  # 合併同一次互動，保留經歷與既有積分
         return service.merge_interactions(current(request, True)['id'], event_id, data)  # 回傳合併同一次互動，保留經歷與既有積分的結果
+
+    @app.get('/api/connections', tags=['Connections'])  # 依焦點及來源種類分頁探索
+    def stories(request: Request, person_id: Optional[str] = Query(None, min_length=1, max_length=128), involvement: Literal['participant', 'mention', 'legacy'] = 'participant', sort: Literal['recent', 'oldest'] = 'recent', limit: int = Query(20, ge=1, le=50), offset: int = Query(0, ge=0)):  # 限制單次顯示量與排序白名單
+        return service.stories(current(request)['id'], person_id, involvement, sort, limit, offset)  # 後端檢查人物與故事所有權
+
+    @app.get('/api/connections/stories/{experience_id}', tags=['Connections'])  # 讀取參與／提及與原文來源
+    def story(experience_id: str, request: Request, manage: bool = False):  # 本人可管理舊未核對或已撤回來源
+        return service.story_detail(current(request)['id'], experience_id, manage)  # 探索模式拒絕不可見來源
+
+    @app.put('/api/connections/stories/{experience_id}/people', tags=['Connections'])  # 獨立人工分類與更正入口
+    def story_people(experience_id: str, request: Request, data: schemas.StoryPeopleEdit):  # 不重做原經歷確認或發獎勵
+        return service.edit_story_people(current(request, True)['id'], experience_id, data)  # 版本、權限及去重在交易內處理
+
+    @app.post('/api/connections/mentions/{mention_id}/match', tags=['Connections'])  # 人工配對原文所指人物
+    def mention_match(mention_id: str, request: Request, data: schemas.MentionMatch):  # 不改參與或人物私人關係
+        return service.match_mention(current(request, True)['id'], mention_id, data)  # 來源失效時拒絕操作
+
+    @app.post('/api/connections/stories/{experience_id}/availability', tags=['Connections'])  # 撤回或恢復交會展示
+    def story_availability(experience_id: str, request: Request, data: schemas.StoryAvailability):  # 原文與獎勵仍保留
+        return service.story_availability(current(request, True)['id'], experience_id, data)  # 只調整派生探索狀態
 
     @app.post('/api/goals/{goal_id}/evidence', status_code=201, tags=['Evidence'])  # 註冊此 HTTP 路由、例外處理器或中介層
     async def upload(goal_id: str, request: Request, file: UploadFile = File(...)):  # 驗證權限與圖片內容後保存目標佐證

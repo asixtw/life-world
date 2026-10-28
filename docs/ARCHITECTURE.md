@@ -27,7 +27,7 @@ flowchart LR
 
 `requests` 記錄 owner／operation／request ID／請求指紋／回執。同 key 同內容回原回執，不同內容回 409。SQLite `BEGIN IMMEDIATE` 序列化併發寫入，唯一約束保護每份草稿及積分事件。
 
-`people` 跨目標存在；人物統計是已確認紀錄筆數，**不聲稱是去重後的實際見面次數**。多份草稿是否屬同一次真實相遇，尚待正式事件辨識政策。
+`people` 跨目標存在；v0.2 起以互動事件去重，只有 `in_person` 計見面。v0.3 另分參與與直接互動，提及不入統計；同次互動可人工合併，尚無自動語意辨識。
 
 `evidence` 以 BLOB 保存，通過 owner／goal 檢查及 Pillow 格式／損毀驗證才能引用。`completions` 必須由使用者明確確認並帶同目標證據；不以 action progress 自動完成。
 
@@ -53,3 +53,11 @@ flowchart LR
 舊 role 全文作為 roles 的單一項目，不推測逗號含義；備註不轉為事實。舊經歷以穩定 legacy ID 轉成 unknown 互動，分類前不算見面。互動的多經歷關聯與人物參與者各自保存，合併不更新積分／貢獻。人物事實同值合併來源，衝突明確採用後保留歷史，撤回引用不刪原文。
 
 啟動前已使用 SQLite backup API 保存本機遷移前副本，備份在排除 Git 的 data/backups；14 個舊表的既有欄位逐筆比對一致。回退須停服務，使用對應的舊版程式及遷移前備份，不能僅將程式回退到仍使用六欄 positional INSERT 的初版。
+
+## v0.3 交會與逐經歷來源
+
+`ConnectionsMixin`／`connections.py` 使用增量遷移 `003_connections.sql`：`draft_stories` 保存草稿候選，`experience_stories` 保存審閱／展示／版本，`experience_participants` 保存逐筆參與與直接互動，`experience_mentions` 保存原名／Unicode 範圍／人工身分配對，`story_history` 保存更正。舊欄位與帳本不變，舊經歷只回填待核對狀態。
+
+確認仍在單一交易內保存經歷、人物角色、互動、任務、貢獻與一次獎勵。事件合併不改每筆故事名單；配對、更正與展示撤回都有 owner、CSRF、版本及重送去重，不重新發獎勵。
+
+前端 `connections.js` 取代星圖，與收藏冊／人物卡共用資料；來源用獨立底部抽屜。路徑、展開、捲動及核對編輯暫存本頁，URL 保留當前焦點，登出／換帳號清除，不寫 localStorage。正式配對由 SQLite 保存，刷新可重讀。

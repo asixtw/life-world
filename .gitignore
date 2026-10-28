@@ -14,3 +14,12 @@ data/*
 build/
 dist/
 .DS_Store
+node_modules/
+coverage/
+.vite/
+playwright-report/
+test-results/
+*.pem
+*.key
+*.p12
+*.pfx

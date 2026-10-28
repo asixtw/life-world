@@ -18,6 +18,7 @@ from .errors import DomainError, require  # 共用領域錯誤與條件檢查
 from .schemas import format_decimal  # 載入領域輸入模型或十進位格式工具
 from .security import PASSWORDS, DUMMY_HASH, digest, new_session, require_registered  # 共用密碼、工作階段與帳號權限檢查
 from .people import PeopleMixin  # 載入人物來源與互動事件服務擴充
+from .connections import ConnectionsMixin  # 載入逐經歷人物角色與故事探索服務
 
 
 def uid():  # 產生不依賴名稱的固定唯一識別碼
@@ -28,7 +29,7 @@ def encoded(value):  # 以穩定鍵序序列化 JSON，供指紋與資料保存�
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))  # 回傳以穩定鍵序序列化 JSON，供指紋與資料保存使用的結果
 
 
-class LifeWorld(PeopleMixin):  # 目標、經歷、積分與身分的領域服務
+class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、積分與身分共用交易服務
     def __init__(self, db, policy, clock=None, assistant=None):  # 注入資料庫、設定、時鐘與整理提供者
         self.db = db  # 保存「self.db」供後續驗證或回傳使用
         self.policy = policy  # 保存「self.policy」供後續驗證或回傳使用
@@ -210,11 +211,14 @@ class LifeWorld(PeopleMixin):  # 目標、經歷、積分與身分的領域服�
             c.execute("INSERT INTO drafts VALUES (?,?,?,?,?,?,?,'draft',1,?,?)",
                       (draft_id, owner, data.goal_id, data.person_id, data.raw_text,
                        data.occurred_at.astimezone(timezone.utc).isoformat(), encoded([v.model_dump() for v in data.contributions]), now, now))  # 新增經歷草稿；值以參數傳入
+            self._store_draft_story(c, owner, draft_id, data.raw_text, data.story)  # 同交易保存未確認的人物整理
             return self._draft(c, owner, draft_id)  # 回傳保存尚未確認、不計分的原始經歷草稿的結果
 
     def _draft(self, c, owner, draft_id):  # 讀取有權限的草稿並還原貢獻清單
         result = dict(self._owned(c, 'drafts', draft_id, owner))  # 準備本次操作的回傳資料
         result['contributions'] = json.loads(result['contributions'])  # 保存「result['contributions']」供後續驗證或回傳使用
+        story = c.execute('SELECT payload FROM draft_stories WHERE draft_id=?', (draft_id,)).fetchone()  # 回讀未確認的多人整理
+        result['story'] = json.loads(story[0]) if story else None  # 舊草稿仍可正常讀取
         return result  # 回傳讀取有權限的草稿並還原貢獻清單的結果
 
     def draft(self, owner, draft_id):  # 讀取原始草稿與人工貢獻設定
@@ -230,6 +234,10 @@ class LifeWorld(PeopleMixin):  # 目標、經歷、積分與身分的領域服�
             require(draft['status'] == 'draft', 409, 'already_confirmed', '已確認的原始紀錄不可用草稿方式修改。')  # 驗證限制：已確認的原始紀錄不可用草稿方式修改。
             require(draft['revision'] == data.expected_revision, 409, 'revision_conflict', '草稿已有新版，請重新載入。')  # 驗證限制：草稿已有新版，請重新載入。
             self._related(c, user, data.goal_id, data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
+            if 'story' in data.model_fields_set: self._store_draft_story(c, owner, draft_id, data.raw_text, data.story)  # 明確送出時才取代角色整理
+            elif draft['story'] is not None:  # 舊客戶端編輯原文時仍需保護來源位置
+                from .schemas import StoryInput  # 僅為相容更新還原已保存型別
+                self._validate_story(c, owner, data.raw_text, StoryInput.model_validate(draft['story']))  # 不默默保留失效片段
             c.execute('UPDATE drafts SET raw_text=?,occurred_at=?,goal_id=?,person_id=?,contributions=?,revision=revision+1,updated_at=? WHERE id=? AND owner_id=?',
                       (data.raw_text, data.occurred_at.astimezone(timezone.utc).isoformat(), data.goal_id, data.person_id,
                        encoded([v.model_dump() for v in data.contributions]), self.now().isoformat(), draft_id, owner))  # 更新經歷草稿；值以參數傳入
@@ -254,8 +262,8 @@ class LifeWorld(PeopleMixin):  # 目標、經歷、積分與身分的領域服�
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             draft = self._draft(c, owner, draft_id)  # 準備目前尚未確認的原始經歷
             payload = data.model_dump(mode='json')  # 準備將送出或用於指紋比對的完整內容
-            for key in ('interaction_type', 'interaction_event_id', 'person_updates'):  # 新版欄位使用預設值時不加入舊版請求指紋，維持原有重送相容性
-                if payload[key] is None or payload[key] == 'unknown' or payload[key] == []:  # 依目前條件選擇下一步處理分支
+            for key in ('interaction_type', 'interaction_event_id', 'person_updates', 'story', 'story_reviewed'):  # 省略新版預設以維持舊提交指紋
+                if payload[key] is None or payload[key] is False or payload[key] == 'unknown' or payload[key] == []:  # 僅移除未指定的新欄位
                     payload.pop(key)  # 移除未指定的新欄位，避免相同舊請求被誤判為內容衝突
             payload['draft_id'] = draft_id  # 保存「payload['draft_id']」供後續驗證或回傳使用
             cached, fingerprint = self._cached(c, owner, 'confirm', data.request_id, payload)  # 比較請求指紋，重送時回傳先前結果
@@ -264,6 +272,10 @@ class LifeWorld(PeopleMixin):  # 目標、經歷、積分與身分的領域服�
             require(draft['status'] == 'draft', 409, 'already_confirmed', '這份草稿已確認，不能重複計入。')  # 驗證限制：這份草稿已確認，不能重複計入。
             require(draft['revision'] == data.expected_revision, 409, 'revision_conflict', '草稿已有新版，請重新核對。')  # 驗證限制：草稿已有新版，請重新核對。
             self._related(c, user, draft['goal_id'], data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
+            if data.story is not None:  # 新版明確區分參與與提及
+                require(data.story_reviewed, 422, 'story_review_required', '請先核對這段故事的人物參與及提及。')  # 不將候選直接轉成正式角色
+                self._validate_story(c, owner, draft['raw_text'], data.story)  # 先核對全部來源與所有權
+                require(not data.person_id or data.person_id in [p.person_id for p in data.story.participants], 422, 'primary_not_participant', '主要關聯人物必須是本次參與者；提及者請在提及區配對。')  # 避免舊主要人物欄位誤用身分
             if data.contributions and draft['goal_id']:  # 依目標是否存在及其狀態選擇處理方式
                 goal = self._owned(c, 'goals', draft['goal_id'], owner)  # 準備目前選定的目標資料
                 require(goal['status'] == 'active', 409, 'policy_required', '完成後的貢獻更正規則尚未定案；草稿已保留，可移除貢獻後只保存經歷。')  # 驗證限制：完成後的貢獻更正規則尚未定案；草稿已保留，可移除貢獻後只保存經歷。
@@ -275,7 +287,9 @@ class LifeWorld(PeopleMixin):  # 目標、經歷、積分與身分的領域服�
                 c.execute('INSERT INTO contributions VALUES (?,?,?,?,?)', (uid(), owner, experience_id, item.action_id, item.quantity))  # 新增行動貢獻；值以參數傳入
             for title in data.tasks:  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 c.execute('INSERT INTO tasks (id,owner_id,experience_id,title) VALUES (?,?,?,?)', (uid(), owner, experience_id, title))  # 新增下一步待辦；值以參數傳入
-            event_id = self._attach_interaction(c, owner, experience_id, data.person_id, data, draft['occurred_at'])  # 準備互動或積分事件的唯一識別碼
+            c.execute('INSERT INTO experience_stories(experience_id,owner_id) VALUES (?,?)', (experience_id, owner))  # 舊 API 先保留待核對狀態
+            if data.story is not None: self._write_story(c, owner, experience_id, draft['raw_text'], data.story)  # 正式保存逐經歷角色
+            event_id = self._attach_story_event(c, owner, experience_id, data.story, data, draft['occurred_at']) if data.story is not None else self._attach_interaction(c, owner, experience_id, data.person_id, data, draft['occurred_at'])  # 新角色只計直接互動，舊行為相容
             self._apply_person_updates(c, owner, data.person_id, experience_id, data.person_updates)  # 僅套用明確勾選的人物更新；任何失敗皆回滾
             reward_id = self._award(c, owner, experience_id, now)  # 只為本次已確認經歷新增一次積分帳目
             c.execute("UPDATE drafts SET status='confirmed',updated_at=? WHERE id=? AND owner_id=?", (now, draft_id, owner))  # 更新經歷草稿；值以參數傳入

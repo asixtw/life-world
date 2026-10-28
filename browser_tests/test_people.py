@@ -65,15 +65,12 @@ def test_original_people_flow_views_sources_and_context(page, width):  # 驗證�
     expect(page.locator('#world-relationships')).not_to_contain_text('林先生')  # 等待並核對目前畫面狀態
     shot(page, f'people-{width}-world.png')  # 保存目前畫面的驗收截圖
     page.locator('#nav').get_by_role('link',name='關係',exact=True).click()  # 依使用者動線點擊畫面入口
-    expect(page.get_by_role('heading',name='我的人際關係')).to_be_visible()  # 等待並核對目前畫面狀態
-    page.locator('[data-person="'+p['id']+'"]').first.click()  # 依使用者動線點擊畫面入口
-    expect(page.locator('.person-summary')).to_contain_text('林先生')  # 等待並核對目前畫面狀態
-    shot(page, f'people-{width}-star-all.png')  # 保存目前畫面的驗收截圖
-    page.get_by_role('tab',name='收藏冊',exact=True).click()  # 依使用者動線點擊畫面入口
-    expect(page.locator('.person-card')).to_have_count(6)  # 等待並核對目前畫面狀態
-    shot(page, f'people-{width}-cards-all.png')  # 保存目前畫面的驗收截圖
-    page.get_by_role('tab',name='星圖',exact=True).click()  # 依使用者動線點擊畫面入口
-    expect(page.get_by_role('tab',name='星圖',exact=True)).to_have_attribute('aria-selected','true')  # 等待並核對目前畫面狀態
+    expect(page.locator('#connections-explorer')).to_be_visible()  # 交會已依最新決策取代星圖
+    page.get_by_role('tab',name='收藏冊',exact=True).click()  # 人物管理仍由收藏冊進入
+    expect(page.get_by_role('heading',name='我的人際關係')).to_be_visible()  # 原人物資訊架構保持可用
+    expect(page.locator('.person-card')).to_have_count(6)  # 所有既有人物仍在
+    page.locator('[data-person="'+p['id']+'"]').first.click()  # 原人物摘要仍可選取
+    expect(page.locator('.person-summary')).to_contain_text('林先生')  # 摘要不得遺失
     page.locator('#people-query').fill('音樂')  # 填入此步驟的虛構表單內容
     page.locator('#people-filter-form').get_by_role('button',name='搜尋',exact=True).click()  # 依使用者動線點擊畫面入口
     expect(page.locator('[data-person="'+p['id']+'"]').first).to_be_visible()  # 等待並核對目前畫面狀態
@@ -81,8 +78,9 @@ def test_original_people_flow_views_sources_and_context(page, width):  # 驗證�
     expect(page.locator('.person-summary')).to_contain_text('創業交流會')  # 等待並核對目前畫面狀態
     page.get_by_role('button',name='設為關注',exact=True).click()  # 依使用者動線點擊畫面入口
     expect(page.get_by_role('button',name='已關注',exact=True)).to_be_visible()  # 等待並核對目前畫面狀態
-    shot(page, f'people-{width}-star.png')  # 保存目前畫面的驗收截圖
-    page.get_by_role('tab',name='收藏冊',exact=True).click()  # 依使用者動線點擊畫面入口
+    page.get_by_role('tab',name='交會',exact=True).click()  # 新探索入口可切換
+    expect(page.locator('#connections-explorer')).to_be_visible()  # 沒有已審閱新故事時也有退路
+    page.get_by_role('tab',name='收藏冊',exact=True).click()  # 回到人物管理
     expect(page.locator('#people-query')).to_have_value('音樂')  # 等待並核對目前畫面狀態
     expect(page.locator('.person-card.selected')).to_contain_text('林先生')  # 等待並核對目前畫面狀態
     shot(page, f'people-{width}-cards.png')  # 保存目前畫面的驗收截圖

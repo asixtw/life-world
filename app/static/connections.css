@@ -1,0 +1,39 @@
+#connections-explorer { max-width:900px; margin:0 auto; } /* 保持故事焦點與適當閱讀寬度 */
+#app-loading { position:sticky; top:0; z-index:10; padding:10px 20px; background:#e7f0e3; color:var(--green); border-bottom:1px solid var(--line); font-size:13px; } /* 慢網路等待不再只有鎖住的舊畫面 */
+.connection-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; } /* 排序與上一步保持明確入口 */
+.connection-toolbar label { margin-left:auto; font-size:13px; color:var(--muted); } /* 排序不搶故事焦點 */
+.connection-toolbar select { margin-top:5px; } /* 保留標籤與選項距離 */
+.connection-origin { padding:12px 16px; background:#eaf4ec; border-radius:12px; margin:16px 0; font-size:13px; } /* 提及路徑保持來源界線 */
+.connection-story { background:var(--white); border:1px solid var(--line); border-radius:24px; overflow:hidden; } /* 中央故事是主要資訊層 */
+.connection-scene { min-height:265px; padding:24px; background:radial-gradient(ellipse at 15% 30%,#d8ecdf 0,transparent 52%),radial-gradient(ellipse at 85% 5%,#e5e8f4 0,transparent 54%),#f8efdd; } /* 用簡單 2D 色塊營造溫暖情境 */
+.connection-scene>.tag { margin-right:8px; background:#ffffffd9; } /* 顯示日期與審閱狀態 */
+.connection-scene-people { display:flex; justify-content:space-around; margin:24px 0 10px; } /* 人物圍繞事件，不畫私人關係線 */
+.connection-scene-people .person-avatar { width:60px; height:60px; border:3px solid white; } /* 提供簡單人物識別 */
+.memory-card { max-width:400px; margin:auto; background:#ffffffed; border-radius:18px; text-align:center; padding:18px; box-shadow:0 8px 28px #29432d10; } /* 經歷以回憶卡片呈現 */
+.memory-card h2 { margin:5px 0 8px; overflow-wrap:anywhere; } /* 長標題在手機正確換行 */
+.memory-card small,.connection-person small,.connection-story-row small,.mention-row small { display:block; font-size:12px; color:var(--muted); margin-top:6px; } /* 次要脈絡與主資訊分層 */
+.connection-copy { padding:24px; } /* 摘要及來源有足夠留白 */
+.connection-people { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:16px 0; } /* 首批只顯示三位參與者 */
+.connection-person { border:1px solid var(--line); background:var(--white); border-radius:18px; padding:15px; text-align:left; min-width:0; color:var(--ink); font:inherit; cursor:pointer; overflow-wrap:anywhere; } /* 人物可操作且長名字不溢位 */
+.connection-person .person-avatar { margin-bottom:10px; } /* 頭像與稱呼分層 */
+.connection-person.current { border-color:#8fb69b; background:#eaf3ec; } /* 柔和標示當前焦點人物 */
+.mention-row,.connection-story-row { width:100%; display:flex; align-items:center; gap:14px; padding:16px; margin:12px 0; background:var(--white); border:1px solid var(--line); border-radius:16px; text-align:left; color:var(--ink); font:inherit; cursor:pointer; } /* 線索與其他故事是容易理解的延伸入口 */
+.mention-row>span:nth-child(2),.connection-story-row>span:first-child { flex:1; min-width:0; overflow-wrap:anywhere; } /* 保持箭頭與長文排列 */
+.mention-symbol { border-radius:12px; background:#e9eff6; padding:8px 12px; color:#6684a0; font-weight:700; } /* 提及與實際參與有不同視覺 */
+#source-dialog { margin:0 auto; top:auto; bottom:0; width:min(760px,100%); max-height:88dvh; border:1px solid var(--line); border-radius:24px 24px 0 0; padding:24px; overflow-y:auto; background:var(--white); color:var(--ink); } /* 手機使用底部來源抽屜 */
+#source-dialog::backdrop { background:#233d3266; } /* 原故事維持脈絡並聚焦來源 */
+#source-dialog .source-close { position:sticky; top:0; z-index:2; display:block; margin-left:auto; background:var(--white); } /* 長來源仍能隨時關閉 */
+.source-quote { padding:18px; margin:12px 0 20px; border:1px solid #d9e8db; background:#eff6f0; border-radius:16px; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.9; } /* 原句與摘要分開呈現 */
+.source-quote mark { background:#f5e4a0; color:#594a2b; border-radius:3px; } /* 只高亮使用者點選的原文位置 */
+.source-mention { padding:15px; border:1px solid var(--line); border-radius:14px; margin:12px 0; } /* 提及來源各自有配對狀態 */
+.source-mention.selected { border-color:#88b29a; box-shadow:0 0 0 2px #dfeee4; } /* 表示目前定位線索 */
+.source-mention>.tag { float:right; } /* 配對狀態與名字並列 */
+.story-editor { border-top:1px solid var(--line); margin:20px 0; padding-top:18px; } /* 人物整理為選填且有明確邊界 */
+.story-editor-body { padding-top:14px; } /* 避免選填開關貼住輸入內容 */
+.participant-options { max-height:250px; overflow:auto; margin:12px 0; } /* 多人輸入不無限拉長整頁 */
+.participant-option { padding:8px 0; border-bottom:1px solid var(--line); } /* 將參與與直接互動分在同一人物區 */
+.participant-option .check-line { margin:6px 0; } /* 勾選區仍易於觸控 */
+.story-mention-editor { padding:14px; margin:12px 0; background:#f1f5f0; border-radius:14px; } /* 來源位置與原名一起編輯 */
+.connection-person:focus-visible,.mention-row:focus-visible,.connection-story-row:focus-visible { outline:3px solid #668dba; outline-offset:3px; } /* 鍵盤焦點清楚可見 */
+@media(max-width:600px) { .connection-people { grid-template-columns:repeat(2,minmax(0,1fr)); } .connection-scene,.connection-copy { padding:18px; } #source-dialog { padding:18px; } } /* 手機降低擁擠並保留完整來源 */
+@media(prefers-reduced-motion:no-preference) { .connection-story { animation:story-arrive .22s ease-out; } @keyframes story-arrive { from { opacity:.6; transform:translateY(6px); } to { opacity:1; transform:none; } } } /* 僅用輕量轉場且尊重減少動畫設定 */
