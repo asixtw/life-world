@@ -10,9 +10,9 @@
 
 ## 接入與驗證
 
-React＋TypeScript／Vite 專案、鎖定檔與啟動方法見 [README](../README.md)。`content/` 放十五人、六場、45 示例與來源；`evaluation/inputs.v1.json` 和 `reference.v1.json` 分離 30 題的模型輸入與參考；`assets/manifest.json` 指到已驗證的共用原稿與輸出。人物頭像與三封面仍缺件，固定 ID 需求在 `assets/expected-persona-art.v1.json`。
+React＋TypeScript／Vite 專案、鎖定檔與啟動方法見 [README](../README.md)。`content/` 放十五人、六場、45 示例與來源；`evaluation/inputs.v1.json` 和 `reference.v1.json` 分離 30 題的模型輸入與參考；`assets/manifest.json` 指到已驗證的共用原稿與輸出。十五頭像與三封面已接入，映射見 `assets/persona-art-map.v1.json`。
 
-最近一次 `tsc -b`、`vite build`、`vitest run` 通過，41 模組與 12 案例。Chrome 已操作選角、來源、分支結尾、返回與手動匯出；匯出 JSON 已在 `Downloads` 讀回並核對 `demo` 隔離欄位。390×844 新劇場與美術頁無水平溢位、小按鈕或破圖；先前五頁及 1280×800 桌面基本檢查通過。未測實機、Safari、真實 AI 或正式服務；沒有可寫入套件的瀏覽器截圖檔。
+最近一次 `tsc -b`、`vite build`、`vitest run` 通過，61 模組與 12 案例。Chrome 已操作選角、來源、分支結尾、返回與手動匯出；匯出 JSON 已在 `Downloads` 讀回並核對 `demo` 隔離欄位。390×844 新劇場與美術頁無水平溢位、小按鈕或破圖；先前五頁及 1280×800 桌面基本檢查通過。未測實機、Safari、真實 AI 或正式服務；沒有可寫入套件的瀏覽器截圖檔。
 
 ## Jerry 接入要點
 
@@ -24,4 +24,4 @@ React＋TypeScript／Vite 專案、鎖定檔與啟動方法見 [README](../READM
 
 ## 剩餘缺件
 
-十五頭像、三封面、分離蛋殼、完成定格、獨立養分光效、世界基底；Boyi／Jerry 審查與實際截圖檔。共用美術原料依使用者指定本地 ZIP 取得，兩份 Library ID 與 SHA256 見 [進度](PROGRESS.md)。Windows 官方 Library helper 的 xattr 步驟失敗，本地檔案沒有 Library metadata；未修改 helper。十三類逐項見 [盤點](13_CATEGORY_AUDIT.md)。
+分離蛋殼、完成定格、獨立養分光效、世界基底；Boyi／Jerry 審查與實際截圖檔。共用美術原料依使用者指定本地 ZIP 取得，兩份 Library ID 與 SHA256 見 [進度](PROGRESS.md)。Windows 官方 Library helper 的 xattr 步驟失敗，本地檔案沒有 Library metadata；未修改 helper。十三類逐項見 [盤點](13_CATEGORY_AUDIT.md)。

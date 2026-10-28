@@ -1,0 +1,131 @@
+{
+  "status": "pass",
+  "asset_count": 6,
+  "verified_image_files": 24,
+  "usage_scope": "demo",
+  "formal_release_approved": false,
+  "file_checks": [
+    {
+      "path": "originals/portrait-international-dialogue-us-representative.png",
+      "status": "pass"
+    },
+    {
+      "path": "masters/portrait-international-dialogue-us-representative@1024.png",
+      "status": "pass"
+    },
+    {
+      "path": "exports/portrait-international-dialogue-us-representative@256.png",
+      "status": "pass"
+    },
+    {
+      "path": "previews/portrait-international-dialogue-us-representative@256-circle.png",
+      "status": "pass"
+    },
+    {
+      "path": "originals/portrait-international-dialogue-iran-representative.png",
+      "status": "pass"
+    },
+    {
+      "path": "masters/portrait-international-dialogue-iran-representative@1024.png",
+      "status": "pass"
+    },
+    {
+      "path": "exports/portrait-international-dialogue-iran-representative@256.png",
+      "status": "pass"
+    },
+    {
+      "path": "previews/portrait-international-dialogue-iran-representative@256-circle.png",
+      "status": "pass"
+    },
+    {
+      "path": "originals/portrait-international-dialogue-neutral-mediator.png",
+      "status": "pass"
+    },
+    {
+      "path": "masters/portrait-international-dialogue-neutral-mediator@1024.png",
+      "status": "pass"
+    },
+    {
+      "path": "exports/portrait-international-dialogue-neutral-mediator@256.png",
+      "status": "pass"
+    },
+    {
+      "path": "previews/portrait-international-dialogue-neutral-mediator@256-circle.png",
+      "status": "pass"
+    },
+    {
+      "path": "originals/portrait-international-dialogue-international-observer.png",
+      "status": "pass"
+    },
+    {
+      "path": "masters/portrait-international-dialogue-international-observer@1024.png",
+      "status": "pass"
+    },
+    {
+      "path": "exports/portrait-international-dialogue-international-observer@256.png",
+      "status": "pass"
+    },
+    {
+      "path": "previews/portrait-international-dialogue-international-observer@256-circle.png",
+      "status": "pass"
+    },
+    {
+      "path": "originals/portrait-international-dialogue-shipping-representative.png",
+      "status": "pass"
+    },
+    {
+      "path": "masters/portrait-international-dialogue-shipping-representative@1024.png",
+      "status": "pass"
+    },
+    {
+      "path": "exports/portrait-international-dialogue-shipping-representative@256.png",
+      "status": "pass"
+    },
+    {
+      "path": "previews/portrait-international-dialogue-shipping-representative@256-circle.png",
+      "status": "pass"
+    },
+    {
+      "path": "originals/cover-international-dialogue.png",
+      "status": "pass"
+    },
+    {
+      "path": "masters/cover-international-dialogue@1600x900.png",
+      "status": "pass"
+    },
+    {
+      "path": "exports/cover-international-dialogue@800x450.png",
+      "status": "pass"
+    },
+    {
+      "path": "previews/international-dialogue-crop-qa.png",
+      "status": "pass"
+    }
+  ],
+  "original_preservation_checks": [
+    {
+      "id": "portrait-international-dialogue-us-representative",
+      "status": "pass_byte_identical_to_tool_output"
+    },
+    {
+      "id": "portrait-international-dialogue-iran-representative",
+      "status": "pass_byte_identical_to_tool_output"
+    },
+    {
+      "id": "portrait-international-dialogue-neutral-mediator",
+      "status": "pass_byte_identical_to_tool_output"
+    },
+    {
+      "id": "portrait-international-dialogue-international-observer",
+      "status": "pass_byte_identical_to_tool_output"
+    },
+    {
+      "id": "portrait-international-dialogue-shipping-representative",
+      "status": "pass_byte_identical_to_tool_output"
+    },
+    {
+      "id": "cover-international-dialogue",
+      "status": "pass_byte_identical_to_tool_output"
+    }
+  ]
+}

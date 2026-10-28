@@ -1,0 +1,23 @@
+[
+  {
+    "path": "docs/team/ART_DELIVERY_SPEC.md",
+    "ref": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
+    "sha": "5e67f2b50fdcae702a23a77e8d845834333ebb04",
+    "url": "https://github.com/asixtw/life-world/blob/1c9d502f32688bcc3c73e4b99a2cc3724c179047/docs/team/ART_DELIVERY_SPEC.md",
+    "matches_read_main_blob": true
+  },
+  {
+    "path": "docs/team/PROMPT_SIMULATION_001.md",
+    "ref": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
+    "sha": "8929c6cec01f462735b9fa5662e5dc5d3150e99d",
+    "url": "https://github.com/asixtw/life-world/blob/1c9d502f32688bcc3c73e4b99a2cc3724c179047/docs/team/PROMPT_SIMULATION_001.md",
+    "matches_read_main_blob": true
+  },
+  {
+    "path": "app/static/tokens.css",
+    "ref": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
+    "sha": "68067075e86d59673fc12f288b39c3b63b45a82e",
+    "url": "https://github.com/asixtw/life-world/blob/1c9d502f32688bcc3c73e4b99a2cc3724c179047/app/static/tokens.css",
+    "matches_read_main_blob": true
+  }
+]

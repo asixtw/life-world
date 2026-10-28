@@ -1,0 +1,157 @@
+{
+  "status": "technical_checks_passed",
+  "logical_assets": 6,
+  "image_files": 23,
+  "originals_byte_identical": true,
+  "required_dimensions_passed": true,
+  "circle_alpha_passed": true,
+  "manifest_paths_passed": true,
+  "checks": [
+    {
+      "path": "assets/originals/portrait-three-kingdoms-caocao.original.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/masters/portrait-three-kingdoms-caocao.1024.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/display/portrait-three-kingdoms-caocao.256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/previews/portrait-three-kingdoms-caocao.circle-256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/originals/portrait-three-kingdoms-liubei.original.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/masters/portrait-three-kingdoms-liubei.1024.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/display/portrait-three-kingdoms-liubei.256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/previews/portrait-three-kingdoms-liubei.circle-256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/originals/portrait-three-kingdoms-zhugeliang.original.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/masters/portrait-three-kingdoms-zhugeliang.1024.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/display/portrait-three-kingdoms-zhugeliang.256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/previews/portrait-three-kingdoms-zhugeliang.circle-256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/originals/portrait-three-kingdoms-sunquan.original.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/masters/portrait-three-kingdoms-sunquan.1024.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/display/portrait-three-kingdoms-sunquan.256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/previews/portrait-three-kingdoms-sunquan.circle-256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/originals/portrait-three-kingdoms-zhouyu.original.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/masters/portrait-three-kingdoms-zhouyu.1024.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/display/portrait-three-kingdoms-zhouyu.256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/previews/portrait-three-kingdoms-zhouyu.circle-256.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/originals/cover-three-kingdoms.original.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/masters/cover-three-kingdoms.1600x900.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    },
+    {
+      "path": "assets/display/cover-three-kingdoms.800x450.png",
+      "dimensions_ok": true,
+      "sha256_ok": true,
+      "decode_ok": true
+    }
+  ],
+  "visual_qa": "All six originals inspected from imagegen output. Export contact sheet inspection recorded separately.",
+  "not_tested": [
+    "App integration",
+    "physical devices",
+    "Safari",
+    "production rights clearance",
+    "authentic historical likeness"
+  ]
+}

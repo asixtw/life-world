@@ -1,0 +1,467 @@
+{
+  "schema_version": "lifeworld.art-pack/1.0",
+  "pack_id": "philosophy",
+  "package_version": "1.0.0",
+  "usage_scope": "demo",
+  "formal_release_approved": false,
+  "formal_release_status": "not_approved",
+  "root_integration_target": "collaboration/ui-kit/",
+  "created_utc": "2026-10-28",
+  "source_ref": "asixtw/life-world@1c9d502f32688bcc3c73e4b99a2cc3724c179047",
+  "assets": [
+    {
+      "id": "portrait-philosophy-socrates",
+      "persona_id": "philosophy-socrates",
+      "pack_id": "philosophy",
+      "display_name": "蘇格拉底",
+      "type": "historical_interpretation_portrait",
+      "usage": "人物選角、回合發言、人物來源及回顧的 demo 頭像",
+      "usage_scope": "demo",
+      "channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "formal_release_status": "not_approved",
+      "version": "1.0.0",
+      "generation_revision": "v1",
+      "theme": "warm cream / mint / sage / muted gold; theme-neutral raster",
+      "state": "static",
+      "alt": "蘇格拉底的生成藝術詮釋：禿頂、灰白捲鬚，穿米白與鼠尾草綠古希臘披衣，神情專注溫和。 此為藝術詮釋，非經核實的歷史肖像。",
+      "tool": "image_gen.imagegen (built-in)",
+      "model_version": "not exposed by tool",
+      "source_type": "AI-generated artistic interpretation",
+      "source": "provenance/prompts-v1.json",
+      "use_basis": "User-authorized fullkit demo generation and approved philosophy cast; no reference portrait inputs. Rights and formal-production review pending; no unrestricted-commercial-use claim.",
+      "status": "generated_exported_self_reviewed_pending_Boyi_Jerry_acceptance",
+      "files": {
+        "generated_original": {
+          "path": "assets/originals/portrait-philosophy-socrates-generated-v1.png",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2522138,
+          "sha256": "214774c0d588ea257646a4f42baeb7b9b082984a6ba25432086514bd8649709d"
+        },
+        "master": {
+          "path": "assets/masters/portrait-philosophy-socrates-1024.png",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1585772,
+          "sha256": "88197bd6cd37a6ac6c3d541bd4d2b6996bfecb6ae528148437bc2cec022f94dc"
+        },
+        "display": {
+          "path": "assets/display/portrait-philosophy-socrates-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 110763,
+          "sha256": "8827432722232f110cdf66707d7fcb55f90ff02aafdaea273e43eee8759d1689"
+        },
+        "circle_preview": {
+          "path": "assets/previews/portrait-philosophy-socrates-circle-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 127159,
+          "sha256": "c26e26259b39456e22d2c381f3d2e0794d5405b061b88e9d69f63ffdb63c94a9"
+        }
+      },
+      "integration": {
+        "display_path": "assets/display/portrait-philosophy-socrates-256.png",
+        "master_path": "assets/masters/portrait-philosophy-socrates-1024.png",
+        "css_object_fit": "cover",
+        "css_object_position": "50% 50%",
+        "circle_css": "border-radius: 50%",
+        "identity_mapping_status": "stable art ID; persona_id integration alias requires schema reconciliation by parent/Jerry"
+      }
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "persona_id": "philosophy-confucius",
+      "pack_id": "philosophy",
+      "display_name": "孔子",
+      "type": "historical_interpretation_portrait",
+      "usage": "人物選角、回合發言、人物來源及回顧的 demo 頭像",
+      "usage_scope": "demo",
+      "channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "formal_release_status": "not_approved",
+      "version": "1.0.0",
+      "generation_revision": "v1",
+      "theme": "warm cream / mint / sage / muted gold; theme-neutral raster",
+      "state": "static",
+      "alt": "孔子的生成藝術詮釋：戴素色學者帽、蓄長鬚，穿米白、淡金與鼠尾草綠長袍，神情沉靜。 此為藝術詮釋，非經核實的歷史肖像。",
+      "tool": "image_gen.imagegen (built-in)",
+      "model_version": "not exposed by tool",
+      "source_type": "AI-generated artistic interpretation",
+      "source": "provenance/prompts-v1.json",
+      "use_basis": "User-authorized fullkit demo generation and approved philosophy cast; no reference portrait inputs. Rights and formal-production review pending; no unrestricted-commercial-use claim.",
+      "status": "generated_exported_self_reviewed_pending_Boyi_Jerry_acceptance",
+      "files": {
+        "generated_original": {
+          "path": "assets/originals/portrait-philosophy-confucius-generated-v1.png",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2572944,
+          "sha256": "183a04d9b1e4cf214c3d62be3cde7b8c6d45d2d59e6ddc6032d366140f9b2e40"
+        },
+        "master": {
+          "path": "assets/masters/portrait-philosophy-confucius-1024.png",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1590427,
+          "sha256": "17748105160c632c03d1185bb813c1140169b3a9fb7a8fbef7c8351e626ba356"
+        },
+        "display": {
+          "path": "assets/display/portrait-philosophy-confucius-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 103373,
+          "sha256": "7e9e276e58ed1060900969649136e652082bf29a3d589670b1ae0683ca7693f2"
+        },
+        "circle_preview": {
+          "path": "assets/previews/portrait-philosophy-confucius-circle-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 118729,
+          "sha256": "19e2485a2be74a256c21ac04a26360b00ac036e7e1f493c41c4cd706f9ae5fd8"
+        }
+      },
+      "integration": {
+        "display_path": "assets/display/portrait-philosophy-confucius-256.png",
+        "master_path": "assets/masters/portrait-philosophy-confucius-1024.png",
+        "css_object_fit": "cover",
+        "css_object_position": "50% 50%",
+        "circle_css": "border-radius: 50%",
+        "identity_mapping_status": "stable art ID; persona_id integration alias requires schema reconciliation by parent/Jerry"
+      }
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "persona_id": "philosophy-zhuangzi",
+      "pack_id": "philosophy",
+      "display_name": "莊子",
+      "type": "historical_interpretation_portrait",
+      "usage": "人物選角、回合發言、人物來源及回顧的 demo 頭像",
+      "usage_scope": "demo",
+      "channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "formal_release_status": "not_approved",
+      "version": "1.0.0",
+      "generation_revision": "v1",
+      "theme": "warm cream / mint / sage / muted gold; theme-neutral raster",
+      "state": "static",
+      "alt": "莊子的生成藝術詮釋：髮束成鬆髻、蓄疏鬚，穿素雅淺綠長袍，背景是淡墨般的遠山。 此為藝術詮釋，非經核實的歷史肖像。",
+      "tool": "image_gen.imagegen (built-in)",
+      "model_version": "not exposed by tool",
+      "source_type": "AI-generated artistic interpretation",
+      "source": "provenance/prompts-v1.json",
+      "use_basis": "User-authorized fullkit demo generation and approved philosophy cast; no reference portrait inputs. Rights and formal-production review pending; no unrestricted-commercial-use claim.",
+      "status": "generated_exported_self_reviewed_pending_Boyi_Jerry_acceptance",
+      "files": {
+        "generated_original": {
+          "path": "assets/originals/portrait-philosophy-zhuangzi-generated-v1.png",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2654997,
+          "sha256": "da158b3bebd692861a307606e96a75c86ead850ec201ffbbc6f900142d6ea872"
+        },
+        "master": {
+          "path": "assets/masters/portrait-philosophy-zhuangzi-1024.png",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1658107,
+          "sha256": "dfa0ec88152823349f1785471c149152790d69a89f774061198464b43369834c"
+        },
+        "display": {
+          "path": "assets/display/portrait-philosophy-zhuangzi-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 107103,
+          "sha256": "79f096cebc114295d98310d11a4988a2cf1a1e8998691f73939c293119863272"
+        },
+        "circle_preview": {
+          "path": "assets/previews/portrait-philosophy-zhuangzi-circle-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 121595,
+          "sha256": "d88bf0784250f5e69d8ea11185ad09778eff2eb43322ea5df7c4ae6911f12c2c"
+        }
+      },
+      "integration": {
+        "display_path": "assets/display/portrait-philosophy-zhuangzi-256.png",
+        "master_path": "assets/masters/portrait-philosophy-zhuangzi-1024.png",
+        "css_object_fit": "cover",
+        "css_object_position": "50% 50%",
+        "circle_css": "border-radius: 50%",
+        "identity_mapping_status": "stable art ID; persona_id integration alias requires schema reconciliation by parent/Jerry"
+      }
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "persona_id": "philosophy-nietzsche",
+      "pack_id": "philosophy",
+      "display_name": "尼采",
+      "type": "historical_interpretation_portrait",
+      "usage": "人物選角、回合發言、人物來源及回顧的 demo 頭像",
+      "usage_scope": "demo",
+      "channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "formal_release_status": "not_approved",
+      "version": "1.0.0",
+      "generation_revision": "v1",
+      "theme": "warm cream / mint / sage / muted gold; theme-neutral raster",
+      "state": "static",
+      "alt": "尼采的生成藝術詮釋：向後梳的深髮、濃厚大鬍髭，穿深鼠尾草綠十九世紀外套與米白襯衫。 此為藝術詮釋，非經核實的歷史肖像。",
+      "tool": "image_gen.imagegen (built-in)",
+      "model_version": "not exposed by tool",
+      "source_type": "AI-generated artistic interpretation",
+      "source": "provenance/prompts-v1.json",
+      "use_basis": "User-authorized fullkit demo generation and approved philosophy cast; no reference portrait inputs. Rights and formal-production review pending; no unrestricted-commercial-use claim.",
+      "status": "generated_exported_self_reviewed_pending_Boyi_Jerry_acceptance",
+      "files": {
+        "generated_original": {
+          "path": "assets/originals/portrait-philosophy-nietzsche-generated-v1.png",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2767897,
+          "sha256": "1ab90b78e4f4a8cb04ffd9ce3e9747513a74c123ef384cdaa52835e39782ae39"
+        },
+        "master": {
+          "path": "assets/masters/portrait-philosophy-nietzsche-1024.png",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1728300,
+          "sha256": "d016eb53d5da46d8b47e1833cf76d62836a7790632e57abc4a62692426a458a4"
+        },
+        "display": {
+          "path": "assets/display/portrait-philosophy-nietzsche-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 113107,
+          "sha256": "beba3adebaf274b0eefc4e127b9254863caffb86c1ecee063b92498a6d64bcd0"
+        },
+        "circle_preview": {
+          "path": "assets/previews/portrait-philosophy-nietzsche-circle-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 129346,
+          "sha256": "49eb7b84201c5641cddb9e8e83c499e77590c5719af9c23475932b22724b5890"
+        }
+      },
+      "integration": {
+        "display_path": "assets/display/portrait-philosophy-nietzsche-256.png",
+        "master_path": "assets/masters/portrait-philosophy-nietzsche-1024.png",
+        "css_object_fit": "cover",
+        "css_object_position": "50% 50%",
+        "circle_css": "border-radius: 50%",
+        "identity_mapping_status": "stable art ID; persona_id integration alias requires schema reconciliation by parent/Jerry"
+      }
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "persona_id": "philosophy-plato",
+      "pack_id": "philosophy",
+      "display_name": "柏拉圖",
+      "type": "historical_interpretation_portrait",
+      "usage": "人物選角、回合發言、人物來源及回顧的 demo 頭像",
+      "usage_scope": "demo",
+      "channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "formal_release_status": "not_approved",
+      "version": "1.0.0",
+      "generation_revision": "v1",
+      "theme": "warm cream / mint / sage / muted gold; theme-neutral raster",
+      "state": "static",
+      "alt": "柏拉圖的生成藝術詮釋：灰白捲髮與濃密長鬚，穿帶淡金邊的鼠尾草綠古希臘披衣。 此為藝術詮釋，非經核實的歷史肖像。",
+      "tool": "image_gen.imagegen (built-in)",
+      "model_version": "not exposed by tool",
+      "source_type": "AI-generated artistic interpretation",
+      "source": "provenance/prompts-v1.json",
+      "use_basis": "User-authorized fullkit demo generation and approved philosophy cast; no reference portrait inputs. Rights and formal-production review pending; no unrestricted-commercial-use claim.",
+      "status": "generated_exported_self_reviewed_pending_Boyi_Jerry_acceptance",
+      "files": {
+        "generated_original": {
+          "path": "assets/originals/portrait-philosophy-plato-generated-v1.png",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2816170,
+          "sha256": "939d43aeae35365185638eedc1b6b1d7c37d6b899b52ee7d55214626114586c6"
+        },
+        "master": {
+          "path": "assets/masters/portrait-philosophy-plato-1024.png",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1726135,
+          "sha256": "19234d4ace160d523a13ca630052a9a25acbd6be1b90212d65c1756cab6b601e"
+        },
+        "display": {
+          "path": "assets/display/portrait-philosophy-plato-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 113051,
+          "sha256": "69ac56cecbccd6ed2c7085bb91ccf02980567a3cb126357a9eff075b2a80ebd5"
+        },
+        "circle_preview": {
+          "path": "assets/previews/portrait-philosophy-plato-circle-256.png",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 128892,
+          "sha256": "f5d6a3d9cde0f1771f7ac6a1f64a1c4be8e45d7d2b7964a77c5e01308fc23744"
+        }
+      },
+      "integration": {
+        "display_path": "assets/display/portrait-philosophy-plato-256.png",
+        "master_path": "assets/masters/portrait-philosophy-plato-1024.png",
+        "css_object_fit": "cover",
+        "css_object_position": "50% 50%",
+        "circle_css": "border-radius: 50%",
+        "identity_mapping_status": "stable art ID; persona_id integration alias requires schema reconciliation by parent/Jerry"
+      }
+    },
+    {
+      "id": "cover-philosophy",
+      "pack_id": "philosophy",
+      "type": "imaginary_cross_era_group_cover",
+      "display_name": "哲學辯論｜想像的跨時代聚會",
+      "usage": "哲學辯論 demo 組別封面／情境選擇",
+      "usage_scope": "demo",
+      "channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "formal_release_status": "not_approved",
+      "version": "1.0.0",
+      "generation_revision": "v2",
+      "theme": "warm cream / mint / sage / muted gold; theme-neutral raster",
+      "state": "static",
+      "alt": "想像的跨時代哲學聚會：由左至右，蘇格拉底、孔子、莊子、尼采與柏拉圖在庭院圓桌旁交流。此場景為創作，並非真實發生的歷史會面。",
+      "tool": "image_gen.imagegen (built-in)",
+      "model_version": "not exposed by tool",
+      "source_type": "AI-generated explicitly imaginary historical scene",
+      "source": "provenance/prompts-v1.json + provenance/prompt-cover-v2.txt",
+      "use_basis": "User-authorized fullkit philosophy demo cast; v2 uses only this pack’s generated v1 cover as edit target. Rights and formal-production review pending; no unrestricted-commercial-use claim.",
+      "status": "generated_refined_exported_self_reviewed_pending_Boyi_Jerry_acceptance",
+      "files": {
+        "generated_original": {
+          "path": "assets/originals/cover-philosophy-generated-v2.png",
+          "width": 1672,
+          "height": 941,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 3000521,
+          "sha256": "2de2be9f63356f1d19616a1fd5a10a92e373e578c8dd68f9e7e57684f7c44f8e"
+        },
+        "master": {
+          "path": "assets/masters/cover-philosophy-1600x900.png",
+          "width": 1600,
+          "height": 900,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2591503,
+          "sha256": "be63c6695d863e40618d0d5e16adb403907c8a6456e29d8a6861ecf61e6d7047"
+        },
+        "display": {
+          "path": "assets/display/cover-philosophy-800x450.png",
+          "width": 800,
+          "height": 450,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 736686,
+          "sha256": "d12de8bb38f2797b6b935decd93cb90cb7b807a0437d76802c72d938bbe2c45e"
+        },
+        "superseded_original": {
+          "path": "assets/originals/cover-philosophy-generated-v1.png",
+          "width": 1672,
+          "height": 941,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2703708,
+          "sha256": "893413cbcf075b6392b99b73355fc80d634131092e9eb8ec8a6c2aec1e536e5a"
+        }
+      },
+      "integration": {
+        "display_path": "assets/display/cover-philosophy-800x450.png",
+        "master_path": "assets/masters/cover-philosophy-1600x900.png",
+        "css_object_fit": "cover",
+        "css_object_position": "50% 50%",
+        "recommended_aspect_ratio": "16 / 9",
+        "disclosure": "跨時代聚會為創作；頭像為藝術詮釋，不是經核實的真實肖像。"
+      }
+    }
+  ],
+  "qa_preview": {
+    "path": "assets/previews/philosophy-contact-sheet.png",
+    "width": 1440,
+    "height": 940,
+    "format": "PNG",
+    "mode": "RGB",
+    "bytes": 1534893,
+    "sha256": "690743ba43fdaaa6765826c4398f673992dc4246354cce1f6c0c8b5e59b55cb8"
+  },
+  "limitations": [
+    "Generated portraits are artistic interpretations, not verified historical likenesses.",
+    "The five-person gathering is fictional and cross-era, not a documented historical event.",
+    "Generation tool model/version was not exposed; asset and prompt revisions are recorded separately.",
+    "Native generation outputs are flattened raster images, no editable layers.",
+    "Formal release and unrestricted commercial-use approval are not established.",
+    "No frontend integration, browser QA, mobile/Safari QA, public upload or desktop repository change performed by this art subtask."
+  ]
+}

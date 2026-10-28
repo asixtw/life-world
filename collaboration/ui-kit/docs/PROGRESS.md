@@ -1,5 +1,11 @@
 # 交付進度（2026-10-28）
 
+## 本輪人物美術與內容更新
+
+六個使用者手動下載的角色美術 ZIP 已逐一核對父任務提供的 SHA256，安全合併為三組。各組 manifest 對應的 70 個原稿／輸出檔及套件清單中的 18 個顯示檔均通過 SHA256 核對；保留原稿、1024 主圖、256 頭像、圓形裁切、1600×900 與 800×450 封面和 provenance。十五肖像及三封面均在劇場實際載入，國際組為虛構職務肖像，歷史與哲學組為藝術詮釋，皆只供 demo。
+
+45 段多輪示例改為逐人撰寫，30 題保留情境及各自參考答案也改為具體不同題目。六場劇場 18 條主路線的首輪回應與後果已區分；有名字的場景發言標成旁白轉述，避免把其他人物的話歸給玩家選的人物。12 個測試增加示例、題目、參考答案和分支回應唯一性檢查，`tsc -b`、`vitest run`、`vite build` 全部通過，建置共 61 模組。Chrome 390×844 已逐一切換十五人物，15 張肖像及三張封面全數載入，無水平溢位；操作柏拉圖的承諾場景至第二輪。未取得可寫入套件的瀏覽器截圖檔，實機、Safari、Boyi／Jerry 人工審查仍待做。
+
 共同來源 commit `1c9d502f32688bcc3c73e4b99a2cc3724c179047`；分支 `work/ousang-full-kit`，僅改 `collaboration/ui-kit/`。使用者已選 A：本套件用文件指定十五人；沈知衡屬另一套原創長版卡。
 
 ## 已實作
@@ -13,8 +19,8 @@
 
 ## 驗證與缺口
 
-最近一次 `tsc -b`、`vite build`、`vitest run` 通過：41 模組、3 個測試檔、12 個案例。瀏覽器已驗選角、來源面板、兩輪分支結尾與返回；新接入的蛋、分享圖及圖示裁切在 390×844 均載入，劇場和畫廊無水平溢位或小於 44 CSS px 的可見按鈕。匯出已重試成功，`Downloads/simulation-7b36f892-9310-41a0-a28c-be530d52c958.json` 可讀，包含 `usageScope=demo`、`channel=script`、`exportKind=life-world-simulation`、`importToRealExperience=false`。實際截圖檔、全部新畫面的跨瀏覽器檢查仍待補。
+最近一次 `tsc -b`、`vite build`、`vitest run` 通過：61 模組、3 個測試檔、12 個案例。瀏覽器已驗選角、來源面板、兩輪分支結尾與返回；新接入的蛋、分享圖及圖示裁切在 390×844 均載入，劇場和畫廊無水平溢位或小於 44 CSS px 的可見按鈕。匯出已重試成功，`Downloads/simulation-7b36f892-9310-41a0-a28c-be530d52c958.json` 可讀，包含 `usageScope=demo`、`channel=script`、`exportKind=life-world-simulation`、`importToRealExperience=false`。實際截圖檔、全部新畫面的跨瀏覽器檢查仍待補。
 
-- 十五肖像、三封面尚未交付；`assets/expected-persona-art.v1.json` 記需求而不放空路徑。四項共用美術 `shellsplit`／`completion`／獨立 nourishment 光效／`world-base` 曾遭圖像工具阻擋，沒有檔案，不能標完成。
+- 十五肖像、三封面已接入並驗證顯示檔雜湊；映射見 `assets/persona-art-map.v1.json`。四項共用美術 `shellsplit`／`completion`／獨立 nourishment 光效／`world-base` 曾遭圖像工具阻擋，沒有檔案，不能標完成。
 - 即時 AI 端點、正式 App／DB、實際麥克風／附件上傳未接；Boyi／Jerry 尚未審查。來源的 `reviewed=false` 不等於已人工驗證。
 - Library 原生 materialize 在 Windows 缺 `os.setxattr` 而失敗；本次依使用者明確提供的本地 ZIP 讀取，保留原 Library ID `libfile_c1337d18a09081918aaa69c3951f8e1c` 和 `libfile_5fb88fe851e8819198ee4243b4e37f07`，不宣稱本機 xattr 已寫入。

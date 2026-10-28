@@ -1,0 +1,80 @@
+[
+  {
+    "id": "portrait-three-kingdoms-caocao",
+    "name": "曹操",
+    "slug": "caocao",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-3d122bb8-4958-47b9-a7fe-c2c189e0dc76.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-3d122bb8-4958-47b9-a7fe-c2c189e0dc76.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "tool": "image_gen.imagegen",
+    "model_version": "not exposed by tool",
+    "tool_version": "not exposed by tool",
+    "timestamp_recorded_utc": "2026-10-28T17:23:00.796Z",
+    "status": "generated_inspected",
+    "error": null
+  },
+  {
+    "id": "portrait-three-kingdoms-liubei",
+    "name": "劉備",
+    "slug": "liubei",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-6ac900af-6600-45b0-8d66-78d62e6965ca.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-6ac900af-6600-45b0-8d66-78d62e6965ca.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "tool": "image_gen.imagegen",
+    "model_version": "not exposed by tool",
+    "tool_version": "not exposed by tool",
+    "timestamp_recorded_utc": "2026-10-28T17:23:00.804Z",
+    "status": "generated_inspected",
+    "error": null
+  },
+  {
+    "id": "portrait-three-kingdoms-zhugeliang",
+    "name": "諸葛亮",
+    "slug": "zhugeliang",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-e98c8926-e5fe-4d64-9761-09a3c96a0258.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-e98c8926-e5fe-4d64-9761-09a3c96a0258.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "tool": "image_gen.imagegen",
+    "model_version": "not exposed by tool",
+    "tool_version": "not exposed by tool",
+    "timestamp_recorded_utc": "2026-10-28T17:23:00.807Z",
+    "status": "generated_inspected",
+    "error": null
+  },
+  {
+    "id": "portrait-three-kingdoms-sunquan",
+    "name": "孫權",
+    "slug": "sunquan",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-b470046f-92f7-40ec-b348-d524b3fed1c0.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-b470046f-92f7-40ec-b348-d524b3fed1c0.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "tool": "image_gen.imagegen",
+    "model_version": "not exposed by tool",
+    "tool_version": "not exposed by tool",
+    "timestamp_recorded_utc": "2026-10-28T17:23:00.812Z",
+    "status": "generated_inspected",
+    "error": null
+  },
+  {
+    "id": "portrait-three-kingdoms-zhouyu",
+    "name": "周瑜",
+    "slug": "zhouyu",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-406f4d05-3b7b-4bab-86ac-f350b9058984.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-406f4d05-3b7b-4bab-86ac-f350b9058984.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "tool": "image_gen.imagegen",
+    "model_version": "not exposed by tool",
+    "tool_version": "not exposed by tool",
+    "timestamp_recorded_utc": "2026-10-28T17:23:00.819Z",
+    "status": "generated_inspected",
+    "error": null
+  },
+  {
+    "id": "cover-three-kingdoms",
+    "name": "三國策略",
+    "slug": "cover",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-954aa78c-dfd5-44d5-bf17-8f2766c1955f.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-954aa78c-dfd5-44d5-bf17-8f2766c1955f.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "tool": "image_gen.imagegen",
+    "model_version": "not exposed by tool",
+    "tool_version": "not exposed by tool",
+    "timestamp_recorded_utc": "2026-10-28T17:23:00.826Z",
+    "status": "generated_inspected",
+    "error": null
+  }
+]

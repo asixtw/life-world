@@ -1,0 +1,124 @@
+{
+  "pack_id": "three-kingdoms",
+  "version": "1.0.0",
+  "usage_scope": "demo",
+  "formal_status": "formal_not_approved",
+  "archive_limit_bytes": 8000000,
+  "parts": [
+    {
+      "part": 1,
+      "name": "lifeworld-three-kingdoms-v1-01-caocao.zip",
+      "path": "/workspace/scratch/3aa9e7208a95/lifeworld-pack-art-three-kingdoms-packages/lifeworld-three-kingdoms-v1-01-caocao.zip",
+      "bytes": 6226104,
+      "sha256": "422f6de06c33047ef31aa5a32ee4fbc4adccc06dd566d8fc56ea639cf21272b8",
+      "asset_id": "portrait-three-kingdoms-caocao",
+      "contents": [
+        "README.md",
+        "assets/manifest.json",
+        "assets/originals/portrait-three-kingdoms-caocao.original.png",
+        "assets/masters/portrait-three-kingdoms-caocao.1024.png",
+        "assets/display/portrait-three-kingdoms-caocao.256.png",
+        "assets/previews/portrait-three-kingdoms-caocao.circle-256.png",
+        "provenance/ART_DELIVERY_SPEC.md.source.txt",
+        "provenance/PROMPT_SIMULATION_001.md.source.txt",
+        "provenance/export-records.json",
+        "provenance/export_assets.py",
+        "provenance/generation-records.json",
+        "provenance/package_assets.py",
+        "provenance/prompts.json",
+        "qa/contact-sheet.png",
+        "qa/technical-verification.json",
+        "qa/visual-inspection.json"
+      ],
+      "includes_full_provenance_and_qa": true
+    },
+    {
+      "part": 2,
+      "name": "lifeworld-three-kingdoms-v1-02-liubei.zip",
+      "path": "/workspace/scratch/3aa9e7208a95/lifeworld-pack-art-three-kingdoms-packages/lifeworld-three-kingdoms-v1-02-liubei.zip",
+      "bytes": 4658408,
+      "sha256": "9ab13c51e21d2fc059dbf6fef2e2c21bd3db92f6fcb3bf13edd1222eac0cb856",
+      "asset_id": "portrait-three-kingdoms-liubei",
+      "contents": [
+        "README.md",
+        "assets/manifest.json",
+        "assets/originals/portrait-three-kingdoms-liubei.original.png",
+        "assets/masters/portrait-three-kingdoms-liubei.1024.png",
+        "assets/display/portrait-three-kingdoms-liubei.256.png",
+        "assets/previews/portrait-three-kingdoms-liubei.circle-256.png"
+      ],
+      "includes_full_provenance_and_qa": false
+    },
+    {
+      "part": 3,
+      "name": "lifeworld-three-kingdoms-v1-03-zhugeliang.zip",
+      "path": "/workspace/scratch/3aa9e7208a95/lifeworld-pack-art-three-kingdoms-packages/lifeworld-three-kingdoms-v1-03-zhugeliang.zip",
+      "bytes": 4301092,
+      "sha256": "3d63edcff78457a2c9ff25ed1c8dabfc59bc72f493619f2a0292cfe19528dc54",
+      "asset_id": "portrait-three-kingdoms-zhugeliang",
+      "contents": [
+        "README.md",
+        "assets/manifest.json",
+        "assets/originals/portrait-three-kingdoms-zhugeliang.original.png",
+        "assets/masters/portrait-three-kingdoms-zhugeliang.1024.png",
+        "assets/display/portrait-three-kingdoms-zhugeliang.256.png",
+        "assets/previews/portrait-three-kingdoms-zhugeliang.circle-256.png"
+      ],
+      "includes_full_provenance_and_qa": false
+    },
+    {
+      "part": 4,
+      "name": "lifeworld-three-kingdoms-v1-04-sunquan.zip",
+      "path": "/workspace/scratch/3aa9e7208a95/lifeworld-pack-art-three-kingdoms-packages/lifeworld-three-kingdoms-v1-04-sunquan.zip",
+      "bytes": 4435391,
+      "sha256": "8abb34cb74943d335df8de3f34a9223f3dcb7f5ea1ecd9e4896c94d545246d39",
+      "asset_id": "portrait-three-kingdoms-sunquan",
+      "contents": [
+        "README.md",
+        "assets/manifest.json",
+        "assets/originals/portrait-three-kingdoms-sunquan.original.png",
+        "assets/masters/portrait-three-kingdoms-sunquan.1024.png",
+        "assets/display/portrait-three-kingdoms-sunquan.256.png",
+        "assets/previews/portrait-three-kingdoms-sunquan.circle-256.png"
+      ],
+      "includes_full_provenance_and_qa": false
+    },
+    {
+      "part": 5,
+      "name": "lifeworld-three-kingdoms-v1-05-zhouyu.zip",
+      "path": "/workspace/scratch/3aa9e7208a95/lifeworld-pack-art-three-kingdoms-packages/lifeworld-three-kingdoms-v1-05-zhouyu.zip",
+      "bytes": 4642504,
+      "sha256": "aaa864590d40c1e7846aaf8a82c786f91485277ef9fe2bbb9c305f6e4a9ca8a3",
+      "asset_id": "portrait-three-kingdoms-zhouyu",
+      "contents": [
+        "README.md",
+        "assets/manifest.json",
+        "assets/originals/portrait-three-kingdoms-zhouyu.original.png",
+        "assets/masters/portrait-three-kingdoms-zhouyu.1024.png",
+        "assets/display/portrait-three-kingdoms-zhouyu.256.png",
+        "assets/previews/portrait-three-kingdoms-zhouyu.circle-256.png"
+      ],
+      "includes_full_provenance_and_qa": false
+    },
+    {
+      "part": 6,
+      "name": "lifeworld-three-kingdoms-v1-06-cover.zip",
+      "path": "/workspace/scratch/3aa9e7208a95/lifeworld-pack-art-three-kingdoms-packages/lifeworld-three-kingdoms-v1-06-cover.zip",
+      "bytes": 5901930,
+      "sha256": "a7f6095deec13efc88bf7f5342c1f06f6ccf28671b4e907247698e5312ccf69d",
+      "asset_id": "cover-three-kingdoms",
+      "contents": [
+        "README.md",
+        "assets/manifest.json",
+        "assets/originals/cover-three-kingdoms.original.png",
+        "assets/masters/cover-three-kingdoms.1600x900.png",
+        "assets/display/cover-three-kingdoms.800x450.png"
+      ],
+      "includes_full_provenance_and_qa": false
+    }
+  ],
+  "extract_instructions": "Extract all six parts into the same directory. Repeated README.md and assets/manifest.json are byte-identical. Full provenance and QA are in part 01.",
+  "total_zip_bytes": 30165429,
+  "archive_extract_verified": true,
+  "asset_sha256_verified_after_extraction": 23
+}

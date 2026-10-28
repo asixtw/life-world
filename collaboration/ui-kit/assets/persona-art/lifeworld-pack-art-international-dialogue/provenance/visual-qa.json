@@ -1,0 +1,27 @@
+{
+  "date_utc": "2026-10-28",
+  "review_kind": "assistant_visual_inspection",
+  "status": "passed_image_level_checks_pending_product_review",
+  "formal_release_approved": false,
+  "originals_inspected": 6,
+  "portrait_square_exports_inspected": 5,
+  "portrait_circle_previews_inspected": 5,
+  "cover_master_inspected": true,
+  "checks": {
+    "five_distinct_adult_fictional_roles": "pass",
+    "cover_exactly_five_distinct_matching_characters": "pass",
+    "no_text_or_official_symbols_observed": "pass",
+    "no_flags_or_real_institutional_branding_observed": "pass",
+    "warm_restrained_shared_painterly_style": "pass",
+    "heads_and_faces_safe_in_circle_crop": "pass",
+    "day_and_quiet_background_crop_previews": "pass",
+    "file_hash_dimensions_and_paths": "see verification-report.json"
+  },
+  "notes": [
+    "Raw tool outputs were visually inspected when returned; the first portrait was also opened locally.",
+    "All derivatives are technical transforms of inspected originals; the contact sheet covers all five square exports and circle crops.",
+    "Portraits have soft, lightly textured editorial painting treatment; no face-retouching was applied.",
+    "No real-person reference was used. Incidental resemblance is not claimed absent with certainty; these must remain labeled fictional demo art.",
+    "No browser, device, deployment or interactive-module integration testing was performed by this artwork task."
+  ]
+}

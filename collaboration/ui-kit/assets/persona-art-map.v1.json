@@ -1,0 +1,167 @@
+[
+  {
+    "id": "portrait-three-kingdoms-caocao",
+    "path": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-caocao.256.png",
+    "alt": "曹操的歷史藝術詮釋：灰黑鬍鬚、沉著神情與深藍綠衣袍，暖米色背景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "d2943c411ec4a65888e9c733178e8df309e011a2db2c1c5a78e0ecbae6625216"
+  },
+  {
+    "id": "portrait-three-kingdoms-liubei",
+    "path": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-liubei.256.png",
+    "alt": "劉備的歷史藝術詮釋：溫厚神情、黑鬚與米白綠色衣袍，暖米色背景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "6da4bd487f66dcdc42225a8d1226268b4caa321667033d99790e840212d59d78"
+  },
+  {
+    "id": "portrait-three-kingdoms-zhugeliang",
+    "path": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-zhugeliang.256.png",
+    "alt": "諸葛亮的歷史藝術詮釋：長鬚、素色學者衣冠與羽扇，暖米色背景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "889f2e907626ab23164423df2a0a98e3b2fc6df12e1dd205746cf0f97fe971eb"
+  },
+  {
+    "id": "portrait-three-kingdoms-sunquan",
+    "path": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-sunquan.256.png",
+    "alt": "孫權的歷史藝術詮釋：紅棕鬍鬚、堅定神情與墨綠淡金衣袍，暖米色背景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "aa2015922896d343d748865f58f7ba819842fd3e0f9a43fb9effb961218cb3c1"
+  },
+  {
+    "id": "portrait-three-kingdoms-zhouyu",
+    "path": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-zhouyu.256.png",
+    "alt": "周瑜的歷史藝術詮釋：無鬚的清俊成年面容、赭色與鼠尾草綠衣袍，暖米色背景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "24142a387bdb700f4a7248ca387a54996614fec721a841d4694758f01cf3ddcf"
+  },
+  {
+    "id": "portrait-international-dialogue-us-representative",
+    "path": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-us-representative@256.png",
+    "alt": "虛構美方代表：短捲髮帶銀色髮絲的中年女性，穿海軍藍西裝外套與米白上衣；奶油與鼠尾草綠背景的柔和繪畫頭像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "244e20cda432b0a23996f4881803432c5decab8209b2ff72232c2543a7f8b30f"
+  },
+  {
+    "id": "portrait-international-dialogue-iran-representative",
+    "path": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-iran-representative@256.png",
+    "alt": "虛構伊方代表：深色微捲髮、短灰黑鬍鬚的中年男性，穿炭灰西裝外套與米白襯衫；柔和奶油與綠色背景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "2743a5d31b40db41e2bfd2205bfcce4df3dff9b3bf8a01e60106e47909f1932f"
+  },
+  {
+    "id": "portrait-international-dialogue-neutral-mediator",
+    "path": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-neutral-mediator@256.png",
+    "alt": "虛構中立調停者：銀色短直髮、戴細圓框眼鏡的年長女性，穿鼠尾草綠外套與米白上衣；柔和繪畫頭像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "af92043541c8185ae35adeb95605fcfcbc6b4d64fa345705aa73b466b7e319e6"
+  },
+  {
+    "id": "portrait-international-dialogue-international-observer",
+    "path": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-international-observer@256.png",
+    "alt": "虛構國際組織觀察員：黑髮低髮髻的成年女性，穿炭灰外套與薄荷綠上衣；奶油與淡綠背景的柔和繪畫頭像，無機構標誌。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "1e94b7521b8d8837ba9866da7c2db9e1beb60b64ef87c32348fe2badd5d2f7d1"
+  },
+  {
+    "id": "portrait-international-dialogue-shipping-representative",
+    "path": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-shipping-representative@256.png",
+    "alt": "虛構航運方代表：深棕膚色、短髮與短鬍鬚的成年男性，穿灰綠外套與米白襯衫；背景為柔和想像港景。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "3efb02c78e603bd6768e0439e5f416ad66a2d4a3f7c0a7ea5fd7b41f9bc7c95f"
+  },
+  {
+    "id": "portrait-philosophy-socrates",
+    "path": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-socrates-256.png",
+    "alt": "蘇格拉底的生成藝術詮釋：禿頂、灰白捲鬚，穿米白與鼠尾草綠古希臘披衣，神情專注溫和。 此為藝術詮釋，非經核實的歷史肖像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "8827432722232f110cdf66707d7fcb55f90ff02aafdaea273e43eee8759d1689"
+  },
+  {
+    "id": "portrait-philosophy-confucius",
+    "path": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-confucius-256.png",
+    "alt": "孔子的生成藝術詮釋：戴素色學者帽、蓄長鬚，穿米白、淡金與鼠尾草綠長袍，神情沉靜。 此為藝術詮釋，非經核實的歷史肖像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "7e9e276e58ed1060900969649136e652082bf29a3d589670b1ae0683ca7693f2"
+  },
+  {
+    "id": "portrait-philosophy-zhuangzi",
+    "path": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-zhuangzi-256.png",
+    "alt": "莊子的生成藝術詮釋：髮束成鬆髻、蓄疏鬚，穿素雅淺綠長袍，背景是淡墨般的遠山。 此為藝術詮釋，非經核實的歷史肖像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "79f096cebc114295d98310d11a4988a2cf1a1e8998691f73939c293119863272"
+  },
+  {
+    "id": "portrait-philosophy-nietzsche",
+    "path": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-nietzsche-256.png",
+    "alt": "尼采的生成藝術詮釋：向後梳的深髮、濃厚大鬍髭，穿深鼠尾草綠十九世紀外套與米白襯衫。 此為藝術詮釋，非經核實的歷史肖像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "beba3adebaf274b0eefc4e127b9254863caffb86c1ecee063b92498a6d64bcd0"
+  },
+  {
+    "id": "portrait-philosophy-plato",
+    "path": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-plato-256.png",
+    "alt": "柏拉圖的生成藝術詮釋：灰白捲髮與濃密長鬚，穿帶淡金邊的鼠尾草綠古希臘披衣。 此為藝術詮釋，非經核實的歷史肖像。",
+    "status": "delivered_demo_pending_owner_review",
+    "scope": "demo",
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "sha256": "69ac56cecbccd6ed2c7085bb91ccf02980567a3cb126357a9eff075b2a80ebd5"
+  }
+]

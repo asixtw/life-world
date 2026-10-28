@@ -1,0 +1,165 @@
+[
+  {
+    "id": "portrait-philosophy-socrates",
+    "source": {
+      "path": "assets/originals/portrait-philosophy-socrates-generated-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 2522138,
+      "sha256": "214774c0d588ea257646a4f42baeb7b9b082984a6ba25432086514bd8649709d"
+    },
+    "operation": "square resize; no source crop; then display downsample and antialiased circular alpha mask",
+    "resize_filter": "Pillow LANCZOS",
+    "master_size": [
+      1024,
+      1024
+    ],
+    "display_size": [
+      256,
+      256
+    ],
+    "circle_center": [
+      128,
+      128
+    ],
+    "circle_radius": 128
+  },
+  {
+    "id": "portrait-philosophy-confucius",
+    "source": {
+      "path": "assets/originals/portrait-philosophy-confucius-generated-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 2572944,
+      "sha256": "183a04d9b1e4cf214c3d62be3cde7b8c6d45d2d59e6ddc6032d366140f9b2e40"
+    },
+    "operation": "square resize; no source crop; then display downsample and antialiased circular alpha mask",
+    "resize_filter": "Pillow LANCZOS",
+    "master_size": [
+      1024,
+      1024
+    ],
+    "display_size": [
+      256,
+      256
+    ],
+    "circle_center": [
+      128,
+      128
+    ],
+    "circle_radius": 128
+  },
+  {
+    "id": "portrait-philosophy-zhuangzi",
+    "source": {
+      "path": "assets/originals/portrait-philosophy-zhuangzi-generated-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 2654997,
+      "sha256": "da158b3bebd692861a307606e96a75c86ead850ec201ffbbc6f900142d6ea872"
+    },
+    "operation": "square resize; no source crop; then display downsample and antialiased circular alpha mask",
+    "resize_filter": "Pillow LANCZOS",
+    "master_size": [
+      1024,
+      1024
+    ],
+    "display_size": [
+      256,
+      256
+    ],
+    "circle_center": [
+      128,
+      128
+    ],
+    "circle_radius": 128
+  },
+  {
+    "id": "portrait-philosophy-nietzsche",
+    "source": {
+      "path": "assets/originals/portrait-philosophy-nietzsche-generated-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 2767897,
+      "sha256": "1ab90b78e4f4a8cb04ffd9ce3e9747513a74c123ef384cdaa52835e39782ae39"
+    },
+    "operation": "square resize; no source crop; then display downsample and antialiased circular alpha mask",
+    "resize_filter": "Pillow LANCZOS",
+    "master_size": [
+      1024,
+      1024
+    ],
+    "display_size": [
+      256,
+      256
+    ],
+    "circle_center": [
+      128,
+      128
+    ],
+    "circle_radius": 128
+  },
+  {
+    "id": "portrait-philosophy-plato",
+    "source": {
+      "path": "assets/originals/portrait-philosophy-plato-generated-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 2816170,
+      "sha256": "939d43aeae35365185638eedc1b6b1d7c37d6b899b52ee7d55214626114586c6"
+    },
+    "operation": "square resize; no source crop; then display downsample and antialiased circular alpha mask",
+    "resize_filter": "Pillow LANCZOS",
+    "master_size": [
+      1024,
+      1024
+    ],
+    "display_size": [
+      256,
+      256
+    ],
+    "circle_center": [
+      128,
+      128
+    ],
+    "circle_radius": 128
+  },
+  {
+    "id": "cover-philosophy",
+    "source": {
+      "path": "assets/originals/cover-philosophy-generated-v2.png",
+      "width": 1672,
+      "height": 941,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 3000521,
+      "sha256": "2de2be9f63356f1d19616a1fd5a10a92e373e578c8dd68f9e7e57684f7c44f8e"
+    },
+    "operation": "center crop to exact 16:9 then resize; no creative retouching",
+    "source_crop_box": [
+      0,
+      0.25,
+      1672,
+      940.75
+    ],
+    "resize_filter": "Pillow LANCZOS",
+    "master_size": [
+      1600,
+      900
+    ],
+    "display_size": [
+      800,
+      450
+    ]
+  }
+]

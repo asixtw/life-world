@@ -1,0 +1,56 @@
+[
+  {
+    "id": "portrait-philosophy-socrates",
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "model_version": "not exposed by tool",
+    "asset_version": "v1",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-174ce404-ba63-4726-a492-1cd6fb6032ee.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-174ce404-ba63-4726-a492-1cd6fb6032ee.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "portrait-philosophy-confucius",
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "model_version": "not exposed by tool",
+    "asset_version": "v1",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-71feb2e3-a894-40ec-b7ce-552dee25a7ad.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-71feb2e3-a894-40ec-b7ce-552dee25a7ad.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "portrait-philosophy-zhuangzi",
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "model_version": "not exposed by tool",
+    "asset_version": "v1",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-6e56dad3-9f46-48db-97ec-746c98067081.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-6e56dad3-9f46-48db-97ec-746c98067081.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "portrait-philosophy-nietzsche",
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "model_version": "not exposed by tool",
+    "asset_version": "v1",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-4543bc24-e281-454d-b96b-d44a28efc0c5.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-4543bc24-e281-454d-b96b-d44a28efc0c5.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "portrait-philosophy-plato",
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "model_version": "not exposed by tool",
+    "asset_version": "v1",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-70145852-7869-40fe-b4a3-2eac204568aa.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-70145852-7869-40fe-b4a3-2eac204568aa.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "cover-philosophy",
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "model_version": "not exposed by tool",
+    "asset_version": "v1",
+    "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-aa88b11b-8725-46a7-8b2d-1c296c10244a.png",
+    "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-aa88b11b-8725-46a7-8b2d-1c296c10244a.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  }
+]

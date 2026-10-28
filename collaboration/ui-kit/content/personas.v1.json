@@ -14,7 +14,7 @@
     "sourceRefs": [
       "src-sgz-wei"
     ],
-    "avatarId": "avatar-tk-caocao",
+    "avatarId": "portrait-three-kingdoms-caocao",
     "usageScope": "demo"
   },
   {
@@ -32,7 +32,7 @@
     "sourceRefs": [
       "src-sgz-shu"
     ],
-    "avatarId": "avatar-tk-liubei",
+    "avatarId": "portrait-three-kingdoms-liubei",
     "usageScope": "demo"
   },
   {
@@ -50,7 +50,7 @@
     "sourceRefs": [
       "src-sgz-zhuge"
     ],
-    "avatarId": "avatar-tk-zhuge",
+    "avatarId": "portrait-three-kingdoms-zhugeliang",
     "usageScope": "demo"
   },
   {
@@ -68,7 +68,7 @@
     "sourceRefs": [
       "src-sgz-wu"
     ],
-    "avatarId": "avatar-tk-sunquan",
+    "avatarId": "portrait-three-kingdoms-sunquan",
     "usageScope": "demo"
   },
   {
@@ -86,7 +86,7 @@
     "sourceRefs": [
       "src-sgz-zhou"
     ],
-    "avatarId": "avatar-tk-zhouyu",
+    "avatarId": "portrait-three-kingdoms-zhouyu",
     "usageScope": "demo"
   },
   {
@@ -194,7 +194,7 @@
     "sourceRefs": [
       "src-plato-apology"
     ],
-    "avatarId": "avatar-ph-socrates",
+    "avatarId": "portrait-philosophy-socrates",
     "usageScope": "demo"
   },
   {
@@ -212,7 +212,7 @@
     "sourceRefs": [
       "src-analects"
     ],
-    "avatarId": "avatar-ph-confucius",
+    "avatarId": "portrait-philosophy-confucius",
     "usageScope": "demo"
   },
   {
@@ -230,7 +230,7 @@
     "sourceRefs": [
       "src-zhuangzi"
     ],
-    "avatarId": "avatar-ph-zhuangzi",
+    "avatarId": "portrait-philosophy-zhuangzi",
     "usageScope": "demo"
   },
   {
@@ -248,7 +248,7 @@
     "sourceRefs": [
       "src-nietzsche"
     ],
-    "avatarId": "avatar-ph-nietzsche",
+    "avatarId": "portrait-philosophy-nietzsche",
     "usageScope": "demo"
   },
   {
@@ -266,7 +266,7 @@
     "sourceRefs": [
       "src-plato-republic"
     ],
-    "avatarId": "avatar-ph-plato",
+    "avatarId": "portrait-philosophy-plato",
     "usageScope": "demo"
   }
 ]

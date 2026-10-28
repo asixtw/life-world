@@ -1,0 +1,509 @@
+{
+  "schema_version": "1.0",
+  "package_id": "lifeworld-pack-art-international-dialogue",
+  "pack_id": "international-dialogue",
+  "version": "v1",
+  "usage_scope": "demo",
+  "formal_release_approved": false,
+  "expected_count": {
+    "portraits": 5,
+    "covers": 1
+  },
+  "delivered_count": {
+    "portraits": 5,
+    "covers": 1
+  },
+  "source_repository": "asixtw/life-world",
+  "source_ref": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
+  "path_base": "package root",
+  "assets": [
+    {
+      "id": "portrait-international-dialogue-us-representative",
+      "pack_id": "international-dialogue",
+      "display_name": "美方代表",
+      "asset_type": "fictional_role_portrait",
+      "version": "v1",
+      "usage_scope": "demo",
+      "applicable_channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "status": "generated_visual_qa_passed_pending_product_review",
+      "theme": "warm_cream_mint_sage_light_gold",
+      "alt": "虛構美方代表：短捲髮帶銀色髮絲的中年女性，穿海軍藍西裝外套與米白上衣；奶油與鼠尾草綠背景的柔和繪畫頭像。",
+      "usage_basis": "User approved repository specified character list A and Life World fullkit artwork; completely fictional role visualization, not a real official portrait or institutional endorsement. Formal product use and legal clearance not asserted.",
+      "generation": {
+        "tool": "OpenAI built-in image_gen.imagegen",
+        "tool_mode": "built-in",
+        "model_version": "not exposed by tool",
+        "date_utc": "2026-10-28",
+        "prompt_path": "provenance/prompts.json",
+        "prompt_key": "portrait-international-dialogue-us-representative",
+        "input_image_refs": [],
+        "source_path": "originals/portrait-international-dialogue-us-representative.png",
+        "source_pixels": [
+          1254,
+          1254
+        ]
+      },
+      "variants": [
+        {
+          "path": "originals/portrait-international-dialogue-us-representative.png",
+          "role": "imagegen_original",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2220618,
+          "sha256": "d31452f67b4c8124fd12f18ed9e12dd57db98318456c05027fc476fb48cd1e8b",
+          "transform": "none; generator bytes preserved"
+        },
+        {
+          "path": "masters/portrait-international-dialogue-us-representative@1024.png",
+          "role": "derived_master",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1392960,
+          "sha256": "083d66044e346d636d1e8d7f6dd4f3d3753f8b6573f80e6aa518e19f103873b6",
+          "transform": "uniform Lanczos resize 1254x1254 to 1024x1024; no crop"
+        },
+        {
+          "path": "exports/portrait-international-dialogue-us-representative@256.png",
+          "role": "display_export",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 95156,
+          "sha256": "244e20cda432b0a23996f4881803432c5decab8209b2ff72232c2543a7f8b30f",
+          "transform": "Lanczos resize derived master to 256x256"
+        },
+        {
+          "path": "previews/portrait-international-dialogue-us-representative@256-circle.png",
+          "role": "circle_crop_preview",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 110113,
+          "sha256": "3b31525cdebc44e1ca36af50ca41bab30e886f6f6970bd5438e7969039ab7e80",
+          "transform": "centered 256px circle alpha mask; no retouching; transparent outside circle"
+        }
+      ],
+      "integration": "Render image as demo-only fiction with adjacent UI label 示範角色・虛構形象. Keep real UI text outside pixels. Preserve these IDs and explicit persona mapping. CSS circle clipping can use the square 256px export; preview is not the only master. Cover is an imaginary scene, not news or evidence of a real meeting."
+    },
+    {
+      "id": "portrait-international-dialogue-iran-representative",
+      "pack_id": "international-dialogue",
+      "display_name": "伊方代表",
+      "asset_type": "fictional_role_portrait",
+      "version": "v1",
+      "usage_scope": "demo",
+      "applicable_channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "status": "generated_visual_qa_passed_pending_product_review",
+      "theme": "warm_cream_mint_sage_light_gold",
+      "alt": "虛構伊方代表：深色微捲髮、短灰黑鬍鬚的中年男性，穿炭灰西裝外套與米白襯衫；柔和奶油與綠色背景。",
+      "usage_basis": "User approved repository specified character list A and Life World fullkit artwork; completely fictional role visualization, not a real official portrait or institutional endorsement. Formal product use and legal clearance not asserted.",
+      "generation": {
+        "tool": "OpenAI built-in image_gen.imagegen",
+        "tool_mode": "built-in",
+        "model_version": "not exposed by tool",
+        "date_utc": "2026-10-28",
+        "prompt_path": "provenance/prompts.json",
+        "prompt_key": "portrait-international-dialogue-iran-representative",
+        "input_image_refs": [],
+        "source_path": "originals/portrait-international-dialogue-iran-representative.png",
+        "source_pixels": [
+          1254,
+          1254
+        ]
+      },
+      "variants": [
+        {
+          "path": "originals/portrait-international-dialogue-iran-representative.png",
+          "role": "imagegen_original",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2193239,
+          "sha256": "1f0b9a3005ba2623eda8b879bdf61ef3a68b4b3708ab0c6def436d54337a0e62",
+          "transform": "none; generator bytes preserved"
+        },
+        {
+          "path": "masters/portrait-international-dialogue-iran-representative@1024.png",
+          "role": "derived_master",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1384840,
+          "sha256": "8b01938d3cd2e6068bee47e3c52b687906324c944df3017d961ca468561e849d",
+          "transform": "uniform Lanczos resize 1254x1254 to 1024x1024; no crop"
+        },
+        {
+          "path": "exports/portrait-international-dialogue-iran-representative@256.png",
+          "role": "display_export",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 96786,
+          "sha256": "2743a5d31b40db41e2bfd2205bfcce4df3dff9b3bf8a01e60106e47909f1932f",
+          "transform": "Lanczos resize derived master to 256x256"
+        },
+        {
+          "path": "previews/portrait-international-dialogue-iran-representative@256-circle.png",
+          "role": "circle_crop_preview",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 112425,
+          "sha256": "667b35cda16c9d5c3178718652fa6f593d971cbd9325abfdd5de5dbb41a38598",
+          "transform": "centered 256px circle alpha mask; no retouching; transparent outside circle"
+        }
+      ],
+      "integration": "Render image as demo-only fiction with adjacent UI label 示範角色・虛構形象. Keep real UI text outside pixels. Preserve these IDs and explicit persona mapping. CSS circle clipping can use the square 256px export; preview is not the only master. Cover is an imaginary scene, not news or evidence of a real meeting."
+    },
+    {
+      "id": "portrait-international-dialogue-neutral-mediator",
+      "pack_id": "international-dialogue",
+      "display_name": "中立調停者",
+      "asset_type": "fictional_role_portrait",
+      "version": "v1",
+      "usage_scope": "demo",
+      "applicable_channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "status": "generated_visual_qa_passed_pending_product_review",
+      "theme": "warm_cream_mint_sage_light_gold",
+      "alt": "虛構中立調停者：銀色短直髮、戴細圓框眼鏡的年長女性，穿鼠尾草綠外套與米白上衣；柔和繪畫頭像。",
+      "usage_basis": "User approved repository specified character list A and Life World fullkit artwork; completely fictional role visualization, not a real official portrait or institutional endorsement. Formal product use and legal clearance not asserted.",
+      "generation": {
+        "tool": "OpenAI built-in image_gen.imagegen",
+        "tool_mode": "built-in",
+        "model_version": "not exposed by tool",
+        "date_utc": "2026-10-28",
+        "prompt_path": "provenance/prompts.json",
+        "prompt_key": "portrait-international-dialogue-neutral-mediator",
+        "input_image_refs": [],
+        "source_path": "originals/portrait-international-dialogue-neutral-mediator.png",
+        "source_pixels": [
+          1254,
+          1254
+        ]
+      },
+      "variants": [
+        {
+          "path": "originals/portrait-international-dialogue-neutral-mediator.png",
+          "role": "imagegen_original",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2251006,
+          "sha256": "b4074694a8cac86568a300b82b5d3f04514405981e92ca6109b68926a25b3230",
+          "transform": "none; generator bytes preserved"
+        },
+        {
+          "path": "masters/portrait-international-dialogue-neutral-mediator@1024.png",
+          "role": "derived_master",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1423172,
+          "sha256": "ed673ccd8f327776ff194f5e787e806ba70ad6bf71d7836be4115b9f475b5e44",
+          "transform": "uniform Lanczos resize 1254x1254 to 1024x1024; no crop"
+        },
+        {
+          "path": "exports/portrait-international-dialogue-neutral-mediator@256.png",
+          "role": "display_export",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 97504,
+          "sha256": "af92043541c8185ae35adeb95605fcfcbc6b4d64fa345705aa73b466b7e319e6",
+          "transform": "Lanczos resize derived master to 256x256"
+        },
+        {
+          "path": "previews/portrait-international-dialogue-neutral-mediator@256-circle.png",
+          "role": "circle_crop_preview",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 112751,
+          "sha256": "7cebf220f530f701f62c4667ebcb92a7945a3c31164682889f425b3236b9eb9f",
+          "transform": "centered 256px circle alpha mask; no retouching; transparent outside circle"
+        }
+      ],
+      "integration": "Render image as demo-only fiction with adjacent UI label 示範角色・虛構形象. Keep real UI text outside pixels. Preserve these IDs and explicit persona mapping. CSS circle clipping can use the square 256px export; preview is not the only master. Cover is an imaginary scene, not news or evidence of a real meeting."
+    },
+    {
+      "id": "portrait-international-dialogue-international-observer",
+      "pack_id": "international-dialogue",
+      "display_name": "國際組織觀察員",
+      "asset_type": "fictional_role_portrait",
+      "version": "v1",
+      "usage_scope": "demo",
+      "applicable_channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "status": "generated_visual_qa_passed_pending_product_review",
+      "theme": "warm_cream_mint_sage_light_gold",
+      "alt": "虛構國際組織觀察員：黑髮低髮髻的成年女性，穿炭灰外套與薄荷綠上衣；奶油與淡綠背景的柔和繪畫頭像，無機構標誌。",
+      "usage_basis": "User approved repository specified character list A and Life World fullkit artwork; completely fictional role visualization, not a real official portrait or institutional endorsement. Formal product use and legal clearance not asserted.",
+      "generation": {
+        "tool": "OpenAI built-in image_gen.imagegen",
+        "tool_mode": "built-in",
+        "model_version": "not exposed by tool",
+        "date_utc": "2026-10-28",
+        "prompt_path": "provenance/prompts.json",
+        "prompt_key": "portrait-international-dialogue-international-observer",
+        "input_image_refs": [],
+        "source_path": "originals/portrait-international-dialogue-international-observer.png",
+        "source_pixels": [
+          1254,
+          1254
+        ]
+      },
+      "variants": [
+        {
+          "path": "originals/portrait-international-dialogue-international-observer.png",
+          "role": "imagegen_original",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2216263,
+          "sha256": "4f894b6548a9707222937c9f64c40d7dcabce7c1024988060e51d811ac4cf1b5",
+          "transform": "none; generator bytes preserved"
+        },
+        {
+          "path": "masters/portrait-international-dialogue-international-observer@1024.png",
+          "role": "derived_master",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1388093,
+          "sha256": "e34af0ec4382a2c43754718e9dcbdd30d5c27023a59c363235430719e4845474",
+          "transform": "uniform Lanczos resize 1254x1254 to 1024x1024; no crop"
+        },
+        {
+          "path": "exports/portrait-international-dialogue-international-observer@256.png",
+          "role": "display_export",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 92345,
+          "sha256": "1e94b7521b8d8837ba9866da7c2db9e1beb60b64ef87c32348fe2badd5d2f7d1",
+          "transform": "Lanczos resize derived master to 256x256"
+        },
+        {
+          "path": "previews/portrait-international-dialogue-international-observer@256-circle.png",
+          "role": "circle_crop_preview",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 106915,
+          "sha256": "cd84dc196338262106a004e79ad68b59a0277e53288198b6e03d13b1723e0885",
+          "transform": "centered 256px circle alpha mask; no retouching; transparent outside circle"
+        }
+      ],
+      "integration": "Render image as demo-only fiction with adjacent UI label 示範角色・虛構形象. Keep real UI text outside pixels. Preserve these IDs and explicit persona mapping. CSS circle clipping can use the square 256px export; preview is not the only master. Cover is an imaginary scene, not news or evidence of a real meeting."
+    },
+    {
+      "id": "portrait-international-dialogue-shipping-representative",
+      "pack_id": "international-dialogue",
+      "display_name": "航運方代表",
+      "asset_type": "fictional_role_portrait",
+      "version": "v1",
+      "usage_scope": "demo",
+      "applicable_channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "status": "generated_visual_qa_passed_pending_product_review",
+      "theme": "warm_cream_mint_sage_light_gold",
+      "alt": "虛構航運方代表：深棕膚色、短髮與短鬍鬚的成年男性，穿灰綠外套與米白襯衫；背景為柔和想像港景。",
+      "usage_basis": "User approved repository specified character list A and Life World fullkit artwork; completely fictional role visualization, not a real official portrait or institutional endorsement. Formal product use and legal clearance not asserted.",
+      "generation": {
+        "tool": "OpenAI built-in image_gen.imagegen",
+        "tool_mode": "built-in",
+        "model_version": "not exposed by tool",
+        "date_utc": "2026-10-28",
+        "prompt_path": "provenance/prompts.json",
+        "prompt_key": "portrait-international-dialogue-shipping-representative",
+        "input_image_refs": [],
+        "source_path": "originals/portrait-international-dialogue-shipping-representative.png",
+        "source_pixels": [
+          1254,
+          1254
+        ]
+      },
+      "variants": [
+        {
+          "path": "originals/portrait-international-dialogue-shipping-representative.png",
+          "role": "imagegen_original",
+          "width": 1254,
+          "height": 1254,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2318929,
+          "sha256": "0d26645e33f1664dea7e7e39b7c6912490e097af610569f38fe77a8f89f16aa6",
+          "transform": "none; generator bytes preserved"
+        },
+        {
+          "path": "masters/portrait-international-dialogue-shipping-representative@1024.png",
+          "role": "derived_master",
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 1473228,
+          "sha256": "f4876dbc8f3abf12f437dda4726fa832b97143137f310a7bd1c8538e9389849e",
+          "transform": "uniform Lanczos resize 1254x1254 to 1024x1024; no crop"
+        },
+        {
+          "path": "exports/portrait-international-dialogue-shipping-representative@256.png",
+          "role": "display_export",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 98483,
+          "sha256": "3efb02c78e603bd6768e0439e5f416ad66a2d4a3f7c0a7ea5fd7b41f9bc7c95f",
+          "transform": "Lanczos resize derived master to 256x256"
+        },
+        {
+          "path": "previews/portrait-international-dialogue-shipping-representative@256-circle.png",
+          "role": "circle_crop_preview",
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "mode": "RGBA",
+          "bytes": 114180,
+          "sha256": "4aa04122494ea24f703f617bbd7cd36835b050a502603c38f64e92e37f87d70e",
+          "transform": "centered 256px circle alpha mask; no retouching; transparent outside circle"
+        }
+      ],
+      "integration": "Render image as demo-only fiction with adjacent UI label 示範角色・虛構形象. Keep real UI text outside pixels. Preserve these IDs and explicit persona mapping. CSS circle clipping can use the square 256px export; preview is not the only master. Cover is an imaginary scene, not news or evidence of a real meeting."
+    },
+    {
+      "id": "cover-international-dialogue",
+      "pack_id": "international-dialogue",
+      "display_name": "國際協調：虛構協商場景封面",
+      "asset_type": "scenario_cover",
+      "version": "v1",
+      "usage_scope": "demo",
+      "applicable_channels": [
+        "test",
+        "POC",
+        "closed_beta"
+      ],
+      "formal_release_approved": false,
+      "status": "generated_visual_qa_passed_pending_product_review",
+      "theme": "warm_cream_mint_sage_light_gold",
+      "alt": "五位虛構代表圍坐淺木色圓桌，在奶油與鼠尾草綠的明亮房間中平和討論；桌上有空白紙張和水杯，窗外是庭園，沒有旗幟、文字或機構標誌。",
+      "usage_basis": "User approved repository specified character list A and Life World fullkit artwork; completely fictional role visualization, not a real official portrait or institutional endorsement. Formal product use and legal clearance not asserted.",
+      "generation": {
+        "tool": "OpenAI built-in image_gen.imagegen",
+        "tool_mode": "built-in",
+        "model_version": "not exposed by tool",
+        "date_utc": "2026-10-28",
+        "prompt_path": "provenance/prompt-cover.txt",
+        "prompt_key": null,
+        "input_image_refs": [
+          "portrait-international-dialogue-us-representative",
+          "portrait-international-dialogue-iran-representative",
+          "portrait-international-dialogue-neutral-mediator",
+          "portrait-international-dialogue-international-observer",
+          "portrait-international-dialogue-shipping-representative"
+        ],
+        "source_path": "originals/cover-international-dialogue.png",
+        "source_pixels": [
+          1672,
+          941
+        ]
+      },
+      "variants": [
+        {
+          "path": "originals/cover-international-dialogue.png",
+          "role": "imagegen_original",
+          "width": 1672,
+          "height": 941,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2349234,
+          "sha256": "8f23b26eda5514433e89001944554fe67111c0e203173e9e9bb3d2209b488b61",
+          "transform": "none; generator bytes preserved"
+        },
+        {
+          "path": "masters/cover-international-dialogue@1600x900.png",
+          "role": "derived_master",
+          "width": 1600,
+          "height": 900,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 2049826,
+          "sha256": "751903c3272c87dda225e69ec91b7932b5613cfc9ef952b2a84d059be68bd394",
+          "transform": "center fit from 1672x941; source crop box [0,0.25,1672,940.75]; Lanczos resize to 1600x900"
+        },
+        {
+          "path": "exports/cover-international-dialogue@800x450.png",
+          "role": "display_export",
+          "width": 800,
+          "height": 450,
+          "format": "PNG",
+          "mode": "RGB",
+          "bytes": 592392,
+          "sha256": "b72a828b96da6643be1231ed126540b8f094fb4fe20b85312104a16f9176b65d",
+          "transform": "Lanczos resize derived master to 800x450"
+        }
+      ],
+      "integration": "Render image as demo-only fiction with adjacent UI label 示範角色・虛構形象. Keep real UI text outside pixels. Preserve these IDs and explicit persona mapping. CSS circle clipping can use the square 256px export; preview is not the only master. Cover is an imaginary scene, not news or evidence of a real meeting."
+    }
+  ],
+  "technical_previews": [
+    {
+      "path": "previews/international-dialogue-crop-qa.png",
+      "role": "technical_contact_sheet",
+      "width": 1440,
+      "height": 1000,
+      "format": "PNG",
+      "mode": "RGB",
+      "bytes": 1350779,
+      "sha256": "5d2bc8204f8e4402f7096c24b3879117454a31067bc92fea4284c62ea6c4298f",
+      "transform": "square exports plus transparent circle previews composited on Day and Quiet backgrounds; labels are outside art"
+    }
+  ],
+  "limits": [
+    "Flattened generated PNGs, not layered illustration sources or editable vector.",
+    "No actual politicians or private-person reference images used; generated fictional faces are not claimed to represent current officials.",
+    "No official institutional endorsement, commercial-use clearance, real events, deployment, device tests, or formal product approval claimed.",
+    "Art QA covers images and technical crops; application integration remains parent/Jerry responsibility."
+  ]
+}
