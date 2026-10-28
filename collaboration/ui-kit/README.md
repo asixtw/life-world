@@ -15,6 +15,10 @@ corepack pnpm dev
 
 打開 `http://127.0.0.1:5173/`。執行 `corepack pnpm build` 與 `corepack pnpm test` 驗證。本輪 Windows 環境的預設 `node` shim 未啟用，實際使用 Codex 附帶 Node 24.22.1 將其 `bin` 目錄加至 PATH 後執行。
 
+## 瀏覽器畫面驗證
+
+在 Windows 安裝版 Chrome 可用時，另開終端以 `corepack pnpm dev -- --port 5174` 啟動本機展示，再執行 `corepack pnpm qa:visual`。此腳本只開啟 `127.0.0.1:5174`，用隔離的無頭 Chrome 測試 390×844 與 1280×800、破圖和水平溢位，將四張實際 PNG 寫入 `docs/qa/screenshots/`。其他作業系統可修改腳本的 Chrome 執行路徑後重跑；既有截圖是本輪 Windows Chrome 的實測證據，不代表實機或 Safari 驗收。
+
 ## 契約與隔離
 
 - `src/contracts.ts` 定義人物、場景、來源、資產、對話、session、即時 adapter 及孵化事件。

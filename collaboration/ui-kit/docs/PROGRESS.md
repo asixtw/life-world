@@ -1,5 +1,9 @@
 # 交付進度（2026-10-28）
 
+## 可保存的瀏覽器畫面證據
+
+使用已安裝 Chrome 與隔離測試 profile，Playwright 僅打開本機 `127.0.0.1:5174`，在 `docs/qa/screenshots/` 留下四張真實 PNG：390×844 總覽、人物劇場、含本地圖片預覽與 100% 模擬進度的紀錄頁，以及 1280×800 總覽。四頁檢查沒有破圖或水平溢位，截圖已目視檢查。`tests/visual-qa.mjs` 保留重跑步驟。這不涵蓋實機、Safari、正式資料或服務。
+
 ## 最後來源與離開流程覆核
 
 保留題 `hold-ph-zhuangzi-1` 改為夢中許諾與醒後核對的事件，與曲木寓言分離。IMO 來源改為 2024-05-24 的 MSC 108 新聞稿，精確記錄頁面行 25–38；不再引用含 2026 更新的熱點頁作 2024 依據。四筆來源只標 `machine_checked_locator`，其餘十一筆為 `unverified`，十五筆人工 `reviewed` 仍為 false。孵化與轉場在播放中卸載時各送出一次取消回呼；完成後離開不再送取消，純函式契約測試涵蓋此邊界。
@@ -10,7 +14,7 @@
 
 30 個保留題換成與 45 段開發示例不同的事件，評估參考新增逐題情境要點、0–3 分尺度及具體失敗條件；`evaluation/README.md` 記錄四組已移除的事件重疊。來源中的《Apology》、《Republic》改為 Perseus 精確作品紀錄；IAEA 改為 2024-11-19 的 GOV/2024/61 PDF。十五人物六項設定各有 `fieldEvidence`，虛構職務的內在設定全為設計假設；十五筆 `reviewed` 仍為 false。查證範圍、生成提示及模型可見性記於 `docs/CONTENT_PROVENANCE.md`。
 
-孵化重播使用 `replay` 事件，Quiet／介面及 OS 減少動效均直接定格；轉場新增 `start`／`complete`／`cancel` 回呼。紀錄頁以本地 SVG、文字檔及 25–100% 原生進度條展示附件 fixture。`tsc -b`、16 項 Vitest 及 Vite build（64 模組）通過。Chrome 390×844 已實測柏拉圖兩輪對話至結尾、圖片 fixture 載入與 100% 進度，頁面無水平溢位或破圖。未取得可寫入套件的截圖檔；實機、Safari 及人工來源審查仍待做。
+孵化重播使用 `replay` 事件，Quiet／介面及 OS 減少動效均直接定格；轉場新增 `start`／`complete`／`cancel` 回呼。紀錄頁以本地 SVG、文字檔及 25–100% 原生進度條展示附件 fixture。`tsc -b`、18 項 Vitest 及 Vite build（64 模組）通過。Chrome 390×844 已實測柏拉圖兩輪對話至結尾、圖片 fixture 載入與 100% 進度，頁面無水平溢位或破圖。實機、Safari 及人工來源審查仍待做。
 
 ## 本輪人物美術與內容更新
 

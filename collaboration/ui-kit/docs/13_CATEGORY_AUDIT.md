@@ -20,11 +20,11 @@
 
 ## 實測範圍
 
-- `tsc -b`、`vite build`、`vitest run` 通過：3 個測試檔、16 個案例；內容與圖片缺項不由這些測試宣稱通過。
+- `tsc -b`、`vite build`、`vitest run` 通過：5 個測試檔、18 個案例；內容與圖片缺項不由這些測試宣稱通過。
 - Chrome 390×844：總覽、元件、孵化、紀錄、劇場逐頁檢查，`documentElement.scrollWidth - clientWidth = 0`，可見按鈕沒有小於 44 CSS px 的目標。BottomSheet 初始焦點為關閉鍵，Escape 後返回開啟鍵。Quiet／減少動效及 Toast 可切換。紀錄頁附件和錄音失敗後，草稿文字仍保留。
 - Chrome 1280×800：紀錄頁無水平溢位或小於 44 CSS px 的可見按鈕。重啟 Vite 前瀏覽器出現 HMR WebSocket 連線錯誤；重啟後頁面可載入，未發現應用程式例外。
 - 新資料接入後在 Chrome 390×844 實測劇場和共用美術頁無水平溢位、小按鈕或破圖；蛋 512 px 原圖、分享圖及三種圖示裁切載入成功。國際組選角、選場、來源連結、Escape／焦點返回、手動下載 JSON 已驗，匯出標示 `usageScope=demo`、`importToRealExperience=false`。
-- 瀏覽器截圖已用 CUA 目視檢查；目前該工具只回傳會話內 JPEG，未提供可寫入工作目錄的截圖檔匯出。未測真實手機、Safari、實際麥克風／上傳及正式 App 整合。
+- 本機 Playwright 使用已安裝 Chrome 的隔離測試 profile，對 localhost 真實頁面存下 `docs/qa/screenshots/` 四張 PNG：390×844 總覽、劇場、附件紀錄與 1280×800 桌面總覽。腳本逐頁檢查破圖與水平溢位，四張已目視檢查。長頁截圖中固定底部導覽會出現在初始 viewport 高度處，這是 fullPage 擷取固定元素的結果。未測真實手機、Safari、實際麥克風／上傳及正式 App 整合。
 
 ## 依賴與限制
 
