@@ -11,5 +11,6 @@
 - [Perseus《Apology》作品記錄](https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg002)：確認作品 CTS URN `tlg0059.tlg002`、英譯版本與 17a 起始定位；引用欄位指向作品記錄，不聲稱逐句文本已核對。
 - [Perseus《Republic》作品記錄](https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg030)：確認作品 CTS URN `tlg0059.tlg030`、英譯版本；第七卷 514a–517a 仍待逐段人工核對。
 - [IAEA GOV/2024/61 PDF](https://www.iaea.org/sites/default/files/24/11/gov2024-61.pdf)：封面載 2024-11-19、文件號與題名，於 2024-11-21 解密公開；只用作 2024 截止的公開背景，不推斷虛構代表的心理或私下立場。
+- [IMO 2024-05-24 新聞稿](https://www.imo.org/en/mediacentre/pressbriefings/pages/imo-msc-resolution-red-sea.aspx)：頁面行 18–38 有日期、MSC 108 對商船與船員安全的決議背景及航運風險表述；替換會持續更新至 2026 的無日期熱點頁，不把新聞稿當虛構航運代表的本人立場。
 
-其他十二筆來源的精確篇章與逐項主張仍待查核。角色卡中的 `fieldEvidence` 對每項摘要、動機、視角、語氣、行為邊界和時間界線標示 `interpretation` 或 `design_assumption`；來源 ID 只定位參考材料，不能把整段心理創作升格為史實。國際職務角色的內在設定全部為 `design_assumption`。
+其餘十一筆來源的精確篇章與逐項主張仍標為 `unverified`，不能作已查核主張。角色卡中的 `fieldEvidence` 對每項摘要、動機、視角、語氣、行為邊界和時間界線標示 `interpretation` 或 `design_assumption`；來源 ID 只定位參考材料，不能把整段心理創作升格為史實。國際職務角色的內在設定全部為 `design_assumption`。

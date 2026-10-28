@@ -12,3 +12,7 @@ export function planHatchStart(current: HatchStage, receiptId: string | undefine
 export function planHatchSkip(playing: boolean, receiptId: string | undefined): HatchEvent[] { // 跳過與完成各有語意。
   return playing ? [{ type: 'skip', stage: 'complete', receiptId }, { type: 'complete', stage: 'complete', receiptId }] : [] // 非播放中不重複完成。
 }
+
+export function planHatchUnmount(playing: boolean, receiptId: string | undefined): HatchEvent[] { // 離開畫面須終止未完序列。
+  return playing ? [{ type: 'cancel', stage: 'idle', receiptId }] : [] // 已完成或取消不重複通知。
+}

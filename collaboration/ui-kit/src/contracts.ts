@@ -1,7 +1,7 @@
 // 本檔只定義示範資料與整合邊界，不寫正式人物或獎勵。
 export type EvidenceKind = 'source_fact' | 'literary_account' | 'interpretation' | 'design_assumption' | 'generated_scene' | 'unknown' // 區分可追溯資料與創作。
 export type UsageScope = 'demo' | 'product_candidate' // 讓素材用途在型別層清楚分流。
-export interface SourceRef { id: string; title: string; creator: string; date: string | null; locator: string; url?: string; evidence: EvidenceKind; reviewed: boolean } // 保存來源定位與人工核對狀態。
+export interface SourceRef { id: string; title: string; creator: string; date: string | null; locator: string; url?: string; evidence: EvidenceKind; reviewed: boolean; verificationStatus?: 'machine_checked_locator' | 'unverified' } // 機器定位與人工核對分欄。
 export interface AssetRef { id: string; path: string; alt: string; scope: UsageScope; format: string; width: number; height: number } // 圖像 ID 需能解析到實檔。
 export interface Persona { id: string; packId: string; name: string; kind: 'fictional' | 'historical' | 'role'; version: string; summary: string; motivation: string; perspective: string; voice: string; boundary: string; knowledgeCutoff: string; sourceRefs: string[]; fieldEvidence: { field: 'summary' | 'motivation' | 'perspective' | 'voice' | 'boundary' | 'knowledgeCutoff'; evidence: EvidenceKind; sourceRefs: string[] }[]; avatarId: string; usageScope: 'demo' } // 人物每項設定明示詮釋或設計假設。
 export interface DialogueTurn { id: string; speaker: 'visitor' | 'persona' | 'narrator'; speakerId?: string; text: string; evidence: EvidenceKind; sourceRefs: string[] } // speakerId 將角色發話綁到穩定人物 ID。

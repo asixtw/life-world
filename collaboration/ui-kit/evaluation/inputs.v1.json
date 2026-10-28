@@ -218,7 +218,7 @@
   {
     "id": "hold-ph-zhuangzi-1",
     "personaId": "ph-zhuangzi",
-    "prompt": "一位園丁只留直長的樹，卻發現庭院失去陰影。請用寓言式提問。",
+    "prompt": "有人在夢中聽見朋友許諾，醒後堅稱朋友必須履約。請以莊子的詮釋視角探討經驗、證據與視角，不把寓言當史實。",
     "sourceRefs": [
       "src-zhuangzi"
     ],

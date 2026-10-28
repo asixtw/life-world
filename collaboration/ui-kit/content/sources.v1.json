@@ -7,7 +7,8 @@
     "locator": "魏書一",
     "url": "https://ctext.org/sanguozhi/1",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-sgz-shu",
@@ -17,7 +18,8 @@
     "locator": "蜀書二",
     "url": "https://ctext.org/sanguozhi/32",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-sgz-zhuge",
@@ -27,7 +29,8 @@
     "locator": "蜀書五",
     "url": "https://ctext.org/sanguozhi/35",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-sgz-wu",
@@ -37,7 +40,8 @@
     "locator": "吳書二",
     "url": "https://ctext.org/sanguozhi/47",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-sgz-zhou",
@@ -47,7 +51,8 @@
     "locator": "吳書九",
     "url": "https://ctext.org/sanguozhi/54",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-us-2024",
@@ -57,7 +62,8 @@
     "locator": "Iran portion",
     "url": "https://2021-2025.state.gov/statement-to-the-2024-npt-prepcom-cluster-2-specific-issue/",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-un-2231",
@@ -67,7 +73,8 @@
     "locator": "Resolution 2231 overview",
     "url": "https://main.un.org/securitycouncil/en/content/2231/background",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-un-charter",
@@ -77,7 +84,8 @@
     "locator": "Articles 33–38",
     "url": "https://www.un.org/en/about-us/un-charter/chapter-6",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-iaea",
@@ -87,17 +95,19 @@
     "locator": "GOV/2024/61，封面與第1段；2024-11-21公開",
     "url": "https://www.iaea.org/sites/default/files/24/11/gov2024-61.pdf",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
   },
   {
     "id": "src-imo",
-    "title": "Red Sea area maritime security",
+    "title": "IMO Maritime Safety Committee Red Sea statement",
     "creator": "International Maritime Organization",
-    "date": null,
-    "locator": "Red Sea Project",
-    "url": "https://www.imo.org/en/mediacentre/hottopics/pages/red-sea.aspx",
+    "date": "2024-05-24",
+    "locator": "2024-05-24 新聞稿正文，頁面行 25–38；MSC 108 決議與船員安全",
+    "url": "https://www.imo.org/en/mediacentre/pressbriefings/pages/imo-msc-resolution-red-sea.aspx",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
   },
   {
     "id": "src-plato-apology",
@@ -107,7 +117,8 @@
     "locator": "Apology；Stephanus 17a–42a；Perseus CTS urn:cts:greekLit:tlg0059.tlg002",
     "url": "https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg002",
     "evidence": "literary_account",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
   },
   {
     "id": "src-analects",
@@ -117,7 +128,8 @@
     "locator": "學而／為政／子路",
     "url": "https://ctext.org/analects/zh",
     "evidence": "literary_account",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-zhuangzi",
@@ -127,7 +139,8 @@
     "locator": "內篇",
     "url": "https://ctext.org/zhuangzi/zh",
     "evidence": "literary_account",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-nietzsche",
@@ -137,7 +150,8 @@
     "locator": "Project Gutenberg ebook 1998",
     "url": "https://www.gutenberg.org/ebooks/1998",
     "evidence": "source_fact",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "unverified"
   },
   {
     "id": "src-plato-republic",
@@ -147,6 +161,7 @@
     "locator": "Republic VII 514a–517a；Perseus CTS urn:cts:greekLit:tlg0059.tlg030",
     "url": "https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg030",
     "evidence": "literary_account",
-    "reviewed": false
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
   }
 ]

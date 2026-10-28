@@ -17,6 +17,8 @@ describe('十五人資料與六場劇場', () => { // 明確覆蓋任務數量�
     expect(personas.every(item => item.fieldEvidence.length === 6 && item.fieldEvidence.every(field => field.evidence === 'interpretation' || field.evidence === 'design_assumption'))).toBe(true) // 六項人物自我設定均標來源層級。
     expect(personas.filter(item => item.kind === 'role').every(item => item.fieldEvidence.every(field => field.evidence === 'design_assumption'))).toBe(true) // 虛構外交職務不冒充真人內心。
     expect(sources.every(item => !item.reviewed)).toBe(true) // 機器定位不假填人工通過。
+    expect(sources.filter(item => item.verificationStatus === 'machine_checked_locator')).toHaveLength(4) // 其餘來源如實保留未知。
+    expect(sources.find(item => item.id === 'src-imo')).toMatchObject({ date: '2024-05-24', verificationStatus: 'machine_checked_locator' }) // 2024 截止不可用動態熱點頁。
   }) // 名單定版。
   it('keeps 45 distinct multi-turn examples and 30 held-out cases separate', () => { // 參考答案不載入 UI。
     expect(examples).toHaveLength(45) // 每人三段。
@@ -29,6 +31,7 @@ describe('十五人資料與六場劇場', () => { // 明確覆蓋任務數量�
     expect(examples.every(item => item.turns.length >= 4)).toBe(true) // 每段為多輪。
     expect(new Set(examples.map(item => item.turns.map(turn => turn.text).join('|'))).size).toBe(45) // 每段語句確實不同。
     expect(new Set(heldout.map(item => item.prompt)).size).toBe(30) // 保留題目各有情境。
+    expect(heldout.find(item => item.id === 'hold-ph-zhuangzi-1')?.prompt).toContain('夢中') // 不重用曲木／樹蔭寓言。
     expect(new Set(references.map(item => item.referenceAnswer)).size).toBe(30) // 參考方向不靠換名複製。
   }) // 研究資料隔離。
   it('plays every primary route to a distinct ending', () => { // 六場各三條實質不同選項。
