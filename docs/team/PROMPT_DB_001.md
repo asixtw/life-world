@@ -1,6 +1,6 @@
 # LW-DB-001｜資料核對與遷移驗收指令
 
-主責：資料庫夥伴；審查：全端。安排在 UI 第一包之後。此包先做只讀分析與測試設計，不改正式資料庫。輸入為同一個[來源快照](BASELINE.md)、[架構](../ARCHITECTURE.md)、[API](../API.md)及 `app/migrations/`／`tests/`。
+主責：歐桑；審查：Jerry（全端）。安排在本輪完整 UI／美術／模擬模組交付之後。此包先做只讀分析與測試設計，不改正式資料庫。輸入為同一個[來源快照](BASELINE.md)、[架構](../ARCHITECTURE.md)、[API](../API.md)及 `app/migrations/`／`tests/`。
 
 ```text
 任務：LW-DB-001，Life World 的資料核對與 PostgreSQL 遷移驗收設計。

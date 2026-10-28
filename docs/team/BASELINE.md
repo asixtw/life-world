@@ -2,6 +2,8 @@
 
 日期：2026-10-28。這份紀錄區分目前實作、暫定目標及本輪文件交付。
 
+具名任務更新：Boyi（產品）、Jerry／jerry（全端）、歐桑（資料庫／Pro 協作）。本次新增[歐桑完整交付任務](PROMPT_OUSANG_START.md)，包含[十五位模擬人物](PROMPT_SIMULATION_001.md)與[完整美術／元件／動效](ART_DELIVERY_SPEC.md)，Boyi 已確認通知同仁並作正式任務；目前只有指引更新，成果未交付。共同起點須使用包含這次文件的 commit，不只使用舊 `d82171a`。
+
 ## GitHub 共用起點（本次發布）
 
 使用者已授權將目前 App、共同產品規格、存放與協作規則發布至 `asixtw/life-world`。團隊優先 clone 此儲存庫，以產品／全端提供的本次發布完整 commit 開工，記錄於每張任務卡；不是繼續依賴下方舊來源包。GitHub 的本文件隨發布提交保存，發布結果／測試見[發布檢查](../GITHUB_PUBLISH.md)，開工步驟見[協作規則](../../CONTRIBUTING.md)。
