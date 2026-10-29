@@ -1,0 +1,25 @@
+[
+  {
+    "id": "lw-egg-shellsplit-v2",
+    "prompt": "Use case: precise-object-edit. Input image is the edit target: canonical Life World cream egg. Make a separated-shell UI asset from this same egg: two clearly separated large shell pieces with empty interiors, lower cream shell bowl with the same sage painted sprout motif and an upper cap lifted slightly to the upper left, gently tilted. Leave a visible transparent gap between both pieces. Preserve warm ivory, pale borders, restrained soft 2D shading and shell appearance. Both pieces fully in frame with ample transparent margins. No character, face, wings, leaves growing out of shell, glow, ground, shadow, background or text. Deliver square raster art with genuine transparent background, not a checkerboard drawing. The two shell pieces share one transparent composition.",
+    "references": [
+      "lw-egg-deepcrack-v1.png"
+    ],
+    "source_output": "exec-a9c2bf08-54dd-4921-a694-f4bab775dbaa.png"
+  },
+  {
+    "id": "lw-lumi-completion-v2",
+    "prompt": "Use case: compositing. Asset type: Life World dedicated hatch-completion still, square transparent raster. Input 1 is Lumi character identity reference; input 2 is egg shell style reference. Show the SAME creamy egg-shaped Lumi with two sage-green sprout leaves, dark green vertical oval eyes, tiny golden oval beak and mint-sage wings, now in a quietly joyful completed-hatch pose with BOTH wings gently opened. Full body, no feet. Two opened ivory shell remnants rest beside the lower body, one on either side, with a fragment of the original painted sage sprout motif. This is a new hatch-completion composition, not the regular one-wing companion pose. Preserve the soft minimal 2D shading, pale warm border and warmcream/sage/mint/gold palette of references. Fully frame all leaves, wings and shells with ample transparent margin. Genuine transparent background. No glow, confetti, ground, shadow, text or other background.",
+    "references": [
+      "lw-lumi-companion-v1.png",
+      "lw-egg-rest-v1.png"
+    ],
+    "source_output": "exec-1de51d9f-322f-44d4-acb5-dc81ff575912.png"
+  },
+  {
+    "id": "lw-effects-nourishment-v2",
+    "prompt": "Use case: stylized-concept. Asset type: independent compositable Life World nourishment light effect, square transparent raster. Create ONLY a delicate soft golden and pale mint light motif: an airy oval aura around an EMPTY transparent center, with three tiny muted-gold four-point glints. Minimal warm 2D illustration, quiet and gentle, diffuse light fading fully to genuine alpha at the outside. Warmcream, sage, pale mint and mutedgold palette. The center must remain transparent so a separately supplied egg or Lumi mascot can show through when composited later. Keep all effects comfortably within the square canvas with generous empty margins. No egg, character, shell, leaves, solid oval fill, ground, backdrop, border, text or UI. No checkerboard drawn into the artwork; actual transparent background. This is the effect layer alone, not an illustration of an object emitting light.",
+    "references": [],
+    "source_output": "exec-64e79948-101f-4069-8af4-3e3bab4a674d.png"
+  }
+]

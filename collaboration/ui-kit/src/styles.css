@@ -20,3 +20,13 @@
 .pack-cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:15px;margin-bottom:20px}.persona-avatar{display:block;width:96px;height:96px;object-fit:cover;border-radius:50%;float:left;margin:0 16px 10px 0}.persona-summary::after{content:'';display:block;clear:both}.dialogue-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;grid-column:1;grid-row:1}.dialogue-line:has(.dialogue-avatar){grid-template-columns:38px 80px minmax(0,1fr) auto}.dialogue-line:has(.dialogue-avatar) strong{grid-column:2}.dialogue-line:has(.dialogue-avatar) span{grid-column:3}.dialogue-line:has(.dialogue-avatar) small{grid-column:4}@media(max-width:760px){.dialogue-line:has(.dialogue-avatar){grid-template-columns:38px minmax(0,1fr)}.dialogue-line:has(.dialogue-avatar) strong{grid-column:2}.dialogue-line:has(.dialogue-avatar) span,.dialogue-line:has(.dialogue-avatar) small{grid-column:1/-1}}
 /* 本機附件 fixture 以真實檔案預覽和原生進度條呈現，不暗示已上傳。 */
 .fixture-preview{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}.fixture-preview img{display:block;max-width:100%;width:320px;border-radius:10px}.fixture-preview p{margin:8px 0 0;color:var(--muted)}.fixture-progress{display:grid;gap:8px;margin:12px 0}.fixture-progress progress{width:100%;height:14px;accent-color:var(--green)}
+
+/* 新透明插畫保留原始畫布；安全邊距避免完成定格窄側邊被裁切。 */
+.hatch-art .hatch-asset{width:min(calc(100% - 24px),276px);height:calc(100% - 24px);object-fit:contain;transform-origin:50% 88%} /* 在既有 300／270 高容器內等比縮放。 */
+.positive-feedback{position:relative;width:min(100%,300px);aspect-ratio:1;margin:12px auto;isolation:isolate} /* 正方透明合成畫布，手機不橫溢。 */
+.positive-feedback img{position:absolute;display:block;object-fit:contain;pointer-events:none} /* 裝飾圖不攔截輸入。 */
+.nourishment-layer{inset:0;width:100%;height:100%;opacity:.65;z-index:0} /* 濃光效獨立在後，保留透明中心。 */
+.feedback-lumi{inset:8%;width:84%;height:84%;z-index:1} /* 完成主體保留四邊安全空間。 */
+.theme-quiet .nourishment-layer{opacity:.38} /* Quiet 降低光效亮度，始終無聲。 */
+.art-review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:20px} /* 同一元件的靜態審查構圖。 */
+.art-review{background:var(--paper);color:var(--ink);min-height:100vh;padding:24px} /* 審查頁使用原有主題 token。 */

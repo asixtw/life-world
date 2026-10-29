@@ -1,0 +1,41 @@
+$ tsc -b && vite build
+vite v7.1.12 building for production...
+transforming...
+✓ 66 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                                           0.53 kB │ gzip:  0.35 kB
+dist/assets/lw-app-icon-v1@180-CB7KdCPp.png                                              23.76 kB
+dist/assets/lw-app-icon-v1@192-loI_V6zm.png                                              27.16 kB
+dist/assets/lw-egg-rest-v1@512-DYrl64tI.png                                              63.32 kB
+dist/assets/lw-egg-initialcrack-v1@512-CWPJFD2O.png                                      65.86 kB
+dist/assets/lw-egg-deepcrack-v1@512-BXfL8tW_.png                                         70.82 kB
+dist/assets/lw-lumi-quiet-v1@512-DQ-jw1tc.png                                            75.38 kB
+dist/assets/lw-lumi-companion-v1@512-CMn7GCYO.png                                        75.84 kB
+dist/assets/portrait-international-dialogue-international-observer@256-BZkeliTM.png      92.35 kB
+dist/assets/portrait-international-dialogue-us-representative@256-BJK6bE_P.png           95.16 kB
+dist/assets/portrait-international-dialogue-iran-representative@256-Dw7n3nIw.png         96.79 kB
+dist/assets/lw-egg-softglow-v1@512-CcK4Uo8m.png                                          97.43 kB
+dist/assets/portrait-international-dialogue-neutral-mediator@256-BLcTZF33.png            97.50 kB
+dist/assets/portrait-international-dialogue-shipping-representative@256-CqR_WqUg.png     98.48 kB
+dist/assets/portrait-philosophy-confucius-256-CdWIyQPX.png                              103.37 kB
+dist/assets/portrait-philosophy-zhuangzi-256-d7aZWJdw.png                               107.10 kB
+dist/assets/portrait-three-kingdoms-zhugeliang.256-ZVxbznvS.png                         110.30 kB
+dist/assets/portrait-philosophy-socrates-256-DL7H-iy-.png                               110.76 kB
+dist/assets/portrait-three-kingdoms-liubei.256-CY8bK9J4.png                             110.77 kB
+dist/assets/portrait-three-kingdoms-caocao.256-Bl3OYABs.png                             110.87 kB
+dist/assets/portrait-three-kingdoms-sunquan.256-B4OSPhFI.png                            112.22 kB
+dist/assets/portrait-philosophy-plato-256-CLIZsuf0.png                                  113.05 kB
+dist/assets/portrait-philosophy-nietzsche-256-LHwAzWxJ.png                              113.11 kB
+dist/assets/portrait-three-kingdoms-zhouyu.256-BEqJJtjh.png                             114.86 kB
+dist/assets/lw-share-illustration-v1@600x315-ToLCHD_4.png                               154.43 kB
+dist/assets/lw-app-icon-v1@512-srEdauXM.png                                             192.26 kB
+dist/assets/cover-international-dialogue@800x450-Dy58G2HE.png                           592.39 kB
+dist/assets/cover-three-kingdoms.800x450-B_A9pt4J.png                                   681.83 kB
+dist/assets/lw-egg-shellsplit-v2-COZSoaq8.png                                           691.47 kB
+dist/assets/cover-philosophy-800x450-D8RS4EJ9.png                                       736.69 kB
+dist/assets/lw-lumi-completion-v2-BTUdhben.png                                          784.95 kB
+dist/assets/lw-effects-nourishment-v2-XhylJqRE.png                                    1,325.81 kB
+dist/assets/index-BLER636Y.css                                                           17.19 kB │ gzip:  4.76 kB
+dist/assets/index-D13TbgP6.js                                                           308.21 kB │ gzip: 96.13 kB
+✓ built in 901ms

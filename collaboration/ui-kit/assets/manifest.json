@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_commit": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
-  "status": "partial_with_missing_art",
+  "status": "review_ready_with_user_deferred_world_base",
   "shared_art_runtime_library_id": "libfile_c1337d18a09081918aaa69c3951f8e1c",
   "shared_art_originals_library_id": "libfile_5fb88fe851e8819198ee4243b4e37f07",
   "assets": [
@@ -305,39 +305,174 @@
         }
       ],
       "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 1325811,
+      "sha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+      "alpha_extrema": [
+        0,
+        253
+      ],
+      "alpha_zero_pixels": 783589,
+      "alpha_partial_pixels": 788927,
+      "alpha_opaque_pixels": 0,
+      "alpha_center": 0,
+      "alpha_bbox": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "alpha_visible_bbox": [
+        192,
+        85,
+        1100,
+        1178
+      ],
+      "id": "lw-effects-nourishment-v2",
+      "status": "product_candidate",
+      "tool": "OpenAI built-in image_gen.imagegen",
+      "originalPath": "shared-art/additions-20261029/originals/lw-effects-nourishment-v2.png",
+      "usageScope": "product_candidate",
+      "version": "v2",
+      "stateId": "nourishment",
+      "display": {
+        "canvas": [
+          1254,
+          1254
+        ],
+        "fit": "contain",
+        "anchor": [
+          0.5,
+          0.88
+        ],
+        "hatchMaxCssPx": 276,
+        "safeInsetCssPx": 12
+      },
+      "themes": [
+        "day",
+        "quiet",
+        "reduced-motion"
+      ],
+      "layerLimit": "Flattened RGBA PNG; shell halves and completion subject are not native editable layers. Separate shell, completion and nourishment files can be composed.",
+      "approval": "User approved visual appearance; formal product release not approved.",
+      "alt": "透明中心的金色與薄荷色獨立養分光環。"
+    },
+    {
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 691469,
+      "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_pixels": 1108174,
+      "alpha_partial_pixels": 463627,
+      "alpha_opaque_pixels": 715,
+      "alpha_center": 0,
+      "alpha_bbox": [
+        0,
+        29,
+        1235,
+        1254
+      ],
+      "alpha_visible_bbox": [
+        229,
+        154,
+        1048,
+        1138
+      ],
+      "id": "lw-egg-shellsplit-v2",
+      "status": "product_candidate",
+      "tool": "OpenAI built-in image_gen.imagegen",
+      "originalPath": "shared-art/additions-20261029/originals/lw-egg-shellsplit-v2.png",
+      "usageScope": "product_candidate",
+      "version": "v2",
+      "stateId": "open",
+      "display": {
+        "canvas": [
+          1254,
+          1254
+        ],
+        "fit": "contain",
+        "anchor": [
+          0.5,
+          0.88
+        ],
+        "hatchMaxCssPx": 276,
+        "safeInsetCssPx": 12
+      },
+      "themes": [
+        "day",
+        "quiet",
+        "reduced-motion"
+      ],
+      "layerLimit": "Flattened RGBA PNG; shell halves and completion subject are not native editable layers. Separate shell, completion and nourishment files can be composed.",
+      "approval": "User approved visual appearance; formal product release not approved.",
+      "alt": "奶油色蛋殼上下分離，保留綠色嫩芽圖案。"
+    },
+    {
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 784948,
+      "sha256": "b04aaaf36ad2226f5645e3e7b8d8fd0a4572e35ad9c263d1b297318bd5ccd04a",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_pixels": 1012791,
+      "alpha_partial_pixels": 558886,
+      "alpha_opaque_pixels": 839,
+      "alpha_center": 253,
+      "alpha_bbox": [
+        0,
+        0,
+        1244,
+        1212
+      ],
+      "alpha_visible_bbox": [
+        23,
+        206,
+        1231,
+        1109
+      ],
+      "id": "lw-lumi-completion-v2",
+      "status": "product_candidate",
+      "tool": "OpenAI built-in image_gen.imagegen",
+      "originalPath": "shared-art/additions-20261029/originals/lw-lumi-completion-v2.png",
+      "usageScope": "product_candidate",
+      "version": "v2",
+      "stateId": "complete",
+      "display": {
+        "canvas": [
+          1254,
+          1254
+        ],
+        "fit": "contain",
+        "anchor": [
+          0.5,
+          0.88
+        ],
+        "hatchMaxCssPx": 276,
+        "safeInsetCssPx": 12
+      },
+      "themes": [
+        "day",
+        "quiet",
+        "reduced-motion"
+      ],
+      "layerLimit": "Flattened RGBA PNG; shell halves and completion subject are not native editable layers. Separate shell, completion and nourishment files can be composed.",
+      "approval": "User approved visual appearance; formal product release not approved.",
+      "alt": "Lumi 張開雙臂，兩側為分離蛋殼的孵化完成定格。"
     }
   ],
   "missing_persona_art": "expected-persona-art.v1.json",
-  "requested_but_not_delivered": [
-    {
-      "id": "lw-egg-shellsplit-v1",
-      "stateId": "shellsplit",
-      "status": "blocked_or_unresolved",
-      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
-      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
-    },
-    {
-      "id": "lw-lumi-completion-v1",
-      "stateId": "lumi-completion",
-      "status": "blocked_or_unresolved",
-      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
-      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
-    },
-    {
-      "id": "lw-effects-nourishment-v1",
-      "stateId": "nourishment",
-      "status": "blocked_or_unresolved",
-      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
-      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
-    },
-    {
-      "id": "lw-world-base-v1",
-      "stateId": "world-base",
-      "status": "blocked_or_unresolved",
-      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
-      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
-    }
-  ],
   "personaArt": [
     {
       "id": "portrait-three-kingdoms-caocao",
@@ -593,5 +728,46 @@
     }
   ],
   "personaArtCount": 18,
-  "personaArtStatus": "demo_only_pending_Boyi_Jerry_review"
+  "personaArtStatus": "demo_only_pending_Boyi_Jerry_review",
+  "recovery": {
+    "contentSnapshot": "b3a715c",
+    "archiveSha256": "0683792faff60acb7d3adf01f0a7a5c854e9ee49853d8669ea872123fe9a5cf0",
+    "gitHistoryRecovered": false
+  },
+  "historical_unavailable_generation": [
+    {
+      "id": "lw-egg-shellsplit-v1",
+      "stateId": "shellsplit",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    },
+    {
+      "id": "lw-lumi-completion-v1",
+      "stateId": "lumi-completion",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    },
+    {
+      "id": "lw-effects-nourishment-v1",
+      "stateId": "nourishment",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    },
+    {
+      "id": "lw-world-base-v1",
+      "stateId": "world-base",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    }
+  ],
+  "deferred": [
+    {
+      "id": "lw-world-base-v1",
+      "reason": "使用者指定其他組員依賴先延後，未生成。"
+    }
+  ]
 }

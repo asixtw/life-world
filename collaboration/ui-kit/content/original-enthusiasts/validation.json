@@ -1,0 +1,167 @@
+[
+  {
+    "file": "LifeWorld_Character_HS01_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 22453,
+    "sha256": "07f316473ec8a16c062f6f332c2082e1750b3c08da55ca72dbe54cb034da47e4"
+  },
+  {
+    "file": "LifeWorld_Character_HS02_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 24101,
+    "sha256": "3b787ade87ad03e52969d28bfc980aeb7a33757193110dd9d7dd528eacce57ee"
+  },
+  {
+    "file": "LifeWorld_Character_HS03_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23686,
+    "sha256": "38e4b1e5e4d05791bb7aa5d7b87f70fa51255b9f83a1c6d035654ac82d6ecf08"
+  },
+  {
+    "file": "LifeWorld_Character_HS04_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23756,
+    "sha256": "3ccc169a5e8ab8c5ddbc558f8a1fd05a4437496e8a1b2e86fc457b355506bdc9"
+  },
+  {
+    "file": "LifeWorld_Character_HS05_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23834,
+    "sha256": "f76cfbd0f4fd1f2f8acafe68df801ad1568be1fe247572b1cb6d738d80d66878"
+  },
+  {
+    "file": "LifeWorld_Character_IP01_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23113,
+    "sha256": "d860e4e2010a0e8adb55b9b3ee3c0c526e9b288693dcfde193180ba78e401902"
+  },
+  {
+    "file": "LifeWorld_Character_IP02_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23126,
+    "sha256": "6a8b265c1bc91e70eec676508e9ca71420673893d49120c4c5e1a37585d485ae"
+  },
+  {
+    "file": "LifeWorld_Character_IP03_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 22994,
+    "sha256": "6ca5c7daae9bd9f6a7dedf962aa6be11d1ba4d458db49eeb280f07cd45899348"
+  },
+  {
+    "file": "LifeWorld_Character_IP04_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23069,
+    "sha256": "34e45290da66c85150be2d98cb8b410de1ea157f784f48f5626153c2e0d57586"
+  },
+  {
+    "file": "LifeWorld_Character_IP05_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23171,
+    "sha256": "4b63064379ccbe8b594989025e2b8b1a627afeccfcd5ee2682d38ce07866e8f8"
+  },
+  {
+    "file": "LifeWorld_Character_PH01_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 24024,
+    "sha256": "2c22a7446f891df6f2fa6c85385e805b0572429ecd8a18c99a49737cc8ed235f"
+  },
+  {
+    "file": "LifeWorld_Character_PH02_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23980,
+    "sha256": "bf99e3cbea4c48de8bf978b2dfdc43edf54d4a38ce517f0825eb182b1f6d7691"
+  },
+  {
+    "file": "LifeWorld_Character_PH03_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 24076,
+    "sha256": "6a8bde4425566d28e7f178b7af75c1ab2abb712e7dde0b5d92431dec3e51ce15"
+  },
+  {
+    "file": "LifeWorld_Character_PH04_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 24034,
+    "sha256": "674be9a2c842586279f4b9a4ab8d89abd1d540160611cdb77823af30719ec897"
+  },
+  {
+    "file": "LifeWorld_Character_PH05_v0.1.txt",
+    "sectionsHan": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "bytes": 23953,
+    "sha256": "86612b95102d3f1d8b29c6da6a1007bd49c27033053bc624211fbd2c8dbf62a2"
+  }
+]

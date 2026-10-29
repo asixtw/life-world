@@ -1,3 +1,5 @@
+> 2026-10-29 更新：三張新美術已接入、原創十五卡已追加。22 項測試、型別檢查、建置及六張新靜態畫面核對通過；Boyi／Jerry 尚未驗收。詳見 [最新交接](docs/HANDOFF.md) 及 [十三類盤點](docs/13_CATEGORY_AUDIT.md)。
+
 # Life World 獨立展示套件
 
 來源共同 commit：`1c9d502f32688bcc3c73e4b99a2cc3724c179047`；工作分支：`work/ousang-full-kit`。
@@ -27,3 +29,9 @@ corepack pnpm dev
 - 正式接入前需由 Jerry 核對資料模型、回執來源、權限、取消、錯誤及入口。Boyi 決定示範角色是否保留正式版。
 
 完整需求與目前缺口見 [PLAN](docs/PLAN.md) 與 [PROGRESS](docs/PROGRESS.md)。
+
+## 本輪靜態核對（不執行延後的互動測試）
+
+`pnpm dev --port 5174` 保持運行；另一終端 `node tests/static-art-qa.mjs`。Windows 預設 Chrome 安裝路徑，其他位置用 `CHROME_PATH` 指定。已輸出六張 day／quiet／reduced × 390／1280 靜態圖與 `static-layout.json` 至 `docs/qa/20261029/`。上方舊 qa:visual 是歷史互動腳本，不在這次授權測試範圍。
+
+追加內容：[原創興趣人物十五卡](content/original-enthusiasts/README.md)。

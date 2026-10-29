@@ -1,0 +1,15 @@
+$ vitest run
+
+ RUN  v3.2.4 /workspace/scratch/3aa9e7208a95/lifeworld-review-workspace/collaboration/ui-kit
+
+ ✓ tests/hatch-machine.test.ts (3 tests) 4ms
+ ✓ tests/transition-machine.test.ts (2 tests) 3ms
+ ✓ tests/validate.test.ts (3 tests) 5ms
+ ✓ tests/engine.test.ts (5 tests) 7ms
+ ✓ tests/art-integration.test.ts (4 tests) 16ms
+ ✓ tests/catalog-content.test.ts (5 tests) 19ms
+
+ Test Files  6 passed (6)
+      Tests  22 passed (22)
+   Start at  09:44:23
+   Duration  504ms (transform 344ms, setup 0ms, collect 584ms, tests 54ms, environment 1ms, prepare 472ms)

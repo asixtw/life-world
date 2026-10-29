@@ -1,0 +1,41 @@
+{
+  "date_utc": "2026-10-29",
+  "tool": "OpenAI built-in image_gen.imagegen",
+  "execution": "Three separate per-asset calls, all succeeded; no CLI, alternate provider or API",
+  "transparent_background": true,
+  "originals": "Unmodified native tool outputs copied to originals/; no image editing/resampling",
+  "historical_block": {
+    "date_utc": "2026-10-28",
+    "status": "Four-job batch output moderation_blocked, category other, individual job not identified, no usable files",
+    "request_id": "ea16e21f-c111-411d-a2e6-856168730a92",
+    "prior_record": "../lifeworld-fullkit-shared-art/provenance/generation-status.json"
+  },
+  "current_request": "User explicitly requested another current-environment attempt for shellsplit, completion still and nourishment effect; world base deferred.",
+  "current_results": [
+    {
+      "id": "lw-egg-shellsplit-v2",
+      "status": "generated_and_static_QA_verified",
+      "path": "originals/lw-egg-shellsplit-v2.png"
+    },
+    {
+      "id": "lw-lumi-completion-v2",
+      "status": "generated_and_static_QA_verified",
+      "path": "originals/lw-lumi-completion-v2.png"
+    },
+    {
+      "id": "lw-effects-nourishment-v2",
+      "status": "generated_and_static_QA_verified",
+      "path": "originals/lw-effects-nourishment-v2.png"
+    }
+  ],
+  "world_base": "deferred_by_user_not_attempted",
+  "verification": "Viewed exact input references and every output. Read-only Pillow metadata/alpha inspection and SHA-256. No runtime, interactive tests or integration.",
+  "limitations": [
+    "All files are flattened RGBA PNGs, not editable layered sources.",
+    "Both separated shell pieces share one PNG; independent piece files not supplied.",
+    "Faint generated alpha speckles remain outside principal bounds; no cleanup performed.",
+    "Completion shells have narrow visible side margins (~23 px).",
+    "Nourishment light is a relatively broad, textured gold/mint ring with fine particles and three principal glints; denser than requested minimal effect.",
+    "No normalized size or anchor compatibility claimed; native dimensions 1254x1254."
+  ]
+}

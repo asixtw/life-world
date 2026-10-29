@@ -1,0 +1,7 @@
+NOT RUN TO COMPLETION — 2026-10-29 current final code.
+Native Chromium failed before loading UI: socket() Operation not permitted; crashpad directory unavailable.
+Escalated exec failed at platform bwrap mount before executing test. No denied-path read was attempted.
+Vite foreground session remained alive, but separate shell and supported CUA localhost could not connect (ERR_CONNECTION_REFUSED).
+CUA file URL request was denied by browser URL policy; no alternate file-render route was attempted afterward.
+No current screenshot exists. Historical screenshot files are not evidence for the new artwork.
+Next authorized action: use connected Windows checkout, CHROME_PATH when necessary, run local Vite and node tests/static-art-qa.mjs. This is six STATIC layouts, not an interactive browser journey.

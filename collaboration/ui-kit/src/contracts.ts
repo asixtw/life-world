@@ -12,6 +12,6 @@ export interface SimulationSession { id: string; schemaVersion: '1.0'; usageScop
 export interface LiveRequest { sessionId: string; personaId: string; scenarioId: string; turns: DialogueTurn[]; userText: string; signal: AbortSignal } // 即時服務須由宿主提供，不暴露金鑰。
 export interface LiveResponse { turn: DialogueTurn; sourceRefs: SourceRef[] } // 後端回應須附來源，前端仍標候選。
 export interface LiveAdapter { reply(request: LiveRequest): Promise<LiveResponse> } // Jerry 可替換的供應商中立介面。
-export type HatchStage = 'idle' | 'glow' | 'crack' | 'open' | 'complete' // 孵化畫面的固定狀態 ID。
+export type HatchStage = 'idle' | 'glow' | 'crack' | 'deepcrack' | 'open' | 'complete' // 孵化畫面的固定狀態 ID。
 export interface HatchEvent { type: 'start' | 'advance' | 'skip' | 'cancel' | 'replay' | 'complete'; stage: HatchStage; receiptId?: string } // 回呼只報展示事件，不改帳本。
 export interface TransitionEvent { type: 'start' | 'complete' | 'cancel'; transitionId: string } // 視覺轉場的完成與取消可由宿主觀察。
