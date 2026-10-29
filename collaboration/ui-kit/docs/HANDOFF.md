@@ -29,6 +29,8 @@
 
 另用 `tests/static-ui-qa.mjs` 核對全套 UI 的五個主展示頁手機／桌面、六種關鍵構圖、五種系統狀態及共用元件 Quiet／減少動效，共 21 張固定 PNG；無破圖或橫向溢位，已逐張目視檢查。逐項覆蓋、實際布局證據與未驗的開啟／互動狀態見 [全套 UI 靜態核對](qa/20261029/OVERALL_UI_STATIC_AUDIT.md)。靜態通過不代表整套 UI 或正式 App 已完成驗收。
 
+最後程式版本 `035aae19d19242cf93f01bb804c23c566b0d0165` 的獨立重跑指令、UTC 時間、原始輸出及三項退出碼記於 [最終程式檢查紀錄](qa/20261029/final-code-checks.txt)。這份紀錄是在新增全套 UI 靜態審查程式後執行，與前版 19726ce 的測試日誌分開；其後只追加此 QA 紀錄及交接文字，未改程式。
+
 `pnpm dev --port 5174` 保持運行，另一終端 `node tests/static-art-qa.mjs` 可重現固定 fixture；只讀取 `?art-review&mode=day|quiet|reduced`，390×844／1280×800。可設定 `CHROME_PATH`。本輪沒有執行 qa:visual 舊互動腳本；新互動、Safari、實機延後。
 
 ## 美術與接入契約
