@@ -1,0 +1,8 @@
+.month-schedule{display:grid;gap:16px;min-width:0} /* 排程不影響其他頁面樣式。 */
+.month-schedule__controls,.month-schedule__navigation,.month-schedule__presets{display:flex;flex-wrap:wrap;align-items:end;gap:8px} /* 窄螢幕自然換行。 */
+.month-schedule__controls label{display:grid;gap:5px;min-width:130px} /* 日期與期間清楚標示。 */
+.month-schedule__controls input,.month-schedule__controls select{min-height:44px;max-width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--white);color:var(--ink)} /* 控制符合觸控尺寸。 */
+.month-schedule__grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:0} /* 七欄實際日期不橫向溢出。 */
+.month-schedule__grid .button{width:100%;min-width:0;padding:7px 2px;min-height:44px} /* 日期按鈕維持可點範圍。 */
+.month-schedule__grid .month-schedule__weekday{font-size:.78rem} /* 星期標頭亦可操作。 */
+@media(max-width:480px){.month-schedule__grid{gap:2px}.month-schedule__grid .button{font-size:.76rem;padding:6px 0}} /* 390px 手機保留七欄。 */

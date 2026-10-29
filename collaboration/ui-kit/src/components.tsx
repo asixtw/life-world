@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react' // 共用展示元件的子內容型別。
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react' // 保留原生按鈕屬性與參照型別。
 import { useEffect, useRef } from 'react' // 對話框處理初始焦點與 Escape。
 
 export type ButtonKind = 'primary' | 'secondary' | 'text' | 'icon' | 'danger' // 六類按鈕由切換樣式涵蓋。
-export function Button({ children, kind = 'primary', loading = false, success = false, error = false, disabled = false, onClick, title }: { children: ReactNode; kind?: ButtonKind; loading?: boolean; success?: boolean; error?: boolean; disabled?: boolean; onClick?: () => void; title?: string }) { // 統一按鈕狀態及事件。
-  return <button className={`button button--${kind} ${success ? 'is-success' : ''} ${error ? 'is-error' : ''}`} type="button" disabled={disabled || loading} aria-busy={loading} title={title} onClick={onClick}>{loading ? '處理中…' : children}</button> // 原生 button 支援鍵盤、停用與焦點。
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode; kind?: ButtonKind; loading?: boolean; success?: boolean; error?: boolean; ref?: Ref<HTMLButtonElement> } // 呼叫端可傳 type、aria、事件及 ref。
+export function Button({ children, kind = 'primary', loading = false, success = false, error = false, disabled = false, type = 'button', className = '', ref, ...native }: ButtonProps) { // 展示樣式不吞掉原生契約。
+  return <button {...native} ref={ref} className={`button button--${kind} ${success ? 'is-success' : ''} ${error ? 'is-error' : ''} ${className}`} type={type} disabled={disabled || loading} aria-busy={loading}>{loading ? '處理中…' : children}</button> // 載入時停用並保留輔助技術狀態。
 }
 
 export function Field({ label, help, error, children }: { label: string; help?: string; error?: string; children: ReactNode }) { // 文字、長文與其他輸入共用標籤。
