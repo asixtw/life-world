@@ -1,4 +1,62 @@
-# LW-SIM-001／LW-UI-001／LW-ASSET-001 更新交接
+# 歐桑 v1.1 獨立候選交付摘要（供組員審查）
+
+程式基準：本地 `6a0f8cf651a6869361e1c378a3fe2a83884d7161`；上次遠端待審查版 `7e3301eab31b0c25283545c9286bcec97c254fdf`；v1.1 文件基準 `ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d`。目前改動只在 `collaboration/ui-kit/` 的 `work/ousang-full-kit` 本地分支；**本次 v1.1 尚未 push、merge 或 deploy**。此摘要是可審查候選，不是十四類整體驗收通過。
+
+## 一分鐘摘要
+
+- 舊版已有隔離的 React／TypeScript 展示套件、指定十五人物及劇場、另附十五張原創愛好者 TXT、三項新孵化／回饋圖。v1.1 在此之上增加受控月份與週排程、三習慣、錄音／附件／校對 mock 契約與 IndexedDB 本機草稿、六 Lumi 姿勢和左右殼、日間／Quiet 房間、音效，以及完整輸入／面板狀態展示。本輪**未修改**兩套既有角色內容，未把人物劇場寫入正式服務。
+- 隔離套件的最新程式通過 TypeScript、Vite build、51 個 Vitest 測試；Chrome localhost 定向操作檢查通過。檢查範圍和真截圖見下文。Boyi 美術／聽審、Jerry 正式接入與實機／Safari 都未完成。
+- 立即需要組員判斷的是：蛋殼與完整蛋非同源素材、世界 1920 圖是小原稿上採樣、三組群像在手機中心裁切失去邊緣人物；此外真回執、權限、上傳、AI 與正式資料模型須由宿主提供。
+
+## 從上次遠端版到本地候選
+
+| 階段 | 實際變更 | 審查線索 |
+|---|---|---|
+| P0 操作 | 月／週日期及固定時區、三行動安排、32 SVG 圖示、按鈕契約、十類輸入六狀態、未保存退出與錯誤退路 | `src/ScheduleDemo.tsx`、`src/MediaDemo.tsx`、`src/InputGallery.tsx`、`src/PanelGallery.tsx`；[候選矩陣](V1_1_CANDIDATE_MATRIX.md) |
+| P0 媒體 | 明示 mock 延遲／取消／錯誤；真本機檔預覽，原素材／辨識原文／校對文分離；owner＋draft＋revision IndexedDB 續作與衝突處理 | `src/PersistentDraftDemo.tsx`、`src/media-workflow.ts`；`qa/v1_1/P0_P1_P2_BATCH_3_20261029.md` |
+| P1 視覺 | 六姿勢、真正左右兩片殼、獨立陰影／養分；日／Quiet 橫直房間和分層；一般確認採無殼 Lumi；孵化／轉場取消、重播、卸載與減少動效契約 | `src/LumiPoses.tsx`、`src/WorldRoom.tsx`、`src/Hatch.tsx`、`src/Transitions.tsx`；`qa/v1_1/P1_DERIVED_EXPORTS_20261029.md` |
+| P2 聲音 | 五事件各兩個原創程式合成候選，共十聲；每聲 WAV、AAC／M4A、Ogg 三格式，預設關閉、Quiet 無聲、回執去重 | `assets/audio-candidates/manifest.json`、`src/SoundGallery.tsx`；`qa/v1_1/P0_P1_P2_BATCH_3_20261029.md` |
+
+源碼獨立審查從 `fff363c` 指出週起點、慢回讀／慢保存、真 Blob 續作與逐事件音長缺口；`d82f781` 修正週對齊、草稿競態、真檔／原文保存及五個過長音效；`0ed1790` 再修訂「文字修改即取消核對」與慢回讀保留原 Blob。母端另對**當時**的三格式 30 檔獨立查核 48 kHz 與逐事件時長。最新 51 個測試和 Chrome 檢查是**交付端本機重跑**，不能說成母端對 `6a0f8cf` 重跑或人工驗收。
+
+## 如何開啟與先看哪些內容
+
+在 `collaboration/ui-kit/`，Node 24 與鎖定依賴就緒時，可執行 `corepack pnpm install --frozen-lockfile`、`corepack pnpm dev -- --port 5174`，開啟 `http://127.0.0.1:5174/`。本機 Windows 的 npm shim 未提供 Node 設定，因此實際驗證是用已配置的 Node 24 執行 `node_modules/typescript/bin/tsc --noEmit`、`node_modules/vitest/vitest.mjs run`、`node_modules/vite/bin/vite.js build`；Vite 啟在 127.0.0.1:5174，再依序執行 `tests/v11-controls-qa.mjs`、`v11-lifecycle-qa.mjs`、`v11-interaction-qa.mjs` 與 `v11-lumi-qa.mjs`。Chrome 路徑由本機腳本指定，其他環境須調整後重跑。
+
+建議審查順序：先看首頁與「元件」頁的輸入矩陣／面板退路，再看排程與媒體草稿重整、世界日／Quiet、孵化與轉場、音效靜音政策，最後看人物劇場與來源標記。先審核套件事件及素材限制，再由 Boyi 判斷視覺／聽感、由 Jerry 決定正式能力接線；不要把 fixture 回執當真交易。
+
+## 十四類狀態速覽
+
+| 類別 | 候選狀態 | 主要待驗／缺口 |
+|---|---|---|
+| 1 設計基礎 | 可供審查 | Safari／正式宿主隔離與安全區 |
+| 2 按鈕 | 可供審查 | 正式宿主鍵盤與輔助技術 |
+| 3 輸入 | 可供審查 | 正式校驗及保存規則 |
+| 4 導覽、卡片、排程 | 可供審查 | 正式目標與帳本接線 |
+| 5 面板與回饋 | 可供審查 | 真路由離開、保存及錯誤碼 |
+| 6 多模態 | 部分完成 | 真麥克風、上傳、辨識、認證與後端 |
+| 7 App 圖示 | 可供審查 | Boyi／平台實機驗收；無向量原稿 |
+| 8 Lumi 與世界 | 部分完成 | 原生高解析世界原畫、日／Quiet 精準同構圖及美術驗收 |
+| 9 蛋 | 部分完成 | 同源完整蛋／裂口／左右殼與逐格連續原畫 |
+| 10 孵化 | 部分完成 | 真回執與正式宿主、人工動效審查 |
+| 11 正向回饋 | 可供審查 | 亮度／節奏及正式觸發驗收 |
+| 12 人物美術 | 部分完成 | 手機五人群像裁切及 Boyi 驗收 |
+| 13 轉場 | 部分完成 | 逐格／atlas 素材及宿主事件驗收 |
+| 14 音效 | 部分完成 | Boyi 聽審、Jerry 跨瀏覽器與正式觸發 |
+
+詳列可審查證據與限制見 [最新核對](qa/v1_1/P0_CONTROLS_ART_AUDIT_20261029.md)。本表的「可供審查」只指套件內候選，**沒有任何一類被宣告正式驗收完成**。
+
+## 測試、資產與不可代替的外部工作
+
+- 交付端最後程式：TypeScript exit 0；Vitest **16 檔／51 測試**；Vite build exit 0；本地 Chrome 390×844 與 1280×800 的控制項、轉場／孵化生命週期、既有互動與 Lumi 定向腳本通過。真 PNG 在 `qa/v1_1/controls-*.png`、`lumi-assembly-*.png`、`world-*.png`、`mobile-p0-*.png`。`qa/v1_1/P0_CONTROLS_ART_AUDIT_20261029.md` 記錄本輪命令及範圍。這些不是實機／Safari、真 API 或人工驗收。
+- `assets/derived-v1_1/manifest.json` 記 40 張真 PNG：六姿勢各正規化母版＋512／256／128，共 24；左右殼各 512／256／128，共 6；陰影與養分各 512／256，共 4；日／Quiet 房間各 1920×1440、1280×960、768×1024，共 6。`tools/verify_visual_derivatives.py` 核對原稿 hash 未變、透明像素與落地錨點。六姿勢母版用 alpha bbox 等比調整到可見身高 790、腳底錨點 `(627,1030)`，並非重新繪圖。1920 是由 1448 原生橫稿上採樣；左右殼非完整蛋同源抽層，不能以尺寸合格替代視覺驗收。
+- 十聲音效共有 **30 個播放／原稿檔**，分別為 48 kHz WAV、AAC／M4A、Ogg；逐事件時長、峰值與 SHA 在音效清單。Quiet 無聲與重複回執不重播在 Chrome 候選檢查，聽感、不同瀏覽器和正式觸發仍待 Boyi／Jerry。
+- 指定十五人物、六場劇場及另附十五原創愛好者卡是舊版沿用內容，本次 v1.1 **未改角色卡、人物設定或劇情**；創作內容的人工審閱與正式採用仍由組員決定。`content/original-enthusiasts/` 不替代劇場指定人物。
+- App icon／十五肖像／三封面實際尺寸與 SHA 稽核在 `qa/v1_1/APP_PERSONA_AUDIT.json`。`qa/v1_1/persona-cover-mobile-*.png` 是審查裁切圖，中心裁切無法保留兩側人物，**不是 runtime 素材**；手機正式群像需重新構圖，或用 contain 並檢查版面。
+
+## 舊版交接紀錄（v0.4 歷史，以下不代表 v1.1 目前狀態）
+
+### LW-SIM-001／LW-UI-001／LW-ASSET-001 更新交接
 
 ## 任務卡
 
