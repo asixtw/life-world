@@ -1,6 +1,6 @@
 # 歐桑 v1.1 獨立候選交付摘要（供組員審查）
 
-程式基準：本地 `6a0f8cf651a6869361e1c378a3fe2a83884d7161`；上次遠端待審查版 `7e3301eab31b0c25283545c9286bcec97c254fdf`；v1.1 文件基準 `ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d`。目前改動只在 `collaboration/ui-kit/` 的 `work/ousang-full-kit` 本地分支；**本次 v1.1 尚未 push、merge 或 deploy**。此摘要是可審查候選，不是十四類整體驗收通過。
+程式基準：`6a0f8cf651a6869361e1c378a3fe2a83884d7161`；上次遠端待審查版 `7e3301eab31b0c25283545c9286bcec97c254fdf`；v1.1 文件基準 `ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d`。本次 v1.1 已推送至 `work/ousang-full-kit` 待審查分支；所有改動只在 `collaboration/ui-kit/`，**尚未 merge 或 deploy**。此摘要是可審查候選，不是十四類整體驗收通過。
 
 ## 一分鐘摘要
 
