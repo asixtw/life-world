@@ -8,8 +8,8 @@ import { poseArt, shellArt } from '../src/LumiPoses' // 新姿勢與左右殼必
 describe('新美術接入', () => { // 不把 fixture 當正式服務測試。
   it('六階段保留深裂並使用新增原稿', () => { // 避免回退到深裂／陪伴替代圖。
     expect(stages).toEqual(['idle', 'glow', 'crack', 'deepcrack', 'open', 'complete']) // 固定順序。
-    expect(artByStage.open).toContain('lw-lumi-confirmed-candidate-v1.png') // 開殼需無殼 Lumi。
-    expect(artByStage.complete).toContain('lw-lumi-celebrate-candidate-v1.png') // 完成使用新慶祝姿勢。
+    expect(artByStage.open).toContain('confirmed@512.png') // 開殼需無殼 Lumi 顯示版。
+    expect(artByStage.complete).toContain('celebrate@512.png') // 完成使用新慶祝姿勢顯示版。
     expect(artByStage.deepcrack).toContain('lw-egg-deepcrack-v1') // 舊深裂仍可達。
   }) // 階段檢查結束。
   it('靜態孵化保留可讀標籤及透明圖片', () => { // 無計時器的外觀契約。

@@ -19,10 +19,11 @@ describe('v1.1 Lumi 姿勢及兩片殼', () => {
       expect(createHash('sha256').update(bytes).digest('hex')).toBe(item.sha256)
     }
   })
-  it('明示缺顯示版與錨點驗收', () => {
+  it('顯示版已衍生，人工錨點與殼裂口驗收仍待完成', () => {
     expect(kit.lumiPoseCandidates.poseIds).toHaveLength(6)
     expect(kit.lumiPoseCandidates.shellIds).toEqual(['shell-left', 'shell-right'])
-    expect(kit.lumiPoseCandidates.targetDisplaySizesProduced).toBe(false)
+    expect(kit.lumiPoseCandidates.targetDisplaySizesProduced).toBe(true)
+    expect(kit.lumiPoseCandidates.numericFootAnchorProduced).toBe(true)
     expect(kit.lumiPoseCandidates.uniformAnchorVerified).toBe(false)
   })
 })

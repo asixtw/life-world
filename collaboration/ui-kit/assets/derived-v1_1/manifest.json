@@ -1,0 +1,1076 @@
+{
+  "schemaVersion": "1.0",
+  "sourceSpecCommit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
+  "tool": "Python 3.12.14, Pillow 12.3.0; run python tools/derive_visual_assets.py",
+  "poseAnchorPxOn1254": [
+    627,
+    1030
+  ],
+  "nativeOriginalsUntouched": true,
+  "world1920IsDerivedUpscale": true,
+  "pairedShellClosureVerified": false,
+  "files": [
+    {
+      "assetId": "v1.1-poses-idle@1254",
+      "path": "derived-v1_1/poses/idle@1254.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-idle-candidate-v1.png",
+      "sourceSha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "sha256": "2e7b8f721093ffb1e5d9d6077e9162a847e6255d4a14b440029937bcf11bdede",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 323824,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "idle",
+      "alt": "Lumi idle 姿勢",
+      "method": "alpha>3 crop+8px, LANCZOS proportional scale to alpha>127 height 790, transparent 1254 canvas, center 627/bottom 1030",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        299,
+        240,
+        955,
+        1030
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        627,
+        1030
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-idle@512",
+      "path": "derived-v1_1/poses/idle@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-idle-candidate-v1.png",
+      "sourceSha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "sha256": "228a576fa243592516e8c74e53ecc1a1ff7a7f64f1d7f0a313fa9586aa74d0ee",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 74580,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "idle",
+      "alt": "Lumi idle 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        122,
+        98,
+        390,
+        420
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        421
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-idle@256",
+      "path": "derived-v1_1/poses/idle@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-idle-candidate-v1.png",
+      "sourceSha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "sha256": "353b6852f5691983feac36ec83727f5e08875b00d5bd24b9e38607f3f4a0e3a7",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 22180,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "idle",
+      "alt": "Lumi idle 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        61,
+        49,
+        195,
+        210
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        210
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-idle@128",
+      "path": "derived-v1_1/poses/idle@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-idle-candidate-v1.png",
+      "sourceSha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "sha256": "04edccffe6932c47967f2a8a8150f857dc7c11b378f07bbb86703ee60ee95ed1",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 7276,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "idle",
+      "alt": "Lumi idle 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        30,
+        24,
+        97,
+        105
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        105
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-quiet@1254",
+      "path": "derived-v1_1/poses/quiet@1254.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-quiet-candidate-v1.png",
+      "sourceSha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "sha256": "0dde6205231c3bf333b86798dedbcc36de461c84f097d87ff6b448e7f7ce95d0",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 340958,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "quiet",
+      "alt": "Lumi quiet 姿勢",
+      "method": "alpha>3 crop+8px, LANCZOS proportional scale to alpha>127 height 790, transparent 1254 canvas, center 627/bottom 1030",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        318,
+        240,
+        936,
+        1030
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        627,
+        1030
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-quiet@512",
+      "path": "derived-v1_1/poses/quiet@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-quiet-candidate-v1.png",
+      "sourceSha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "sha256": "ff6bae346a9c8698e1f366e213e021f713d7f5bbdc521ac31db1875edacdbfa8",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 71997,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "quiet",
+      "alt": "Lumi quiet 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        130,
+        98,
+        382,
+        421
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        421
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-quiet@256",
+      "path": "derived-v1_1/poses/quiet@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-quiet-candidate-v1.png",
+      "sourceSha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "sha256": "c58758ec8936d242e072dc1b2851faa074092d3a48551bb00c80a6a51c218b74",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 21391,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "quiet",
+      "alt": "Lumi quiet 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        65,
+        49,
+        191,
+        210
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        210
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-quiet@128",
+      "path": "derived-v1_1/poses/quiet@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-quiet-candidate-v1.png",
+      "sourceSha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "sha256": "1da17a6a7decd696e8fbfddd50ff0cb4758a3c722fdb8cf9be36717ce7aeca93",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 7204,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "quiet",
+      "alt": "Lumi quiet 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        32,
+        24,
+        96,
+        105
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        105
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-welcome@1254",
+      "path": "derived-v1_1/poses/welcome@1254.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-welcome-candidate-v1.png",
+      "sourceSha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "sha256": "8e66b20dfec0367eb04e8132a5ed565e4eb5b1ee2ef8052d917ee19f860c4f63",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 372721,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "welcome",
+      "alt": "Lumi welcome 姿勢",
+      "method": "alpha>3 crop+8px, LANCZOS proportional scale to alpha>127 height 790, transparent 1254 canvas, center 627/bottom 1030",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        293,
+        240,
+        961,
+        1030
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        627,
+        1030
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-welcome@512",
+      "path": "derived-v1_1/poses/welcome@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-welcome-candidate-v1.png",
+      "sourceSha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "sha256": "6ff1b3e85b39640827062d14312d9134afba02d9e9ea3bc1204bf17adac9b70b",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 73692,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "welcome",
+      "alt": "Lumi welcome 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        119,
+        98,
+        392,
+        420
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        421
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-welcome@256",
+      "path": "derived-v1_1/poses/welcome@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-welcome-candidate-v1.png",
+      "sourceSha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "sha256": "2ba17cb350a5de536e772a71029db2243c4a43aa9a5da1a75c6aafe5bcef95ea",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 22024,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "welcome",
+      "alt": "Lumi welcome 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        60,
+        49,
+        196,
+        210
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        210
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-welcome@128",
+      "path": "derived-v1_1/poses/welcome@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-welcome-candidate-v1.png",
+      "sourceSha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "sha256": "178bd2ff3d6c1975f726ec464b8fdec96c07089eb16815000553587434c55793",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 7630,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "welcome",
+      "alt": "Lumi welcome 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        30,
+        24,
+        98,
+        105
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        105
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-listening@1254",
+      "path": "derived-v1_1/poses/listening@1254.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-listening-candidate-v1.png",
+      "sourceSha256": "e05fce759e8f41323644253f8f1a64b9fa3c64446b9dc19bf4d828dc9ff21198",
+      "sha256": "2721bbbe56731db341ee5d9cbc9eef74336f19dcbbaa83d779c55585bce0b94c",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 357667,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "listening",
+      "alt": "Lumi listening 姿勢",
+      "method": "alpha>3 crop+8px, LANCZOS proportional scale to alpha>127 height 790, transparent 1254 canvas, center 627/bottom 1030",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        339,
+        240,
+        914,
+        1030
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        627,
+        1030
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-listening@512",
+      "path": "derived-v1_1/poses/listening@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-listening-candidate-v1.png",
+      "sourceSha256": "e05fce759e8f41323644253f8f1a64b9fa3c64446b9dc19bf4d828dc9ff21198",
+      "sha256": "4f8895dc8b1851935a6181a3bce858f011268faecc0bbac0454c978d91d1f042",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 70941,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "listening",
+      "alt": "Lumi listening 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        139,
+        98,
+        373,
+        421
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        421
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-listening@256",
+      "path": "derived-v1_1/poses/listening@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-listening-candidate-v1.png",
+      "sourceSha256": "e05fce759e8f41323644253f8f1a64b9fa3c64446b9dc19bf4d828dc9ff21198",
+      "sha256": "46ad85b0b917e48d3a20213d25a8ea4148cd01b393ca85920a9de516f284599f",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 21408,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "listening",
+      "alt": "Lumi listening 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        69,
+        49,
+        187,
+        210
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        210
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-listening@128",
+      "path": "derived-v1_1/poses/listening@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-listening-candidate-v1.png",
+      "sourceSha256": "e05fce759e8f41323644253f8f1a64b9fa3c64446b9dc19bf4d828dc9ff21198",
+      "sha256": "5d072ed723024612038ea8c5b18c1a235533ffe88cd2a0ecfa3529cb6c7c9b2b",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 7368,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "listening",
+      "alt": "Lumi listening 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        35,
+        24,
+        93,
+        105
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        105
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-confirmed@1254",
+      "path": "derived-v1_1/poses/confirmed@1254.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-confirmed-candidate-v1.png",
+      "sourceSha256": "76c37b3b6183c2f6984a9a9225f312341b2435ef23770b574bdc5cf4ade962de",
+      "sha256": "c5841d8a15685e865f4c589271c4a06ec37da37dc030e4e30f3ed55c138fde58",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 373841,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "confirmed",
+      "alt": "Lumi confirmed 姿勢",
+      "method": "alpha>3 crop+8px, LANCZOS proportional scale to alpha>127 height 790, transparent 1254 canvas, center 627/bottom 1030",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        254,
+        240,
+        1001,
+        1030
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        627,
+        1030
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-confirmed@512",
+      "path": "derived-v1_1/poses/confirmed@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-confirmed-candidate-v1.png",
+      "sourceSha256": "76c37b3b6183c2f6984a9a9225f312341b2435ef23770b574bdc5cf4ade962de",
+      "sha256": "e00cd1d375f5c2cad97c421118512fdba6fd2102afde480c8be1715a911b4936",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 77890,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "confirmed",
+      "alt": "Lumi confirmed 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        104,
+        98,
+        409,
+        421
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        421
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-confirmed@256",
+      "path": "derived-v1_1/poses/confirmed@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-confirmed-candidate-v1.png",
+      "sourceSha256": "76c37b3b6183c2f6984a9a9225f312341b2435ef23770b574bdc5cf4ade962de",
+      "sha256": "122187094d38707e4688989c73bde1619919fa96368238644cc26c6bf22133af",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 22544,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "confirmed",
+      "alt": "Lumi confirmed 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        52,
+        49,
+        204,
+        210
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        210
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-confirmed@128",
+      "path": "derived-v1_1/poses/confirmed@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-confirmed-candidate-v1.png",
+      "sourceSha256": "76c37b3b6183c2f6984a9a9225f312341b2435ef23770b574bdc5cf4ade962de",
+      "sha256": "bc0dc40ce1dbde47cee3069f935b383e2ecac6766bdde1df93cf6936d5046d68",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 7518,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "confirmed",
+      "alt": "Lumi confirmed 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        26,
+        25,
+        102,
+        105
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        105
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-celebrate@1254",
+      "path": "derived-v1_1/poses/celebrate@1254.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-celebrate-candidate-v1.png",
+      "sourceSha256": "941665d17e5b9312401928a1be9ed0c537924a31fa0913326d5ecfb5d610da76",
+      "sha256": "1ba561e7d7c5ddb8b4a8649e8b91f21700614bad4f150dcde0367988d10fd347",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 388084,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "celebrate",
+      "alt": "Lumi celebrate 姿勢",
+      "method": "alpha>3 crop+8px, LANCZOS proportional scale to alpha>127 height 790, transparent 1254 canvas, center 627/bottom 1030",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        271,
+        240,
+        984,
+        1030
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        627,
+        1030
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-celebrate@512",
+      "path": "derived-v1_1/poses/celebrate@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-celebrate-candidate-v1.png",
+      "sourceSha256": "941665d17e5b9312401928a1be9ed0c537924a31fa0913326d5ecfb5d610da76",
+      "sha256": "e169f47b091eca41142bba4fa00ed44ae97697060894bc3d2878d384c96246bf",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 77168,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "celebrate",
+      "alt": "Lumi celebrate 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        111,
+        98,
+        402,
+        420
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        421
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-celebrate@256",
+      "path": "derived-v1_1/poses/celebrate@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-celebrate-candidate-v1.png",
+      "sourceSha256": "941665d17e5b9312401928a1be9ed0c537924a31fa0913326d5ecfb5d610da76",
+      "sha256": "770e532569b9b0919ecfb5611e4fd3639d84a5eb56eafe1e5c304f1c2fddec65",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 22950,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "celebrate",
+      "alt": "Lumi celebrate 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        55,
+        49,
+        201,
+        210
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        210
+      ]
+    },
+    {
+      "assetId": "v1.1-poses-celebrate@128",
+      "path": "derived-v1_1/poses/celebrate@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-lumi-celebrate-candidate-v1.png",
+      "sourceSha256": "941665d17e5b9312401928a1be9ed0c537924a31fa0913326d5ecfb5d610da76",
+      "sha256": "28eea1ec5b5539b88afc1ec98972b37e48cc0b05fb04c929288e279ad7f18506",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 8026,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "celebrate",
+      "alt": "Lumi celebrate 姿勢",
+      "method": "LANCZOS from normalized 1254 master; original native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        28,
+        24,
+        100,
+        105
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        105
+      ]
+    },
+    {
+      "assetId": "v1.1-shells-shell-left@512",
+      "path": "derived-v1_1/shells/shell-left@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-shell-left-candidate-v1.png",
+      "sourceSha256": "f3f76f704d34f28ccb236ecbfff1f08ce226f80a5b757c641712af6e2d60b6b1",
+      "sha256": "d12730eff8647c18d993751e4b9387f4d75ee2847880d4fcca5bcb94ab95b8bd",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 44914,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "shell-left",
+      "alt": "獨立左蛋殼",
+      "method": "paired translation -70x/-75y on transparent canvas; LANCZOS proportional resize; shell seam not reconstructed",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        64,
+        283,
+        264,
+        455
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        455
+      ]
+    },
+    {
+      "assetId": "v1.1-shells-shell-left@256",
+      "path": "derived-v1_1/shells/shell-left@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-shell-left-candidate-v1.png",
+      "sourceSha256": "f3f76f704d34f28ccb236ecbfff1f08ce226f80a5b757c641712af6e2d60b6b1",
+      "sha256": "1a90bc9a2f566bd12cfc3619d8626d593b60dac3cc18d33cbc1c7f100de72806",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 14505,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "shell-left",
+      "alt": "獨立左蛋殼",
+      "method": "paired translation -70x/-75y on transparent canvas; LANCZOS proportional resize; shell seam not reconstructed",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        32,
+        142,
+        132,
+        227
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        228
+      ]
+    },
+    {
+      "assetId": "v1.1-shells-shell-left@128",
+      "path": "derived-v1_1/shells/shell-left@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-shell-left-candidate-v1.png",
+      "sourceSha256": "f3f76f704d34f28ccb236ecbfff1f08ce226f80a5b757c641712af6e2d60b6b1",
+      "sha256": "57a4fb48a294a413886b2d41383afed1b62e45d60c38960ecb4a864839963dc6",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 5132,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "shell-left",
+      "alt": "獨立左蛋殼",
+      "method": "paired translation -70x/-75y on transparent canvas; LANCZOS proportional resize; shell seam not reconstructed",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        16,
+        71,
+        66,
+        114
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        114
+      ]
+    },
+    {
+      "assetId": "v1.1-shells-shell-right@512",
+      "path": "derived-v1_1/shells/shell-right@512.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-shell-right-candidate-v1.png",
+      "sourceSha256": "26709f2e5da4ea509688e42c2ed5a9ce5c302578c982346b287b682867ec5ff4",
+      "sha256": "8953a2ae09b7f0e2e8bdb4cc61dd0c9e98abe982e693d5240048323114b8aa8c",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 53059,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "shell-right",
+      "alt": "獨立右蛋殼",
+      "method": "paired translation -70x/-82y on transparent canvas; LANCZOS proportional resize; shell seam not reconstructed",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        232,
+        248,
+        448,
+        455
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        256,
+        455
+      ]
+    },
+    {
+      "assetId": "v1.1-shells-shell-right@256",
+      "path": "derived-v1_1/shells/shell-right@256.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-shell-right-candidate-v1.png",
+      "sourceSha256": "26709f2e5da4ea509688e42c2ed5a9ce5c302578c982346b287b682867ec5ff4",
+      "sha256": "621462afd5ad6008a3c15cff1c079ffa6db7a3ce34136f69c3520e10310c6e72",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 16908,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "shell-right",
+      "alt": "獨立右蛋殼",
+      "method": "paired translation -70x/-82y on transparent canvas; LANCZOS proportional resize; shell seam not reconstructed",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        116,
+        124,
+        224,
+        228
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        128,
+        228
+      ]
+    },
+    {
+      "assetId": "v1.1-shells-shell-right@128",
+      "path": "derived-v1_1/shells/shell-right@128.png",
+      "sourcePath": "lumi-poses-candidate-20261029/originals/lw-shell-right-candidate-v1.png",
+      "sourceSha256": "26709f2e5da4ea509688e42c2ed5a9ce5c302578c982346b287b682867ec5ff4",
+      "sha256": "22855dc52d09b6bc9d1638e87fa43421e848232cc92d397934ddd013770dc0a3",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "bytes": 6071,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "shell-right",
+      "alt": "獨立右蛋殼",
+      "method": "paired translation -70x/-82y on transparent canvas; LANCZOS proportional resize; shell seam not reconstructed",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        58,
+        62,
+        112,
+        114
+      ],
+      "trueTransparentBackground": true,
+      "anchorPx": [
+        64,
+        114
+      ]
+    },
+    {
+      "assetId": "v1.1-world-room-day@1920x1440",
+      "path": "derived-v1_1/world/room-day@1920x1440.png",
+      "sourcePath": "world-candidates-20261029/originals/room-day-base.png",
+      "sourceSha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3",
+      "sha256": "410b8bef77584c0f1234fb9ab1fd994eb5583e925aa666b0d727fa32bceb5280",
+      "width": 1920,
+      "height": 1440,
+      "mode": "RGB",
+      "bytes": 2189094,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "room-day",
+      "alt": "日間房間背景",
+      "method": "LANCZOS proportional upscale from native 1448x1086; not native new artwork",
+      "sceneLumiAnchorPercent": [
+        50,
+        76
+      ],
+      "backgroundCropAllowed": true
+    },
+    {
+      "assetId": "v1.1-world-room-day@1280x960",
+      "path": "derived-v1_1/world/room-day@1280x960.png",
+      "sourcePath": "world-candidates-20261029/originals/room-day-base.png",
+      "sourceSha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3",
+      "sha256": "0cb7cf71f5ca71e56227a6b47ae3d27aea813ff06c57d5a6e5dfaab58ba84271",
+      "width": 1280,
+      "height": 960,
+      "mode": "RGB",
+      "bytes": 1163303,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "room-day",
+      "alt": "日間房間背景",
+      "method": "LANCZOS proportional downscale from native 1448x1086; not native new artwork",
+      "sceneLumiAnchorPercent": [
+        50,
+        76
+      ],
+      "backgroundCropAllowed": true
+    },
+    {
+      "assetId": "v1.1-world-room-day@768x1024",
+      "path": "derived-v1_1/world/room-day@768x1024.png",
+      "sourcePath": "world-portrait-supplement-20261029/room-day-portrait-native.png",
+      "sourceSha256": "6b598b3c7d54a8bede2bc21688a4ee2b24f28ce9fff56ffec276ff45ebbfa1fa",
+      "sha256": "3ba26881f0825c36877cd9a00a03a4a397dcba7f2798552ee30467e761d75876",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "bytes": 787018,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "room-day",
+      "alt": "日間房間背景",
+      "method": "LANCZOS proportional downscale from native 1086x1448; not native new artwork",
+      "sceneLumiAnchorPercent": [
+        50,
+        79
+      ],
+      "backgroundCropAllowed": true
+    },
+    {
+      "assetId": "v1.1-world-room-quiet@1920x1440",
+      "path": "derived-v1_1/world/room-quiet@1920x1440.png",
+      "sourcePath": "world-candidates-20261029/originals/room-quiet-base.png",
+      "sourceSha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03",
+      "sha256": "da4bdc49c6da032285c86340275e896edc6fe73bc6d568af57e00eb0707fd8f4",
+      "width": 1920,
+      "height": 1440,
+      "mode": "RGB",
+      "bytes": 2199442,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "room-quiet",
+      "alt": "Quiet 房間背景",
+      "method": "LANCZOS proportional upscale from native 1448x1086; not native new artwork",
+      "sceneLumiAnchorPercent": [
+        50,
+        76
+      ],
+      "backgroundCropAllowed": true
+    },
+    {
+      "assetId": "v1.1-world-room-quiet@1280x960",
+      "path": "derived-v1_1/world/room-quiet@1280x960.png",
+      "sourcePath": "world-candidates-20261029/originals/room-quiet-base.png",
+      "sourceSha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03",
+      "sha256": "18c16aa6331bfecc3104695fd0c4dfad714dd7928a0b98dcf645bd378cdb0b10",
+      "width": 1280,
+      "height": 960,
+      "mode": "RGB",
+      "bytes": 1175990,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "room-quiet",
+      "alt": "Quiet 房間背景",
+      "method": "LANCZOS proportional downscale from native 1448x1086; not native new artwork",
+      "sceneLumiAnchorPercent": [
+        50,
+        76
+      ],
+      "backgroundCropAllowed": true
+    },
+    {
+      "assetId": "v1.1-world-room-quiet@768x1024",
+      "path": "derived-v1_1/world/room-quiet@768x1024.png",
+      "sourcePath": "world-portrait-supplement-20261029/room-quiet-portrait-native.png",
+      "sourceSha256": "10e269776a3101c7e85b00e36d72d2e5e69f57a2df8717127a6bfb4a1fc1f536",
+      "sha256": "35037b0d6e9d136f8b53b0a08d511c8109373537bc65aab2f2194e4f10c0c9f6",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "bytes": 789026,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "room-quiet",
+      "alt": "Quiet 房間背景",
+      "method": "LANCZOS proportional downscale from native 1086x1448; not native new artwork",
+      "sceneLumiAnchorPercent": [
+        50,
+        79
+      ],
+      "backgroundCropAllowed": true
+    },
+    {
+      "assetId": "v1.1-effects-nourishment@512",
+      "path": "derived-v1_1/effects/nourishment@512.png",
+      "sourcePath": "shared-art/additions-20261029/originals/lw-effects-nourishment-v2.png",
+      "sourceSha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+      "sha256": "08162761658a425faa6d7caf850f13be0f6f5417f52a5ceb39f14289b6329593",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 225244,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "nourishment",
+      "alt": "",
+      "method": "LANCZOS proportional RGBA on transparent canvas; source native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        90,
+        47,
+        442,
+        464
+      ],
+      "trueTransparentBackground": true
+    },
+    {
+      "assetId": "v1.1-effects-nourishment@256",
+      "path": "derived-v1_1/effects/nourishment@256.png",
+      "sourcePath": "shared-art/additions-20261029/originals/lw-effects-nourishment-v2.png",
+      "sourceSha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+      "sha256": "320d0eb41eed84680eb00b267e15b4fdb6d0c7ed35c57e0945aad5307168597d",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 64884,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "nourishment",
+      "alt": "",
+      "method": "LANCZOS proportional RGBA on transparent canvas; source native 1254x1254",
+      "visibleAlphaThreshold": 127,
+      "visibleBbox": [
+        45,
+        23,
+        220,
+        232
+      ],
+      "trueTransparentBackground": true
+    },
+    {
+      "assetId": "v1.1-effects-contact-shadow@512",
+      "path": "derived-v1_1/effects/contact-shadow@512.png",
+      "sourcePath": "world-candidates-20261029/layers/lumi-contact-shadow.png",
+      "sourceSha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c",
+      "sha256": "7d03b845317fe687d64b96c3e2d254a635834c43a8bc239e2ab4e18ec25b461b",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 13710,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "contact-shadow",
+      "alt": "",
+      "method": "LANCZOS proportional RGBA on transparent canvas; source native 1774x887",
+      "visibleAlphaThreshold": 3,
+      "visibleBbox": [
+        120,
+        408,
+        393,
+        443
+      ],
+      "trueTransparentBackground": true
+    },
+    {
+      "assetId": "v1.1-effects-contact-shadow@256",
+      "path": "derived-v1_1/effects/contact-shadow@256.png",
+      "sourcePath": "world-candidates-20261029/layers/lumi-contact-shadow.png",
+      "sourceSha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c",
+      "sha256": "c2797a5056d68c4e6e6c6f34c8919de27fa2edc2ad1bd51772f90b848db7f160",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "bytes": 4732,
+      "usageScope": "product_candidate",
+      "version": "v1.1-derived-1",
+      "event": "contact-shadow",
+      "alt": "",
+      "method": "LANCZOS proportional RGBA on transparent canvas; source native 1774x887",
+      "visibleAlphaThreshold": 3,
+      "visibleBbox": [
+        60,
+        203,
+        197,
+        221
+      ],
+      "trueTransparentBackground": true
+    }
+  ]
+}

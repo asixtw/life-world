@@ -12,5 +12,5 @@ describe('v1.1 世界原稿與分層', () => { // 不把 CSS 顯示當點陣輸�
     expect(manifest.worldCandidates.files).toHaveLength(7) // 四背景加三透明層。
     for (const item of manifest.worldCandidates.files) { const bytes = readFileSync(fileURLToPath(new URL(`../assets/${item.path}`, import.meta.url))); expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a'); expect(bytes.readUInt32BE(16)).toBe(item.width); expect(bytes.readUInt32BE(20)).toBe(item.height); expect(bytes[25]).toBe(item.mode === 'RGBA' ? 6 : 2); expect(createHash('sha256').update(bytes).digest('hex')).toBe(item.sha256) } // 實際檔案逐一核對。
   }) // 透明 PNG 與 RGB 背景分流。
-  it('保留尚未達標的輸出狀態', () => { expect(manifest.worldCandidates.targetOriginalSizeMet).toBe(false); expect(manifest.worldCandidates.targetDisplaySizesProduced).toBe(false); expect(manifest.worldCandidates.status).toContain('pending') }) // 不將原生尺寸冒充規格尺寸。
+  it('指定像素已衍生，但 1920 不是原生高解析', () => { expect(manifest.worldCandidates.targetOriginalSizeMet).toBe(false); expect(manifest.worldCandidates.targetDisplaySizesProduced).toBe(true); expect(manifest.worldCandidates.target1920IsDerivedUpscale).toBe(true); expect(manifest.worldCandidates.status).toContain('review_pending') }) // 不將放大圖冒充新原稿。
 }) // Boyi／Jerry 視覺審查另列。

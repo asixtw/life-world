@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_commit": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
-  "status": "v1_1_independent_candidate_world_lumi_audio_pending_exports_and_review",
+  "status": "v1_1_independent_candidate_derived_exports_ready_visual_and_human_review_pending",
   "shared_art_runtime_library_id": "libfile_c1337d18a09081918aaa69c3951f8e1c",
   "shared_art_originals_library_id": "libfile_5fb88fe851e8819198ee4243b4e37f07",
   "assets": [
@@ -766,24 +766,28 @@
   ],
   "lumiPoseCandidates": {
     "manifestPath": "lumi-poses-candidate-20261029/manifest.json",
+    "derivedManifestPath": "derived-v1_1/manifest.json",
     "libraryId": "libfile_2bc372f039108191add7f621757a2178",
     "usageScope": "product_candidate",
-    "status": "six_original_poses_and_independent_left_right_shell_integrated_anchor_and_exports_pending",
+    "status": "six_original_poses_and_independent_shells_with_derived_display_exports_visual_review_pending",
     "originalSize": [1254, 1254],
     "poseIds": ["idle", "quiet", "welcome", "listening", "confirmed", "celebrate"],
     "shellIds": ["shell-left", "shell-right"],
-    "targetDisplaySizesProduced": false,
+    "targetDisplaySizesProduced": true,
+    "numericFootAnchorProduced": true,
     "uniformAnchorVerified": false,
     "pairedShellClosureVerified": false
   },
   "worldCandidates": {
     "usageScope": "product_candidate",
-    "status": "native_sources_integrated_pending_target_exports_and_boyi_jerry_review",
+    "status": "native_sources_and_derived_target_exports_integrated_boyi_jerry_review_pending",
+    "derivedManifestPath": "derived-v1_1/manifest.json",
     "specCommit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
     "horizontalLibraryId": "libfile_94713f7b5ba48191baa9b4936cdd1ffc",
     "portraitLibraryId": "libfile_83d2a42ee2208191b38e1a21229b1307",
     "targetOriginalSizeMet": false,
-    "targetDisplaySizesProduced": false,
+    "targetDisplaySizesProduced": true,
+    "target1920IsDerivedUpscale": true,
     "files": [
       { "id": "world-day-wide-native", "path": "world-candidates-20261029/originals/room-day-base.png", "width": 1448, "height": 1086, "mode": "RGB", "sha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3" },
       { "id": "world-quiet-wide-native", "path": "world-candidates-20261029/originals/room-quiet-base.png", "width": 1448, "height": 1086, "mode": "RGB", "sha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03" },
@@ -794,7 +798,7 @@
       { "id": "world-shadow-layer", "path": "world-candidates-20261029/layers/lumi-contact-shadow.png", "width": 1774, "height": 887, "mode": "RGBA", "sha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c" }
     ],
     "provenance": ["world-candidates-20261029/provenance/asset-metadata.json", "world-candidates-20261029/provenance/prompts.json", "world-portrait-supplement-20261029/provenance/prompts.json"],
-    "limitations": ["原稿不是指定的 1920×1440；尚無 1280×960 與 768×1024 點陣顯示版", "家具與植物的 Quiet 效果仍為 CSS 候選調色", "原稿的日間與 Quiet 構圖尚未像素級對齊", "Boyi 與 Jerry 尚未驗收"]
+    "limitations": ["原生橫稿 1448×1086；1920×1440 是等比放大衍生圖，不是原生高解析原稿", "1280×960 與 768×1024 為等比縮小顯示版", "家具與植物的 Quiet 效果仍為 CSS 候選調色", "原稿的日間與 Quiet 構圖尚未像素級對齊", "Boyi 與 Jerry 尚未驗收"]
   },
   "audioCandidates": {
     "manifestPath": "audio-candidates/manifest.json",

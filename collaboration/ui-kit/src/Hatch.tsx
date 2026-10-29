@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from 'react' // 控制孵化階段與計�
 import type { HatchEvent, HatchStage } from './contracts' // 對外只回報展示事件。
 import { Button, Card, StatusMessage } from './components' // 沿用可鍵盤操作的元件。
 import { planHatchSkip, planHatchStart, planHatchUnmount } from './hatch-machine' // 純函式固定回執與事件順序。
-import { poseArt, shellArt } from './LumiPoses' // 兩殼片與無殼 Lumi 各自載入。
+import { hatchShadowArt, poseArt, shellArt } from './LumiPoses' // 陰影、兩殼片與無殼 Lumi 各自載入。
 
 export const stages: HatchStage[] = ['idle', 'glow', 'crack', 'deepcrack', 'open', 'complete'] // 固定狀態對應資產圖層。
 export const stageLabels: Record<HatchStage, string> = { idle: '目標蛋待開始', glow: '蛋殼微光', crack: '裂紋逐漸清晰', deepcrack: '裂紋加深', open: '蛋殼已分離', complete: 'Lumi 孵化完成' } // 固定六階段含獨立深裂、分離與完成。
 export const artByStage: Record<HatchStage, string> = { idle: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-rest-v1@512.png', import.meta.url).href, glow: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-softglow-v1@512.png', import.meta.url).href, crack: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-initialcrack-v1@512.png', import.meta.url).href, deepcrack: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-deepcrack-v1@512.png', import.meta.url).href, open: poseArt.confirmed, complete: poseArt.celebrate } // 開殼與完成改用無殼角色；殼片另由獨立層裝配。
 
 export function HatchArt({ stage, still = true }: { stage: HatchStage; still?: boolean }) { // 與狀態檢視共用同一渲染器，不另造截圖用美術。
-  return <div className={`hatch-art hatch-art--${stage} ${still ? 'hatch-art--still' : ''}`} role="img" aria-label={stageLabels[stage]}>{stage === 'open' || stage === 'complete' ? <div className="hatch-composite"><img className="hatch-composite__lumi" src={artByStage[stage]} alt="" /><img className="hatch-composite__left" src={shellArt.left} alt="" /><img className="hatch-composite__right" src={shellArt.right} alt="" /></div> : <img className="hatch-asset" src={artByStage[stage]} alt="" />}</div> // 真左右殼分別裝配；原生尺寸與錨點差異仍待審查。
+  const [failed, setFailed] = useState<string[]>([]) // 單層破圖退回可讀狀態，不阻斷階段或按鈕。
+  const asset = (src: string, className: string) => failed.includes(src) ? null : <img className={className} src={src} alt="" onError={() => setFailed(previous => previous.includes(src) ? previous : [...previous, src])} />
+  return <div className={`hatch-art hatch-art--${stage} ${still ? 'hatch-art--still' : ''}`} role="img" aria-label={stageLabels[stage]}>{stage === 'open' || stage === 'complete' ? <div className="hatch-composite">{asset(hatchShadowArt, 'hatch-composite__shadow')}{asset(artByStage[stage], 'hatch-composite__lumi')}{asset(shellArt.left, 'hatch-composite__left')}{asset(shellArt.right, 'hatch-composite__right')}</div> : asset(artByStage[stage], 'hatch-asset')}{failed.length > 0 && <span className="hatch-art__fallback">部分圖片載入失敗；可使用文字操作。</span>}</div> // 真左右殼與陰影分別裝配；裂口仍待美術審查。
 } // 純展示不產生回執或積分。
 
 export function Hatch({ confirmedReceiptId, quiet, reducedMotion, onEvent }: { confirmedReceiptId?: string; quiet: boolean; reducedMotion: boolean; onEvent?: (event: HatchEvent) => void }) { // 回執由宿主傳入，元件不確認目標。
