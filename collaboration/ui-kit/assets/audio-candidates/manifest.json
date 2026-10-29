@@ -1,0 +1,171 @@
+{
+  "version": "v1.1-candidate-wav-only",
+  "method": "Original deterministic Python 3.12 + NumPy additive synthesis",
+  "sampleRate": 48000,
+  "channels": 1,
+  "format": "PCM 16-bit WAV",
+  "usageScope": "product_candidate",
+  "status": "WAV candidates only; AAC/M4A and Ogg not produced; Boyi listening review pending",
+  "events": [
+    {
+      "id": "ui-tap-01",
+      "event": "ui-tap",
+      "candidate": 1,
+      "path": "wav/ui-tap-01.wav",
+      "description": "柔和單擊",
+      "durationSeconds": 0.14,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.85,
+      "bytes": 13484,
+      "sha256": "16074a5102d548e63f61ff48959ce067d36e69a9e38a4887a4c2987583ef8317",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "ui-tap-02",
+      "event": "ui-tap",
+      "candidate": 2,
+      "path": "wav/ui-tap-02.wav",
+      "description": "雙層輕觸",
+      "durationSeconds": 0.18,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.3,
+      "bytes": 17324,
+      "sha256": "a5d842381318bff19a694e351d13bebd3fabeb5ee61e53a6a0e0e7b5981ba3b3",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "draft-saved-01",
+      "event": "draft-saved",
+      "candidate": 1,
+      "path": "wav/draft-saved-01.wav",
+      "description": "上行兩音",
+      "durationSeconds": 0.47,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.26,
+      "bytes": 45164,
+      "sha256": "25b6bd60c41d2a69674aa7b46e98c04955e50a84497bb9c5cce5fc595aaae81d",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "draft-saved-02",
+      "event": "draft-saved",
+      "candidate": 2,
+      "path": "wav/draft-saved-02.wav",
+      "description": "低暖兩音",
+      "durationSeconds": 0.52,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.36,
+      "bytes": 49964,
+      "sha256": "1f7efa91caab1af41cefeaff1f2910821e46b4559fec4fcb442d0ef7aa49a9f9",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "experience-confirmed-01",
+      "event": "experience-confirmed",
+      "candidate": 1,
+      "path": "wav/experience-confirmed-01.wav",
+      "description": "溫和三音",
+      "durationSeconds": 0.76,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.03,
+      "bytes": 73004,
+      "sha256": "f0fcb6938cfca0f37bb23e222650337fb1d21e4c6cf5d018a42076704fd6476c",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "experience-confirmed-02",
+      "event": "experience-confirmed",
+      "candidate": 2,
+      "path": "wav/experience-confirmed-02.wav",
+      "description": "緩升和聲",
+      "durationSeconds": 0.82,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.15,
+      "bytes": 78764,
+      "sha256": "32f590524acf306400215cc94e4617996966c9d3b0145084866c7dc9cd74f2a5",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "first-hatch-01",
+      "event": "first-hatch",
+      "candidate": 1,
+      "path": "wav/first-hatch-01.wav",
+      "description": "四音破曉",
+      "durationSeconds": 1.62,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.75,
+      "bytes": 155564,
+      "sha256": "5963b2378b4e1cf41f4c7eca01899b9b3283ba1b240a3a9fb13f5768aecdf5cc",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "first-hatch-02",
+      "event": "first-hatch",
+      "candidate": 2,
+      "path": "wav/first-hatch-02.wav",
+      "description": "慢速甦醒",
+      "durationSeconds": 1.76,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.86,
+      "bytes": 169004,
+      "sha256": "c1d8efc8cb98a536a416fc4e0af8edffdaf6fe613c026965ff352922881245b4",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "goal-completed-01",
+      "event": "goal-completed",
+      "candidate": 1,
+      "path": "wav/goal-completed-01.wav",
+      "description": "明亮收束",
+      "durationSeconds": 1.18,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.7,
+      "bytes": 113324,
+      "sha256": "ac0b3b5197abe5a1709c95caa4ffa62d7ca5747c3eb400b0ba5a54f1d83efc8a",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    },
+    {
+      "id": "goal-completed-02",
+      "event": "goal-completed",
+      "candidate": 2,
+      "path": "wav/goal-completed-02.wav",
+      "description": "沉穩收束",
+      "durationSeconds": 1.28,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.49,
+      "bytes": 122924,
+      "sha256": "6019e9cc09827fd29fd6d2961f1ab2961d5ec871f116c6bb7e662826cc028120",
+      "playbackFormatsPending": [
+        "AAC/M4A",
+        "Ogg"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+@scope (.lw-kit) { /* 房間只影響隔離套件，不碰正式 App 全域樣式。 */
+.world-room-wrap{width:100%;min-width:0} /* 場景與文字卡分開。 */
+.world-room{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:18px;background:#e9eadc} /* 橫向原稿比例，不拉伸。 */
+.world-room__base,.world-room__base img{display:block;position:absolute;inset:0;width:100%;height:100%} /* 背景獨占最底層。 */
+.world-room__base img{object-fit:cover;object-position:center} /* 背景允許裁切，角色與控制不裁切。 */
+.world-room__furniture,.world-room__shadow,.world-room__lumi,.world-room__foreground{position:absolute;height:auto;max-width:none;pointer-events:none;object-fit:contain} /* 分層可獨立調整。 */
+.world-room__furniture{left:1%;top:46%;width:34%;z-index:1} /* 橫向家具依來源 manifest 候選錨點。 */
+.world-room__shadow{left:50%;top:76%;width:23%;transform:translate(-50%,-50%);opacity:.55;z-index:2} /* 接地陰影不烤進 Lumi。 */
+.world-room__lumi{left:50%;top:76%;width:112px;height:135px;transform:translate(-50%,-90%);z-index:3} /* 角色完整顯示，維持既有 CSS 參考尺寸。 */
+.world-room__foreground{right:0;bottom:1%;width:19%;z-index:4} /* 前景獨立遮擋，但不覆蓋操作。 */
+.world-room--quiet .world-room__furniture,.world-room--quiet .world-room__foreground{filter:brightness(.7) saturate(.8)} /* Quiet 層目前只做候選色調，非獨立繪製。 */
+@media(max-width:600px){.world-room{aspect-ratio:3/4}.world-room__furniture{left:-10%;top:55%;width:54%}.world-room__foreground{right:-4%;bottom:2%;width:34%}.world-room__shadow{top:79%;width:44%}.world-room__lumi{top:79%;transform:translate(-50%,-90%) scale(.85)}} /* 真直向背景搭配手機獨立錨點。 */
+} /* 不聲稱已產出 1280×960 或 768×1024 點陣顯示版。 */

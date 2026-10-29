@@ -1,0 +1,91 @@
+[
+  {
+    "path": "originals/room-day-base.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "bytes": 1665922,
+    "sha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3"
+  },
+  {
+    "path": "originals/room-quiet-base.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "bytes": 1683021,
+    "sha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03"
+  },
+  {
+    "path": "layers/furniture-cabinet.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGBA",
+    "bytes": 909846,
+    "sha256": "207cb4692b198a7b97e7c9d82f9a16b4d89cfc66a41974bec032837d97a13d36",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 990935,
+    "partialPixels": 580568,
+    "opaquePixels": 1025,
+    "visibleBoundsAlphaAbove8": [
+      239,
+      111,
+      1212,
+      947
+    ]
+  },
+  {
+    "path": "layers/foreground-plant.png",
+    "size": [
+      1299,
+      1211
+    ],
+    "mode": "RGBA",
+    "bytes": 785206,
+    "sha256": "f5bfce9b4d0105542424be953e6d8bbe397eb4ba7f866d74afd16ecfef1e7824",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 1170959,
+    "partialPixels": 401561,
+    "opaquePixels": 569,
+    "visibleBoundsAlphaAbove8": [
+      240,
+      179,
+      1081,
+      1079
+    ]
+  },
+  {
+    "path": "layers/lumi-contact-shadow.png",
+    "size": [
+      1774,
+      887
+    ],
+    "mode": "RGBA",
+    "bytes": 278443,
+    "sha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c",
+    "alphaRange": [
+      0,
+      97
+    ],
+    "transparentPixels": 1367072,
+    "partialPixels": 206466,
+    "opaquePixels": 0,
+    "visibleBoundsAlphaAbove8": [
+      295,
+      370,
+      1496,
+      522
+    ]
+  }
+]

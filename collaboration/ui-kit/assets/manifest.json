@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_commit": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
-  "status": "review_ready_with_user_deferred_world_base",
+  "status": "v1_1_independent_candidate_world_native_pending_target_exports_and_review",
   "shared_art_runtime_library_id": "libfile_c1337d18a09081918aaa69c3951f8e1c",
   "shared_art_originals_library_id": "libfile_5fb88fe851e8819198ee4243b4e37f07",
   "assets": [
@@ -764,6 +764,37 @@
       "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
     }
   ],
+  "worldCandidates": {
+    "usageScope": "product_candidate",
+    "status": "native_sources_integrated_pending_target_exports_and_boyi_jerry_review",
+    "specCommit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
+    "horizontalLibraryId": "libfile_94713f7b5ba48191baa9b4936cdd1ffc",
+    "portraitLibraryId": "libfile_83d2a42ee2208191b38e1a21229b1307",
+    "targetOriginalSizeMet": false,
+    "targetDisplaySizesProduced": false,
+    "files": [
+      { "id": "world-day-wide-native", "path": "world-candidates-20261029/originals/room-day-base.png", "width": 1448, "height": 1086, "mode": "RGB", "sha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3" },
+      { "id": "world-quiet-wide-native", "path": "world-candidates-20261029/originals/room-quiet-base.png", "width": 1448, "height": 1086, "mode": "RGB", "sha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03" },
+      { "id": "world-day-portrait-native", "path": "world-portrait-supplement-20261029/room-day-portrait-native.png", "width": 1086, "height": 1448, "mode": "RGB", "sha256": "6b598b3c7d54a8bede2bc21688a4ee2b24f28ce9fff56ffec276ff45ebbfa1fa" },
+      { "id": "world-quiet-portrait-native", "path": "world-portrait-supplement-20261029/room-quiet-portrait-native.png", "width": 1086, "height": 1448, "mode": "RGB", "sha256": "10e269776a3101c7e85b00e36d72d2e5e69f57a2df8717127a6bfb4a1fc1f536" },
+      { "id": "world-furniture-layer", "path": "world-candidates-20261029/layers/furniture-cabinet.png", "width": 1448, "height": 1086, "mode": "RGBA", "sha256": "207cb4692b198a7b97e7c9d82f9a16b4d89cfc66a41974bec032837d97a13d36" },
+      { "id": "world-foreground-layer", "path": "world-candidates-20261029/layers/foreground-plant.png", "width": 1299, "height": 1211, "mode": "RGBA", "sha256": "f5bfce9b4d0105542424be953e6d8bbe397eb4ba7f866d74afd16ecfef1e7824" },
+      { "id": "world-shadow-layer", "path": "world-candidates-20261029/layers/lumi-contact-shadow.png", "width": 1774, "height": 887, "mode": "RGBA", "sha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c" }
+    ],
+    "provenance": ["world-candidates-20261029/provenance/asset-metadata.json", "world-candidates-20261029/provenance/prompts.json", "world-portrait-supplement-20261029/provenance/prompts.json"],
+    "limitations": ["原稿不是指定的 1920×1440；尚無 1280×960 與 768×1024 點陣顯示版", "家具與植物的 Quiet 效果仍為 CSS 候選調色", "原稿的日間與 Quiet 構圖尚未像素級對齊", "Boyi 與 Jerry 尚未驗收"]
+  },
+  "audioCandidates": {
+    "manifestPath": "audio-candidates/manifest.json",
+    "status": "ten_original_48khz_wav_candidates_aac_m4a_ogg_and_listening_review_pending",
+    "usageScope": "product_candidate",
+    "method": "deterministic_python_numpy_additive_synthesis",
+    "events": ["ui-tap", "draft-saved", "experience-confirmed", "first-hatch", "goal-completed"],
+    "candidatesPerEvent": 2,
+    "playbackFormatsPending": ["AAC/M4A", "Ogg"],
+    "defaultEnabled": false,
+    "quietMuted": true
+  },
   "deferred": [
     {
       "id": "lw-world-base-v1",

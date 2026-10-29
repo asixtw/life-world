@@ -1,0 +1,5 @@
+@scope (.lw-kit) { /* 音效候選樣式隔離於套件。 */
+.sound-gallery{display:grid;gap:8px;margin:14px 0} /* 五事件十檔可逐項檢視。 */
+.sound-gallery__row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0} /* 手機不推開頁寬。 */
+.sound-gallery__row span{overflow-wrap:anywhere} /* 長資產 ID 可折行。 */
+} /* 不將 WAV 候選偽裝為完整播放格式。 */

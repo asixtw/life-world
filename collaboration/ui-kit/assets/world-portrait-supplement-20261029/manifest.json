@@ -1,0 +1,50 @@
+{
+  "status": "portrait-independent-candidate",
+  "sourceSpecCommit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
+  "supplementsLibrary": "libfile_94713f7b5ba48191baa9b4936cdd1ffc",
+  "targetPixels": [
+    768,
+    1024
+  ],
+  "exactTargetMet": false,
+  "generationAPI": "image_gen.imagegen",
+  "apiExposesSizeParameter": false,
+  "aspectRatio": "3:4",
+  "layer": "background-only",
+  "assets": [
+    {
+      "path": "room-day-portrait-native.png",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "bytes": 1677298,
+      "sha256": "6b598b3c7d54a8bede2bc21688a4ee2b24f28ce9fff56ffec276ff45ebbfa1fa"
+    },
+    {
+      "path": "room-quiet-portrait-native.png",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "bytes": 1697009,
+      "sha256": "10e269776a3101c7e85b00e36d72d2e5e69f57a2df8717127a6bfb4a1fc1f536"
+    }
+  ],
+  "anchorProposalNormalized": [
+    0.5,
+    0.78
+  ],
+  "safeAreaProposalNormalized": {
+    "left": 0.25,
+    "top": 0.6,
+    "width": 0.5,
+    "height": 0.3
+  },
+  "verification": "Both originals visually inspected. Same-room identity and approximate day/Quiet geometry preserved; not pixel-registration or browser-crop verified.",
+  "excluded": [
+    "No Lumi/egg/UI/text baked in",
+    "No furniture replacement",
+    "No resizing or compositing applied",
+    "No browser retry",
+    "No repo modification/push"
+  ]
+}

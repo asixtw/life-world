@@ -13,6 +13,9 @@ try { // 確保測試失敗也會關閉瀏覽器。
   if (await page.evaluate(() => document.activeElement?.getAttribute('aria-label')) !== '關閉面板') throw new Error('Dialog focus did not enter') // 真正焦點檢查。
   await page.keyboard.press('Escape') // Escape 應關閉面板。
   if (await page.getByRole('dialog').count()) throw new Error('Dialog Escape failed') // 不只看靜態畫面。
+  await page.getByRole('button', { name: '送出示範' }).click() // 測原生 submit、aria 與 ref。
+  await page.getByText('ref、type 與 aria 均已透傳').waitFor() // ref 取得 DOM button。
+  if (await page.getByRole('button', { name: '停用示範' }).isEnabled()) throw new Error('Button disabled prop failed') // 停用無法誤觸。
   const schedule = page.getByRole('region', { name: '行動排程' }) // v1.1 新月／週元件。
   await schedule.getByLabel('結束日期').fill('2026-11-10') // 使用者明確設定期間。
   await schedule.getByRole('button', { name: '週一至週五' }).click() // 套用期間內快捷。
@@ -44,6 +47,40 @@ try { // 確保測試失敗也會關閉瀏覽器。
   if (!await page.getByText('人工核對：待核對').count()) throw new Error('Review did not reset') // 防止舊核對滲入。
   await page.screenshot({ path: path.join(folder, 'mobile-p0-media-390x844.png'), fullPage: true }) // 真實媒體狀態截圖。
   if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error('mobile media overflow') // 長文字不遮操作。
+  let persistent = page.locator('section.card').filter({ has: page.getByRole('heading', { name: 'v1.1 本機草稿持久化' }) }) // 真 IndexedDB 候選卡片。
+  await persistent.getByRole('textbox', { name: '本機草稿文字' }).fill('A 的本機草稿') // A 的文字。
+  await persistent.getByRole('button', { name: '保存本機草稿' }).click() // 寫入 IndexedDB。
+  await persistent.getByText('已存本機草稿 v1').waitFor() // 確認交易完成。
+  await persistent.getByRole('combobox', { name: '示範 owner' }).selectOption('demo-owner-b') // 換 owner。
+  await persistent.getByText('此 owner 尚無本機草稿').waitFor() // B 看不到 A。
+  await persistent.getByRole('combobox', { name: '示範 owner' }).selectOption('demo-owner-a') // 回 A。
+  await persistent.getByRole('textbox', { name: '本機草稿文字' }).waitFor() // 等欄位重建。
+  if (await persistent.getByRole('textbox', { name: '本機草稿文字' }).inputValue() !== 'A 的本機草稿') throw new Error('owner draft isolation failed') // A 回讀原文。
+  await page.reload({ waitUntil: 'networkidle' }) // 真正重整頁面測持久化。
+  await page.getByRole('navigation', { name: '手機展示導覽' }).getByRole('button', { name: '紀錄', exact: true }).click() // 回紀錄頁。
+  persistent = page.locator('section.card').filter({ has: page.getByRole('heading', { name: 'v1.1 本機草稿持久化' }) }) // 新 DOM 卡片。
+  await persistent.getByText('已回讀本機草稿 v1').waitFor() // IndexedDB 回讀完成。
+  if (await persistent.getByRole('textbox', { name: '本機草稿文字' }).inputValue() !== 'A 的本機草稿') throw new Error('IndexedDB reload lost text') // 重整不丟草稿。
+  await persistent.getByRole('textbox', { name: '本機草稿文字' }).fill('保存失敗仍保留') // 未存文字。
+  await persistent.getByRole('combobox', { name: '故障 fixture' }).selectOption('save-failure') // 注入失敗。
+  await persistent.getByRole('button', { name: '保存本機草稿' }).click() // 不寫入。
+  await persistent.getByText('保存失敗：', { exact: false }).waitFor() // 可見錯誤。
+  if (await persistent.getByRole('textbox', { name: '本機草稿文字' }).inputValue() !== '保存失敗仍保留') throw new Error('failed save cleared text') // 草稿仍在本頁。
+  await persistent.getByRole('combobox', { name: '故障 fixture' }).selectOption('normal') // 恢復保存能力。
+  await persistent.getByRole('button', { name: '模擬別頁更新' }).click() // 別頁寫入較新 revision。
+  await persistent.getByText('模擬別頁已更新').waitFor() // 模擬更新已完成。
+  await persistent.getByRole('button', { name: '保存本機草稿' }).click() // 舊版應衝突。
+  await persistent.getByText('版本衝突：', { exact: false }).waitFor() // 不靜默覆寫。
+  await persistent.getByRole('button', { name: '保留本頁文字並用新版重試' }).click() // 取新版號，保留本頁編輯。
+  await persistent.getByRole('button', { name: '保存本機草稿' }).click() // 同一 draftId 重試。
+  await persistent.getByText('已存本機草稿 v3').waitFor() // 版本正確前進。
+  await persistent.getByRole('combobox', { name: '故障 fixture' }).selectOption('link-failure') // 文字成功素材失敗。
+  await persistent.getByRole('textbox', { name: '本機草稿文字' }).fill('文字成功但素材待連結') // 新文字。
+  await persistent.getByRole('button', { name: '保存本機草稿' }).click() // 先存文字再連素材。
+  await persistent.getByText('文字已存 v4；素材連結失敗').waitFor() // 部分成功可見。
+  await persistent.getByRole('button', { name: '重試素材連結' }).click() // 同草稿重試。
+  await persistent.getByText('同一草稿 v11-record-fixture 的素材已連結').waitFor() // 不能造新草稿。
+  await page.screenshot({ path: path.join(folder, 'mobile-p0-persistent-draft-390x844.png'), fullPage: true }) // 真回讀與連結退路證據。
   await page.getByRole('button', { name: '劇場', exact: true }).click() // 既有劇場回歸。
   await page.getByRole('combobox', { name: '示範人物' }).selectOption({ label: '柏拉圖' }) // 選定示範角色。
   await page.getByRole('combobox', { name: '演練場景' }).selectOption({ label: '承諾、責任與選擇' }) // 選定同組場景。
@@ -74,6 +111,7 @@ try { // 確保測試失敗也會關閉瀏覽器。
   if (await page.getByRole('button', { name: '開始孵化' }).isEnabled()) throw new Error('hatch started without receipt') // 無回執不能孵化。
   await page.setViewportSize({ width: 1280, height: 800 }) // 桌面驗證同一版。
   await page.getByRole('button', { name: '元件', exact: true }).click() // 查看桌面排程布局。
+  await page.waitForLoadState('networkidle') // 導覽後先等 Gallery 真圖片完成載入。
   const layout = await page.evaluate(() => ({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, broken: [...document.images].filter(image => !image.complete || !image.naturalWidth).length })) // 實際 DOM 幾何與載圖檢查。
   if (layout.overflow > 0 || layout.broken) throw new Error(`desktop layout: ${JSON.stringify(layout)}`) // 不冒稱無破圖。
   await page.screenshot({ path: path.join(folder, 'desktop-p0-schedule-1280x800.png'), fullPage: true }) // 桌面真實 PNG。
