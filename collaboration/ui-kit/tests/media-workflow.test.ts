@@ -33,4 +33,23 @@ describe('v1.1 媒體草稿契約', () => { // mock 只驗本機邏輯，不冒�
     await flow.saveDraft() // 明確保存。
     expect(flow.snapshot()).toMatchObject({ editedTranscript: '保留的摘要', phase: 'error', error: 'version-conflict', version: 1 }) // 版本不前進。
   }) // 重試由宿主確認版本後才執行。
+  it('格式與容量由宿主驗證，拒絕檔案仍保留人工草稿', () => { // 本套件不宣告正式 5MiB 或 30 秒政策。
+    const flow = new MediaWorkflow({ upload: async () => 'receipt', recognize: async () => '', save: async () => 2 }, undefined, source => source.sizeBytes && source.sizeBytes > 10 ? 'host-limit' : null) // 測試能力由宿主注入。
+    flow.editTranscript('先前輸入的文字') // 其他輸入先存在。
+    flow.select({ id: 'large', name: 'large.png', kind: 'image', sizeBytes: 11, mimeType: 'image/png', blob: new Blob(['too-large']) }) // 用本機 Blob 代表檔案。
+    expect(flow.snapshot()).toMatchObject({ source: null, editedTranscript: '先前輸入的文字', phase: 'error', error: 'host-limit' }) // 拒絕後不丟原草稿。
+  }) // 正式限制由 Jerry 接入時決定。
+  it('辨識等待中清空校對欄位，晚回應只更新原文', async () => { // 空字串也是使用者有意編輯。
+    let release!: (value: string) => void // 控制辨識回應時機。
+    const delayed = new Promise<string>(resolve => { release = resolve }) // 模擬服務延遲。
+    const flow = new MediaWorkflow({ upload: async () => 'receipt', recognize: async () => delayed, save: async () => 2 }) // 不用真 AI。
+    flow.select({ id: 'audio', name: 'fixture.wav', kind: 'audio' }) // 保留素材。
+    await flow.uploadSelected() // 明確上傳。
+    flow.editTranscript('稍後刪除') // 原本有文字。
+    const pending = flow.recognize() // 正在等待。
+    flow.editTranscript('') // 人工清空仍是編輯。
+    release('晚到原文') // 晚回應不應填回校對欄位。
+    await pending // 讓回呼完成。
+    expect(flow.snapshot()).toMatchObject({ originalTranscript: '晚到原文', editedTranscript: '', reviewed: false }) // 原文和人工校對分離。
+  }) // 避免辨識覆蓋人工選擇。
 }) // 不接觸正式人物、進度或獎勵。

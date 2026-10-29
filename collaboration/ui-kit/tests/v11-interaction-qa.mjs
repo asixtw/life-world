@@ -20,12 +20,18 @@ try { // 確保測試失敗也會關閉瀏覽器。
   if (reading < 1) throw new Error('Schedule preset did not apply') // 不能只有視覺按鈕。
   await page.getByRole('button', { name: '整理', exact: true }).click() // 第二項應獨立。
   if (await schedule.locator('[aria-pressed="true"]').count()) throw new Error('Habit plans leaked') // 不串三項安排。
+  await page.getByRole('textbox', { name: '更正行動名稱' }).fill('整理研究') // 名稱可修正。
+  if (!await page.getByText('固定單位：次', { exact: false }).count()) throw new Error('Habit unit changed with name') // 單位保持固定。
   await schedule.getByLabel('檢視').selectOption('week') // 真正切換週檢視。
   await page.screenshot({ path: path.join(folder, 'mobile-p0-schedule-390x844.png'), fullPage: true }) // 新畫面真實 PNG。
   if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error('mobile schedule overflow') // 手機七欄不可橫溢。
   await page.getByRole('navigation', { name: '手機展示導覽' }).getByRole('button', { name: '紀錄', exact: true }).click() // 進入媒體候選。
   await page.getByRole('button', { name: '開始', exact: true }).click() // 只進入權限 fixture。
   await page.getByRole('button', { name: '模擬拒絕' }).click() // 權限拒絕仍可文字或選檔。
+  await page.getByLabel('選擇本機檔案').setInputFiles({ name: 'local-fixture.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" rx="12" fill="#eaf0e1"/><circle cx="80" cy="44" r="24" fill="#679170"/><path d="M40 78h80" stroke="#315c35" stroke-width="8"/></svg>') }) // 僅供真本機檔案預覽測試的程式生成 fixture。
+  await page.getByRole('img', { name: '所選本機圖片預覽' }).waitFor() // Blob URL 可在瀏覽器顯示。
+  if (!await page.getByText('上傳回執：無', { exact: false }).count()) throw new Error('Local file auto-uploaded') // 選真檔仍不自動上傳。
+  await page.screenshot({ path: path.join(folder, 'mobile-p0-local-preview-390x844.png'), fullPage: true }) // 真本機 Blob 預覽畫面證據。
   await page.getByRole('button', { name: '選圖片 fixture' }).click() // 只選素材，不上傳。
   if (!await page.getByText('上傳回執：無', { exact: false }).count()) throw new Error('Selecting file auto-uploaded') // 明確檢查上傳邊界。
   await page.getByRole('button', { name: '明確上傳 fixture' }).click() // 使用者觸發 mock。
@@ -71,5 +77,5 @@ try { // 確保測試失敗也會關閉瀏覽器。
   const layout = await page.evaluate(() => ({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, broken: [...document.images].filter(image => !image.complete || !image.naturalWidth).length })) // 實際 DOM 幾何與載圖檢查。
   if (layout.overflow > 0 || layout.broken) throw new Error(`desktop layout: ${JSON.stringify(layout)}`) // 不冒稱無破圖。
   await page.screenshot({ path: path.join(folder, 'desktop-p0-schedule-1280x800.png'), fullPage: true }) // 桌面真實 PNG。
-  console.log('v1.1 local interaction QA passed: Dialog focus/Escape, schedule independence/week, media permission/upload/review, theater source/branch/back/reset/export, Quiet hatch/replay/cancel, desktop layout.') // 精確列覆蓋範圍。
+  console.log('v1.1 local interaction QA passed: Dialog focus/Escape, schedule independence/week, local file preview, media permission/upload/review, theater three routes/source/back/reset/export, Quiet and dynamic hatch, mobile/desktop layout.') // 精確列覆蓋範圍。
 } finally { await browser.close() } // 不留 Chrome 程序。

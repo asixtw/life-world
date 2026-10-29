@@ -1,0 +1,2 @@
+.fixture-local-preview{display:block;max-width:min(100%,420px);max-height:260px;object-fit:contain;margin:12px 0;border:1px solid var(--line);border-radius:12px} /* 本機圖片完整顯示，不裁掉來源。 */
+.media-demo-file{min-width:0} /* 媒體檔名不推開手機欄寬。 */
