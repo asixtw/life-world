@@ -34,4 +34,6 @@ corepack pnpm dev
 
 `pnpm dev --port 5174` 保持運行；另一終端 `node tests/static-art-qa.mjs`。Windows 預設 Chrome 安裝路徑，其他位置用 `CHROME_PATH` 指定。已輸出六張 day／quiet／reduced × 390／1280 靜態圖與 `static-layout.json` 至 `docs/qa/20261029/`。上方舊 qa:visual 是歷史互動腳本，不在這次授權測試範圍。
 
+整套 UI 的固定初始與關鍵構圖另以 `node tests/static-ui-qa.mjs` 直接載入 `?ui-review=` fixture，已留 21 張手機／桌面 PNG 與量測 JSON；範圍及未覆蓋互動狀態見 [全套 UI 靜態核對](docs/qa/20261029/OVERALL_UI_STATIC_AUDIT.md)。此檢查不點選按鈕，不等同互動或產品驗收。
+
 追加內容：[原創興趣人物十五卡](content/original-enthusiasts/README.md)。

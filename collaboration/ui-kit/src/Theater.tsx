@@ -4,9 +4,9 @@ import { choose, exportSession, getNode, startSession } from './engine' // 腳�
 import { Button, Card, Dialog, StatusMessage } from './components' // 對話、來源與退路使用共用元件。
 import { PersonaArt } from './PersonaArt' // 固定 ID 對應示範肖像與封面。
 
-export function Theater({ personas, scenarios, sources }: { personas: Persona[]; scenarios: Scenario[]; sources: SourceRef[] }) { // 名單決定後僅需注入版本化內容。
-  const [personaId, setPersonaId] = useState('') // 選角與 session 解耦。
-  const [scenarioId, setScenarioId] = useState('') // 場景只從目前 pack 選擇。
+export function Theater({ personas, scenarios, sources, initialPersonaId = '', initialScenarioId = '' }: { personas: Persona[]; scenarios: Scenario[]; sources: SourceRef[]; initialPersonaId?: string; initialScenarioId?: string }) { // 固定初始選角僅供靜態 QA，不啟動對話。
+  const [personaId, setPersonaId] = useState(initialPersonaId) // 選角與 session 解耦。
+  const [scenarioId, setScenarioId] = useState(initialScenarioId) // 場景只從目前 pack 選擇。
   const [session, setSession] = useState<SimulationSession | null>(null) // 目前演練留在記憶體。
   const [history, setHistory] = useState<SimulationSession[]>([]) // 返回保留逐步快照。
   const [sourceOpen, setSourceOpen] = useState(false) // 來源抽屜不改對話。

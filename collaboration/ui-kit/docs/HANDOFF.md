@@ -27,6 +27,8 @@
 
 **本輪靜態版面 gate 已通過，仍非完整產品驗收。** 在受核准的本機 Windows Chrome 環境，以暫時 Vite localhost 服務執行 `tests/static-art-qa.mjs`，六個 day／quiet／reduced × 390／1280 固定畫面全數載入；無破圖、水平溢位或仍運行的動畫。六張真實 PNG 已目視檢查分離蛋殼、完成 Lumi、養分層級、留白與 Quiet 呈現，見 `docs/qa/20261029/art-*.png` 與 `static-layout.json`。舊 `static-layout.txt` 僅記先前失敗，不代表最終狀態。
 
+另用 `tests/static-ui-qa.mjs` 核對全套 UI 的五個主展示頁手機／桌面、六種關鍵構圖、五種系統狀態及共用元件 Quiet／減少動效，共 21 張固定 PNG；無破圖或橫向溢位，已逐張目視檢查。逐項覆蓋、實際布局證據與未驗的開啟／互動狀態見 [全套 UI 靜態核對](qa/20261029/OVERALL_UI_STATIC_AUDIT.md)。靜態通過不代表整套 UI 或正式 App 已完成驗收。
+
 `pnpm dev --port 5174` 保持運行，另一終端 `node tests/static-art-qa.mjs` 可重現固定 fixture；只讀取 `?art-review&mode=day|quiet|reduced`，390×844／1280×800。可設定 `CHROME_PATH`。本輪沒有執行 qa:visual 舊互動腳本；新互動、Safari、實機延後。
 
 ## 美術與接入契約

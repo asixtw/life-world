@@ -1,0 +1,206 @@
+{
+  "browser": "156.0.8078.48",
+  "scope": "static gallery fixtures only; interactive, cross-team, real-device and Safari tests deferred",
+  "results": [
+    {
+      "name": "overview-390",
+      "page": "overview",
+      "width": 390,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 0,
+      "mainText": 187
+    },
+    {
+      "name": "overview-1280",
+      "page": "overview",
+      "width": 1280,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 0,
+      "mainText": 187
+    },
+    {
+      "name": "components-390",
+      "page": "components",
+      "width": 390,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 767
+    },
+    {
+      "name": "components-1280",
+      "page": "components",
+      "width": 1280,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 767
+    },
+    {
+      "name": "hatch-390",
+      "page": "hatch",
+      "width": 390,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 1,
+      "mainText": 164
+    },
+    {
+      "name": "hatch-1280",
+      "page": "hatch",
+      "width": 1280,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 1,
+      "mainText": 164
+    },
+    {
+      "name": "record-390",
+      "page": "record",
+      "width": 390,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 0,
+      "mainText": 222
+    },
+    {
+      "name": "record-1280",
+      "page": "record",
+      "width": 1280,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 0,
+      "mainText": 222
+    },
+    {
+      "name": "theater-390",
+      "page": "theater",
+      "width": 390,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 2,
+      "mainText": 291
+    },
+    {
+      "name": "theater-1280",
+      "page": "theater",
+      "width": 1280,
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 2,
+      "mainText": 291
+    },
+    {
+      "name": "flow-goal-390",
+      "page": "components",
+      "width": 390,
+      "flow": "goal",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 830
+    },
+    {
+      "name": "flow-world-390",
+      "page": "components",
+      "width": 390,
+      "flow": "world",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 785
+    },
+    {
+      "name": "flow-record-390",
+      "page": "components",
+      "width": 390,
+      "flow": "record",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 773
+    },
+    {
+      "name": "flow-relations-390",
+      "page": "components",
+      "width": 390,
+      "flow": "relations",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 865
+    },
+    {
+      "name": "flow-feedback-390",
+      "page": "components",
+      "width": 390,
+      "flow": "feedback",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 6,
+      "mainText": 800
+    },
+    {
+      "name": "state-loading-390",
+      "page": "components",
+      "width": 390,
+      "state": "loading",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 764
+    },
+    {
+      "name": "state-error-390",
+      "page": "components",
+      "width": 390,
+      "state": "error",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 770
+    },
+    {
+      "name": "state-permission-390",
+      "page": "components",
+      "width": 390,
+      "state": "permission",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 768
+    },
+    {
+      "name": "state-success-390",
+      "page": "components",
+      "width": 390,
+      "state": "success",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 767
+    },
+    {
+      "name": "components-quiet-390",
+      "page": "components",
+      "width": 390,
+      "mode": "quiet",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 767
+    },
+    {
+      "name": "components-reduced-390",
+      "page": "components",
+      "width": 390,
+      "mode": "reduced",
+      "overflow": 0,
+      "broken": [],
+      "imageCount": 4,
+      "mainText": 767
+    }
+  ]
+}

@@ -27,6 +27,7 @@
 - top-level manifest 所有 original/master/display/variant 路徑存在；新增三圖 SHA 與原始輸入一致，均 1254×1254 RGBA，有真透明。未改像素。
 - 追加 15 張 TXT 重新計數：60 段各 1,000 漢字，合計 60,000；HS01 exact hash 通過。
 - `tests/static-art-qa.mjs` 在本機受核准 Chrome 環境實際通過：6 張固定 PNG（day／quiet／reduced × 390×844／1280×800），`static-layout.json` 記錄每頁 `overflow=0`、4 個圖片皆載入、`animations=0`。六張已目視檢查圖像組合、透明留白及 Quiet 對比；舊 `static-layout.txt` 是先前環境失敗紀錄，不代表最終結果。
+- `tests/static-ui-qa.mjs` 另直接載入 21 個非互動固定 fixture：五主展示頁的手機／桌面、六種關鍵構圖、五種系統狀態、共用元件 Quiet／減少動效。全部圖片載入、無橫向溢位；21 張 PNG 已目視檢查。詳見 [全套 UI 靜態核對](qa/20261029/OVERALL_UI_STATIC_AUDIT.md)，其中明列 Dialog／附件／劇場等尚未覆蓋的操作狀態。
 
 ## 結論／待閉環
 
