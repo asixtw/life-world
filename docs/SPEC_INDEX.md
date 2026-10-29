@@ -1,5 +1,6 @@
 # 共同規格入口
 
+> 本分支只發布交接文件，程式維持 v0.3.0；本機 v0.4／素材進度未發布。範圍、收件及同步狀態以[本次發布說明](team/DELIVERY_V1_1_RELEASE.md)為準。
 更新：2026-10-28。適用 `asixtw/life-world` 全體協作者。本文索引、產品基準、規則與任務均隨儲存庫保存，可直接在 GitHub 閱讀，不需取得產品負責人的完整桌面工作區。
 
 草案狀態：「變更同步與公告後發布」依 Boyi 於 2026-10-28 最新指示先發布供團隊閱讀，仍待正式定案／公告；GitHub 發布不代表成員電腦或部署已更新。具名任務基準見 `26e36c7`，本次草案版本以包含此修訂的 Git commit 為準。
@@ -16,7 +17,7 @@
 | [三人分工與任務](team/README.md) | 主責、工作包、可複製提示詞及第一輪交付 |
 | [歐桑完整交付入口](team/PROMPT_OUSANG_START.md) | Boyi 已通知並定案的具名任務、VS Code／Codex 工作方式與整包交付 |
 | [LW-SIM-001](team/PROMPT_SIMULATION_001.md) | 三組十五位資料、可玩劇場、來源／評估／整合介面；成果尚未交付 |
-| [完整 UI／美術／動效](team/ART_DELIVERY_SPEC.md) | 十三類資產／元件、App 圖示／縮圖、蛋與破蛋／轉場，歐桑本輪一次交齊 |
+| [完整 UI／美術／動效／音效 v1.1](team/ART_DELIVERY_SPEC.md) | 十四類，P0 操作、P1 房間／六姿勢／分層孵化／人物／動效、P2 音效；本機確認，待公告／發布及工程驗收 |
 | [流程與狀態](team/FLOWS_AND_STATES.md) | 排程、登入、錄音與夜間的後續行為規格；未實作部分明示 |
 | [API](API.md)／[OpenAPI](openapi.json)／[架構](ARCHITECTURE.md) | 現有可執行服務；未來 React／PG 契約由全端另審 |
 | [演進](EVOLUTION.md)／[驗收](CONNECTIONS_ACCEPTANCE.md)／[發布檢查](GITHUB_PUBLISH.md) | 實作與證據；歷史結果不替代本輪測試 |
