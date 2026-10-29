@@ -1,0 +1,6 @@
+@scope (.lw-kit) { /* 抽屜與退出確認僅限獨立套件。 */
+.dialog-backdrop--drawer{place-items:stretch end;padding:0} /* 來源抽屜由右側開啟。 */
+.dialog--drawer{width:min(100%,460px);max-width:460px;max-height:100dvh;height:100dvh;border-radius:20px 0 0 20px;overflow:auto} /* 長內容可捲動。 */
+.panel-gallery__draft{min-height:110px} /* 草稿內容可在面板內編輯。 */
+@media(max-width:600px){.dialog--drawer{width:100%;max-width:none;border-radius:0}} /* 手機不受窄邊限制。 */
+}

@@ -1,0 +1,67 @@
+import { chromium } from 'playwright' // 僅操作 localhost 隔離套件。
+import path from 'node:path'
+
+const browser = await chromium.launch({ headless: true, executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' })
+try {
+  for (const viewport of [{ width: 390, height: 844, name: 'mobile' }, { width: 1280, height: 800, name: 'desktop' }]) {
+    const page = await browser.newPage({ viewport })
+    await page.goto('http://127.0.0.1:5174/?ui-review=components', { waitUntil: 'networkidle' })
+    const buttons = page.locator('section.card').filter({ has: page.getByRole('heading', { name: '按鈕與回饋' }) })
+    const primary = buttons.getByRole('button', { name: '主要操作' })
+    await primary.focus()
+    await page.keyboard.press('Enter')
+    await buttons.getByText('展示操作完成。').waitFor()
+    await page.keyboard.press('Tab')
+    if (!await page.evaluate(() => document.activeElement?.matches(':focus-visible'))) throw new Error('keyboard focus not visible')
+    if (!await buttons.getByRole('button', { name: '處理中…' }).isDisabled() || !await buttons.getByRole('button', { name: '停用' }).isDisabled()) throw new Error('disabled/loading button operable')
+    if (!await buttons.getByRole('button', { name: '圖示按鈕' }).count()) throw new Error('icon button lacks accessible name')
+    const toggle = buttons.getByRole('button', { name: '切換操作' })
+    await toggle.focus(); await page.keyboard.press('Space')
+    if (await toggle.getAttribute('aria-pressed') !== 'true') throw new Error('keyboard toggle did not update aria-pressed')
+    await primary.hover()
+    if (!await primary.evaluate(node => node.matches(':hover'))) throw new Error('hover state unavailable')
+    const rect = await primary.boundingBox()
+    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2); await page.mouse.down()
+    if (!await primary.evaluate(node => node.matches(':active'))) throw new Error('pressed state unavailable')
+    await page.mouse.up()
+
+    const inputs = page.locator('section.card').filter({ has: page.getByRole('heading', { name: '受控輸入矩陣' }) })
+    if (await inputs.locator('input,textarea,select').count() !== 11) throw new Error('input matrix missing controls') // 十種輸入，Radio 有兩個原生選項。
+    await inputs.getByRole('button', { name: '填寫' }).click()
+    if (await inputs.getByRole('textbox', { name: '文字', exact: true }).inputValue() !== '示範內容') throw new Error('filled text state missing')
+    if (!await inputs.getByRole('radio', { name: '選項 B' }).isChecked()) throw new Error('filled radio missing')
+    await inputs.getByRole('button', { name: '錯誤' }).click()
+    if (await inputs.locator('[aria-invalid=true]').count() < 10 || !await inputs.getByRole('alert').count()) throw new Error('error state missing semantic text')
+    if (viewport.name === 'mobile') await inputs.screenshot({ path: path.join(process.cwd(), 'docs/qa/v1_1/controls-input-mobile-error.png') })
+    await inputs.getByRole('button', { name: '停用' }).click()
+    if (!await inputs.getByRole('textbox', { name: '文字', exact: true }).isDisabled()) throw new Error('disabled input still operable')
+    await inputs.getByRole('button', { name: '載入' }).click()
+    if (await inputs.getByRole('textbox', { name: '文字', exact: true }).getAttribute('aria-busy') !== 'true') throw new Error('loading input not announced')
+
+    const panels = page.locator('section.card').filter({ has: page.getByRole('heading', { name: '面板、來源與未存退出' }) })
+    await panels.getByRole('button', { name: '開啟草稿面板' }).click()
+    await page.getByRole('dialog', { name: '草稿編輯面板' }).getByRole('textbox', { name: '草稿文字' }).fill('需保留的未存文字')
+    await page.keyboard.press('Escape')
+    await page.getByRole('dialog', { name: '未保存變更' }).waitFor()
+    if (viewport.name === 'mobile') await page.getByRole('dialog', { name: '未保存變更' }).screenshot({ path: path.join(process.cwd(), 'docs/qa/v1_1/controls-panel-mobile-unsaved.png') })
+    await page.keyboard.press('Escape')
+    if (await page.getByRole('dialog', { name: '草稿編輯面板' }).getByRole('textbox', { name: '草稿文字' }).inputValue() !== '需保留的未存文字') throw new Error('cancel exit lost draft')
+    await page.getByRole('button', { name: '模擬保存失敗' }).click()
+    await page.getByText('示範保存失敗；輸入仍保留', { exact: false }).waitFor()
+    await page.getByRole('dialog', { name: '草稿編輯面板' }).getByRole('button', { name: '保存此頁 fixture' }).click()
+    await page.getByRole('status').getByText('已保存此頁示範草稿').waitFor()
+    await panels.getByRole('button', { name: '開啟來源抽屜' }).click()
+    const drawer = page.getByRole('dialog', { name: '來源抽屜' })
+    if (!await drawer.evaluate(node => node.scrollHeight > node.clientHeight)) throw new Error('long drawer content cannot scroll')
+    await page.keyboard.press('Escape')
+    if (await drawer.count()) throw new Error('drawer Escape failed')
+    const status = page.locator('section.card').filter({ has: page.getByRole('heading', { name: '系統狀態與退路' }) })
+    for (const [button, message] of [['搜尋無結果', '搜尋沒有結果'], ['服務未設定', '示範服務未設定'], ['版本衝突', '版本衝突：本機輸入仍保留'], ['連線失敗', '示範連線失敗']]) {
+      await status.getByRole('button', { name: button, exact: true }).click()
+      await status.getByText(message, { exact: false }).waitFor()
+    }
+    if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error(`${viewport.name} horizontal overflow`)
+    await page.close()
+  }
+  console.log('v1.1 controls QA passed: keyboard button states, 10x6 inputs, unsaved exit, drawer, Toast and error paths.')
+} finally { await browser.close() }

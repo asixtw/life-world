@@ -19,12 +19,12 @@ export function StatusMessage({ tone, children }: { tone: 'info' | 'success' | '
   return <div className={`status status--${tone}`} role={tone === 'error' ? 'alert' : 'status'}>{children}</div> // 螢幕閱讀器可收到狀態。
 }
 
-export function Dialog({ title, open, onClose, children, variant = 'dialog' }: { title: string; open: boolean; onClose: () => void; children: ReactNode; variant?: 'dialog' | 'sheet' }) { // 展示面板可關閉並恢復焦點。
+export function Dialog({ title, open, onClose, children, variant = 'dialog' }: { title: string; open: boolean; onClose: () => void; children: ReactNode; variant?: 'dialog' | 'sheet' | 'drawer' }) { // 展示面板可關閉並恢復焦點。
   const closeRef = useRef<HTMLButtonElement>(null) // 記錄第一個可操作控制。
   const previousRef = useRef<HTMLElement | null>(null) // 關閉後回到原控制。
   useEffect(() => { if (!open) return; previousRef.current = document.activeElement as HTMLElement; closeRef.current?.focus(); const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); if (event.key === 'Tab') { const dialog = closeRef.current?.closest('[role=dialog]'); const focusable = [...(dialog?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href]') ?? [])]; if (!focusable.length) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() } } }; document.addEventListener('keydown', onKey); return () => { document.removeEventListener('keydown', onKey); previousRef.current?.focus() } }, [open, onClose]) // 監聽器與焦點隨面板清理。
   if (!open) return null // 關閉時從 DOM 移除 overlay。
-  return <div className={`dialog-backdrop ${variant === 'sheet' ? 'dialog-backdrop--sheet' : ''}`} onMouseDown={event => { if (event.target === event.currentTarget) onClose() }}><section className={`dialog ${variant === 'sheet' ? 'dialog--sheet' : ''}`} role="dialog" aria-modal="true" aria-label={title}><header className="dialog__head"><h2>{title}</h2><button ref={closeRef} className="icon-close" type="button" aria-label="關閉面板" onClick={onClose}>×</button></header>{children}</section></div> // 點背景與 Escape 均可退出。
+  return <div className={`dialog-backdrop dialog-backdrop--${variant}`} onMouseDown={event => { if (event.target === event.currentTarget) onClose() }}><section className={`dialog dialog--${variant}`} role="dialog" aria-modal="true" aria-label={title}><header className="dialog__head"><h2>{title}</h2><button ref={closeRef} className="icon-close" type="button" aria-label="關閉面板" onClick={onClose}>×</button></header>{children}</section></div> // 點背景與 Escape 均可退出。
 }
 
 
