@@ -24,4 +24,12 @@ for item in manifest['events']:  # 每個音檔單獨檢查。
     assert abs(duration - item['durationSeconds']) < .002  # 清單時長不可編造。
     assert abs(20 * math.log10(peak) - item['peakDbfs']) < .05  # 量化後峰值近似清單值。
     assert peak < .5 and peak > .05  # 峰值保留餘裕且非無聲檔。
-print('Verified 10 true 48 kHz PCM WAV candidates; metadata, hashes, durations and peaks match. AAC/M4A/Ogg and listening approval pending.')  # 範圍清楚。
+    if 'playbackVersions' in item:  # 僅在真正產出播放版後查驗。
+        for fmt, signature in [('m4a', b'ftyp'), ('ogg', b'OggS')]:
+            version = item['playbackVersions'][fmt]  # 清單需包含各格式真路徑。
+            playback = root / version['path']  # 不讀目錄外資料。
+            data = playback.read_bytes()  # 避免只核路徑而漏掉空檔。
+            assert len(data) == version['bytes'] and hashlib.sha256(data).hexdigest() == version['sha256']  # 真檔核對。
+            assert (signature in data[:16]) if fmt == 'm4a' else data.startswith(signature)  # 容器檔頭。
+            assert version['sampleRate'] == 48_000  # 轉碼參數與清單一致，解碼由瀏覽器另驗。
+print('Verified 10 true 48 kHz PCM WAV candidates and available playback files; Boyi listening approval pending.')  # 範圍清楚。

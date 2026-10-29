@@ -786,12 +786,12 @@
   },
   "audioCandidates": {
     "manifestPath": "audio-candidates/manifest.json",
-    "status": "ten_original_48khz_wav_candidates_aac_m4a_ogg_and_listening_review_pending",
+    "status": "ten_original_48khz_wav_candidates_with_m4a_ogg_playback_versions_boyi_listening_pending",
     "usageScope": "product_candidate",
     "method": "deterministic_python_numpy_additive_synthesis",
     "events": ["ui-tap", "draft-saved", "experience-confirmed", "first-hatch", "goal-completed"],
     "candidatesPerEvent": 2,
-    "playbackFormatsPending": ["AAC/M4A", "Ogg"],
+    "playbackFormats": ["AAC/M4A", "Ogg Vorbis"],
     "defaultEnabled": false,
     "quietMuted": true
   },

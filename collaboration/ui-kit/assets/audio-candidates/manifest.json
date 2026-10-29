@@ -1,11 +1,11 @@
 {
-  "version": "v1.1-candidate-wav-only",
+  "version": "v1.1-candidate-three-formats",
   "method": "Original deterministic Python 3.12 + NumPy additive synthesis",
   "sampleRate": 48000,
   "channels": 1,
   "format": "PCM 16-bit WAV",
   "usageScope": "product_candidate",
-  "status": "WAV candidates only; AAC/M4A and Ogg not produced; Boyi listening review pending",
+  "status": "WAV + AAC/M4A + Ogg candidates; browser decode and Boyi listening review pending",
   "events": [
     {
       "id": "ui-tap-01",
@@ -18,10 +18,22 @@
       "rmsDbfs": -24.85,
       "bytes": 13484,
       "sha256": "16074a5102d548e63f61ff48959ce067d36e69a9e38a4887a4c2987583ef8317",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/ui-tap-01.m4a",
+          "bytes": 1936,
+          "sha256": "89b2f825871f9eefd3a59459fdab25eab257297fda5f756d201fd7333857d809",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/ui-tap-01.ogg",
+          "bytes": 4308,
+          "sha256": "9314ccd0f9bc32e7cb7fa771355cf15b9cdb400fa873c4acf2798015350c3f90",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "ui-tap-02",
@@ -34,10 +46,22 @@
       "rmsDbfs": -24.3,
       "bytes": 17324,
       "sha256": "a5d842381318bff19a694e351d13bebd3fabeb5ee61e53a6a0e0e7b5981ba3b3",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/ui-tap-02.m4a",
+          "bytes": 2407,
+          "sha256": "65ce6987977129d19e563153172249c3449d1ff75d25fc4be1ad7ddffbf1ad09",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/ui-tap-02.ogg",
+          "bytes": 4643,
+          "sha256": "a90470382a123f5b4f9ba028f7253b249135474e364e8cae6c8e875b4ab51faf",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "draft-saved-01",
@@ -50,10 +74,22 @@
       "rmsDbfs": -23.26,
       "bytes": 45164,
       "sha256": "25b6bd60c41d2a69674aa7b46e98c04955e50a84497bb9c5cce5fc595aaae81d",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/draft-saved-01.m4a",
+          "bytes": 5660,
+          "sha256": "4d3aad212f401a6db7820fd1debdbae6402c0eee1294c03ce0226298c1bc2644",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/draft-saved-01.ogg",
+          "bytes": 5978,
+          "sha256": "c537a8d707d609e7e88cbec47e29d08f60ef6f3a7c7b29a3ca11c5b69ccc3639",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "draft-saved-02",
@@ -66,10 +102,22 @@
       "rmsDbfs": -23.36,
       "bytes": 49964,
       "sha256": "1f7efa91caab1af41cefeaff1f2910821e46b4559fec4fcb442d0ef7aa49a9f9",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/draft-saved-02.m4a",
+          "bytes": 6040,
+          "sha256": "57e0561fa35d16437392fc495ddea010cd3789acd77bc162c2637c68cf51a491",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/draft-saved-02.ogg",
+          "bytes": 6150,
+          "sha256": "40df7d676153915bd776d2c4590e4741c7dc8cb1c4855277baeb25ee9d226b5d",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "experience-confirmed-01",
@@ -82,10 +130,22 @@
       "rmsDbfs": -24.03,
       "bytes": 73004,
       "sha256": "f0fcb6938cfca0f37bb23e222650337fb1d21e4c6cf5d018a42076704fd6476c",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/experience-confirmed-01.m4a",
+          "bytes": 8822,
+          "sha256": "e3c3f247e866d6a8218f70c7cff42d799f0fa94930290f869e3a7d05c0fb1881",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/experience-confirmed-01.ogg",
+          "bytes": 7469,
+          "sha256": "ac08142ccecb15f1ac2afe878d56373ab6ab2196c510b2809a20bb967ff63a4c",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "experience-confirmed-02",
@@ -98,10 +158,22 @@
       "rmsDbfs": -24.15,
       "bytes": 78764,
       "sha256": "32f590524acf306400215cc94e4617996966c9d3b0145084866c7dc9cd74f2a5",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/experience-confirmed-02.m4a",
+          "bytes": 9330,
+          "sha256": "873dd1bcafafff106562da36607007e899cea0e687cf373022d95512c4cff9e0",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/experience-confirmed-02.ogg",
+          "bytes": 7412,
+          "sha256": "aed11bc8a741ca8d3c127ce861a76ae51b3b7556b7192a5d57e0ecc62ef3fd5d",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "first-hatch-01",
@@ -114,10 +186,22 @@
       "rmsDbfs": -23.75,
       "bytes": 155564,
       "sha256": "5963b2378b4e1cf41f4c7eca01899b9b3283ba1b240a3a9fb13f5768aecdf5cc",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/first-hatch-01.m4a",
+          "bytes": 18924,
+          "sha256": "30e7772625c24179c264ec97abc119f342f524fb1e344a7c9b54f5c0d3de9a8f",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/first-hatch-01.ogg",
+          "bytes": 11512,
+          "sha256": "88ec99f5ffbe91150bf50c88322ceb5fce248dacb859f91c13409fa6ba19a6cf",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "first-hatch-02",
@@ -130,10 +214,22 @@
       "rmsDbfs": -23.86,
       "bytes": 169004,
       "sha256": "c1d8efc8cb98a536a416fc4e0af8edffdaf6fe613c026965ff352922881245b4",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/first-hatch-02.m4a",
+          "bytes": 19252,
+          "sha256": "e903bd36dbe550a0952725463464c6c08fce590a2152d25e37c5defbbe852944",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/first-hatch-02.ogg",
+          "bytes": 11973,
+          "sha256": "5a65569c36a0c0d2423ed00e7417dbdb1920e962d047932635ccdc998c7a5b4f",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "goal-completed-01",
@@ -146,10 +242,22 @@
       "rmsDbfs": -24.7,
       "bytes": 113324,
       "sha256": "ac0b3b5197abe5a1709c95caa4ffa62d7ca5747c3eb400b0ba5a54f1d83efc8a",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/goal-completed-01.m4a",
+          "bytes": 12400,
+          "sha256": "a86db123f3cbf41613be9ae34f5f0cfe9ad04274b367c418f4ce5c0b8095cfc5",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/goal-completed-01.ogg",
+          "bytes": 9292,
+          "sha256": "c00198bd3c70110719eced57cca7229ac806fb1e2918f0d1b79996a5a8f19914",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     },
     {
       "id": "goal-completed-02",
@@ -162,10 +270,27 @@
       "rmsDbfs": -24.49,
       "bytes": 122924,
       "sha256": "6019e9cc09827fd29fd6d2961f1ab2961d5ec871f116c6bb7e662826cc028120",
-      "playbackFormatsPending": [
-        "AAC/M4A",
-        "Ogg"
-      ]
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/goal-completed-02.m4a",
+          "bytes": 13358,
+          "sha256": "70030b3937748c4ffd815edba2df947f0ebd1258e3f0aa290ade5c1cfdf9f499",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/goal-completed-02.ogg",
+          "bytes": 9464,
+          "sha256": "6572fb3a54fe3558ce26a007f60ba9480221bae093bea1d7d942388890a67281",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
     }
-  ]
+  ],
+  "playbackEncoder": {
+    "version": "ffmpeg version n4.4.4-6-gd5fa6e3a91 Copyright (c) 2000-2023 the FFmpeg developers",
+    "aac": "FFmpeg native AAC, 96 kbps, mono",
+    "ogg": "FFmpeg experimental native Vorbis, 96 kbps, stereo duplicated from mono"
+  }
 }
