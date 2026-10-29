@@ -26,6 +26,9 @@ try { // 確保測試失敗也會關閉瀏覽器。
   await page.getByRole('textbox', { name: '更正行動名稱' }).fill('整理研究') // 名稱可修正。
   if (!await page.getByText('固定單位：次', { exact: false }).count()) throw new Error('Habit unit changed with name') // 單位保持固定。
   await schedule.getByLabel('檢視').selectOption('week') // 真正切換週檢視。
+  const monday = await schedule.locator('.month-schedule__navigation strong').innerText()
+  const firstWeekCell = await schedule.locator('.month-schedule__day').first().getAttribute('aria-label')
+  if (!firstWeekCell?.startsWith(monday)) throw new Error(`week grid Monday mismatch: ${monday} / ${firstWeekCell}`) // 固定週一欄不能顯示今天週四。
   await page.screenshot({ path: path.join(folder, 'mobile-p0-schedule-390x844.png'), fullPage: true }) // 新畫面真實 PNG。
   if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error('mobile schedule overflow') // 手機七欄不可橫溢。
   await page.getByRole('navigation', { name: '手機展示導覽' }).getByRole('button', { name: '紀錄', exact: true }).click() // 進入媒體候選。

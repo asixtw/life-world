@@ -26,7 +26,20 @@ export function calendarCells(cursor: string): (string | null)[] { // 依實際�
   const count = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate() // 當月真實天數。
   return [...Array<string | null>(pad).fill(null), ...Array.from({ length: count }, (_, index) => `${cursor}-${String(index + 1).padStart(2, '0')}`)] // 不補虛構可選日。
 } // 格子不是固定四列。
+export function weekStart(cursor: string): string { // 任何民用日期都對齊該週星期一。
+  if (!validDay(cursor)) return '' // 無效日期不產生假週。
+  const date = civil(cursor) // UTC 正午避免時區的午夜切換。
+  date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 6) % 7) // 星期日向前六日。
+  return isoDay(date)
+}
+export function weekCells(cursor: string): string[] { // 欄頭一至日必須對應真實星期。
+  const first = weekStart(cursor)
+  if (!first) return []
+  const last = civil(first)
+  last.setUTCDate(last.getUTCDate() + 6)
+  return daysInPeriod(first, isoDay(last))
+}
 export function nextCycle(cursor: string, cycle: Cycle, amount: number): string { // 導覽不修改保存期間。
   if (cycle === 'month') { const date = civil(`${cursor}-01`); date.setUTCMonth(date.getUTCMonth() + amount); return isoDay(date).slice(0, 7) } // 月份保持月首錨點。
-  const date = civil(cursor); date.setUTCDate(date.getUTCDate() + amount * 7); return isoDay(date) // 週視圖以起始日移動七日。
+  const first = weekStart(cursor); if (!first) return ''; const date = civil(first); date.setUTCDate(date.getUTCDate() + amount * 7); return isoDay(date) // 週視圖先對齊週一再移動七日。
 } // 週跨月、跨年仍可用。

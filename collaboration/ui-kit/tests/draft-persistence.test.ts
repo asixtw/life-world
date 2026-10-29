@@ -22,4 +22,13 @@ describe('v1.1 owner 草稿隔離', () => { // 此測試不接正式帳號或資
     const retried = await retryMaterialLink(store, failed.draft, 'material-1', async () => {}) // 同一 draftId 重試。
     expect(retried).toMatchObject({ draft: { draftId: 'draft-1', revision: 2, text: '已寫文字', materials: ['material-1'] }, linkError: null }) // 無新草稿或重複連結。
   }) // 正式上傳與連結 API 待 Jerry 審查。
+  it('真 Blob 與原文、校對文字綁在同一 owner 草稿', async () => { // 不只儲存 fixture-material 字串。
+    const store = new MemoryDraftRepository()
+    const source = { id: 'local-image', name: 'mine.png', kind: 'image' as const, mimeType: 'image/png', sizeBytes: 4, blob: new Blob(['real'], { type: 'image/png' }) }
+    await store.save({ ownerId: 'demo-a', draftId: 'draft-1', revision: 0, text: '人工校對', originalTranscript: '辨識原文', reviewed: true, source, materials: [] }, 0)
+    expect(await store.load('demo-b', 'draft-1')).toBeNull()
+    const restored = await store.load('demo-a', 'draft-1')
+    expect(restored).toMatchObject({ text: '人工校對', originalTranscript: '辨識原文', reviewed: true, source: { name: 'mine.png' } })
+    expect(await restored?.source?.blob?.text()).toBe('real')
+  })
 }) // 純函式測試與真 IndexedDB 瀏覽器測試分開。

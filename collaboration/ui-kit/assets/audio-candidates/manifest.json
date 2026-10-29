@@ -13,23 +13,23 @@
       "candidate": 1,
       "path": "wav/ui-tap-01.wav",
       "description": "柔和單擊",
-      "durationSeconds": 0.14,
+      "durationSeconds": 0.08,
       "peakDbfs": -12.4,
-      "rmsDbfs": -24.85,
-      "bytes": 13484,
-      "sha256": "16074a5102d548e63f61ff48959ce067d36e69a9e38a4887a4c2987583ef8317",
+      "rmsDbfs": -24.29,
+      "bytes": 7724,
+      "sha256": "02eea828728dd0a01a2a5390adb37380c69910ffed3cf6747b5ec0fbeca0e476",
       "playbackVersions": {
         "m4a": {
           "path": "m4a/ui-tap-01.m4a",
-          "bytes": 1936,
-          "sha256": "89b2f825871f9eefd3a59459fdab25eab257297fda5f756d201fd7333857d809",
+          "bytes": 1717,
+          "sha256": "1361f1a8189efc962c2318a6477b99af205ec7a548898ea76d9a34b1b0cc01ba",
           "sampleRate": 48000,
           "channels": 1
         },
         "ogg": {
           "path": "ogg/ui-tap-01.ogg",
-          "bytes": 4308,
-          "sha256": "9314ccd0f9bc32e7cb7fa771355cf15b9cdb400fa873c4acf2798015350c3f90",
+          "bytes": 3953,
+          "sha256": "fd00ee4072759f9959f45ba4e66bfb4ce32d26eb56a6614df6da44099deccf74",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -41,23 +41,23 @@
       "candidate": 2,
       "path": "wav/ui-tap-02.wav",
       "description": "雙層輕觸",
-      "durationSeconds": 0.18,
+      "durationSeconds": 0.09,
       "peakDbfs": -12.4,
-      "rmsDbfs": -24.3,
-      "bytes": 17324,
-      "sha256": "a5d842381318bff19a694e351d13bebd3fabeb5ee61e53a6a0e0e7b5981ba3b3",
+      "rmsDbfs": -24.11,
+      "bytes": 8684,
+      "sha256": "2dc79d22e25d9a79e68653295bfe888d7436a07e90b52868d2c684d4e23f55a6",
       "playbackVersions": {
         "m4a": {
           "path": "m4a/ui-tap-02.m4a",
-          "bytes": 2407,
-          "sha256": "65ce6987977129d19e563153172249c3449d1ff75d25fc4be1ad7ddffbf1ad09",
+          "bytes": 1835,
+          "sha256": "efefc428cee502c962a6bcaf4cf218ac500b354244791b25502a4fcc434ae789",
           "sampleRate": 48000,
           "channels": 1
         },
         "ogg": {
           "path": "ogg/ui-tap-02.ogg",
-          "bytes": 4643,
-          "sha256": "a90470382a123f5b4f9ba028f7253b249135474e364e8cae6c8e875b4ab51faf",
+          "bytes": 4226,
+          "sha256": "8e5abb3aec9bbf8fa45c1a1c0c96c026307d4b1980818e051d83f8af074a78a7",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -69,23 +69,23 @@
       "candidate": 1,
       "path": "wav/draft-saved-01.wav",
       "description": "上行兩音",
-      "durationSeconds": 0.47,
+      "durationSeconds": 0.28,
       "peakDbfs": -12.4,
-      "rmsDbfs": -23.26,
-      "bytes": 45164,
-      "sha256": "25b6bd60c41d2a69674aa7b46e98c04955e50a84497bb9c5cce5fc595aaae81d",
+      "rmsDbfs": -23.16,
+      "bytes": 26924,
+      "sha256": "9b0c8a1c377da8bd35f82c4e75c40d5b9c1d25ed2517ad69e4bfefca6308b057",
       "playbackVersions": {
         "m4a": {
           "path": "m4a/draft-saved-01.m4a",
-          "bytes": 5660,
-          "sha256": "4d3aad212f401a6db7820fd1debdbae6402c0eee1294c03ce0226298c1bc2644",
+          "bytes": 3715,
+          "sha256": "14e54b3a17dd988154155587757c28640645d3f0e4be973af0f5accfbe0d64db",
           "sampleRate": 48000,
           "channels": 1
         },
         "ogg": {
           "path": "ogg/draft-saved-01.ogg",
-          "bytes": 5978,
-          "sha256": "c537a8d707d609e7e88cbec47e29d08f60ef6f3a7c7b29a3ca11c5b69ccc3639",
+          "bytes": 5075,
+          "sha256": "23116b820d7d4a0754fa3e53e6ff1852edf7374d66aa889c4bea5c7504bdbbdd",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -97,23 +97,23 @@
       "candidate": 2,
       "path": "wav/draft-saved-02.wav",
       "description": "低暖兩音",
-      "durationSeconds": 0.52,
+      "durationSeconds": 0.33,
       "peakDbfs": -12.4,
-      "rmsDbfs": -23.36,
-      "bytes": 49964,
-      "sha256": "1f7efa91caab1af41cefeaff1f2910821e46b4559fec4fcb442d0ef7aa49a9f9",
+      "rmsDbfs": -23.67,
+      "bytes": 31724,
+      "sha256": "0775c1e69031a37d2ac07497505657c399dd167581b0eb5ba8e76f31aff5a8aa",
       "playbackVersions": {
         "m4a": {
           "path": "m4a/draft-saved-02.m4a",
-          "bytes": 6040,
-          "sha256": "57e0561fa35d16437392fc495ddea010cd3789acd77bc162c2637c68cf51a491",
+          "bytes": 4331,
+          "sha256": "0a848d5e4d43c22528da3218cf10117498b81293962ced6b8dc73c3e8f76db4c",
           "sampleRate": 48000,
           "channels": 1
         },
         "ogg": {
           "path": "ogg/draft-saved-02.ogg",
-          "bytes": 6150,
-          "sha256": "40df7d676153915bd776d2c4590e4741c7dc8cb1c4855277baeb25ee9d226b5d",
+          "bytes": 5311,
+          "sha256": "9c92fa8a806329d03570ccbf575fa9fabf17200697c1ea11bb1aec2ab0052a43",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -141,7 +141,7 @@
         "ogg": {
           "path": "ogg/experience-confirmed-01.ogg",
           "bytes": 7469,
-          "sha256": "ac08142ccecb15f1ac2afe878d56373ab6ab2196c510b2809a20bb967ff63a4c",
+          "sha256": "9c155754f1b371ec255d23c9fbd7a43d5277e19828f0dfa56fce93bc849f70c2",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -153,23 +153,23 @@
       "candidate": 2,
       "path": "wav/experience-confirmed-02.wav",
       "description": "緩升和聲",
-      "durationSeconds": 0.82,
+      "durationSeconds": 0.78,
       "peakDbfs": -12.4,
-      "rmsDbfs": -24.15,
-      "bytes": 78764,
-      "sha256": "32f590524acf306400215cc94e4617996966c9d3b0145084866c7dc9cd74f2a5",
+      "rmsDbfs": -23.94,
+      "bytes": 74924,
+      "sha256": "13b219fdb03181dc83e5d29ecde50015f322b5c8bd594e51095c936c6e8dff37",
       "playbackVersions": {
         "m4a": {
           "path": "m4a/experience-confirmed-02.m4a",
-          "bytes": 9330,
-          "sha256": "873dd1bcafafff106562da36607007e899cea0e687cf373022d95512c4cff9e0",
+          "bytes": 9314,
+          "sha256": "19cf0735a471a25ce1bb3c9f459bfe9e0330bd44dcb1fee0e0bad04183891da4",
           "sampleRate": 48000,
           "channels": 1
         },
         "ogg": {
           "path": "ogg/experience-confirmed-02.ogg",
-          "bytes": 7412,
-          "sha256": "aed11bc8a741ca8d3c127ce861a76ae51b3b7556b7192a5d57e0ecc62ef3fd5d",
+          "bytes": 7350,
+          "sha256": "47af6b12d7e9ff4a4e79af43eed6860b2e6594699200ff246ca2e9b97966c547",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -197,7 +197,7 @@
         "ogg": {
           "path": "ogg/first-hatch-01.ogg",
           "bytes": 11512,
-          "sha256": "88ec99f5ffbe91150bf50c88322ceb5fce248dacb859f91c13409fa6ba19a6cf",
+          "sha256": "f038c2ed8a80166d9cd2504d3e372fe4e8f807328c5d6e0f0e63a2fce20e6bc3",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -225,7 +225,7 @@
         "ogg": {
           "path": "ogg/first-hatch-02.ogg",
           "bytes": 11973,
-          "sha256": "5a65569c36a0c0d2423ed00e7417dbdb1920e962d047932635ccdc998c7a5b4f",
+          "sha256": "b0a6ba10bf61c587d3b2a617aa23634deb897930cf4ffaf93a758285c2d38621",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -253,7 +253,7 @@
         "ogg": {
           "path": "ogg/goal-completed-01.ogg",
           "bytes": 9292,
-          "sha256": "c00198bd3c70110719eced57cca7229ac806fb1e2918f0d1b79996a5a8f19914",
+          "sha256": "61b5a028ead0eb72f772224a03ae1753b58c918b1ca01a140ccd9628aed4ab94",
           "sampleRate": 48000,
           "channels": 2
         }
@@ -281,7 +281,7 @@
         "ogg": {
           "path": "ogg/goal-completed-02.ogg",
           "bytes": 9464,
-          "sha256": "6572fb3a54fe3558ce26a007f60ba9480221bae093bea1d7d942388890a67281",
+          "sha256": "df43153889dd3ab5b569088182dae86d72f2037db4d3fdd5039ad2a972960034",
           "sampleRate": 48000,
           "channels": 2
         }

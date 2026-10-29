@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react' // 控制孵化階段與計�
 import type { HatchEvent, HatchStage } from './contracts' // 對外只回報展示事件。
 import { Button, Card, StatusMessage } from './components' // 沿用可鍵盤操作的元件。
 import { planHatchSkip, planHatchStart, planHatchUnmount } from './hatch-machine' // 純函式固定回執與事件順序。
+import { poseArt, shellArt } from './LumiPoses' // 兩殼片與無殼 Lumi 各自載入。
 
 export const stages: HatchStage[] = ['idle', 'glow', 'crack', 'deepcrack', 'open', 'complete'] // 固定狀態對應資產圖層。
 export const stageLabels: Record<HatchStage, string> = { idle: '目標蛋待開始', glow: '蛋殼微光', crack: '裂紋逐漸清晰', deepcrack: '裂紋加深', open: '蛋殼已分離', complete: 'Lumi 孵化完成' } // 固定六階段含獨立深裂、分離與完成。
-export const artByStage: Record<HatchStage, string> = { idle: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-rest-v1@512.png', import.meta.url).href, glow: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-softglow-v1@512.png', import.meta.url).href, crack: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-initialcrack-v1@512.png', import.meta.url).href, deepcrack: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-deepcrack-v1@512.png', import.meta.url).href, open: new URL('../assets/shared-art/additions-20261029/originals/lw-egg-shellsplit-v2.png', import.meta.url).href, complete: new URL('../assets/shared-art/additions-20261029/originals/lw-lumi-completion-v2.png', import.meta.url).href } // 靜態路徑讓 Vite 打包真實圖片；原稿不改像素，以 contain 呈現。
+export const artByStage: Record<HatchStage, string> = { idle: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-rest-v1@512.png', import.meta.url).href, glow: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-softglow-v1@512.png', import.meta.url).href, crack: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-initialcrack-v1@512.png', import.meta.url).href, deepcrack: new URL('../assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-deepcrack-v1@512.png', import.meta.url).href, open: poseArt.confirmed, complete: poseArt.celebrate } // 開殼與完成改用無殼角色；殼片另由獨立層裝配。
 
 export function HatchArt({ stage, still = true }: { stage: HatchStage; still?: boolean }) { // 與狀態檢視共用同一渲染器，不另造截圖用美術。
-  return <div className={`hatch-art hatch-art--${stage} ${still ? 'hatch-art--still' : ''}`} role="img" aria-label={stageLabels[stage]}><img className="hatch-asset" src={artByStage[stage]} alt="" /></div> // 完整透明畫布置中，預留完成圖兩側安全邊距。
+  return <div className={`hatch-art hatch-art--${stage} ${still ? 'hatch-art--still' : ''}`} role="img" aria-label={stageLabels[stage]}>{stage === 'open' || stage === 'complete' ? <div className="hatch-composite"><img className="hatch-composite__lumi" src={artByStage[stage]} alt="" /><img className="hatch-composite__left" src={shellArt.left} alt="" /><img className="hatch-composite__right" src={shellArt.right} alt="" /></div> : <img className="hatch-asset" src={artByStage[stage]} alt="" />}</div> // 真左右殼分別裝配；原生尺寸與錨點差異仍待審查。
 } // 純展示不產生回執或積分。
 
 export function Hatch({ confirmedReceiptId, quiet, reducedMotion, onEvent }: { confirmedReceiptId?: string; quiet: boolean; reducedMotion: boolean; onEvent?: (event: HatchEvent) => void }) { // 回執由宿主傳入，元件不確認目標。

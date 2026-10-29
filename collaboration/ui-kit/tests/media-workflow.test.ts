@@ -52,4 +52,17 @@ describe('v1.1 媒體草稿契約', () => { // mock 只驗本機邏輯，不冒�
     await pending // 讓回呼完成。
     expect(flow.snapshot()).toMatchObject({ originalTranscript: '晚到原文', editedTranscript: '', reviewed: false }) // 原文和人工校對分離。
   }) // 避免辨識覆蓋人工選擇。
+  it('保存 A 等待中編輯 B，不把 B 錯標為已保存', async () => { // 保存回應只對提交當下的版本有效。
+    let release!: (version: number) => void
+    const pendingVersion = new Promise<number>(resolve => { release = resolve })
+    let savedText = ''
+    const flow = new MediaWorkflow({ upload: async () => 'receipt', recognize: async () => '', save: async snapshot => { savedText = snapshot.editedTranscript; return pendingVersion } })
+    flow.editTranscript('A')
+    const pending = flow.saveDraft()
+    flow.editTranscript('B')
+    release(2)
+    await pending
+    expect(savedText).toBe('A')
+    expect(flow.snapshot()).toMatchObject({ editedTranscript: 'B', version: 2, phase: 'review', error: 'edited-during-save' })
+  })
 }) // 不接觸正式人物、進度或獎勵。

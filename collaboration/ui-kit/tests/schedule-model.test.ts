@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest' // 先寫排程行為契約，再補實作。
-import { calendarCells, datesForPreset, daysInPeriod, nextCycle, todayInZone, validatePeriod } from '../src/schedule-model' // 驗證實際日期及期間邊界。
+import { calendarCells, datesForPreset, daysInPeriod, nextCycle, todayInZone, validatePeriod, weekStart, weekCells } from '../src/schedule-model' // 驗證實際日期及期間邊界。
 
 describe('v1.1 排程純函式', () => { // 月份只作檢視，不自動產生期限。
   it('跨閏年、短月與年界正確列日期', () => { // 避免固定二十八格。
@@ -17,4 +17,10 @@ describe('v1.1 排程純函式', () => { // 月份只作檢視，不自動產生
     expect(validatePeriod('2028-03-01', '2028-02-29')).toBe(false) // 不允許倒置期間。
     expect(todayInZone('Asia/Taipei', new Date('2027-12-31T17:00:00Z'))).toBe('2028-01-01') // 台北已跨年。
   }) // 目標時區由宿主提供。
+  it('任意游標在週檢視都對齊週一並能跨月年', () => { // 不能把週四畫在週一欄。
+    expect(weekStart('2026-10-29')).toBe('2026-10-26')
+    expect(weekCells('2026-10-29')).toEqual(['2026-10-26','2026-10-27','2026-10-28','2026-10-29','2026-10-30','2026-10-31','2026-11-01'])
+    expect(weekCells('2028-01-01')).toEqual(['2027-12-27','2027-12-28','2027-12-29','2027-12-30','2027-12-31','2028-01-01','2028-01-02'])
+    expect(nextCycle('2026-10-29', 'week', 1)).toBe('2026-11-02')
+  })
 }) // 純函式測試不接正式保存。

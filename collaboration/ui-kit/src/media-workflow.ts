@@ -14,7 +14,7 @@ export class MediaWorkflow { // 隔離 fixture 的可取消流程，不呼叫正
   private active(id: number) { return id === this.generation } // 晚回應不能覆寫新草稿。
   select(source: LocalSource) { const reason = this.validateSource?.(source); if (reason) { this.publish({ phase: 'error', error: reason }); return } this.cancel(); this.publish({ source: { ...source }, materialReceipt: null, originalTranscript: '', reviewed: false, phase: 'ready', error: null }) } // 拒絕不清空舊素材或草稿。
   remove() { this.cancel(); this.publish({ source: null, materialReceipt: null, originalTranscript: '', reviewed: false, phase: 'idle', error: null }) } // 其他人工文字仍保留。
-  editTranscript(value: string) { this.editRevision++; this.publish({ editedTranscript: value, reviewed: false, phase: this.state.phase === 'saved' ? 'review' : this.state.phase }) } // 修改必須重新校對，包含清空。
+  editTranscript(value: string) { this.editRevision++; this.publish({ editedTranscript: value, reviewed: false, phase: ['saved', 'saving'].includes(this.state.phase) ? 'review' : this.state.phase }) } // 保存中編輯也回待校對，不把新文字標成已存。
   markReviewed() { if (this.state.editedTranscript.trim()) this.publish({ reviewed: true, phase: 'review' }) } // 不自動確認人物或成果。
   cancel() { this.generation++; this.controller?.abort(); this.controller = null; if (['uploading', 'recognizing', 'saving'].includes(this.state.phase)) this.publish({ phase: this.state.materialReceipt ? 'uploaded' : this.state.source ? 'ready' : 'idle', error: null }) } // 取消本機等待，正式伺服器狀態仍需宿主核對。
   async uploadSelected() { // 明確按下上傳才呼叫 adapter。
@@ -28,7 +28,7 @@ export class MediaWorkflow { // 隔離 fixture 的可取消流程，不呼叫正
     try { const original = await this.adapter.recognize(this.state.materialReceipt, signal); if (this.active(id)) this.publish({ originalTranscript: original, editedTranscript: editAtStart === 0 && this.editRevision === 0 ? original : this.state.editedTranscript, reviewed: false, phase: 'review' }) } catch (error) { if (this.active(id)) this.publish({ phase: 'error', error: error instanceof Error ? error.message : 'recognition-failed' }) } // 辨識原文可更新，人工文字即使為空也保留。
   } // 取消後晚回應由世代識別擋下。
   async saveDraft() { // 儲存僅交宿主 adapter，版本不自行增加。
-    const { id, signal } = this.begin(); this.publish({ phase: 'saving', error: null }) // 明示正在保存。
-    try { const version = await this.adapter.save(this.snapshot(), signal); if (this.active(id)) this.publish({ version, phase: 'saved' }) } catch (error) { if (this.active(id)) this.publish({ phase: 'error', error: error instanceof Error ? error.message : 'save-failed' }) } // 衝突保留所有編輯及舊版本。
+    const { id, signal } = this.begin(); const editAtStart = this.editRevision; this.publish({ phase: 'saving', error: null }) // 記錄送出文字版本。
+    try { const version = await this.adapter.save(this.snapshot(), signal); if (this.active(id)) this.publish(editAtStart === this.editRevision ? { version, phase: 'saved' } : { version, phase: 'review', reviewed: false, error: 'edited-during-save' }) } catch (error) { if (this.active(id)) this.publish({ phase: 'error', error: error instanceof Error ? error.message : 'save-failed' }) } // 舊版成功不代表等待中的新編輯已存。
   } // 正式提交、計分與人物建立不屬此流程。
 } // 此模組可由正式容器接真能力，但未宣稱已接入。

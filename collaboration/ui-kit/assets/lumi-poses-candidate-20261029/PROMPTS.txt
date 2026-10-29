@@ -1,0 +1,10 @@
+REFERENCE CHARACTER: originals/lw-lumi-companion-v1.png from prior delivered shared-art kit; inspected before edits. REFERENCE SHELL: lw-egg-shellsplit-v2.png from 2026-10-29 additions; inspected before edits.
+Built-in image_gen; true transparent_background=true; one reference and one output per call.
+Shared character constraints: preserve ivory egg body, two sage leaves, dark green eyes, tiny flat gold beak, mint wings, soft flat shading; no shell, props, glow, shadow, text. Desired square1254 canvas, bodybottom627,1030, leaftop240; all intact.
+welcome: right wing raised higher gentle wave, left relaxed.
+listening: slight5degree lean viewer-left, bothwings relaxed, attentive openeyes.
+confirmed: both wings extended diagonally downward/outward, happy upcurved eye arcs, light restrained happiness.
+celebrate: bothwings raised diagonal upward V, happy eye arcs, grounded body.
+shell-left: one independent quarter bowl shard tipped left, cream exterior beige interior goldfinecracks, sage botanicalfragment; desired bbox250..610,790..1040; rest transparent.
+shell-right: one independent quarter bowl shard tipped right; samepalette; desired bbox645..1005,790..1040; rest transparent.
+Actual outcomes differ in scale/placement from desired prompts. See manifest measured bbox.

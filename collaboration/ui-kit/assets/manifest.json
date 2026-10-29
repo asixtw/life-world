@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_commit": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
-  "status": "v1_1_independent_candidate_world_native_pending_target_exports_and_review",
+  "status": "v1_1_independent_candidate_world_lumi_audio_pending_exports_and_review",
   "shared_art_runtime_library_id": "libfile_c1337d18a09081918aaa69c3951f8e1c",
   "shared_art_originals_library_id": "libfile_5fb88fe851e8819198ee4243b4e37f07",
   "assets": [
@@ -764,6 +764,18 @@
       "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
     }
   ],
+  "lumiPoseCandidates": {
+    "manifestPath": "lumi-poses-candidate-20261029/manifest.json",
+    "libraryId": "libfile_2bc372f039108191add7f621757a2178",
+    "usageScope": "product_candidate",
+    "status": "six_original_poses_and_independent_left_right_shell_integrated_anchor_and_exports_pending",
+    "originalSize": [1254, 1254],
+    "poseIds": ["idle", "quiet", "welcome", "listening", "confirmed", "celebrate"],
+    "shellIds": ["shell-left", "shell-right"],
+    "targetDisplaySizesProduced": false,
+    "uniformAnchorVerified": false,
+    "pairedShellClosureVerified": false
+  },
   "worldCandidates": {
     "usageScope": "product_candidate",
     "status": "native_sources_integrated_pending_target_exports_and_boyi_jerry_review",
@@ -798,7 +810,7 @@
   "deferred": [
     {
       "id": "lw-world-base-v1",
-      "reason": "使用者指定其他組員依賴先延後，未生成。"
+        "reason": "舊版 ID 未生成；v1.1 另有 worldCandidates 日間／Quiet 候選接入，但指定尺寸仍未達標。"
     }
   ]
 }

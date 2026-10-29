@@ -1,8 +1,9 @@
-export type DraftRecord = { ownerId: string; draftId: string; revision: number; text: string; materials: string[] } // owner、draft 與版本共同界定草稿。
+export type StoredSource = { id: string; name: string; kind: 'image' | 'audio' | 'business-card' | 'file'; mimeType?: string; sizeBytes?: number; blob?: Blob } // 真本機素材可由 IndexedDB structured clone 保存。
+export type DraftRecord = { ownerId: string; draftId: string; revision: number; text: string; materials: string[]; source?: StoredSource | null; originalTranscript?: string; reviewed?: boolean } // owner、draft、素材與版本共同界定草稿。
 export interface DraftRepository { load(ownerId: string, draftId: string): Promise<DraftRecord | null>; save(draft: DraftRecord, expectedRevision: number): Promise<DraftRecord> } // 儲存介面不預設正式 API。
 export class VersionConflictError extends Error { constructor() { super('version-conflict'); this.name = 'VersionConflictError' } } // 過期頁籤需讓使用者核對。
 const identity = (ownerId: string, draftId: string) => `${ownerId}\u0000${draftId}` // 同名草稿跨 owner 不共用鍵。
-const copy = (draft: DraftRecord): DraftRecord => ({ ...draft, materials: [...draft.materials] }) // 避免外部改動已存資料。
+const copy = (draft: DraftRecord): DraftRecord => ({ ...draft, materials: [...draft.materials], source: draft.source ? { ...draft.source } : draft.source }) // 避免外部改動已存資料，Blob 本身不可變。
 
 export class MemoryDraftRepository implements DraftRepository { // 單元測試與無 IndexedDB 環境的明示 mock。
   private records = new Map<string, DraftRecord>() // 只在此實例記憶體存活。
