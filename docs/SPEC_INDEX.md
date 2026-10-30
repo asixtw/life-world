@@ -17,6 +17,7 @@
 | [歐桑完整交付入口](team/PROMPT_OUSANG_START.md) | Boyi 已通知並定案的具名任務、VS Code／Codex 工作方式與整包交付 |
 | [LW-SIM-001](team/PROMPT_SIMULATION_001.md) | 三組十五位資料、可玩劇場、來源／評估／整合介面；成果尚未交付 |
 | [完整 UI／美術／動效](team/ART_DELIVERY_SPEC.md) | 十三類資產／元件、App 圖示／縮圖、蛋與破蛋／轉場，歐桑本輪一次交齊 |
+| [劇場 v0.5 確認決策](team/theater/DECISIONS_v1.1_2026-10-30.md)／[UX 與行為](team/theater/UX_BEHAVIOR_v0.5_2026-10-30.md)／[架構對照](team/theater/ARCHITECTURE.md)／[Wireframe](../collaboration/flow-wireframe/README.md) | 已確認劇場封測方向與獨立模擬原型；正式服務、ASR 及供應商尚未接入 |
 | [流程與狀態](team/FLOWS_AND_STATES.md) | 排程、登入、錄音與夜間的後續行為規格；未實作部分明示 |
 | [API](API.md)／[OpenAPI](openapi.json)／[架構](ARCHITECTURE.md) | 現有可執行服務；未來 React／PG 契約由全端另審 |
 | [演進](EVOLUTION.md)／[驗收](CONNECTIONS_ACCEPTANCE.md)／[發布檢查](GITHUB_PUBLISH.md) | 實作與證據；歷史結果不替代本輪測試 |

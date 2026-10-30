@@ -1,0 +1,33 @@
+/* 劇場線框的局部樣式；與四分頁及舊流程共存，不覆蓋正式 App。 */
+.theater-hub-hero{display:grid;grid-template-columns:minmax(0,1fr) 180px;align-items:center;gap:1rem;background:#eaf0e1}
+.theater-hub-hero img{width:100%;max-height:170px;object-fit:contain}
+.theater-layout{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:1rem;align-items:start}
+.theater-aside{text-align:center;padding:1.25rem;border-radius:1.5rem;background:#eaf0e1}
+.theater-aside img{width:150px;height:150px;object-fit:contain}
+.theater-person-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.65rem;margin:1rem 0}
+.theater-person{display:flex;align-items:center;gap:.75rem;padding:.8rem;border:1px solid #c7d6c8;border-radius:1rem;min-height:52px;background:#fffefb}
+.theater-person small{display:block;color:#526f4d}
+.theater-error{padding:.8rem;color:#7b3429;background:#fff0e7;border-radius:.75rem}
+.theater-scene{display:grid;grid-template-columns:minmax(180px,34%) minmax(0,1fr);align-items:start;gap:1rem}
+.theater-room{position:sticky;top:1rem;height:min(68vh,700px);overflow:hidden;border-radius:1.5rem;background:#eaf0e1}
+.theater-room>img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.theater-room-caption{position:absolute;left:.8rem;right:.8rem;bottom:.8rem;display:grid;gap:.3rem;padding:.8rem;border-radius:.8rem;background:rgba(255,254,251,.9);color:#334431}
+.theater-main{min-width:0}
+.theater-transcript{display:flex;flex-direction:column;gap:.6rem;min-height:120px;max-height:430px;overflow:auto;padding:.5rem 0}
+.theater-event{border:1px solid #dae4d6;background:#fffefb;border-radius:1rem;padding:.85rem;max-width:90%}
+.theater-event.mine{align-self:flex-end;background:#eaf0e1}
+.theater-event header{display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;font-size:.9rem}
+.theater-event header span,.theater-event header small{color:#526f4d}
+.theater-event p{margin:.45rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.theater-pending{font-size:.85rem;color:#526f4d}
+.theater-compose textarea,.theater-asr textarea,.lumi-private textarea{width:100%;min-height:90px}
+.theater-qa{margin-top:1rem;border-top:1px dashed #bdcbbb;padding-top:.8rem;color:#566b55}
+.theater-asr{margin-top:1rem;padding:1rem;background:#edf2ec;border-radius:1rem}
+.theater-lumi{display:block;width:120px;height:120px;object-fit:contain;margin:auto}
+.recap-events{display:grid;gap:.6rem}
+.theater-demo-cover{display:block;width:100%;max-height:340px;aspect-ratio:16/9;object-fit:contain;background:#f2f4ef;border-radius:1rem;margin:1rem 0}
+.theater-demo-person{display:inline-flex;align-items:center;gap:.45rem;margin:.25rem;padding:.4rem .65rem;border:1px solid #d4e2d4;border-radius:1rem}
+.theater-demo-person img{width:46px;height:46px;object-fit:cover;border-radius:50%}
+body.quiet .theater-aside,body.quiet .theater-hub-hero,body.quiet .theater-event.mine{background:#e2e9e6}
+@media(max-width:700px){.theater-layout,.theater-scene,.theater-hub-hero{grid-template-columns:1fr}.theater-aside{display:none}.theater-hub-hero img{display:none}.theater-room{position:relative;top:auto;height:150px}.theater-room>img{object-fit:cover;object-position:center 55%}.theater-main{padding:1rem}.theater-transcript{max-height:none}.theater-event{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.theater-event,.theater-room{animation:none!important;transition:none!important}}

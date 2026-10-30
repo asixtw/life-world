@@ -6,6 +6,8 @@
 
 開發入口：[共同產品研發指引](docs/PRODUCT_GUIDE.md)、[Codex 專案規則](AGENTS.md)、[App 與原型功能演進](docs/EVOLUTION.md)。App 目前為 v0.3.0；交會已取代星圖，接入真實經歷、來源與人工人物配對。原 Connections v0.3 設計原型另外保留。
 
+**劇場 v0.5 獨立 Wireframe：**[開啟完整流程](collaboration/flow-wireframe/index.html)／[操作與限制](collaboration/flow-wireframe/README.md)／[改版前快照](collaboration/flow-wireframe-v1.1-archive/README.md)。此分支只發布虛構資料原型及工程對照，不代表正式 App 已接入劇場或 AI。
+
 團隊先讀[共同規格入口](docs/SPEC_INDEX.md)、[檔案／素材存放規則](docs/STORAGE_RULES.md)、[分支與審查規則](CONTRIBUTING.md)，再到[三人協作入口](docs/team/README.md)領取任務與完整指令。共同起點以本次發布的 Git commit 為準；本機快照保留作歷史備份。React＋TypeScript／PostgreSQL／GCP 為暫定目標，尚未遷移；AI 供應商未定。文件發布不提升 App 版本，實際測試與範圍見[發布檢查](docs/GITHUB_PUBLISH.md)。
 
 **具名分工：Boyi（產品／體驗）、Jerry／jerry（全端整合／審查）、歐桑（資料庫／Pro 協作）。**歐桑從[完整任務總入口](docs/team/PROMPT_OUSANG_START.md)開始，一次交齊[三組十五位模擬人物與可玩模組](docs/team/PROMPT_SIMULATION_001.md)及[完整 UI／美術／按鈕／轉場／App 代表圖／蛋與破蛋](docs/team/ART_DELIVERY_SPEC.md)。任務已由 Boyi 通知同仁並定案；成果尚未交付。十五位與三封面為測試／POC／封測 demo，正式版及封測入口仍待評估。

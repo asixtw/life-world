@@ -2,6 +2,8 @@
 
 更新：2026-10-28（Asia/Taipei）。來源：使用者本次要求實施的「三人團隊分工方案」及前續暫定技術方向。文件已建立；下列工程任務尚未由此文件自動完成或派送。
 
+劇場 v0.5 確認版本：[產品決策](theater/DECISIONS_v1.1_2026-10-30.md)、[UX／行為規格](theater/UX_BEHAVIOR_v0.5_2026-10-30.md)、[候選架構](theater/ARCHITECTURE.md)與[線框驗收](theater/ACCEPTANCE.md)。目前是獨立模擬原型，正式 App 尚未接入。
+
 ## 先從這裡開始
 
 | 讀者 | 先讀 | 第一份工作 |
