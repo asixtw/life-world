@@ -1,0 +1,8 @@
+@scope (.lw-kit) {
+.icon-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px} /* 圖示清單按可用寬度換行。 */
+.icon-gallery__item{min-width:0;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--paper)} /* 每組 ID 與尺寸獨立可辨。 */
+.icon-gallery__item strong{display:block;font-size:.75rem;overflow-wrap:anywhere;margin-bottom:8px} /* 長 ID 不使窄螢幕溢位。 */
+.icon-gallery__item div{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:var(--green)} /* 展示 16／20／24／32 四尺寸。 */
+.icon-gallery__item span{min-width:36px;min-height:36px;display:grid;place-items:center} /* 展示非按鈕；實際按鈕另需 44px。 */
+
+}

@@ -1,0 +1,27 @@
+import { chromium } from 'playwright' // 本機 Chrome 驗證慢回讀與編輯，不碰正式資料。
+
+const browser = await chromium.launch({ headless: true, executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' })
+try {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  await page.goto('http://127.0.0.1:5174/?ui-review=record', { waitUntil: 'networkidle' })
+  const card = page.locator('section.card').filter({ has: page.getByRole('heading', { name: 'v1.1 本機草稿持久化' }) })
+  await card.getByRole('textbox', { name: '本機草稿文字' }).fill('A 已保存的文字')
+  await card.getByRole('button', { name: '保存本機草稿' }).click()
+  await card.getByText('已存本機草稿 v1').waitFor()
+  await page.goto('http://127.0.0.1:5174/?ui-review=record&qa-draft-delay=500', { waitUntil: 'domcontentloaded' })
+  const slow = page.locator('section.card').filter({ has: page.getByRole('heading', { name: 'v1.1 本機草稿持久化' }) })
+  const editor = slow.getByRole('textbox', { name: '本機草稿文字' })
+  await editor.fill('A 在慢回讀期間輸入')
+  await slow.getByText('載入期間的新輸入已保留').waitFor()
+  if (await editor.inputValue() !== 'A 在慢回讀期間輸入') throw new Error('delayed load overwrote new text')
+  await slow.getByRole('button', { name: '重新載入' }).click()
+  await editor.fill('A 在重新載入期間輸入')
+  await slow.getByText('回讀完成；載入期間的新輸入已保留').waitFor()
+  if (await editor.inputValue() !== 'A 在重新載入期間輸入') throw new Error('manual reload overwrote new text')
+  await slow.getByRole('combobox', { name: '示範 owner' }).selectOption('demo-owner-b')
+  await editor.fill('B 的未存文字')
+  await slow.getByRole('combobox', { name: '示範 owner' }).selectOption('demo-owner-a')
+  await slow.getByText('已回讀本機草稿 v1').waitFor()
+  if (await editor.inputValue() !== 'A 已保存的文字') throw new Error('owner switch accepted stale load or leaked B draft')
+  console.log('Draft race QA passed: delayed initial load, delayed manual reload, owner switch and edit preservation.')
+} finally { await browser.close() }

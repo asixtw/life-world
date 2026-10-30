@@ -1,0 +1,50 @@
+{
+  "allTopLevelManifestPathsExist": true,
+  "assets": [
+    {
+      "id": "lw-effects-nourishment-v2",
+      "sha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+      "bytes": 1325811,
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alphaExtrema": [
+        0,
+        253
+      ],
+      "centerAlpha": 0
+    },
+    {
+      "id": "lw-egg-shellsplit-v2",
+      "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+      "bytes": 691469,
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "centerAlpha": 0
+    },
+    {
+      "id": "lw-lumi-completion-v2",
+      "sha256": "b04aaaf36ad2226f5645e3e7b8d8fd0a4572e35ad9c263d1b297318bd5ccd04a",
+      "bytes": 784948,
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "centerAlpha": 253
+    }
+  ]
+}

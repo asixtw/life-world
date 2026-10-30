@@ -1,0 +1,820 @@
+{
+  "schema_version": "1.0",
+  "source_commit": "1c9d502f32688bcc3c73e4b99a2cc3724c179047",
+  "status": "v1_1_independent_candidate_derived_exports_ready_visual_and_human_review_pending",
+  "shared_art_runtime_library_id": "libfile_c1337d18a09081918aaa69c3951f8e1c",
+  "shared_art_originals_library_id": "libfile_5fb88fe851e8819198ee4243b4e37f07",
+  "assets": [
+    {
+      "id": "lw-egg-rest-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "rest",
+      "alt": "靜置的奶油色目標蛋，蛋殼上有鼠尾草綠的嫩芽圖案。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-rest-v1.png",
+      "originalSha256": "6bb5e377dbaf40367ff8726394e944dc7489b47bd21d36561fd9ff1cb4eb09a3",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-rest-v1@1024.png",
+          "sha256": "94030f73e258c946a73b1cceea21153c9f305ca8c5cf283780a155137bc1708c",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 211192
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-rest-v1@256.png",
+          "sha256": "e3ff799b08fd1ef8fa1caa162c8ec75fa16496eb842a2ee65e5566a6ea495cbf",
+          "width": 256,
+          "height": 256,
+          "bytes": 18333
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-rest-v1@512.png",
+          "sha256": "2538d6cd4920a633056688ad1d473ddc77120fd4328a81c0478033bf18a0d97a",
+          "width": 512,
+          "height": 512,
+          "bytes": 63321
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-egg-softglow-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "softglow",
+      "alt": "完整目標蛋周圍泛起柔和金光和三個小光點。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-softglow-v1.png",
+      "originalSha256": "523001d03b80f9eda1864072ef544af1cd0e3a8f845809b4bd81d681bf07ff87",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-softglow-v1@1024.png",
+          "sha256": "eb703cf00080748a3e17f469ef5b1f4b43ea47b376c2dcd65db420c7f27bf9f3",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 341018
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-softglow-v1@256.png",
+          "sha256": "0de01a655c2232728331b37b726d252be4ad536b5125a32a91b84655b4b4914e",
+          "width": 256,
+          "height": 256,
+          "bytes": 26291
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-softglow-v1@512.png",
+          "sha256": "1342bd1d4c26d9a80fd96ed27ecf57d9f15b4025fd74159c91b4e0c48317150c",
+          "width": 512,
+          "height": 512,
+          "bytes": 97427
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-egg-initialcrack-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "initialcrack",
+      "alt": "奶油色目標蛋右上方出現一道細小裂紋。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-initialcrack-v1.png",
+      "originalSha256": "f7682e3e0a433f857cbaba01b52a804d4d1cb02c5ff882796ecf2307cf3ce1f6",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-initialcrack-v1@1024.png",
+          "sha256": "37a9234dc1cb392c5d50f3441a53413642c557a5232277398aabe38944036d43",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 227918
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-initialcrack-v1@256.png",
+          "sha256": "70e2568268b04305115e8dcee1345b93c214d665c25ba56746a6d9765ed541f8",
+          "width": 256,
+          "height": 256,
+          "bytes": 18943
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-initialcrack-v1@512.png",
+          "sha256": "8cff24a20eba12fabfcf81a972a1b79c0d126f9fd38aee2e21d3106a4217372d",
+          "width": 512,
+          "height": 512,
+          "bytes": 65859
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-egg-deepcrack-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "deepcrack",
+      "alt": "目標蛋表面的金褐色裂紋延伸分岔，蛋殼尚未分開。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-deepcrack-v1.png",
+      "originalSha256": "87585e05a376269141b31d83243d9bca7e1c22e04a5e4c5681407043b4b63f5c",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-deepcrack-v1@1024.png",
+          "sha256": "549dba103805d21f9215b91176e7e9b1a47d577809ad075981581576ad039931",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 241594
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-deepcrack-v1@256.png",
+          "sha256": "dbf069d34aa845dc8972b1b783e6a083dcccd79eab102dd81b6067a2a97b3da0",
+          "width": 256,
+          "height": 256,
+          "bytes": 21122
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-egg-deepcrack-v1@512.png",
+          "sha256": "94265cd4661a02e5e0003590ced7daf92630474cb1cb4c2b2e9656d1ee4e9ea5",
+          "width": 512,
+          "height": 512,
+          "bytes": 70822
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-lumi-companion-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "companion",
+      "alt": "奶油色蛋形 Lumi 頭頂兩片嫩葉，一側薄荷綠小翅膀輕輕抬起。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-lumi-companion-v1.png",
+      "originalSha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-lumi-companion-v1@1024.png",
+          "sha256": "f9a3718531f2e65a6223cf5f87447ed56461b46e825bb2c968eacbc54cf1ffce",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 243754
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-lumi-companion-v1@256.png",
+          "sha256": "2a066f2d0ec59934720db3f1ab282acb8a37d728a1f8e1f20c73cb32d9e090c2",
+          "width": 256,
+          "height": 256,
+          "bytes": 22446
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-lumi-companion-v1@512.png",
+          "sha256": "063bf5ecdd59b99693bd76643cd3afaf42cfc58529bab538de28a877db40b190",
+          "width": 512,
+          "height": 512,
+          "bytes": 75838
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-lumi-quiet-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "quiet",
+      "alt": "Lumi 輕閉雙眼、雙翅自然下垂，安靜陪伴。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-lumi-quiet-v1.png",
+      "originalSha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-lumi-quiet-v1@1024.png",
+          "sha256": "981f696b5b855f5bd218708fc52c5a606e4ba066d8e3d80a7eb5cfce49cbc419",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 261117
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-lumi-quiet-v1@256.png",
+          "sha256": "5186aaeda2c3677f091a14f66c6b05df4bbf2b981431f32d8b7d60145b8086a1",
+          "width": 256,
+          "height": 256,
+          "bytes": 21825
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-lumi-quiet-v1@512.png",
+          "sha256": "5cda7eeaf7945ca461a8cdd7c06308cfd5ac3093faad079f99ab1f14f39211f2",
+          "width": 512,
+          "height": 512,
+          "bytes": 75383
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-app-icon-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "app-icon",
+      "alt": "淺薄荷綠方形底上的 Lumi，保留雙葉芽、深綠眼睛與小金嘴。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-app-icon-v1.png",
+      "originalSha256": "e5beb459afe15afdbbafc522f6bcdfc5788318914086583854e9512566df8563",
+      "originalWidth": 1254,
+      "originalHeight": 1254,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@1024.png",
+          "sha256": "be6a8ced52b8b784a521aca189a3714a8dd532c999920e33d95cf20cdbf72b67",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 608096
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@16.png",
+          "sha256": "8165eb9c96fdf84c5580a886707cc1df7937fd0d9bcb0fc59b07f69c146ee2c9",
+          "width": 16,
+          "height": 16,
+          "bytes": 465
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@180.png",
+          "sha256": "d8350526954bacc61961320a5ef9c3c95039de02db7be0665dd66e7bde0161dd",
+          "width": 180,
+          "height": 180,
+          "bytes": 23755
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@192.png",
+          "sha256": "7be8620b6995354b411bfa70598ea63cfcd30e49514254a6e40657f5b2c09230",
+          "width": 192,
+          "height": 192,
+          "bytes": 27157
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@32.png",
+          "sha256": "e013b3247edcf65c3e1a0416879fb61ab250ffd1905b9460ca92e2e9585bb64d",
+          "width": 32,
+          "height": 32,
+          "bytes": 1216
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@48.png",
+          "sha256": "c3f967a494db5878e6f1b7902c8cab440f78efb47d1456ace15edad923cdb9b7",
+          "width": 48,
+          "height": 48,
+          "bytes": 2188
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@512.png",
+          "sha256": "2695146db5fbdd3ffef78193b7a42f0533cd5fb4b29b8dc69334d51d29a17242",
+          "width": 512,
+          "height": 512,
+          "bytes": 192257
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "id": "lw-share-illustration-v1",
+      "status": "delivered_product_candidate",
+      "usageScope": "product_candidate",
+      "stateId": "share",
+      "alt": "Lumi 與一顆目標蛋坐落在淡綠小花園，後方是弧形窗與遠山，左方保留留白。",
+      "originalPath": "shared-art/lifeworld-fullkit-shared-art/originals/lw-share-illustration-v1.png",
+      "originalSha256": "d0af20b745920cb04e6f8b780f92229d2339750271351944d24ea182f4c9aa5b",
+      "originalWidth": 1731,
+      "originalHeight": 909,
+      "variants": [
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-share-illustration-v1@1200x630.png",
+          "sha256": "656200b99cfe2951f6b3d23f94fa76014f528bf3a1123806147debd111dcfdd3",
+          "width": 1200,
+          "height": 630,
+          "bytes": 515536
+        },
+        {
+          "path": "shared-art/lifeworld-fullkit-shared-art/exports/lw-share-illustration-v1@600x315.png",
+          "sha256": "e6b6f117ed38a51adb93cb9c623bfb71061ddd5bb8173281120b489deebf3aad",
+          "width": 600,
+          "height": 315,
+          "bytes": 154434
+        }
+      ],
+      "provenanceManifest": "shared-art/lifeworld-fullkit-shared-art/assets/manifest.json"
+    },
+    {
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 1325811,
+      "sha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+      "alpha_extrema": [
+        0,
+        253
+      ],
+      "alpha_zero_pixels": 783589,
+      "alpha_partial_pixels": 788927,
+      "alpha_opaque_pixels": 0,
+      "alpha_center": 0,
+      "alpha_bbox": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "alpha_visible_bbox": [
+        192,
+        85,
+        1100,
+        1178
+      ],
+      "id": "lw-effects-nourishment-v2",
+      "status": "product_candidate",
+      "tool": "OpenAI built-in image_gen.imagegen",
+      "originalPath": "shared-art/additions-20261029/originals/lw-effects-nourishment-v2.png",
+      "usageScope": "product_candidate",
+      "version": "v2",
+      "stateId": "nourishment",
+      "display": {
+        "canvas": [
+          1254,
+          1254
+        ],
+        "fit": "contain",
+        "anchor": [
+          0.5,
+          0.88
+        ],
+        "hatchMaxCssPx": 276,
+        "safeInsetCssPx": 12
+      },
+      "themes": [
+        "day",
+        "quiet",
+        "reduced-motion"
+      ],
+      "layerLimit": "Flattened RGBA PNG; shell halves and completion subject are not native editable layers. Separate shell, completion and nourishment files can be composed.",
+      "approval": "User approved visual appearance; formal product release not approved.",
+      "alt": "透明中心的金色與薄荷色獨立養分光環。"
+    },
+    {
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 691469,
+      "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_pixels": 1108174,
+      "alpha_partial_pixels": 463627,
+      "alpha_opaque_pixels": 715,
+      "alpha_center": 0,
+      "alpha_bbox": [
+        0,
+        29,
+        1235,
+        1254
+      ],
+      "alpha_visible_bbox": [
+        229,
+        154,
+        1048,
+        1138
+      ],
+      "id": "lw-egg-shellsplit-v2",
+      "status": "product_candidate",
+      "tool": "OpenAI built-in image_gen.imagegen",
+      "originalPath": "shared-art/additions-20261029/originals/lw-egg-shellsplit-v2.png",
+      "usageScope": "product_candidate",
+      "version": "v2",
+      "stateId": "open",
+      "display": {
+        "canvas": [
+          1254,
+          1254
+        ],
+        "fit": "contain",
+        "anchor": [
+          0.5,
+          0.88
+        ],
+        "hatchMaxCssPx": 276,
+        "safeInsetCssPx": 12
+      },
+      "themes": [
+        "day",
+        "quiet",
+        "reduced-motion"
+      ],
+      "layerLimit": "Flattened RGBA PNG; shell halves and completion subject are not native editable layers. Separate shell, completion and nourishment files can be composed.",
+      "approval": "User approved visual appearance; formal product release not approved.",
+      "alt": "奶油色蛋殼上下分離，保留綠色嫩芽圖案。"
+    },
+    {
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 784948,
+      "sha256": "b04aaaf36ad2226f5645e3e7b8d8fd0a4572e35ad9c263d1b297318bd5ccd04a",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_pixels": 1012791,
+      "alpha_partial_pixels": 558886,
+      "alpha_opaque_pixels": 839,
+      "alpha_center": 253,
+      "alpha_bbox": [
+        0,
+        0,
+        1244,
+        1212
+      ],
+      "alpha_visible_bbox": [
+        23,
+        206,
+        1231,
+        1109
+      ],
+      "id": "lw-lumi-completion-v2",
+      "status": "product_candidate",
+      "tool": "OpenAI built-in image_gen.imagegen",
+      "originalPath": "shared-art/additions-20261029/originals/lw-lumi-completion-v2.png",
+      "usageScope": "product_candidate",
+      "version": "v2",
+      "stateId": "complete",
+      "display": {
+        "canvas": [
+          1254,
+          1254
+        ],
+        "fit": "contain",
+        "anchor": [
+          0.5,
+          0.88
+        ],
+        "hatchMaxCssPx": 276,
+        "safeInsetCssPx": 12
+      },
+      "themes": [
+        "day",
+        "quiet",
+        "reduced-motion"
+      ],
+      "layerLimit": "Flattened RGBA PNG; shell halves and completion subject are not native editable layers. Separate shell, completion and nourishment files can be composed.",
+      "approval": "User approved visual appearance; formal product release not approved.",
+      "alt": "Lumi 張開雙臂，兩側為分離蛋殼的孵化完成定格。"
+    }
+  ],
+  "missing_persona_art": "expected-persona-art.v1.json",
+  "personaArt": [
+    {
+      "id": "portrait-three-kingdoms-caocao",
+      "packId": "three-kingdoms",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-caocao.256.png",
+      "displaySha256": "d2943c411ec4a65888e9c733178e8df309e011a2db2c1c5a78e0ecbae6625216",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-caocao.1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/originals/portrait-three-kingdoms-caocao.original.png",
+      "alt": "曹操的歷史藝術詮釋：灰黑鬍鬚、沉著神情與深藍綠衣袍，暖米色背景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-three-kingdoms/assets/manifest.json"
+    },
+    {
+      "id": "portrait-three-kingdoms-liubei",
+      "packId": "three-kingdoms",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-liubei.256.png",
+      "displaySha256": "6da4bd487f66dcdc42225a8d1226268b4caa321667033d99790e840212d59d78",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-liubei.1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/originals/portrait-three-kingdoms-liubei.original.png",
+      "alt": "劉備的歷史藝術詮釋：溫厚神情、黑鬚與米白綠色衣袍，暖米色背景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-three-kingdoms/assets/manifest.json"
+    },
+    {
+      "id": "portrait-three-kingdoms-zhugeliang",
+      "packId": "three-kingdoms",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-zhugeliang.256.png",
+      "displaySha256": "889f2e907626ab23164423df2a0a98e3b2fc6df12e1dd205746cf0f97fe971eb",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-zhugeliang.1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/originals/portrait-three-kingdoms-zhugeliang.original.png",
+      "alt": "諸葛亮的歷史藝術詮釋：長鬚、素色學者衣冠與羽扇，暖米色背景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-three-kingdoms/assets/manifest.json"
+    },
+    {
+      "id": "portrait-three-kingdoms-sunquan",
+      "packId": "three-kingdoms",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-sunquan.256.png",
+      "displaySha256": "aa2015922896d343d748865f58f7ba819842fd3e0f9a43fb9effb961218cb3c1",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-sunquan.1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/originals/portrait-three-kingdoms-sunquan.original.png",
+      "alt": "孫權的歷史藝術詮釋：紅棕鬍鬚、堅定神情與墨綠淡金衣袍，暖米色背景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-three-kingdoms/assets/manifest.json"
+    },
+    {
+      "id": "portrait-three-kingdoms-zhouyu",
+      "packId": "three-kingdoms",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-zhouyu.256.png",
+      "displaySha256": "24142a387bdb700f4a7248ca387a54996614fec721a841d4694758f01cf3ddcf",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-zhouyu.1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/originals/portrait-three-kingdoms-zhouyu.original.png",
+      "alt": "周瑜的歷史藝術詮釋：無鬚的清俊成年面容、赭色與鼠尾草綠衣袍，暖米色背景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-three-kingdoms/assets/manifest.json"
+    },
+    {
+      "id": "cover-three-kingdoms",
+      "packId": "three-kingdoms",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/display/cover-three-kingdoms.800x450.png",
+      "displaySha256": "0dc4136c8511a7a9d8bf9031f9da8164182bb9522d187f1f8306086036ec4ec4",
+      "displayWidth": 800,
+      "displayHeight": 450,
+      "masterPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/cover-three-kingdoms.1600x900.png",
+      "originalPath": "persona-art/lifeworld-pack-art-three-kingdoms/assets/originals/cover-three-kingdoms.original.png",
+      "alt": "虛構三國策略情境封面：五位古代人物在江畔亭中圍桌商議，桌上有地形圖，遠方是平靜江面與山巒。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-three-kingdoms/assets/manifest.json"
+    },
+    {
+      "id": "portrait-international-dialogue-us-representative",
+      "packId": "international-dialogue",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-us-representative@256.png",
+      "displaySha256": "244e20cda432b0a23996f4881803432c5decab8209b2ff72232c2543a7f8b30f",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-us-representative@1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-international-dialogue/originals/portrait-international-dialogue-us-representative.png",
+      "alt": "虛構美方代表：短捲髮帶銀色髮絲的中年女性，穿海軍藍西裝外套與米白上衣；奶油與鼠尾草綠背景的柔和繪畫頭像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-international-dialogue/assets/manifest.json"
+    },
+    {
+      "id": "portrait-international-dialogue-iran-representative",
+      "packId": "international-dialogue",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-iran-representative@256.png",
+      "displaySha256": "2743a5d31b40db41e2bfd2205bfcce4df3dff9b3bf8a01e60106e47909f1932f",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-iran-representative@1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-international-dialogue/originals/portrait-international-dialogue-iran-representative.png",
+      "alt": "虛構伊方代表：深色微捲髮、短灰黑鬍鬚的中年男性，穿炭灰西裝外套與米白襯衫；柔和奶油與綠色背景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-international-dialogue/assets/manifest.json"
+    },
+    {
+      "id": "portrait-international-dialogue-neutral-mediator",
+      "packId": "international-dialogue",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-neutral-mediator@256.png",
+      "displaySha256": "af92043541c8185ae35adeb95605fcfcbc6b4d64fa345705aa73b466b7e319e6",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-neutral-mediator@1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-international-dialogue/originals/portrait-international-dialogue-neutral-mediator.png",
+      "alt": "虛構中立調停者：銀色短直髮、戴細圓框眼鏡的年長女性，穿鼠尾草綠外套與米白上衣；柔和繪畫頭像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-international-dialogue/assets/manifest.json"
+    },
+    {
+      "id": "portrait-international-dialogue-international-observer",
+      "packId": "international-dialogue",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-international-observer@256.png",
+      "displaySha256": "1e94b7521b8d8837ba9866da7c2db9e1beb60b64ef87c32348fe2badd5d2f7d1",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-international-observer@1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-international-dialogue/originals/portrait-international-dialogue-international-observer.png",
+      "alt": "虛構國際組織觀察員：黑髮低髮髻的成年女性，穿炭灰外套與薄荷綠上衣；奶油與淡綠背景的柔和繪畫頭像，無機構標誌。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-international-dialogue/assets/manifest.json"
+    },
+    {
+      "id": "portrait-international-dialogue-shipping-representative",
+      "packId": "international-dialogue",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-shipping-representative@256.png",
+      "displaySha256": "3efb02c78e603bd6768e0439e5f416ad66a2d4a3f7c0a7ea5fd7b41f9bc7c95f",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-shipping-representative@1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-international-dialogue/originals/portrait-international-dialogue-shipping-representative.png",
+      "alt": "虛構航運方代表：深棕膚色、短髮與短鬍鬚的成年男性，穿灰綠外套與米白襯衫；背景為柔和想像港景。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-international-dialogue/assets/manifest.json"
+    },
+    {
+      "id": "cover-international-dialogue",
+      "packId": "international-dialogue",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-international-dialogue/exports/cover-international-dialogue@800x450.png",
+      "displaySha256": "b72a828b96da6643be1231ed126540b8f094fb4fe20b85312104a16f9176b65d",
+      "displayWidth": 800,
+      "displayHeight": 450,
+      "masterPath": "persona-art/lifeworld-pack-art-international-dialogue/masters/cover-international-dialogue@1600x900.png",
+      "originalPath": "persona-art/lifeworld-pack-art-international-dialogue/originals/cover-international-dialogue.png",
+      "alt": "五位虛構代表圍坐淺木色圓桌，在奶油與鼠尾草綠的明亮房間中平和討論；桌上有空白紙張和水杯，窗外是庭園，沒有旗幟、文字或機構標誌。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-international-dialogue/assets/manifest.json"
+    },
+    {
+      "id": "portrait-philosophy-socrates",
+      "packId": "philosophy",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-socrates-256.png",
+      "displaySha256": "8827432722232f110cdf66707d7fcb55f90ff02aafdaea273e43eee8759d1689",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-socrates-1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-philosophy/assets/originals/portrait-philosophy-socrates-generated-v1.png",
+      "alt": "蘇格拉底的生成藝術詮釋：禿頂、灰白捲鬚，穿米白與鼠尾草綠古希臘披衣，神情專注溫和。 此為藝術詮釋，非經核實的歷史肖像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-philosophy/assets/manifest.json"
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "packId": "philosophy",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-confucius-256.png",
+      "displaySha256": "7e9e276e58ed1060900969649136e652082bf29a3d589670b1ae0683ca7693f2",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-confucius-1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-philosophy/assets/originals/portrait-philosophy-confucius-generated-v1.png",
+      "alt": "孔子的生成藝術詮釋：戴素色學者帽、蓄長鬚，穿米白、淡金與鼠尾草綠長袍，神情沉靜。 此為藝術詮釋，非經核實的歷史肖像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-philosophy/assets/manifest.json"
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "packId": "philosophy",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-zhuangzi-256.png",
+      "displaySha256": "79f096cebc114295d98310d11a4988a2cf1a1e8998691f73939c293119863272",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-zhuangzi-1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-philosophy/assets/originals/portrait-philosophy-zhuangzi-generated-v1.png",
+      "alt": "莊子的生成藝術詮釋：髮束成鬆髻、蓄疏鬚，穿素雅淺綠長袍，背景是淡墨般的遠山。 此為藝術詮釋，非經核實的歷史肖像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-philosophy/assets/manifest.json"
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "packId": "philosophy",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-nietzsche-256.png",
+      "displaySha256": "beba3adebaf274b0eefc4e127b9254863caffb86c1ecee063b92498a6d64bcd0",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-nietzsche-1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-philosophy/assets/originals/portrait-philosophy-nietzsche-generated-v1.png",
+      "alt": "尼采的生成藝術詮釋：向後梳的深髮、濃厚大鬍髭，穿深鼠尾草綠十九世紀外套與米白襯衫。 此為藝術詮釋，非經核實的歷史肖像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-philosophy/assets/manifest.json"
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "packId": "philosophy",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-plato-256.png",
+      "displaySha256": "69ac56cecbccd6ed2c7085bb91ccf02980567a3cb126357a9eff075b2a80ebd5",
+      "displayWidth": 256,
+      "displayHeight": 256,
+      "masterPath": "persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-plato-1024.png",
+      "originalPath": "persona-art/lifeworld-pack-art-philosophy/assets/originals/portrait-philosophy-plato-generated-v1.png",
+      "alt": "柏拉圖的生成藝術詮釋：灰白捲髮與濃密長鬚，穿帶淡金邊的鼠尾草綠古希臘披衣。 此為藝術詮釋，非經核實的歷史肖像。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-philosophy/assets/manifest.json"
+    },
+    {
+      "id": "cover-philosophy",
+      "packId": "philosophy",
+      "usageScope": "demo",
+      "status": "delivered_pending_owner_review",
+      "displayPath": "persona-art/lifeworld-pack-art-philosophy/assets/display/cover-philosophy-800x450.png",
+      "displaySha256": "d12de8bb38f2797b6b935decd93cb90cb7b807a0437d76802c72d938bbe2c45e",
+      "displayWidth": 800,
+      "displayHeight": 450,
+      "masterPath": "persona-art/lifeworld-pack-art-philosophy/assets/masters/cover-philosophy-1600x900.png",
+      "originalPath": "persona-art/lifeworld-pack-art-philosophy/assets/originals/cover-philosophy-generated-v2.png",
+      "alt": "想像的跨時代哲學聚會：由左至右，蘇格拉底、孔子、莊子、尼采與柏拉圖在庭院圓桌旁交流。此場景為創作，並非真實發生的歷史會面。",
+      "provenanceManifest": "persona-art/lifeworld-pack-art-philosophy/assets/manifest.json"
+    }
+  ],
+  "personaArtCount": 18,
+  "personaArtStatus": "demo_only_pending_Boyi_Jerry_review",
+  "recovery": {
+    "contentSnapshot": "b3a715c",
+    "archiveSha256": "0683792faff60acb7d3adf01f0a7a5c854e9ee49853d8669ea872123fe9a5cf0",
+    "gitHistoryRecovered": false
+  },
+  "historical_unavailable_generation": [
+    {
+      "id": "lw-egg-shellsplit-v1",
+      "stateId": "shellsplit",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    },
+    {
+      "id": "lw-lumi-completion-v1",
+      "stateId": "lumi-completion",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    },
+    {
+      "id": "lw-effects-nourishment-v1",
+      "stateId": "nourishment",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    },
+    {
+      "id": "lw-world-base-v1",
+      "stateId": "world-base",
+      "status": "blocked_or_unresolved",
+      "reason": "Parallel generation batch output moderation_blocked (other), individual blocked job not identified; no available deliverable. No retries or bypass.",
+      "requestId": "ea16e21f-c111-411d-a2e6-856168730a92"
+    }
+  ],
+  "lumiPoseCandidates": {
+    "manifestPath": "lumi-poses-candidate-20261029/manifest.json",
+    "derivedManifestPath": "derived-v1_1/manifest.json",
+    "libraryId": "libfile_2bc372f039108191add7f621757a2178",
+    "usageScope": "product_candidate",
+    "status": "six_original_poses_and_independent_shells_with_derived_display_exports_visual_review_pending",
+    "originalSize": [1254, 1254],
+    "poseIds": ["idle", "quiet", "welcome", "listening", "confirmed", "celebrate"],
+    "shellIds": ["shell-left", "shell-right"],
+    "targetDisplaySizesProduced": true,
+    "numericFootAnchorProduced": true,
+    "uniformAnchorVerified": false,
+    "pairedShellClosureVerified": false
+  },
+  "worldCandidates": {
+    "usageScope": "product_candidate",
+    "status": "native_sources_and_derived_target_exports_integrated_boyi_jerry_review_pending",
+    "derivedManifestPath": "derived-v1_1/manifest.json",
+    "specCommit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
+    "horizontalLibraryId": "libfile_94713f7b5ba48191baa9b4936cdd1ffc",
+    "portraitLibraryId": "libfile_83d2a42ee2208191b38e1a21229b1307",
+    "targetOriginalSizeMet": false,
+    "targetDisplaySizesProduced": true,
+    "target1920IsDerivedUpscale": true,
+    "files": [
+      { "id": "world-day-wide-native", "path": "world-candidates-20261029/originals/room-day-base.png", "width": 1448, "height": 1086, "mode": "RGB", "sha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3" },
+      { "id": "world-quiet-wide-native", "path": "world-candidates-20261029/originals/room-quiet-base.png", "width": 1448, "height": 1086, "mode": "RGB", "sha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03" },
+      { "id": "world-day-portrait-native", "path": "world-portrait-supplement-20261029/room-day-portrait-native.png", "width": 1086, "height": 1448, "mode": "RGB", "sha256": "6b598b3c7d54a8bede2bc21688a4ee2b24f28ce9fff56ffec276ff45ebbfa1fa" },
+      { "id": "world-quiet-portrait-native", "path": "world-portrait-supplement-20261029/room-quiet-portrait-native.png", "width": 1086, "height": 1448, "mode": "RGB", "sha256": "10e269776a3101c7e85b00e36d72d2e5e69f57a2df8717127a6bfb4a1fc1f536" },
+      { "id": "world-furniture-layer", "path": "world-candidates-20261029/layers/furniture-cabinet.png", "width": 1448, "height": 1086, "mode": "RGBA", "sha256": "207cb4692b198a7b97e7c9d82f9a16b4d89cfc66a41974bec032837d97a13d36" },
+      { "id": "world-foreground-layer", "path": "world-candidates-20261029/layers/foreground-plant.png", "width": 1299, "height": 1211, "mode": "RGBA", "sha256": "f5bfce9b4d0105542424be953e6d8bbe397eb4ba7f866d74afd16ecfef1e7824" },
+      { "id": "world-shadow-layer", "path": "world-candidates-20261029/layers/lumi-contact-shadow.png", "width": 1774, "height": 887, "mode": "RGBA", "sha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c" }
+    ],
+    "provenance": ["world-candidates-20261029/provenance/asset-metadata.json", "world-candidates-20261029/provenance/prompts.json", "world-portrait-supplement-20261029/provenance/prompts.json"],
+    "limitations": ["原生橫稿 1448×1086；1920×1440 是等比放大衍生圖，不是原生高解析原稿", "1280×960 與 768×1024 為等比縮小顯示版", "家具與植物的 Quiet 效果仍為 CSS 候選調色", "原稿的日間與 Quiet 構圖尚未像素級對齊", "Boyi 與 Jerry 尚未驗收"]
+  },
+  "audioCandidates": {
+    "manifestPath": "audio-candidates/manifest.json",
+    "status": "ten_original_48khz_wav_candidates_with_m4a_ogg_playback_versions_boyi_listening_pending",
+    "usageScope": "product_candidate",
+    "method": "deterministic_python_numpy_additive_synthesis",
+    "events": ["ui-tap", "draft-saved", "experience-confirmed", "first-hatch", "goal-completed"],
+    "candidatesPerEvent": 2,
+    "playbackFormats": ["AAC/M4A", "Ogg Vorbis"],
+    "defaultEnabled": false,
+    "quietMuted": true
+  },
+  "deferred": [
+    {
+      "id": "lw-world-base-v1",
+        "reason": "舊版 ID 未生成；v1.1 另有 worldCandidates 日間／Quiet 候選接入，但指定尺寸仍未達標。"
+    }
+  ]
+}

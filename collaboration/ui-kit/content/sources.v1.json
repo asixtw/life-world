@@ -1,0 +1,167 @@
+[
+  {
+    "id": "src-sgz-wei",
+    "title": "三國志·魏書·武帝紀",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "魏書一",
+    "url": "https://ctext.org/sanguozhi/1",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-sgz-shu",
+    "title": "三國志·蜀書·先主傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "蜀書二",
+    "url": "https://ctext.org/sanguozhi/32",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-sgz-zhuge",
+    "title": "三國志·蜀書·諸葛亮傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "蜀書五",
+    "url": "https://ctext.org/sanguozhi/35",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-sgz-wu",
+    "title": "三國志·吳書·吳主傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "吳書二",
+    "url": "https://ctext.org/sanguozhi/47",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-sgz-zhou",
+    "title": "三國志·吳書·周瑜傳",
+    "creator": "陳壽",
+    "date": null,
+    "locator": "吳書九",
+    "url": "https://ctext.org/sanguozhi/54",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-us-2024",
+    "title": "Statement to the 2024 NPT PrepCom Cluster 2 Specific Issue",
+    "creator": "U.S. Department of State",
+    "date": "2024-07-29",
+    "locator": "Iran portion",
+    "url": "https://2021-2025.state.gov/statement-to-the-2024-npt-prepcom-cluster-2-specific-issue/",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-un-2231",
+    "title": "Security Council resolution 2231 background",
+    "creator": "United Nations Security Council",
+    "date": "2015-07-20",
+    "locator": "Resolution 2231 overview",
+    "url": "https://main.un.org/securitycouncil/en/content/2231/background",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-un-charter",
+    "title": "UN Charter Chapter VI",
+    "creator": "United Nations",
+    "date": null,
+    "locator": "Articles 33–38",
+    "url": "https://www.un.org/en/about-us/un-charter/chapter-6",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-iaea",
+    "title": "IAEA GOV/2024/61: Verification and monitoring in Iran",
+    "creator": "International Atomic Energy Agency",
+    "date": "2024-11-19",
+    "locator": "GOV/2024/61，封面與第1段；2024-11-21公開",
+    "url": "https://www.iaea.org/sites/default/files/24/11/gov2024-61.pdf",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
+  },
+  {
+    "id": "src-imo",
+    "title": "IMO Maritime Safety Committee Red Sea statement",
+    "creator": "International Maritime Organization",
+    "date": "2024-05-24",
+    "locator": "2024-05-24 新聞稿正文，頁面行 25–38；MSC 108 決議與船員安全",
+    "url": "https://www.imo.org/en/mediacentre/pressbriefings/pages/imo-msc-resolution-red-sea.aspx",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
+  },
+  {
+    "id": "src-plato-apology",
+    "title": "Apology",
+    "creator": "Plato",
+    "date": null,
+    "locator": "Apology；Stephanus 17a–42a；Perseus CTS urn:cts:greekLit:tlg0059.tlg002",
+    "url": "https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg002",
+    "evidence": "literary_account",
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
+  },
+  {
+    "id": "src-analects",
+    "title": "論語·學而、為政、子路",
+    "creator": "傳統歸孔子弟子編纂",
+    "date": null,
+    "locator": "學而／為政／子路",
+    "url": "https://ctext.org/analects/zh",
+    "evidence": "literary_account",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-zhuangzi",
+    "title": "莊子",
+    "creator": "傳統歸莊周及後學",
+    "date": null,
+    "locator": "內篇",
+    "url": "https://ctext.org/zhuangzi/zh",
+    "evidence": "literary_account",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-nietzsche",
+    "title": "Thus Spake Zarathustra",
+    "creator": "Friedrich Nietzsche",
+    "date": "1883–1885",
+    "locator": "Project Gutenberg ebook 1998",
+    "url": "https://www.gutenberg.org/ebooks/1998",
+    "evidence": "source_fact",
+    "reviewed": false,
+    "verificationStatus": "unverified"
+  },
+  {
+    "id": "src-plato-republic",
+    "title": "Republic",
+    "creator": "Plato",
+    "date": null,
+    "locator": "Republic VII 514a–517a；Perseus CTS urn:cts:greekLit:tlg0059.tlg030",
+    "url": "https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg030",
+    "evidence": "literary_account",
+    "reviewed": false,
+    "verificationStatus": "machine_checked_locator"
+  }
+]

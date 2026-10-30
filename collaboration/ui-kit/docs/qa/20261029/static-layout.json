@@ -1,0 +1,222 @@
+{
+  "browser": "156.0.8078.48",
+  "scope": "static fixtures only; interactive testing deferred",
+  "results": [
+    {
+      "mode": "day",
+      "width": 390,
+      "overflow": 0,
+      "images": [
+        {
+          "src": "lw-egg-shellsplit-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 252
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 252
+        },
+        {
+          "src": "lw-effects-nourishment-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 300,
+          "height": 300
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 252,
+          "height": 252
+        }
+      ],
+      "animations": 0
+    },
+    {
+      "mode": "quiet",
+      "width": 390,
+      "overflow": 0,
+      "images": [
+        {
+          "src": "lw-egg-shellsplit-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 252
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 252
+        },
+        {
+          "src": "lw-effects-nourishment-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 300,
+          "height": 300
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 252,
+          "height": 252
+        }
+      ],
+      "animations": 0
+    },
+    {
+      "mode": "reduced",
+      "width": 390,
+      "overflow": 0,
+      "images": [
+        {
+          "src": "lw-egg-shellsplit-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 252
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 252
+        },
+        {
+          "src": "lw-effects-nourishment-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 300,
+          "height": 300
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 252,
+          "height": 252
+        }
+      ],
+      "animations": 0
+    },
+    {
+      "mode": "day",
+      "width": 1280,
+      "overflow": 0,
+      "images": [
+        {
+          "src": "lw-egg-shellsplit-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 276
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 276
+        },
+        {
+          "src": "lw-effects-nourishment-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 300,
+          "height": 300
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 252,
+          "height": 252
+        }
+      ],
+      "animations": 0
+    },
+    {
+      "mode": "quiet",
+      "width": 1280,
+      "overflow": 0,
+      "images": [
+        {
+          "src": "lw-egg-shellsplit-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 276
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 276
+        },
+        {
+          "src": "lw-effects-nourishment-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 300,
+          "height": 300
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 252,
+          "height": 252
+        }
+      ],
+      "animations": 0
+    },
+    {
+      "mode": "reduced",
+      "width": 1280,
+      "overflow": 0,
+      "images": [
+        {
+          "src": "lw-egg-shellsplit-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 276
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 276,
+          "height": 276
+        },
+        {
+          "src": "lw-effects-nourishment-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 300,
+          "height": 300
+        },
+        {
+          "src": "lw-lumi-completion-v2.png",
+          "loaded": true,
+          "naturalWidth": 1254,
+          "width": 252,
+          "height": 252
+        }
+      ],
+      "animations": 0
+    }
+  ]
+}

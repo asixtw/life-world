@@ -1,0 +1,11 @@
+{
+  "id": "cover-philosophy",
+  "tool": "image_gen.imagegen",
+  "mode": "built-in",
+  "model_version": "not exposed by tool",
+  "asset_version": "v2",
+  "source_path": "/workspace/scratch/3aa9e7208a95/generated_images/exec-a3a75943-18ab-4d3c-a2b5-31ce4698b7b8.png",
+  "input_path": "assets/originals/cover-philosophy-generated-v1.png",
+  "edit_intent": "style-transfer; retain composition and cast, visibly painterly medium",
+  "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-a3a75943-18ab-4d3c-a2b5-31ce4698b7b8.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+}

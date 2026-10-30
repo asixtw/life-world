@@ -1,0 +1,22 @@
+{
+  "tool": "OpenAI built-in image_gen.imagegen",
+  "mode": "built-in, no API key or paid external service",
+  "date_utc": "2026-10-28",
+  "reported_model_version": "not exposed by tool",
+  "available_originals": 8,
+  "blocked_batch": {
+    "ids": ["lw-egg-shellsplit-v1", "lw-lumi-completion-v1", "lw-effects-nourishment-v1", "lw-world-base-v1"],
+    "status": "blocked_or_unresolved_no_deliverable",
+    "reason": "A parallel batch returned output moderation_blocked, category other; the tool did not identify the individual job. No output for any of these four was made available in the workspace.",
+    "request_id": "ea16e21f-c111-411d-a2e6-856168730a92",
+    "error_type": "image_generation_user_error",
+    "error_code": "moderation_blocked",
+    "moderation_stage": "output",
+    "categories": ["other"],
+    "raw_error_message": "Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID ea16e21f-c111-411d-a2e6-856168730a92.",
+    "handling": "No retries, prompt rewriting, alternate paths, APIs or substitute generation attempted. Parent instructed to preserve blocker and finalize available assets."
+  },
+  "permissions": "User-authorized Life World full-kit artwork; palette and identity from current repository. Product candidate, not production approval. No representation of unrestricted commercial clearance.",
+  "historical_reference": "lumi_reference/image(20261026-141846).png viewed for context only; current app/static/styles.css identity took precedence. No historical reference pixels copied into deliverables. No film assets used.",
+  "native_layer_limit": "Tool returned flattened PNGs. No PSD, layered illustration source or genuine editable vector was produced. Transparent files are compositable whole-asset layers, not claimed to be fully editable. Separate shell/effect layers remain blocked."
+}

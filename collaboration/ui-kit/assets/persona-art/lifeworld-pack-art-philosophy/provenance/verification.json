@@ -1,0 +1,171 @@
+{
+  "status": "passed",
+  "verified_utc": "2026-10-28",
+  "asset_count": 6,
+  "portrait_count": 5,
+  "selected_cover_count": 1,
+  "image_file_count": 25,
+  "checks": [
+    {
+      "id": "portrait-philosophy-socrates",
+      "role": "generated_original",
+      "path": "assets/originals/portrait-philosophy-socrates-generated-v1.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-socrates",
+      "role": "master",
+      "path": "assets/masters/portrait-philosophy-socrates-1024.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-socrates",
+      "role": "display",
+      "path": "assets/display/portrait-philosophy-socrates-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-socrates",
+      "role": "circle_preview",
+      "path": "assets/previews/portrait-philosophy-socrates-circle-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "role": "generated_original",
+      "path": "assets/originals/portrait-philosophy-confucius-generated-v1.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "role": "master",
+      "path": "assets/masters/portrait-philosophy-confucius-1024.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "role": "display",
+      "path": "assets/display/portrait-philosophy-confucius-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "role": "circle_preview",
+      "path": "assets/previews/portrait-philosophy-confucius-circle-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "role": "generated_original",
+      "path": "assets/originals/portrait-philosophy-zhuangzi-generated-v1.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "role": "master",
+      "path": "assets/masters/portrait-philosophy-zhuangzi-1024.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "role": "display",
+      "path": "assets/display/portrait-philosophy-zhuangzi-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "role": "circle_preview",
+      "path": "assets/previews/portrait-philosophy-zhuangzi-circle-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "role": "generated_original",
+      "path": "assets/originals/portrait-philosophy-nietzsche-generated-v1.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "role": "master",
+      "path": "assets/masters/portrait-philosophy-nietzsche-1024.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "role": "display",
+      "path": "assets/display/portrait-philosophy-nietzsche-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "role": "circle_preview",
+      "path": "assets/previews/portrait-philosophy-nietzsche-circle-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "role": "generated_original",
+      "path": "assets/originals/portrait-philosophy-plato-generated-v1.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "role": "master",
+      "path": "assets/masters/portrait-philosophy-plato-1024.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "role": "display",
+      "path": "assets/display/portrait-philosophy-plato-256.png",
+      "verified": true
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "role": "circle_preview",
+      "path": "assets/previews/portrait-philosophy-plato-circle-256.png",
+      "verified": true
+    },
+    {
+      "id": "cover-philosophy",
+      "role": "generated_original",
+      "path": "assets/originals/cover-philosophy-generated-v2.png",
+      "verified": true
+    },
+    {
+      "id": "cover-philosophy",
+      "role": "master",
+      "path": "assets/masters/cover-philosophy-1600x900.png",
+      "verified": true
+    },
+    {
+      "id": "cover-philosophy",
+      "role": "display",
+      "path": "assets/display/cover-philosophy-800x450.png",
+      "verified": true
+    },
+    {
+      "id": "cover-philosophy",
+      "role": "superseded_original",
+      "path": "assets/originals/cover-philosophy-generated-v1.png",
+      "verified": true
+    }
+  ],
+  "qa_contact_sheet_hash_verified": true,
+  "tool_original_bytes_preserved": true,
+  "visual_review": {
+    "reviewer": "generating assistant self-review, not human acceptance",
+    "method": "Every generated image inspected from imagegen output; 256px squares and circles on cream/dark inspected in contact sheet; final 800x450 cover inspected.",
+    "result": "Five distinguishable dignified faces; coherent warm cream/sage painterly family; faces, hair and hats safely visible in circles; no baked-in text or watermark observed. Cover shows exactly the five intended figures, unobstructed faces and readable group composition.",
+    "cover_refinement": "v1 too photographic; one targeted built-in imagegen style-transfer produced selected v2; v1 preserved and marked superseded.",
+    "human_acceptance": "pending Boyi/Jerry"
+  },
+  "limitations": [
+    "Generated portraits are artistic interpretations, not verified historical likenesses.",
+    "The five-person gathering is fictional and cross-era, not a documented historical event.",
+    "Generation tool model/version was not exposed; asset and prompt revisions are recorded separately.",
+    "Native generation outputs are flattened raster images, no editable layers.",
+    "Formal release and unrestricted commercial-use approval are not established.",
+    "No frontend integration, browser QA, mobile/Safari QA, public upload or desktop repository change performed by this art subtask."
+  ]
+}

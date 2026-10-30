@@ -1,0 +1,272 @@
+[
+  {
+    "id": "hold-tk-caocao-1",
+    "personaId": "tk-caocao",
+    "prompt": "敵營送來一封沒有印記的停戰信，聲稱今晚可安全越過渡口。請以交戰前曹操的詮釋視角處理。",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-caocao-2",
+    "personaId": "tk-caocao",
+    "prompt": "新降將自稱能帶路穿越沼地，但其路線與舊測量不同。請制定採信條件。",
+    "sourceRefs": [
+      "src-sgz-wei"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-liubei-1",
+    "personaId": "tk-liubei",
+    "prompt": "臨時營地只有一口水井，原居民與新來者發生爭執。請設計可公開說明的分配程序。",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-liubei-2",
+    "personaId": "tk-liubei",
+    "prompt": "一名年輕傳令兵承認誤送軍令，部將要求立即重罰。請如何兼顧責任與團隊信任？",
+    "sourceRefs": [
+      "src-sgz-shu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhuge-1",
+    "personaId": "tk-zhuge",
+    "prompt": "連夜暴雨沖毀橋樑，原計畫的會合時間無法達成。請重新安排訊號與隊伍。",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhuge-2",
+    "personaId": "tk-zhuge",
+    "prompt": "使者帶來敵軍兵數估計，但計算方法未交代。請指出下一步核對重點。",
+    "sourceRefs": [
+      "src-sgz-zhuge"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-sunquan-1",
+    "personaId": "tk-sunquan",
+    "prompt": "江東港口徵用漁船遭地方反對，前線卻急需船隻。請設計兼顧動員與生計的決定。",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-sunquan-2",
+    "personaId": "tk-sunquan",
+    "prompt": "兩名將領都請求先用同一批修船木材，理由各不同。請如何裁決？",
+    "sourceRefs": [
+      "src-sgz-wu"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhouyu-1",
+    "personaId": "tk-zhouyu",
+    "prompt": "夜間訓練的號角訊號被兩隊聽成不同命令。請如何修正水軍協同？",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-tk-zhouyu-2",
+    "personaId": "tk-zhouyu",
+    "prompt": "一處港口的水位每天變動，舊船能靠岸，新船可能擱淺。請決定停泊方式。",
+    "sourceRefs": [
+      "src-sgz-zhou"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-us-1",
+    "personaId": "int-us",
+    "prompt": "假設會議的救援物資清單有兩種譯法，各方對允許品項理解不同。請以虛構代表身份回應。",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-us-2",
+    "personaId": "int-us",
+    "prompt": "一場假設記者會前，夥伴要求你宣布尚未討論的共同檢討日期。請如何處理？",
+    "sourceRefs": [
+      "src-us-2024"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-iran-1",
+    "personaId": "int-iran",
+    "prompt": "假設多邊會議的文件把地名譯成兩種名稱，造成執行範圍爭議。請提出修訂程序。",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-iran-2",
+    "personaId": "int-iran",
+    "prompt": "假設談判中，承諾的起算日遇到兩國不同曆法記法。請如何避免履行爭議？",
+    "sourceRefs": [
+      "src-un-2231"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-mediator-1",
+    "personaId": "int-mediator",
+    "prompt": "假設會談因座位順序爭議停滯，實質議題尚未開始。請設計不預判地位的開場。",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-mediator-2",
+    "personaId": "int-mediator",
+    "prompt": "假設兩方對休會後是否保留翻譯筆記看法不同。請設定資料保存程序。",
+    "sourceRefs": [
+      "src-un-charter"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-observer-1",
+    "personaId": "int-observer",
+    "prompt": "假設觀察團兩位成員在同地點量得不同噪音值。請在報告前處理測量差異。",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-observer-2",
+    "personaId": "int-observer",
+    "prompt": "假設觀察團收到一張未標拍攝日期的照片。請如何標示證據等級？",
+    "sourceRefs": [
+      "src-iaea"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-shipping-1",
+    "personaId": "int-shipping",
+    "prompt": "一艘商船的無線電設備在靠港前故障，港口公告仍要求電子回報。請提出臨時通報方法。",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-int-shipping-2",
+    "personaId": "int-shipping",
+    "prompt": "港口臨時更改靠泊次序，兩艘商船都載有易腐貨物。請提出透明的協調依據。",
+    "sourceRefs": [
+      "src-imo"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-socrates-1",
+    "personaId": "ph-socrates",
+    "prompt": "有人說凡是寫在牆上的規則都公正。請用一個反例與追問檢查這個定義。",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-socrates-2",
+    "personaId": "ph-socrates",
+    "prompt": "一位朋友稱學會下棋等於懂得智慧。請幫他區分技術與智慧。",
+    "sourceRefs": [
+      "src-plato-apology"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-confucius-1",
+    "personaId": "ph-confucius",
+    "prompt": "社區共餐由同一人長期收拾，其他人以她熟練為由不幫忙。請討論禮與互惠。",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-confucius-2",
+    "personaId": "ph-confucius",
+    "prompt": "學生在公開場合糾正老師的錯字，老師覺得失了面子。請討論表達方式與求真。",
+    "sourceRefs": [
+      "src-analects"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-zhuangzi-1",
+    "personaId": "ph-zhuangzi",
+    "prompt": "有人在夢中聽見朋友許諾，醒後堅稱朋友必須履約。請以莊子的詮釋視角探討經驗、證據與視角，不把寓言當史實。",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-zhuangzi-2",
+    "personaId": "ph-zhuangzi",
+    "prompt": "朋友要在山路上選最短的道，卻忽略沿途休息處。請探討何謂好路。",
+    "sourceRefs": [
+      "src-zhuangzi"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-nietzsche-1",
+    "personaId": "ph-nietzsche",
+    "prompt": "一位樂手發現自己的新曲總按評審喜好收尾，卻不再想演奏。請討論創造與評價。",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-nietzsche-2",
+    "personaId": "ph-nietzsche",
+    "prompt": "有人把一次失敗寫成自己永遠無能的證明。請以詮釋視角回應。",
+    "sourceRefs": [
+      "src-nietzsche"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-plato-1",
+    "personaId": "ph-plato",
+    "prompt": "某城用民調決定何謂勇敢，但投票前沒人說出定義。請設計一輪對話。",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "usageScope": "demo"
+  },
+  {
+    "id": "hold-ph-plato-2",
+    "personaId": "ph-plato",
+    "prompt": "一位教師只讓學生記住答案，不讓他們解釋推理。請探討學習與知識。",
+    "sourceRefs": [
+      "src-plato-republic"
+    ],
+    "usageScope": "demo"
+  }
+]

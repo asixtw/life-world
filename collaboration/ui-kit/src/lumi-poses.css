@@ -1,0 +1,16 @@
+@scope (.lw-kit) { /* 姿勢與孵化合成只限隔離套件。 */
+.lumi-poses{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px} /* 手機可自然換行。 */
+.lumi-poses figure{margin:0;min-width:0;padding:8px;border:1px solid var(--line);border-radius:12px;text-align:center} /* 每件可獨立核對。 */
+.lumi-poses img{display:block;width:100%;height:140px;object-fit:contain} /* 不裁切角色，但非指定輸出尺寸。 */
+.lumi-poses figcaption{margin-top:5px;font-size:.86rem} /* 圖片無烤字。 */
+.hatch-composite{width:min(100%,300px);height:100%;position:relative;z-index:1;isolation:isolate} /* 同畫布透明素材的候選裝配。 */
+.hatch-composite img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none} /* 角色與兩殼保持各自檔案。 */
+.hatch-composite__shadow{z-index:0} /* 獨立透明接地陰影。 */
+.hatch-composite__lumi{z-index:1} /* Lumi 在殼後。 */
+.hatch-composite__left,.hatch-composite__right{z-index:2} /* 殼片可個別位移。 */
+.hatch-composite__left{transform:translateX(-6%)}
+.hatch-composite__right{transform:translateX(6%)}
+.hatch-art--complete .hatch-composite__left{transform:translateX(-10%)}
+.hatch-art--complete .hatch-composite__right{transform:translateX(10%)}
+.hatch-art__fallback{position:absolute;inset:auto 10px 8px;text-align:center;font-size:.8rem;color:var(--ink);z-index:3} /* 缺圖可讀，不阻斷操作。 */
+} /* 角色落地錨點已用顯示檔對齊；殼裂口非同源抽取，仍待美術驗收。 */

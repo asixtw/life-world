@@ -1,0 +1,112 @@
+{
+  "version": "0.1-candidate",
+  "status": "independent-candidate-not-accepted",
+  "sourceSpecCommit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
+  "generatedSourceSize": [
+    1448,
+    1086
+  ],
+  "requestedOriginalSize": [
+    1920,
+    1440
+  ],
+  "originalSizeCompliance": false,
+  "displayTarget": [
+    1280,
+    960
+  ],
+  "portraitTarget": [
+    768,
+    1024
+  ],
+  "displayAndPortraitExports": "not-produced; HTML viewport simulation only, render blocked",
+  "coordinateSpace": "normalized scene 0..1; layer PNGs have transparent padding, placement must account for alpha bounds",
+  "layers": [
+    {
+      "id": "room-base",
+      "day": "originals/room-day-base.png",
+      "quiet": "originals/room-quiet-base.png",
+      "z": 0,
+      "fit": "cover",
+      "objectPosition": [
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "furniture",
+      "src": "layers/furniture-cabinet.png",
+      "z": 1,
+      "box": {
+        "left": 0.01,
+        "top": 0.46,
+        "width": 0.34
+      },
+      "quiet": "CSS brightness(.7) saturate(.8), candidate only"
+    },
+    {
+      "id": "shadow",
+      "src": "layers/lumi-contact-shadow.png",
+      "z": 2,
+      "anchor": [
+        0.5,
+        0.76
+      ],
+      "width": 0.23,
+      "translatePercent": [
+        -50,
+        -50
+      ],
+      "opacity": 0.55
+    },
+    {
+      "id": "lumi",
+      "src": "layers/reference-lumi-completion.png",
+      "z": 3,
+      "externalReferenceOnly": true,
+      "anchor": [
+        0.5,
+        0.76
+      ],
+      "cssBox": [
+        112,
+        135
+      ],
+      "mobileScale": 0.85,
+      "translatePercent": [
+        -50,
+        -90
+      ]
+    },
+    {
+      "id": "foreground",
+      "src": "layers/foreground-plant.png",
+      "z": 4,
+      "box": {
+        "right": 0,
+        "bottom": 0.01,
+        "width": 0.19
+      },
+      "quiet": "CSS brightness(.7) saturate(.8), candidate only"
+    }
+  ],
+  "safeAreaCandidate": {
+    "left": 0.35,
+    "top": 0.55,
+    "width": 0.3,
+    "height": 0.32,
+    "notVerifiedByScreenshot": true
+  },
+  "textPolicy": "No text or interactive controls over room. External UI owns text, goal/action/connections, bottom tabs and OS insets.",
+  "knownLimitations": [
+    "Not native1920x1440",
+    "No1280x960display raster exported",
+    "No independent768x1024portrait original; HTML recomposition only",
+    "Day/Quiet architecture visually similar, not pixel registration verified",
+    "Furniture and foreground share generated sprites with CSS quiet tint, not separately painted Quiet layers",
+    "Browser rendered crop QA blocked by execution sandbox",
+    "No Jerry or Boyi review",
+    "No integration/push/deploy"
+  ],
+  "assetMetadata": "provenance/asset-metadata.json"
+}

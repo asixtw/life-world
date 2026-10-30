@@ -1,0 +1,86 @@
+[
+  {
+    "path": "lifeworld-art-additions-20261029/originals/lw-effects-nourishment-v2.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 1325811,
+    "sha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+    "alpha_extrema": [
+      0,
+      253
+    ],
+    "alpha_zero_pixels": 783589,
+    "alpha_partial_pixels": 788927,
+    "alpha_opaque_pixels": 0,
+    "alpha_center": 0,
+    "alpha_bbox": [
+      0,
+      0,
+      1254,
+      1254
+    ],
+    "alpha_visible_bbox": [
+      192,
+      85,
+      1100,
+      1178
+    ]
+  },
+  {
+    "path": "lifeworld-art-additions-20261029/originals/lw-egg-shellsplit-v2.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 691469,
+    "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_pixels": 1108174,
+    "alpha_partial_pixels": 463627,
+    "alpha_opaque_pixels": 715,
+    "alpha_center": 0,
+    "alpha_bbox": [
+      0,
+      29,
+      1235,
+      1254
+    ],
+    "alpha_visible_bbox": [
+      229,
+      154,
+      1048,
+      1138
+    ]
+  },
+  {
+    "path": "lifeworld-art-additions-20261029/originals/lw-lumi-completion-v2.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 784948,
+    "sha256": "b04aaaf36ad2226f5645e3e7b8d8fd0a4572e35ad9c263d1b297318bd5ccd04a",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_pixels": 1012791,
+    "alpha_partial_pixels": 558886,
+    "alpha_opaque_pixels": 839,
+    "alpha_center": 253,
+    "alpha_bbox": [
+      0,
+      0,
+      1244,
+      1212
+    ],
+    "alpha_visible_bbox": [
+      23,
+      206,
+      1231,
+      1109
+    ]
+  }
+]

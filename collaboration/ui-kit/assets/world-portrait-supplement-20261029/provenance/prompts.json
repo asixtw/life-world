@@ -1,0 +1,16 @@
+{
+  "generator": "built-in image_gen.imagegen",
+  "sizeControl": "No size field in exposed tool schema; prompt requests exact768x1024, actual output verified separately",
+  "assets": [
+    {
+      "name": "portraitDay",
+      "prompt": "Recompose the provided Life World room into a genuinely PORTRAIT 3:4 image, requested exact768x1024pixels if supported, NOT wide landscape. Same identifiable room: cream plaster wall, sage wainscot, pale blonde floorboards, centered cream arch window with four panes overlooking gentle green hills, warm daylight, soft simple2D handpainted texture. Reframe architectural composition specifically for portrait: complete arch window fits in upper half; retain visible side wall returns and generous clean floor across lower40percent. Do not merely squeeze/stretch a landscape image. Wall-floor horizon at60percent height. Preserve soft existing palette and room identity. BASE BACKGROUND ONLY, no furniture, foreground plant, character, eggs, cast character shadow, UI, text, labels, watermark. Central x25-75percent y60-90percent must be clean unobstructed character staging area. Opaque fullbleed background. Portrait canvas mandatory.",
+      "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-0315252a-7760-4b93-8601-9c123b737b55.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    },
+    {
+      "name": "portraitQuiet",
+      "prompt": "Edit this exact PORTRAIT Life World room into Quiet mode, retain3:4portrait canvas, requested768x1024 if supported. Preserve all architecture, edges, proportions, window size and frame, wainscoting and floorboard arrangement exactly. Change only lighting and outdoor appearance: subdued muted dusk blue-gray sky, low-stimulation sage hills with no bright sun, soft desaturated warm room still clearly readable. Consistent with warm peaceful earlyevening, not pitchblack or scary. Do not add furniture, plants, characters, eggs, shadows, lamps, stars, sparkles, text, UI or graphics. Center lower floor remains completely empty for separate character. Same camera and room geometry as input, fullbleed opaque base layer.",
+      "output_hint": "Generated images are saved to /workspace/scratch/3aa9e7208a95/generated_images as /workspace/scratch/3aa9e7208a95/generated_images/exec-e0760a90-2aa5-48ef-b600-4cfb98294949.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  ]
+}

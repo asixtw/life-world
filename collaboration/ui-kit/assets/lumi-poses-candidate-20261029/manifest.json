@@ -1,0 +1,363 @@
+{
+  "project": "Life World",
+  "status": "product_candidate",
+  "spec_commit": "ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d",
+  "date": "2026-10-29",
+  "assets": [
+    {
+      "id": "idle",
+      "path": "originals/lw-lumi-idle-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 400844,
+      "sha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.7960650320887037,
+      "opaque_pixel_ratio": 0.000447054274805471,
+      "alpha_gt127_bbox": [
+        308,
+        241,
+        963,
+        1030
+      ],
+      "anchor_suggested_px": [
+        635.5,
+        1030
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "lifeworld-review-workspace/collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-lumi-companion-v1.png",
+      "tool": "prior delivered image reused byte-identical",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "idle Lumi character",
+      "event": "idle",
+      "display_exports": "reused 512 and 256 only; 128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "quiet",
+      "path": "originals/lw-lumi-quiet-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 448018,
+      "sha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.7978246326269495,
+      "opaque_pixel_ratio": 0.00025754904878551316,
+      "alpha_gt127_bbox": [
+        316,
+        240,
+        934,
+        1030
+      ],
+      "anchor_suggested_px": [
+        625.0,
+        1030
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "lifeworld-review-workspace/collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-lumi-quiet-v1.png",
+      "tool": "prior delivered image reused byte-identical",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "quiet Lumi character",
+      "event": "quiet",
+      "display_exports": "reused 512 and 256 only; 128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "welcome",
+      "path": "originals/lw-lumi-welcome-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 578906,
+      "sha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.7298768343215586,
+      "opaque_pixel_ratio": 0.0005570690536694063,
+      "alpha_gt127_bbox": [
+        264,
+        219,
+        1033,
+        1128
+      ],
+      "anchor_suggested_px": [
+        648.5,
+        1128
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "generated_images/exec-e5d46553-111a-4ea2-810e-8cf69f7b3321.png",
+      "tool": "built-in image_gen image edit",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "welcome Lumi character",
+      "event": "welcome",
+      "display_exports": "512/256/128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "listening",
+      "path": "originals/lw-lumi-listening-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 554221,
+      "sha256": "e05fce759e8f41323644253f8f1a64b9fa3c64446b9dc19bf4d828dc9ff21198",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.7445183387641207,
+      "opaque_pixel_ratio": 0.0006155740227762388,
+      "alpha_gt127_bbox": [
+        298,
+        198,
+        959,
+        1107
+      ],
+      "anchor_suggested_px": [
+        628.5,
+        1107
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "generated_images/exec-dfe10150-27f1-45af-b24b-66de72e1c9ef.png",
+      "tool": "built-in image_gen image edit",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "listening Lumi character",
+      "event": "listening",
+      "display_exports": "512/256/128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "confirmed",
+      "path": "originals/lw-lumi-confirmed-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 459013,
+      "sha256": "76c37b3b6183c2f6984a9a9225f312341b2435ef23770b574bdc5cf4ade962de",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.7925795349618064,
+      "opaque_pixel_ratio": 0.0004298843382197701,
+      "alpha_gt127_bbox": [
+        254,
+        240,
+        1000,
+        1029
+      ],
+      "anchor_suggested_px": [
+        627.0,
+        1029
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "generated_images/exec-8ec87310-5f03-4d31-ac0e-0d8b63d61ee9.png",
+      "tool": "built-in image_gen image edit",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "confirmed Lumi character",
+      "event": "confirmed",
+      "display_exports": "512/256/128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "celebrate",
+      "path": "originals/lw-lumi-celebrate-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 554006,
+      "sha256": "941665d17e5b9312401928a1be9ed0c537924a31fa0913326d5ecfb5d610da76",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.7424458638258689,
+      "opaque_pixel_ratio": 0.00022193732845961504,
+      "alpha_gt127_bbox": [
+        236,
+        205,
+        1021,
+        1075
+      ],
+      "anchor_suggested_px": [
+        628.5,
+        1075
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "generated_images/exec-4cc5ba45-5b26-45b3-937a-2c753e962a30.png",
+      "tool": "built-in image_gen image edit",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "celebrate Lumi character",
+      "event": "celebrate",
+      "display_exports": "512/256/128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "shell-left",
+      "path": "originals/lw-shell-left-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 254291,
+      "sha256": "f3f76f704d34f28ccb236ecbfff1f08ce226f80a5b757c641712af6e2d60b6b1",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.9139500011446624,
+      "opaque_pixel_ratio": 0.0002422868829315568,
+      "alpha_gt127_bbox": [
+        227,
+        769,
+        717,
+        1189
+      ],
+      "anchor_suggested_px": [
+        472.0,
+        1189
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "generated_images/exec-1d0d2d71-dfad-4502-bdd1-4d8a9962b419.png",
+      "tool": "built-in image_gen image edit",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "shell-left independent eggshell fragment",
+      "event": "shell-left",
+      "display_exports": "512/256/128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    },
+    {
+      "id": "shell-right",
+      "path": "originals/lw-shell-right-candidate-v1.png",
+      "format": "PNG",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "size_bytes": 303791,
+      "sha256": "26709f2e5da4ea509688e42c2ed5a9ce5c302578c982346b287b682867ec5ff4",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "transparent_pixel_ratio": 0.8866943166238054,
+      "opaque_pixel_ratio": 0.00038282599350340476,
+      "alpha_gt127_bbox": [
+        639,
+        688,
+        1168,
+        1197
+      ],
+      "anchor_suggested_px": [
+        903.5,
+        1197
+      ],
+      "anchor_status": "measured silhouette center-bottom suggestion; body anchor and assembly not accepted",
+      "source": "generated_images/exec-561cf90e-48b0-4ff4-a543-5d0738175d54.png",
+      "tool": "built-in image_gen image edit",
+      "theme": "day and quiet-compatible warm cream/sage",
+      "version": "candidate-v1",
+      "use_basis": "user-authorized Life World independent candidate development",
+      "alt": "shell-right independent eggshell fragment",
+      "event": "shell-right",
+      "display_exports": "512/256/128 missing",
+      "qa": {
+        "visually_inspected": true,
+        "fully_visible": true,
+        "true_alpha": true,
+        "uniform_anchor_verified": false,
+        "small_size_checked": false,
+        "edge_fringe_review_required": true
+      }
+    }
+  ],
+  "constraints": [
+    "No repo modification or push",
+    "No raster resize/crop/compositing done: all PNGs original byte copies",
+    "Shared 1254 square originals, not identical subject scale/base anchor",
+    "Suggested anchors only; actual pixel-aligned compositing and closed-egg continuity NOT validated",
+    "New shell pair redraw, NOT pixel-extracted original upper/lower pair",
+    "Generated pose and shell displays 512/256/128 still missing; idle/quiet128 missing",
+    "Imagegen exposes no exact size/anchor controls; CSS scale is NOT exported size compliance",
+    "Light edge fringes visible on dark display: review against both themes before acceptance",
+    "Welcome remains close to idle; its stronger wave and differing scale may need product acceptance"
+  ]
+}

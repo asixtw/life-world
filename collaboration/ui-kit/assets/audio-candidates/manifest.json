@@ -1,0 +1,296 @@
+{
+  "version": "v1.1-candidate-three-formats",
+  "method": "Original deterministic Python 3.12 + NumPy additive synthesis",
+  "sampleRate": 48000,
+  "channels": 1,
+  "format": "PCM 16-bit WAV",
+  "usageScope": "product_candidate",
+  "status": "WAV + AAC/M4A + Ogg candidates; browser decode and Boyi listening review pending",
+  "events": [
+    {
+      "id": "ui-tap-01",
+      "event": "ui-tap",
+      "candidate": 1,
+      "path": "wav/ui-tap-01.wav",
+      "description": "柔和單擊",
+      "durationSeconds": 0.08,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.29,
+      "bytes": 7724,
+      "sha256": "02eea828728dd0a01a2a5390adb37380c69910ffed3cf6747b5ec0fbeca0e476",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/ui-tap-01.m4a",
+          "bytes": 1717,
+          "sha256": "1361f1a8189efc962c2318a6477b99af205ec7a548898ea76d9a34b1b0cc01ba",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/ui-tap-01.ogg",
+          "bytes": 3953,
+          "sha256": "fd00ee4072759f9959f45ba4e66bfb4ce32d26eb56a6614df6da44099deccf74",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "ui-tap-02",
+      "event": "ui-tap",
+      "candidate": 2,
+      "path": "wav/ui-tap-02.wav",
+      "description": "雙層輕觸",
+      "durationSeconds": 0.09,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.11,
+      "bytes": 8684,
+      "sha256": "2dc79d22e25d9a79e68653295bfe888d7436a07e90b52868d2c684d4e23f55a6",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/ui-tap-02.m4a",
+          "bytes": 1835,
+          "sha256": "efefc428cee502c962a6bcaf4cf218ac500b354244791b25502a4fcc434ae789",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/ui-tap-02.ogg",
+          "bytes": 4226,
+          "sha256": "8e5abb3aec9bbf8fa45c1a1c0c96c026307d4b1980818e051d83f8af074a78a7",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "draft-saved-01",
+      "event": "draft-saved",
+      "candidate": 1,
+      "path": "wav/draft-saved-01.wav",
+      "description": "上行兩音",
+      "durationSeconds": 0.28,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.16,
+      "bytes": 26924,
+      "sha256": "9b0c8a1c377da8bd35f82c4e75c40d5b9c1d25ed2517ad69e4bfefca6308b057",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/draft-saved-01.m4a",
+          "bytes": 3715,
+          "sha256": "14e54b3a17dd988154155587757c28640645d3f0e4be973af0f5accfbe0d64db",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/draft-saved-01.ogg",
+          "bytes": 5075,
+          "sha256": "23116b820d7d4a0754fa3e53e6ff1852edf7374d66aa889c4bea5c7504bdbbdd",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "draft-saved-02",
+      "event": "draft-saved",
+      "candidate": 2,
+      "path": "wav/draft-saved-02.wav",
+      "description": "低暖兩音",
+      "durationSeconds": 0.33,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.67,
+      "bytes": 31724,
+      "sha256": "0775c1e69031a37d2ac07497505657c399dd167581b0eb5ba8e76f31aff5a8aa",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/draft-saved-02.m4a",
+          "bytes": 4331,
+          "sha256": "0a848d5e4d43c22528da3218cf10117498b81293962ced6b8dc73c3e8f76db4c",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/draft-saved-02.ogg",
+          "bytes": 5311,
+          "sha256": "9c92fa8a806329d03570ccbf575fa9fabf17200697c1ea11bb1aec2ab0052a43",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "experience-confirmed-01",
+      "event": "experience-confirmed",
+      "candidate": 1,
+      "path": "wav/experience-confirmed-01.wav",
+      "description": "溫和三音",
+      "durationSeconds": 0.76,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.03,
+      "bytes": 73004,
+      "sha256": "f0fcb6938cfca0f37bb23e222650337fb1d21e4c6cf5d018a42076704fd6476c",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/experience-confirmed-01.m4a",
+          "bytes": 8822,
+          "sha256": "e3c3f247e866d6a8218f70c7cff42d799f0fa94930290f869e3a7d05c0fb1881",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/experience-confirmed-01.ogg",
+          "bytes": 7469,
+          "sha256": "9c155754f1b371ec255d23c9fbd7a43d5277e19828f0dfa56fce93bc849f70c2",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "experience-confirmed-02",
+      "event": "experience-confirmed",
+      "candidate": 2,
+      "path": "wav/experience-confirmed-02.wav",
+      "description": "緩升和聲",
+      "durationSeconds": 0.78,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.94,
+      "bytes": 74924,
+      "sha256": "13b219fdb03181dc83e5d29ecde50015f322b5c8bd594e51095c936c6e8dff37",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/experience-confirmed-02.m4a",
+          "bytes": 9314,
+          "sha256": "19cf0735a471a25ce1bb3c9f459bfe9e0330bd44dcb1fee0e0bad04183891da4",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/experience-confirmed-02.ogg",
+          "bytes": 7350,
+          "sha256": "47af6b12d7e9ff4a4e79af43eed6860b2e6594699200ff246ca2e9b97966c547",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "first-hatch-01",
+      "event": "first-hatch",
+      "candidate": 1,
+      "path": "wav/first-hatch-01.wav",
+      "description": "四音破曉",
+      "durationSeconds": 1.62,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.75,
+      "bytes": 155564,
+      "sha256": "5963b2378b4e1cf41f4c7eca01899b9b3283ba1b240a3a9fb13f5768aecdf5cc",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/first-hatch-01.m4a",
+          "bytes": 18924,
+          "sha256": "30e7772625c24179c264ec97abc119f342f524fb1e344a7c9b54f5c0d3de9a8f",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/first-hatch-01.ogg",
+          "bytes": 11512,
+          "sha256": "f038c2ed8a80166d9cd2504d3e372fe4e8f807328c5d6e0f0e63a2fce20e6bc3",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "first-hatch-02",
+      "event": "first-hatch",
+      "candidate": 2,
+      "path": "wav/first-hatch-02.wav",
+      "description": "慢速甦醒",
+      "durationSeconds": 1.76,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -23.86,
+      "bytes": 169004,
+      "sha256": "c1d8efc8cb98a536a416fc4e0af8edffdaf6fe613c026965ff352922881245b4",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/first-hatch-02.m4a",
+          "bytes": 19252,
+          "sha256": "e903bd36dbe550a0952725463464c6c08fce590a2152d25e37c5defbbe852944",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/first-hatch-02.ogg",
+          "bytes": 11973,
+          "sha256": "b0a6ba10bf61c587d3b2a617aa23634deb897930cf4ffaf93a758285c2d38621",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "goal-completed-01",
+      "event": "goal-completed",
+      "candidate": 1,
+      "path": "wav/goal-completed-01.wav",
+      "description": "明亮收束",
+      "durationSeconds": 1.18,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.7,
+      "bytes": 113324,
+      "sha256": "ac0b3b5197abe5a1709c95caa4ffa62d7ca5747c3eb400b0ba5a54f1d83efc8a",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/goal-completed-01.m4a",
+          "bytes": 12400,
+          "sha256": "a86db123f3cbf41613be9ae34f5f0cfe9ad04274b367c418f4ce5c0b8095cfc5",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/goal-completed-01.ogg",
+          "bytes": 9292,
+          "sha256": "61b5a028ead0eb72f772224a03ae1753b58c918b1ca01a140ccd9628aed4ab94",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "goal-completed-02",
+      "event": "goal-completed",
+      "candidate": 2,
+      "path": "wav/goal-completed-02.wav",
+      "description": "沉穩收束",
+      "durationSeconds": 1.28,
+      "peakDbfs": -12.4,
+      "rmsDbfs": -24.49,
+      "bytes": 122924,
+      "sha256": "6019e9cc09827fd29fd6d2961f1ab2961d5ec871f116c6bb7e662826cc028120",
+      "playbackVersions": {
+        "m4a": {
+          "path": "m4a/goal-completed-02.m4a",
+          "bytes": 13358,
+          "sha256": "70030b3937748c4ffd815edba2df947f0ebd1258e3f0aa290ade5c1cfdf9f499",
+          "sampleRate": 48000,
+          "channels": 1
+        },
+        "ogg": {
+          "path": "ogg/goal-completed-02.ogg",
+          "bytes": 9464,
+          "sha256": "df43153889dd3ab5b569088182dae86d72f2037db4d3fdd5039ad2a972960034",
+          "sampleRate": 48000,
+          "channels": 2
+        }
+      }
+    }
+  ],
+  "playbackEncoder": {
+    "version": "ffmpeg version n4.4.4-6-gd5fa6e3a91 Copyright (c) 2000-2023 the FFmpeg developers",
+    "aac": "FFmpeg native AAC, 96 kbps, mono",
+    "ogg": "FFmpeg experimental native Vorbis, 96 kbps, stereo duplicated from mono"
+  }
+}

@@ -1,0 +1,8 @@
+@scope (.lw-kit) { /* 僅供獨立候選表單。 */
+.input-gallery{margin-top:18px} /* 六狀態同一欄位排列。 */
+.input-gallery .field input[type=checkbox],.input-gallery__choice input[type=radio]{width:22px;min-height:22px;height:22px;accent-color:var(--green)} /* 不把核取框拉滿欄位。 */
+.input-gallery__choice{margin:0;border:1px solid var(--line);border-radius:11px;padding:10px 12px;min-width:0} /* Radio 遵守群組語意。 */
+.input-gallery__choice legend{font-weight:700;padding:0 4px} /* 螢幕閱讀器讀到選項群組。 */
+.input-gallery__choice label{display:inline-flex;align-items:center;gap:7px;margin-right:16px;min-height:44px} /* 手機可觸控。 */
+.button[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--green)} /* 切換狀態不只靠顏色。 */
+}

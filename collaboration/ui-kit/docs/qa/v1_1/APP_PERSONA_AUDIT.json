@@ -1,0 +1,569 @@
+{
+  "status": "file_and_crop_qa_not_boyi_approval",
+  "app": [
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-app-icon-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "sha256": "e5beb459afe15afdbbafc522f6bcdfc5788318914086583854e9512566df8563"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@1024.png",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB",
+      "sha256": "be6a8ced52b8b784a521aca189a3714a8dd532c999920e33d95cf20cdbf72b67"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@16.png",
+      "width": 16,
+      "height": 16,
+      "mode": "RGB",
+      "sha256": "8165eb9c96fdf84c5580a886707cc1df7937fd0d9bcb0fc59b07f69c146ee2c9"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@180.png",
+      "width": 180,
+      "height": 180,
+      "mode": "RGB",
+      "sha256": "d8350526954bacc61961320a5ef9c3c95039de02db7be0665dd66e7bde0161dd"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@192.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGB",
+      "sha256": "7be8620b6995354b411bfa70598ea63cfcd30e49514254a6e40657f5b2c09230"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@32.png",
+      "width": 32,
+      "height": 32,
+      "mode": "RGB",
+      "sha256": "e013b3247edcf65c3e1a0416879fb61ab250ffd1905b9460ca92e2e9585bb64d"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@48.png",
+      "width": 48,
+      "height": 48,
+      "mode": "RGB",
+      "sha256": "c3f967a494db5878e6f1b7902c8cab440f78efb47d1456ace15edad923cdb9b7"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-app-icon-v1@512.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGB",
+      "sha256": "2695146db5fbdd3ffef78193b7a42f0533cd5fb4b29b8dc69334d51d29a17242"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-share-illustration-v1@1200x630.png",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "sha256": "656200b99cfe2951f6b3d23f94fa76014f528bf3a1123806147debd111dcfdd3"
+    },
+    {
+      "path": "assets/shared-art/lifeworld-fullkit-shared-art/exports/lw-share-illustration-v1@600x315.png",
+      "width": 600,
+      "height": 315,
+      "mode": "RGB",
+      "sha256": "e6b6f117ed38a51adb93cb9c623bfb71061ddd5bb8173281120b489deebf3aad"
+    },
+    {
+      "path": "public/favicon.png",
+      "width": 48,
+      "height": 48,
+      "mode": "RGB",
+      "sha256": "c3f967a494db5878e6f1b7902c8cab440f78efb47d1456ace15edad923cdb9b7"
+    },
+    {
+      "path": "public/share.png",
+      "width": 1200,
+      "height": 630,
+      "mode": "RGB",
+      "sha256": "656200b99cfe2951f6b3d23f94fa76014f528bf3a1123806147debd111dcfdd3"
+    }
+  ],
+  "portraits": [
+    {
+      "id": "portrait-three-kingdoms-caocao",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-caocao.1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "4334151d13b571fe691fbb6ecdd6c3a88f093fb825a379efa0c286f857cd7076"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-caocao.256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "d2943c411ec4a65888e9c733178e8df309e011a2db2c1c5a78e0ecbae6625216"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/previews/portrait-three-kingdoms-caocao.circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "ece0f31630355c7e9b10ec1ed19480263127c1921f48c66c8c16a728619ca59d"
+      }
+    },
+    {
+      "id": "portrait-three-kingdoms-liubei",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-liubei.1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "da153804361f5e5c0271434c5492927b2cf4d6eea5842b7572bf23b6f5d81e65"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-liubei.256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "6da4bd487f66dcdc42225a8d1226268b4caa321667033d99790e840212d59d78"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/previews/portrait-three-kingdoms-liubei.circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "7f298b039d5f0ff25d4d95e36811f58d75c22010148f643d571a1520bd8195b7"
+      }
+    },
+    {
+      "id": "portrait-three-kingdoms-zhugeliang",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-zhugeliang.1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "7756fefe056882703d12667e08cd46a242dfa04f41d61e89ff7d84d6b0fa487c"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-zhugeliang.256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "889f2e907626ab23164423df2a0a98e3b2fc6df12e1dd205746cf0f97fe971eb"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/previews/portrait-three-kingdoms-zhugeliang.circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "6c01509702594c57bc1cce245de5eb121fba45b56040edc87fae49920ef15194"
+      }
+    },
+    {
+      "id": "portrait-three-kingdoms-sunquan",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-sunquan.1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "b5b0ce1e2582bca7519274ff992368ebdae4c262a97d051e4c14e52ff7ddf8a8"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-sunquan.256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "aa2015922896d343d748865f58f7ba819842fd3e0f9a43fb9effb961218cb3c1"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/previews/portrait-three-kingdoms-sunquan.circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "82eb9a5131b1454004d5679bf6a985b3e9655924c0bbba3139d3ac2dfceb37a1"
+      }
+    },
+    {
+      "id": "portrait-three-kingdoms-zhouyu",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/portrait-three-kingdoms-zhouyu.1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "739df09c78d5ee546dab40a34e45155a80fa2b78f8ae56833941b8557cf123d9"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/display/portrait-three-kingdoms-zhouyu.256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "24142a387bdb700f4a7248ca387a54996614fec721a841d4694758f01cf3ddcf"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/previews/portrait-three-kingdoms-zhouyu.circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "16fb9a5dd7ba1fb1705bc9b8d6a7c99dd15984655b06bfa94e1e2ff8a0a20f30"
+      }
+    },
+    {
+      "id": "portrait-international-dialogue-us-representative",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-us-representative@1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "083d66044e346d636d1e8d7f6dd4f3d3753f8b6573f80e6aa518e19f103873b6"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-us-representative@256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "244e20cda432b0a23996f4881803432c5decab8209b2ff72232c2543a7f8b30f"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/previews/portrait-international-dialogue-us-representative@256-circle.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "3b31525cdebc44e1ca36af50ca41bab30e886f6f6970bd5438e7969039ab7e80"
+      }
+    },
+    {
+      "id": "portrait-international-dialogue-iran-representative",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-iran-representative@1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "8b01938d3cd2e6068bee47e3c52b687906324c944df3017d961ca468561e849d"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-iran-representative@256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "2743a5d31b40db41e2bfd2205bfcce4df3dff9b3bf8a01e60106e47909f1932f"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/previews/portrait-international-dialogue-iran-representative@256-circle.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "667b35cda16c9d5c3178718652fa6f593d971cbd9325abfdd5de5dbb41a38598"
+      }
+    },
+    {
+      "id": "portrait-international-dialogue-neutral-mediator",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-neutral-mediator@1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "ed673ccd8f327776ff194f5e787e806ba70ad6bf71d7836be4115b9f475b5e44"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-neutral-mediator@256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "af92043541c8185ae35adeb95605fcfcbc6b4d64fa345705aa73b466b7e319e6"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/previews/portrait-international-dialogue-neutral-mediator@256-circle.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "7cebf220f530f701f62c4667ebcb92a7945a3c31164682889f425b3236b9eb9f"
+      }
+    },
+    {
+      "id": "portrait-international-dialogue-international-observer",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-international-observer@1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "e34af0ec4382a2c43754718e9dcbdd30d5c27023a59c363235430719e4845474"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-international-observer@256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "1e94b7521b8d8837ba9866da7c2db9e1beb60b64ef87c32348fe2badd5d2f7d1"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/previews/portrait-international-dialogue-international-observer@256-circle.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "cd84dc196338262106a004e79ad68b59a0277e53288198b6e03d13b1723e0885"
+      }
+    },
+    {
+      "id": "portrait-international-dialogue-shipping-representative",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/masters/portrait-international-dialogue-shipping-representative@1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "f4876dbc8f3abf12f437dda4726fa832b97143137f310a7bd1c8538e9389849e"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/exports/portrait-international-dialogue-shipping-representative@256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "3efb02c78e603bd6768e0439e5f416ad66a2d4a3f7c0a7ea5fd7b41f9bc7c95f"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/previews/portrait-international-dialogue-shipping-representative@256-circle.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "4aa04122494ea24f703f617bbd7cd36835b050a502603c38f64e92e37f87d70e"
+      }
+    },
+    {
+      "id": "portrait-philosophy-socrates",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-socrates-1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "88197bd6cd37a6ac6c3d541bd4d2b6996bfecb6ae528148437bc2cec022f94dc"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-socrates-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "8827432722232f110cdf66707d7fcb55f90ff02aafdaea273e43eee8759d1689"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/previews/portrait-philosophy-socrates-circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "c26e26259b39456e22d2c381f3d2e0794d5405b061b88e9d69f63ffdb63c94a9"
+      }
+    },
+    {
+      "id": "portrait-philosophy-confucius",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-confucius-1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "17748105160c632c03d1185bb813c1140169b3a9fb7a8fbef7c8351e626ba356"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-confucius-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "7e9e276e58ed1060900969649136e652082bf29a3d589670b1ae0683ca7693f2"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/previews/portrait-philosophy-confucius-circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "19e2485a2be74a256c21ac04a26360b00ac036e7e1f493c41c4cd706f9ae5fd8"
+      }
+    },
+    {
+      "id": "portrait-philosophy-zhuangzi",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-zhuangzi-1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "dfa0ec88152823349f1785471c149152790d69a89f774061198464b43369834c"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-zhuangzi-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "79f096cebc114295d98310d11a4988a2cf1a1e8998691f73939c293119863272"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/previews/portrait-philosophy-zhuangzi-circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "d88bf0784250f5e69d8ea11185ad09778eff2eb43322ea5df7c4ae6911f12c2c"
+      }
+    },
+    {
+      "id": "portrait-philosophy-nietzsche",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-nietzsche-1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "d016eb53d5da46d8b47e1833cf76d62836a7790632e57abc4a62692426a458a4"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-nietzsche-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "beba3adebaf274b0eefc4e127b9254863caffb86c1ecee063b92498a6d64bcd0"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/previews/portrait-philosophy-nietzsche-circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "49eb7b84201c5641cddb9e8e83c499e77590c5719af9c23475932b22724b5890"
+      }
+    },
+    {
+      "id": "portrait-philosophy-plato",
+      "scope": "demo",
+      "original": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/masters/portrait-philosophy-plato-1024.png",
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB",
+        "sha256": "19234d4ace160d523a13ca630052a9a25acbd6be1b90212d65c1756cab6b601e"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/display/portrait-philosophy-plato-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGB",
+        "sha256": "69ac56cecbccd6ed2c7085bb91ccf02980567a3cb126357a9eff075b2a80ebd5"
+      },
+      "circlePreview": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/previews/portrait-philosophy-plato-circle-256.png",
+        "width": 256,
+        "height": 256,
+        "mode": "RGBA",
+        "sha256": "f5d6a3d9cde0f1771f7ac6a1f64a1c4be8e45d7d2b7964a77c5e01308fc23744"
+      }
+    }
+  ],
+  "covers": [
+    {
+      "pack": "lifeworld-pack-art-international-dialogue",
+      "master": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/masters/cover-international-dialogue@1600x900.png",
+        "width": 1600,
+        "height": 900,
+        "mode": "RGB",
+        "sha256": "751903c3272c87dda225e69ec91b7932b5613cfc9ef952b2a84d059be68bd394"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-international-dialogue/exports/cover-international-dialogue@800x450.png",
+        "width": 800,
+        "height": 450,
+        "mode": "RGB",
+        "sha256": "b72a828b96da6643be1231ed126540b8f094fb4fe20b85312104a16f9176b65d"
+      },
+      "mobileCropPreview": {
+        "path": "docs/qa/v1_1/persona-cover-mobile-international-dialogue.png",
+        "width": 400,
+        "height": 500,
+        "mode": "RGB",
+        "sha256": "6be43ba6124560f8a9f8564245a193ae4946177274466b49a15b4da3c6629650"
+      },
+      "cropOn1600": [
+        440,
+        0,
+        1160,
+        900
+      ],
+      "allFiveSubjectsPreserved": false,
+      "status": "crop_qa_only_not_runtime"
+    },
+    {
+      "pack": "lifeworld-pack-art-philosophy",
+      "master": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/masters/cover-philosophy-1600x900.png",
+        "width": 1600,
+        "height": 900,
+        "mode": "RGB",
+        "sha256": "be63c6695d863e40618d0d5e16adb403907c8a6456e29d8a6861ecf61e6d7047"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-philosophy/assets/display/cover-philosophy-800x450.png",
+        "width": 800,
+        "height": 450,
+        "mode": "RGB",
+        "sha256": "d12de8bb38f2797b6b935decd93cb90cb7b807a0437d76802c72d938bbe2c45e"
+      },
+      "mobileCropPreview": {
+        "path": "docs/qa/v1_1/persona-cover-mobile-philosophy.png",
+        "width": 400,
+        "height": 500,
+        "mode": "RGB",
+        "sha256": "602ae723c29662bce6498335f41c33f9fa84c5a10dcbefa0b3d5c3ae16e5185d"
+      },
+      "cropOn1600": [
+        440,
+        0,
+        1160,
+        900
+      ],
+      "allFiveSubjectsPreserved": false,
+      "status": "crop_qa_only_not_runtime"
+    },
+    {
+      "pack": "lifeworld-pack-art-three-kingdoms",
+      "master": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/masters/cover-three-kingdoms.1600x900.png",
+        "width": 1600,
+        "height": 900,
+        "mode": "RGB",
+        "sha256": "6046ae837aada6ed613770c17126648f601629abf023aa14f4ebeec3a61c6417"
+      },
+      "display": {
+        "path": "assets/persona-art/lifeworld-pack-art-three-kingdoms/assets/display/cover-three-kingdoms.800x450.png",
+        "width": 800,
+        "height": 450,
+        "mode": "RGB",
+        "sha256": "0dc4136c8511a7a9d8bf9031f9da8164182bb9522d187f1f8306086036ec4ec4"
+      },
+      "mobileCropPreview": {
+        "path": "docs/qa/v1_1/persona-cover-mobile-three-kingdoms.png",
+        "width": 400,
+        "height": 500,
+        "mode": "RGB",
+        "sha256": "ee2bc807b394c68d99ee716aea9fd49ebfd7283b839b47d0bf83da81fa92b995"
+      },
+      "cropOn1600": [
+        440,
+        0,
+        1160,
+        900
+      ],
+      "allFiveSubjectsPreserved": false,
+      "status": "crop_qa_only_not_runtime"
+    }
+  ],
+  "squareThumbnail": "reuse verified 1024x1024 app icon candidate",
+  "limits": [
+    "手機 4:5 中央裁切無法同時保留原 16:9 群像五人，正式手機封面需設計審查",
+    "角色臉部位置與圓形裁切僅有檔案核對，尚需 Boyi 視覺驗收"
+  ]
+}
