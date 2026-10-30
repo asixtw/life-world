@@ -23,4 +23,15 @@ describe('v1.1 排程純函式', () => { // 月份只作檢視，不自動產生
     expect(weekCells('2028-01-01')).toEqual(['2027-12-27','2027-12-28','2027-12-29','2027-12-30','2027-12-31','2028-01-01','2028-01-02'])
     expect(nextCycle('2026-10-29', 'week', 1)).toBe('2026-11-02')
   })
+  it('非法月份、日數、閏年與格式只回傳可處理的失敗', () => { // 壞日期不得以 Invalid time value 中斷元件。
+    for (const day of ['2026-13-01', '2026-00-01', '2026-04-31', '2027-02-29', '2026-1-01', '2026-01-1']) { // 覆蓋月份、日數與格式。
+      expect(validatePeriod(day, '2026-12-31')).toBe(false) // 無效期間交由畫面提示。
+      expect(weekStart(day)).toBe('') // 無效週游標不得拋例外。
+      expect(weekCells(day)).toEqual([]) // 週格不顯示虛構日期。
+    }
+    expect(calendarCells('2026-13')).toEqual([]) // 非法月份只回空格集合。
+    expect(calendarCells('2026-00')).toEqual([]) // 零月不可進入 Date 計算。
+    expect(nextCycle('2026-13', 'month', 1)).toBe('') // 無效月導覽不拋例外。
+    expect(validatePeriod('2028-02-29', '2028-02-29')).toBe(true) // 真閏日維持可用。
+  })
 }) // 純函式測試不接正式保存。

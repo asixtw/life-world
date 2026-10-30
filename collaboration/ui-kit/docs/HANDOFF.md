@@ -1,11 +1,11 @@
 # 歐桑 v1.1 獨立候選交付摘要（供組員審查）
 
-程式基準：`6a0f8cf651a6869361e1c378a3fe2a83884d7161`；上次遠端待審查版 `7e3301eab31b0c25283545c9286bcec97c254fdf`；v1.1 文件基準 `ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d`。本次 v1.1 已推送至 `work/ousang-full-kit` 待審查分支；所有改動只在 `collaboration/ui-kit/`，**尚未 merge 或 deploy**。此摘要是可審查候選，不是十四類整體驗收通過。
+v1.1 首次程式基準：`6a0f8cf651a6869361e1c378a3fe2a83884d7161`；上次遠端待審查版 `7e3301eab31b0c25283545c9286bcec97c254fdf`；v1.1 文件基準 `ae5a9dc57cc49886427d3cb8ac7cc94bdc00065d`。本次另含 2026-10-30 三項審查修正；最新提交以本 PR head 為準。所有改動只在 `collaboration/ui-kit/` 的待審查分支，**尚未 merge 或 deploy**。此摘要是可審查候選，不是十四類整體驗收通過。
 
 ## 一分鐘摘要
 
 - 舊版已有隔離的 React／TypeScript 展示套件、指定十五人物及劇場、另附十五張原創愛好者 TXT、三項新孵化／回饋圖。v1.1 在此之上增加受控月份與週排程、三習慣、錄音／附件／校對 mock 契約與 IndexedDB 本機草稿、六 Lumi 姿勢和左右殼、日間／Quiet 房間、音效，以及完整輸入／面板狀態展示。本輪**未修改**兩套既有角色內容，未把人物劇場寫入正式服務。
-- 隔離套件的最新程式通過 TypeScript、Vite build、51 個 Vitest 測試；Chrome localhost 定向操作檢查通過。檢查範圍和真截圖見下文。Boyi 美術／聽審、Jerry 正式接入與實機／Safari 都未完成。
+- 隔離套件的最新程式通過 TypeScript、Vite build、55 個 Vitest 測試；Chrome localhost 定向操作檢查通過。2026-10-30 審查修正的失敗→修復證據見 [三項回歸紀錄](qa/v1_1/REVIEW_FIXES_20261030.md)。Boyi 美術／聽審、Jerry 正式接入與實機／Safari 都未完成。
 - 立即需要組員判斷的是：蛋殼與完整蛋非同源素材、世界 1920 圖是小原稿上採樣、三組群像在手機中心裁切失去邊緣人物；此外真回執、權限、上傳、AI 與正式資料模型須由宿主提供。
 
 ## 從上次遠端版到本地候選
@@ -17,7 +17,7 @@
 | P1 視覺 | 六姿勢、真正左右兩片殼、獨立陰影／養分；日／Quiet 橫直房間和分層；一般確認採無殼 Lumi；孵化／轉場取消、重播、卸載與減少動效契約 | `src/LumiPoses.tsx`、`src/WorldRoom.tsx`、`src/Hatch.tsx`、`src/Transitions.tsx`；`qa/v1_1/P1_DERIVED_EXPORTS_20261029.md` |
 | P2 聲音 | 五事件各兩個原創程式合成候選，共十聲；每聲 WAV、AAC／M4A、Ogg 三格式，預設關閉、Quiet 無聲、回執去重 | `assets/audio-candidates/manifest.json`、`src/SoundGallery.tsx`；`qa/v1_1/P0_P1_P2_BATCH_3_20261029.md` |
 
-源碼獨立審查從 `fff363c` 指出週起點、慢回讀／慢保存、真 Blob 續作與逐事件音長缺口；`d82f781` 修正週對齊、草稿競態、真檔／原文保存及五個過長音效；`0ed1790` 再修訂「文字修改即取消核對」與慢回讀保留原 Blob。母端另對**當時**的三格式 30 檔獨立查核 48 kHz 與逐事件時長。最新 51 個測試和 Chrome 檢查是**交付端本機重跑**，不能說成母端對 `6a0f8cf` 重跑或人工驗收。
+源碼獨立審查從 `fff363c` 指出週起點、慢回讀／慢保存、真 Blob 續作與逐事件音長缺口；`d82f781` 修正週對齊、草稿競態、真檔／原文保存及五個過長音效；`0ed1790` 再修訂「文字修改即取消核對」與慢回讀保留原 Blob。母端另對**當時**的三格式 30 檔獨立查核 48 kHz 與逐事件時長。2026-10-30 補修 Dialog 焦點、劇場切換／刷新與非法日期；最新 55 個測試和 Chrome 檢查是**交付端本機重跑**，不能說成母端重跑或人工驗收。
 
 ## 如何開啟與先看哪些內容
 
@@ -48,7 +48,7 @@
 
 ## 測試、資產與不可代替的外部工作
 
-- 交付端最後程式：TypeScript exit 0；Vitest **16 檔／51 測試**；Vite build exit 0；本地 Chrome 390×844 與 1280×800 的控制項、轉場／孵化生命週期、既有互動與 Lumi 定向腳本通過。真 PNG 在 `qa/v1_1/controls-*.png`、`lumi-assembly-*.png`、`world-*.png`、`mobile-p0-*.png`。`qa/v1_1/P0_CONTROLS_ART_AUDIT_20261029.md` 記錄本輪命令及範圍。這些不是實機／Safari、真 API 或人工驗收。
+- 交付端最後程式：TypeScript exit 0；Vitest **18 檔／55 測試**；Vite build exit 0；本地 Chrome 的焦點、劇場同 owner 續作／切換、控制項及既有互動腳本通過，相關日期純函式與無效畫面由單元測試檢查。真 PNG 在 `qa/v1_1/controls-*.png`、`lumi-assembly-*.png`、`world-*.png`、`mobile-p0-*.png`，是先前畫面證據；新修正的操作斷言與失敗反例見 `qa/v1_1/REVIEW_FIXES_20261030.md`。這些不是實機／Safari、真 API 或人工驗收。
 - `assets/derived-v1_1/manifest.json` 記 40 張真 PNG：六姿勢各正規化母版＋512／256／128，共 24；左右殼各 512／256／128，共 6；陰影與養分各 512／256，共 4；日／Quiet 房間各 1920×1440、1280×960、768×1024，共 6。`tools/verify_visual_derivatives.py` 核對原稿 hash 未變、透明像素與落地錨點。六姿勢母版用 alpha bbox 等比調整到可見身高 790、腳底錨點 `(627,1030)`，並非重新繪圖。1920 是由 1448 原生橫稿上採樣；左右殼非完整蛋同源抽層，不能以尺寸合格替代視覺驗收。
 - 十聲音效共有 **30 個播放／原稿檔**，分別為 48 kHz WAV、AAC／M4A、Ogg；逐事件時長、峰值與 SHA 在音效清單。Quiet 無聲與重複回執不重播在 Chrome 候選檢查，聽感、不同瀏覽器和正式觸發仍待 Boyi／Jerry。
 - 指定十五人物、六場劇場及另附十五原創愛好者卡是舊版沿用內容，本次 v1.1 **未改角色卡、人物設定或劇情**；創作內容的人工審閱與正式採用仍由組員決定。`content/original-enthusiasts/` 不替代劇場指定人物。

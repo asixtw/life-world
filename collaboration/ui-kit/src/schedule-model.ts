@@ -2,7 +2,7 @@ export type Cycle = 'month' | 'week' // 月與週只是檢視週期。
 export type SchedulePreset = 'weekdays' | 'tue-thu-sat' | 'daily' | 'clear' // 快捷是安排規則，不代表完成。
 const isoDay = (date: Date) => date.toISOString().slice(0, 10) // 在純日期運算中固定輸出 YYYY-MM-DD。
 const civil = (day: string) => new Date(`${day}T12:00:00Z`) // 使用 UTC 正午避免午夜與夏令時間漂移。
-const validDay = (day: string) => /^\d{4}-\d{2}-\d{2}$/.test(day) && isoDay(civil(day)) === day // 阻擋不存在的日期。
+const validDay = (day: string) => { const date = civil(day); return /^\d{4}-\d{2}-\d{2}$/.test(day) && Number(day.slice(0, 4)) >= 1 && Number.isFinite(date.getTime()) && isoDay(date) === day } // 先排除 Invalid Date，才使用 toISOString。
 export function validatePeriod(startDate: string, endDate: string): boolean { return validDay(startDate) && validDay(endDate) && startDate <= endDate } // 期間由使用者明確設定。
 export function todayInZone(timeZone: string, now = new Date()): string { // 目標時區由宿主提供，無法用裝置時區代替。
   const parts = new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now) // 讀目標時區的民用日期。
@@ -40,6 +40,7 @@ export function weekCells(cursor: string): string[] { // 欄頭一至日必須�
   return daysInPeriod(first, isoDay(last))
 }
 export function nextCycle(cursor: string, cycle: Cycle, amount: number): string { // 導覽不修改保存期間。
-  if (cycle === 'month') { const date = civil(`${cursor}-01`); date.setUTCMonth(date.getUTCMonth() + amount); return isoDay(date).slice(0, 7) } // 月份保持月首錨點。
+  if (!Number.isInteger(amount)) return '' // 非有限整數偏移不得進入日期計算。
+  if (cycle === 'month') { if (!validDay(`${cursor}-01`)) return ''; const date = civil(`${cursor}-01`); date.setUTCMonth(date.getUTCMonth() + amount); return Number.isFinite(date.getTime()) ? isoDay(date).slice(0, 7) : '' } // 月份保持月首錨點，壞月份回空字串。
   const first = weekStart(cursor); if (!first) return ''; const date = civil(first); date.setUTCDate(date.getUTCDate() + amount * 7); return isoDay(date) // 週視圖先對齊週一再移動七日。
 } // 週跨月、跨年仍可用。

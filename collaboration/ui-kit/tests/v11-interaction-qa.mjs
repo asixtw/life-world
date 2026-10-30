@@ -96,7 +96,8 @@ try { // 確保測試失敗也會關閉瀏覽器。
     await page.locator('.choice-list button').nth(route).click() // 重走選定路線。
     while (await page.locator('.choice-list button').count()) await page.locator('.choice-list button').first().click() // 走到可回顧終點。
     if (!await page.getByText('回顧：', { exact: false }).count()) throw new Error(`theater route ${route} did not end`) // 每路線應有結尾。
-    await page.getByRole('button', { name: '重設', exact: true }).click() // 重設後下一路線獨立。
+    await page.getByRole('button', { name: '重設', exact: true }).click() // 未匯出對話重設前先確認。
+    await page.getByRole('dialog', { name: '尚未匯出的演練' }).getByRole('button', { name: '確認切換' }).click() // 明確同意後下一路線才獨立。
   } // 不將三條路徑當同一條重複。
   const download = page.waitForEvent('download') // 真正檢查匯出事件。
   await page.getByRole('button', { name: '匯出模擬紀錄' }).click() // 匯出 demo JSON。
