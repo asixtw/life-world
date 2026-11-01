@@ -45,15 +45,15 @@ def test_database_does_not_store_plaintext_password_or_session(app, client):  # 
         assert c.execute('SELECT token_hash FROM sessions').fetchone()['token_hash'] != token  # 斷言資料庫不保存明文密碼或工作階段代碼的預期結果
 
 
-def test_28_day_calendar_respects_per_action_weekdays(client):  # 驗證：現有 28 日預覽遵守各行動每週規律
+def test_month_calendar_respects_explicit_action_dates(client):  # 驗證：真實月期間預覽遵守明確排程日期
     _, goal = onboard(client)  # 完成訪客、Bio 與第一目標的測試前置流程
     response = client.get('/api/goals/' + goal['id'] + '/calendar')  # 透過實際測試用戶端操作 API 並保留回應
     assert response.status_code == 200  # 核對 HTTP 狀態，避免失敗請求被當成成功
     days = response.json()  # 保存「days」供後續驗證或回傳使用
-    assert len(days) == 28  # 斷言現有 28 日預覽遵守各行動每週規律的預期結果
-    assert days[0]['date'] == '2026-10-27'  # 斷言現有 28 日預覽遵守各行動每週規律的預期結果
-    assert days[0]['action_ids'] == []  # 斷言現有 28 日預覽遵守各行動每週規律的預期結果
-    assert set(days[1]['action_ids']) == {a['id'] for a in goal['actions']}  # 斷言現有 28 日預覽遵守各行動每週規律的預期結果
+    assert len(days) == 31  # 核對實際月長與各習慣日期
+    assert days[0]['date'] == '2026-10-27'  # 核對實際月長與各習慣日期
+    assert days[0]['action_ids'] == []  # 核對實際月長與各習慣日期
+    assert set(days[1]['action_ids']) == {a['id'] for a in goal['actions']}  # 核對實際月長與各習慣日期
 
 
 def test_assistant_failure_preserves_draft_and_manual_confirmation(app, client):  # 驗證：整理服務失敗仍保留原文且可手動確認

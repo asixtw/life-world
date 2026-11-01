@@ -49,7 +49,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
         p['interaction_count'] = p['stats']['interactions']  # 保存「p['interaction_count']」供後續驗證或回傳使用
         p['last_interaction_at'] = p['stats']['last_interaction_at']  # 保存「p['last_interaction_at']」供後續驗證或回傳使用
         goals = self._person_goals(c, owner, person_id)  # 準備人物相關或帳號所屬的目標清單
-        p['has_active_goal'] = any(g['status'] == 'active' for g in goals)  # 保存「p['has_active_goal']」供後續驗證或回傳使用
+        p['has_active_goal'] = any(g['status'] in {'active', 'awaiting_review', 'needs_setup'} for g in goals)  # 未結束挑戰維持透明優先度。
         p['goal_titles'] = [g['title'] for g in goals]  # 保存「p['goal_titles']」供後續驗證或回傳使用
         return p  # 回傳組合多角色、標籤、統計與目標關聯的結果
 
@@ -95,7 +95,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             WHERE g.owner_id=? AND (pg.person_id IS NOT NULL OR EXISTS
               (SELECT 1 FROM experiences x WHERE x.goal_id=g.id AND x.person_id=? AND x.owner_id=?))
             ORDER BY g.created_at,g.id''', (person_id, owner, person_id, owner)).fetchall()  # 查詢目標；值以參數傳入
-        return [dict(r, link_kind='manual' if r['label'] is not None else 'experience') for r in rows]  # 回傳讀取明確目標關聯與舊經歷的上下文關聯的結果
+        return [dict(r, status=self._goal_status(dict(r), self._owned_user(c, owner)), link_kind='manual' if r['label'] is not None else 'experience') for r in rows]  # 關聯目標使用同一生命週期。
 
     def link_person_goal(self, owner, person_id, data):  # 以可重送的提交建立人物與目標關聯
         with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交

@@ -1,4 +1,5 @@
 """Actual Chromium journeys; run explicitly against an isolated local server."""  # 說明此模組的責任與實作邊界
+from datetime import date, timedelta  # 依伺服器日期設定未來期限。
 import base64  # 解碼虛構的測試圖片
 import os  # 讀取資料目錄或測試網址等環境設定
 from pathlib import Path  # 以跨平台方式組合檔案路徑
@@ -9,7 +10,7 @@ from playwright.sync_api import sync_playwright, expect  # 以實際 Chromium �
 
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGNkaGBgYGBgYmBgYGBgAAAGKgCE5tEtPAAAAABJRU5ErkJggg==')  # 準備供上傳驗收使用的有效虛構圖片
 BASE = os.environ.get('LIFEWORLD_TEST_URL', 'http://127.0.0.1:8001')  # 透過實際測試用戶端操作 API 並保留回應
-ARTIFACTS = Path(__file__).resolve().parent.parent / 'docs' / 'artifacts' / 'connections' / 'regression'  # 準備手機與桌面驗收截圖的輸出目錄
+ARTIFACTS = Path(__file__).resolve().parent.parent / 'docs' / 'artifacts' / 'goals' / 'regression'  # 準備手機與桌面驗收截圖的輸出目錄
 
 
 @pytest.fixture  # 註冊可由 pytest 注入並清理的測試資源
@@ -24,14 +25,21 @@ def page():  # 啟動隔離 Chromium 視窗並於測試後關閉
         browser.close()  # 關閉已使用完畢的資源
 
 
-def create_goal(page, title):  # 透過畫面填寫三項行動並建立目標
-    page.locator('#goal-title').fill(title)  # 填入此步驟的虛構表單內容
-    page.locator('#outcome').fill('完成一個自己的作品，並提供照片佐證。')  # 填入此步驟的虛構表單內容
-    for i, (action, unit) in enumerate([('練習', '小時'), ('記錄', '篇'), ('交流', '次')]):  # 逐項處理測試資料與預期結果
-        page.locator('#action-title-' + str(i)).fill(action)  # 填入此步驟的虛構表單內容
-        page.locator('#target-' + str(i)).fill('10')  # 填入此步驟的虛構表單內容
-        page.locator('#unit-' + str(i)).fill(unit)  # 填入此步驟的虛構表單內容
-    page.get_by_role('button', name='確認設定，建立目標蛋').click()  # 依使用者動線點擊畫面入口
+def create_goal(page, title):  # 逐步確認目標與三個習慣。
+    page.locator('#goal-title').fill(title)  # 設定名稱。
+    page.get_by_role('button', name='下一步').click()  # 進入成果與期限。
+    page.locator('#outcome').fill('完成一個自己的作品，並提供照片佐證。')  # 保留真實結果檢查。
+    today = date.fromisoformat(page.request.get(BASE + '/api/auth/me').json()['today'])  # 不依賴測試主機時區。
+    page.locator('#goal-deadline').fill((today + timedelta(days=30)).isoformat())  # 明確選擇期限。
+    page.get_by_role('button', name='下一步').click()  # 開始習慣。
+    for i, (action, unit) in enumerate([('練習', '小時'), ('記錄', '篇'), ('交流', '次')]):  # 三個習慣逐一檢查。
+        page.locator('#action-title-' + str(i)).fill(action)  # 輸入名稱。
+        page.locator('.gj-quantity > summary').click()  # 展開每次數量設定。
+        page.locator('#target-' + str(i)).fill('10')  # 設定每次預期量。
+        page.locator('#unit-' + str(i)).fill(unit)  # 設定原情境單位。
+        page.get_by_role('button', name='平日', exact=True).click()  # 安排實際日期。
+        page.get_by_role('button', name='下一步').click()  # 確認各習慣。
+    page.get_by_role('button', name='確認設定，').click()  # 首次或後續挑戰都要最後確認。
 
 
 def onboarding(page):  # 以真實瀏覽器完成首次旅程並檢查 Lumi 出現時機
@@ -60,6 +68,12 @@ def test_complete_browser_journey_with_upgrade_preserves_selected_goal_and_contr
     page.on('pageerror', lambda error: errors.append(str(error)))  # 將目前資料加入結果清單
     onboarding(page)  # 以真實瀏覽器完成首次旅程並檢查 Lumi 出現時機
     page.locator('#nav').get_by_role('link', name='目標', exact=True).click()  # 依使用者動線點擊畫面入口
+    page.get_by_role('link', name='查看目標').click()  # 新規則要求先結束第一個挑戰。
+    page.get_by_role('button', name='結束這次挑戰', exact=True).click()  # 由使用者選擇結束。
+    page.locator('#goal-end-confirmed').check()  # 不自動刪除目標。
+    page.get_by_role('button', name='確認結束並收藏').click()  # 保留歷史。
+    expect(page.get_by_role('heading', name='這段挑戰，已經收藏。')).to_be_visible()  # 等待交易完成。
+    page.locator('#nav').get_by_role('link', name='目標', exact=True).click()  # 結束後才能接續。
     page.get_by_role('link', name='新的目標').click()  # 依使用者動線點擊畫面入口
     create_goal(page, '第二個作品')  # 在同一交易建立目標、行動並孵化 Lumi
     expect(page.get_by_role('heading', name='第二個作品')).to_be_visible()  # 等待並核對目前畫面狀態
@@ -163,7 +177,7 @@ def test_unsaved_record_can_be_saved_before_navigation(page):  # 驗證：切頁
     page.locator('#nav').get_by_role('link', name='目標', exact=True).click()  # 依使用者動線點擊畫面入口
     expect(page.get_by_role('heading', name='離開前，留住這段內容。')).to_be_visible()  # 等待並核對目前畫面狀態
     page.get_by_role('button', name='先存草稿並離開').click()  # 依使用者動線點擊畫面入口
-    expect(page.get_by_role('heading', name='照顧你的目標花園。')).to_be_visible()  # 等待並核對目前畫面狀態
+    expect(page.get_by_role('heading', name='目前挑戰')).to_be_visible()  # 等待並核對目前畫面狀態
     page.locator('#nav').get_by_role('link', name='紀錄', exact=True).click()  # 依使用者動線點擊畫面入口
     page.get_by_role('link', name='繼續核對').click()  # 依使用者動線點擊畫面入口
     expect(page.locator('.raw-source')).to_have_text('導覽離開前，這段原文需要先保存。')  # 等待並核對目前畫面狀態

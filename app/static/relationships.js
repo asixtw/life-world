@@ -39,7 +39,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     return 'people'+(q.size?'?'+q:''); // 回傳此步驟組合完成的結果
   } // 結束目前回呼、區塊或模組定義
   function lastTime(p) { return p.last_interaction_at ? c.time(p.last_interaction_at) : '尚無互動紀錄'; } // 顯示最近互動，無紀錄時不捏造日期
-  function follow(p) { return btn('person-follow',p.followed?'已關注':'設為關注','secondary',`data-id="${h(p.id)}" data-revision="${p.revision}" data-followed="${p.followed}"`); } // 產生攜帶版本號的關注切換按鈕
+  function follow(p) { return btn('person-follow',p.followed?'★ 已加星標':'☆ 加入星標','secondary',`data-id="${h(p.id)}" data-revision="${p.revision}" data-followed="${p.followed}" aria-pressed="${p.followed}" title="${p.followed?'再次點選可取消星標':'方便你之後找回，只有你自己看得到'}"`); } // 產生攜帶版本號的關注切換按鈕
   async function renderPeople() { // 以同一清單繪製星圖或收藏冊並保留查詢與選取
     ensureOwner(); returnRoute=location.hash.slice(1) || 'people'; // 先清除跨帳號快取，再處理目前人物頁操作
     const q=query(), view='cards'; // 讀取或組合目前路由的搜尋與返回條件
@@ -51,10 +51,10 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     // 組合「以同一清單繪製星圖或收藏冊並保留查詢與選取」所需的畫面或提交資料
     return `${c.heading('我的人際關係','整理人物資訊，也能沿著交會探索故事。',btn('new-person','＋ 新增人物'))}
       ${ConnectionsUI.tabs('cards')}
-      <form id="people-filter-form" data-search="true" class="people-filters"><div class="field"><label for="people-query">搜尋人物、角色、目標或標籤</label><input id="people-query" name="q" value="${h(q.get('q')||'')}" maxlength="200" placeholder="輸入姓名、目標或標籤"></div><div class="filter-controls"><select name="sort" aria-label="視覺排序">${[['priority','綜合優先度'],['recent','最近互動'],['name','姓名']].map(([v,t])=>`<option value="${v}" ${params.get('sort')===v?'selected':''}>${t}</option>`).join('')}</select><select name="category" aria-label="人物分類"><option value="">全部分類</option>${Object.entries(categories).map(([v,t])=>`<option value="${v}" ${params.get('category')===v?'selected':''}>${t}</option>`).join('')}</select><label class="check-line"><input name="followed_only" type="checkbox" ${params.get('followed_only')==='true'?'checked':''}>只看關注</label><button class="primary">搜尋</button></div></form>
-      <p class="small muted">綜合優先度：關注 → 關聯進行中目標 → 最近互動。排序不代表親密度。共 ${listing.total} 位。</p>
+      <form id="people-filter-form" data-search="true" class="people-filters"><div class="field"><label for="people-query">搜尋人物、角色、目標或標籤</label><input id="people-query" name="q" value="${h(q.get('q')||'')}" maxlength="200" placeholder="輸入姓名、目標或標籤"></div><div class="filter-controls"><select name="sort" aria-label="視覺排序">${[['priority','綜合優先度'],['recent','最近互動'],['name','姓名']].map(([v,t])=>`<option value="${v}" ${params.get('sort')===v?'selected':''}>${t}</option>`).join('')}</select><select name="category" aria-label="人物分類"><option value="">全部分類</option>${Object.entries(categories).map(([v,t])=>`<option value="${v}" ${params.get('category')===v?'selected':''}>${t}</option>`).join('')}</select><label class="check-line"><input name="followed_only" type="checkbox" ${params.get('followed_only')==='true'?'checked':''}>只看星標人物</label><button class="primary">搜尋</button></div></form>
+      <p class="small muted">綜合優先度：星標人物 → 關聯進行中目標 → 最近互動。排序不代表親密度。共 ${listing.total} 位。</p>
       ${c.state.me.status==='guest'?`<div class="upgrade-banner"><h3>建立帳號，開始記錄你的關係。</h3><p class="small muted">人物資料需要先升級；原本的目標與草稿都會保留。</p>${btn('claim-dialog','建立帳號，繼續記錄')}</div>`:''}
-      ${listing.items.length?`<div class="people-cards">${listing.items.map(p=>`<button class="card person-card ${p.id===selected?.id?'selected':''}" data-person="${h(p.id)}" aria-label="選取${h(p.name)}"><span class="person-avatar category-${p.category}">${h(p.name.slice(0,1))}</span><span><b>${h(p.name)}</b><span class="small muted person-card-line">${h(p.roles.join('、')||'尚未設定角色')}</span><span class="small muted person-card-line">${h(lastTime(p))}${p.followed?' · 已關注':''}</span></span></button>`).join('')}</div>`:c.empty('目前沒有符合條件的人物。')}
+      ${listing.items.length?`<div class="people-cards">${listing.items.map(p=>`<button class="card person-card ${p.id===selected?.id?'selected':''}" data-person="${h(p.id)}" aria-label="選取${h(p.name)}"><span class="person-avatar category-${p.category}">${h(p.name.slice(0,1))}</span><span><b>${h(p.name)}</b><span class="small muted person-card-line">${h(p.roles.join('、')||'尚未設定角色')}</span><span class="small muted person-card-line">${h(lastTime(p))}${p.followed?' · ★ 已加星標':''}</span></span></button>`).join('')}</div>`:c.empty('目前沒有符合條件的人物。')}
       ${selected?`<aside class="person-summary card" aria-label="已選人物摘要"><div class="section-title"><h2>${h(selected.name)}</h2>${btn('person-close-summary','關閉摘要','text-button')}</div><p>${h(selected.roles.join('、')||'尚未設定角色')}</p><p class="small muted">最近互動：${h(lastTime(selected))}</p><p class="small">共同場合／交集：${h(selected.common_context||'尚未記錄')}<br>標籤：${h(selected.tags.join('、')||'尚未設定')}</p><div class="button-row">${follow(selected)}${link(personRoute(selected),'查看人物卡','primary')}${link('people?focus='+selected.id,'探索此人的故事','text-button')}</div></aside>`:''}
       <div class="button-row space-top">${listing.offset?link(listingRoute({offset:Math.max(0,listing.offset-listing.limit)}),'上一頁'):''}${listing.offset+listing.items.length<listing.total?link(listingRoute({offset:listing.offset+listing.limit}),'下一頁'):''}</div>`;
   } // 結束目前回呼、區塊或模組定義
@@ -133,7 +133,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     if(action==='person-close-summary') { c.navigate(listingRoute({selected:null})); return true; } // 關閉摘要並保留查詢條件
     if(action==='person-follow') { // 攜帶版本切換關注狀態
       await c.api('/people/'+target.dataset.id,json('PATCH',{expected_revision:Number(target.dataset.revision),followed:target.dataset.followed!=='true'})); // 等待伺服器完成讀取或保存，再進入下一步
-      await c.refresh(); await c.render(); return true; // 重新讀取伺服器確認的資料，再更新畫面
+      await c.refresh(); await c.render(); c.toast(target.dataset.followed!=='true'?'已加入星標，方便你之後找回，只有你自己看得到。':'已取消星標。'); return true; // 成功後才更新標記，不通知對方。
     } // 結束目前回呼、區塊或模組定義
     if(action==='person-edit') { openPersonEditor(profile.person); return true; } // 開啟人物基本資料編輯
     if(action==='fact-new') { // 從已確認經歷建立人物資訊

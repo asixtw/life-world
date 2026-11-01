@@ -1,16 +1,22 @@
 # Life World · Python 本機 App
 
+> **2026-11-01 審查快照：**請先讀[目前版本與已知問題](docs/REVIEW_CURRENT_2026-11-01.md)，內含 App／原型差異、啟動方式、審查重點及本次測試。此分支供同仁檢查，尚未合併 main 或部署。
+
 從第一顆目標蛋開始，保存真實經歷、手動確認行動貢獻，讓 Lumi 陪伴自己的成長。
 
 這是可執行的本機 MVP，依 [最新產品決策 U-01～06](docs/context/LATEST_PRODUCT_DECISIONS_2026-10-27.md) 建立。產品決策副本隨專案保存，原有交接包與歷史檔案沒有修改。
 
-開發入口：[共同產品研發指引](docs/PRODUCT_GUIDE.md)、[Codex 專案規則](AGENTS.md)、[App 與原型功能演進](docs/EVOLUTION.md)。App 目前為 v0.3.0；交會已取代星圖，接入真實經歷、來源與人工人物配對。原 Connections v0.3 設計原型另外保留。
+開發入口：[共同產品研發指引](docs/PRODUCT_GUIDE.md)、[Codex 專案規則](AGENTS.md)、[App 與原型功能演進](docs/EVOLUTION.md)。App 目前為 v0.4.0；交會已取代星圖，接入真實經歷、來源與人工人物配對。原 Connections v0.3 設計原型另外保留。
 
-團隊先讀[共同規格入口](docs/SPEC_INDEX.md)、[檔案／素材存放規則](docs/STORAGE_RULES.md)、[分支與審查規則](CONTRIBUTING.md)，再到[三人協作入口](docs/team/README.md)領取任務與完整指令。共同起點以本次發布的 Git commit 為準；本機快照保留作歷史備份。React＋TypeScript／PostgreSQL／GCP 為暫定目標，尚未遷移；AI 供應商未定。文件發布不提升 App 版本，實際測試與範圍見[發布檢查](docs/GITHUB_PUBLISH.md)。
+團隊先讀[共同規格入口](docs/SPEC_INDEX.md)、[檔案／素材存放規則](docs/STORAGE_RULES.md)、[分支與審查規則](CONTRIBUTING.md)，再到[三人協作入口](docs/team/README.md)領取任務與完整指令。共同起點以本次發布的 Git commit 為準；本機快照保留作歷史備份。React＋TypeScript／PostgreSQL／GCP 為暫定目標，尚未遷移；AI 供應商未定。文件發布不提升 App 版本，v0.4 候選的測試與待發範圍見[發布檢查](docs/GITHUB_PUBLISH_V0_4.md)；[v0.3 發布紀錄](docs/GITHUB_PUBLISH.md)保留為歷史。
 
-**具名分工：Boyi（產品／體驗）、Jerry／jerry（全端整合／審查）、歐桑（資料庫／Pro 協作）。**歐桑從[完整任務總入口](docs/team/PROMPT_OUSANG_START.md)開始，一次交齊[三組十五位模擬人物與可玩模組](docs/team/PROMPT_SIMULATION_001.md)及[完整 UI／美術／按鈕／轉場／App 代表圖／蛋與破蛋](docs/team/ART_DELIVERY_SPEC.md)。任務已由 Boyi 通知同仁並定案；成果尚未交付。十五位與三封面為測試／POC／封測 demo，正式版及封測入口仍待評估。
+**具名分工：Boyi（產品／體驗）、Jerry／jerry（全端整合／審查）、歐桑（資料庫／Pro 協作及製作）。**歐桑從[任務總入口](docs/team/PROMPT_OUSANG_START.md)讀取[完整規格 v1.1](docs/team/ART_DELIVERY_SPEC.md)及[三組十五位／可玩模組](docs/team/PROMPT_SIMULATION_001.md)。原十三類加音效第十四類，按 P0 操作核心、P1 房間／角色／美術／動效、P2 音效分批製作／審查，最後整包交齊。Boyi 已確認本機修訂；新版尚未公告／發布或完成工程驗收，既有候選先核對沿用與缺口。十五位／三封面維持 demo，封測入口與正式版保留待評估。
 
 ## 啟動
+
+Jerry 的資料庫交接：[完整 Table Schema／31 表資料字典](docs/DATABASE_SCHEMA.md)、[PostgreSQL 與功能缺口規劃](docs/database/POSTGRESQL_HANDOFF.md)。依實際 SQLite 及 001–005 查核，不含使用者資料；候選新表與現有結構分開。
+
+**最新完整流程 Wireframe：[開啟原型](collaboration/flow-wireframe/index.html)／[操作說明](collaboration/flow-wireframe/README.md)。**原型獨立呈現目前及規劃流程，全部使用虛構資料；錄音、辨識與夜間明示模擬，與實際 App 分開。習慣調整及本輪驗收見[交付紀錄](docs/HABIT_WIREFRAME_ACCEPTANCE.md)。
 
 在這個 `LifeWorld_App` 資料夾開啟終端機：
 
@@ -38,9 +44,15 @@ LIFEWORLD_DATA_DIR=/你的/私有資料夾 .venv/bin/python -m uvicorn app.main:
 
 環境變數不會自動從 `.env` 讀取。服務預設僅監聽本機，這個版本不是公開部署的正式產品。
 
-## 已可操作（v0.3.0 交會整合）
+## 本輪素材流程增量（本機，尚未發布）
 
-- 訪客開始 → 必填 Bio → 三項行動、Lv1–3 與星期規律 → 確認目標蛋 → Lumi 誕生。後端也阻止略過首次目標。
+已接入真實錄音、圖片／截圖／拍照／名片／音檔選取、本機預覽與草稿接續、人工校對及同裝置來源回看。選取不自動上傳，錄完後明確「上傳並轉文字」，試聽可選。素材保存在此裝置，未同步雲端；辨識服務商未設定，預設明確回覆不可用，仍可手動整理。
+
+[本輪驗收](docs/MEDIA_COMPONENTS_ACCEPTANCE.md)／[Jerry 與歐桑的元件、狀態及辨識契約](docs/team/MEDIA_COMPONENT_CONTRACT.md)。原四分頁與視覺保留，月份安排沿用既有真實日期元件；未將 React gallery 或測試控制列併入產品。
+
+## 已可操作（v0.4.0）
+
+- 訪客開始 → 必填 Bio → 目標命名／成果與截止日 → 三個習慣及月／週日期安排 → 核對 → 目標蛋與首次 Lumi；後端阻止略過首次目標或同時啟動第二個。
 - 記錄文字、過去發生時間、選填目標與人物，保存／恢復草稿。
 - 手動編輯摘要，確認小數貢獻與後續任務，再一次保存經歷與積分；相同提交重試不重複入帳。
 - 訪客人物操作需要建立本機帳號；原 owner、目標、草稿與積分不變，介面保留原操作內容。
@@ -51,13 +63,16 @@ LIFEWORLD_DATA_DIR=/你的/私有資料夾 .venv/bin/python -m uvicorn app.main:
 - 興趣、飲食、專長、習慣四維度，由已確認經歷建立，附原文來源、衝突處理及資訊變更歷史；不自動猜測未知資訊。
 - 真實互動按事件統計，可分類與合併；同次多筆經歷只算一次見面，分類／合併不改積分。
 - 人物小劇場四用途：準備、手動演練、訊息草稿、真實相遇回顧；來源可選，私人內容不寫成真實成果，也不自動發送。
-- 28 日排程預覽、獨立行動累計、待辦勾選。
+- 真實日期月／週排程、星期快選與單日調整；每次預期量預設 1 次，既有行動總量與進度保留。
+- 到期先回顧，選擇延長、成果完成或結束；待處理貢獻逐筆採計且不重複發獎。已完成與曾經挑戰各自收藏，舊目標先補設定。
 - 真實 PNG／JPEG 上傳與預覽、人工確認終極成果；行動次數不會自動完成目標。
 - 本機帳號登入／登出、session 撤銷、CSRF、跨帳號存取限制、SQLite 重啟後回讀。
 
 沒有預設密碼或內建假帳號。請在介面自行建立測試用帳號。訪客若遺失 cookie，沒有身分憑證可保證找回；建立帳號後仍須自行記住本機帳號與密碼，目前沒有找回密碼功能。
 
 ## 測試
+
+v0.4 本輪實測：137 項後端、19 項 Chromium 通過；完整命令、跨日測試啟動方式、手機／桌面截圖及限制見[單一目標驗收](docs/GOAL_FLOW_ACCEPTANCE.md)。一般瀏覽器命令未提供測試時鐘時，跨日案例會明確跳過，不能宣稱完整 19 項通過。
 
 ```bash
 # API、資料庫、交易與邊界測試
@@ -105,7 +120,7 @@ LifeWorld_App/
 
 本輪逐圖驗收與差異見 [人物流程還原報告](docs/PEOPLE_RESTORATION.md)，截圖使用虛構測試資料。
 
-程式碼已補繁體中文註解；閱讀順序、各模組用途及獨立 prototype 位置見 [程式導讀與原型入口](docs/CODE_GUIDE_ZH.md)。
+程式碼已補繁體中文註解；閱讀順序、各模組用途及設計參考界線見 [程式導讀與原型入口](docs/CODE_GUIDE_ZH.md)。
 
 ## 資料與設定
 
@@ -117,8 +132,8 @@ LifeWorld_App/
 
 API 規格：服務運行時 `/openapi.json`；互動文件 `/docs` 使用 FastAPI 預設外部資產，離線時可讀本機 [API 說明](docs/API.md) 與 `docs/openapi.json`。
 
-## v0.3 驗收與體驗
+## v0.3 歷史驗收與體驗
 
-本輪實際結果：100 項後端、14 項 Chromium 旅程通過；手機／桌面來源、配對、返回、草稿、既有功能與慢網路均有測試。詳見[整合與體驗報告](docs/CONNECTIONS_ACCEPTANCE.md)，包含 300 人／103 段故事的量測與限制。
+當時實際結果：100 項後端、14 項 Chromium 旅程通過；手機／桌面來源、配對、返回、草稿、既有功能與慢網路均有測試。詳見[整合與體驗報告](docs/CONNECTIONS_ACCEPTANCE.md)，包含 300 人／103 段故事的量測與限制。
 
 重做效能驗收時，先啟動上方 **8001 的隔離虛構資料服務**，在 App 根目錄執行 `.venv/bin/python scripts/audit_experience.py`。工具會建立虛構帳號、300 人與 103 段故事，不應對正式資料服務執行。

@@ -1,0 +1,19 @@
+[公開版註記] 僅移除行尾空白；失敗案例、斷言與結果保留。
+F
+=================================== FAILURES ===================================
+______________ test_wizard_single_goal_end_and_history[viewport0] ______________
+browser_tests/test_goal_flow.py:37: in test_wizard_single_goal_end_and_history
+    begin(page)  # 進入建立流程。
+browser_tests/test_goal_flow.py:14: in begin
+    expect(page.locator('#goal-form')).to_have_attribute('data-step', '0')  # 現版應因缺少逐步建立而失敗。
+E   AssertionError: Locator expected to have attribute '0'
+E   Actual value: None
+E   Call log:
+E     - Expect "to_have_attribute" with timeout 5000ms
+E     - waiting for locator("#goal-form")
+E       13 × locator resolved to <form class="card" id="goal-form">…</form>
+E          - unexpected value "null"
+=========================== short test summary info ============================
+FAILED browser_tests/test_goal_flow.py::test_wizard_single_goal_end_and_history[viewport0]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 5.91s

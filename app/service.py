@@ -19,6 +19,7 @@ from .schemas import format_decimal  # 載入領域輸入模型或十進位格�
 from .security import PASSWORDS, DUMMY_HASH, digest, new_session, require_registered  # 共用密碼、工作階段與帳號權限檢查
 from .people import PeopleMixin  # 載入人物來源與互動事件服務擴充
 from .connections import ConnectionsMixin  # 載入逐經歷人物角色與故事探索服務
+from .goals import GoalsMixin  # 載入單一挑戰、日期安排與人工回顧。
 
 
 def uid():  # 產生不依賴名稱的固定唯一識別碼
@@ -29,7 +30,7 @@ def encoded(value):  # 以穩定鍵序序列化 JSON，供指紋與資料保存�
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))  # 回傳以穩定鍵序序列化 JSON，供指紋與資料保存使用的結果
 
 
-class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、積分與身分共用交易服務
+class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用既有交易與帳本。
     def __init__(self, db, policy, clock=None, assistant=None):  # 注入資料庫、設定、時鐘與整理提供者
         self.db = db  # 保存「self.db」供後續驗證或回傳使用
         self.policy = policy  # 保存「self.policy」供後續驗證或回傳使用
@@ -51,10 +52,10 @@ class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、�
             user = dict(c.execute('SELECT * FROM users WHERE id=?', (session['owner_id'],)).fetchone())  # 執行目前交易中的參數化查詢
             return user, session['csrf_token']  # 回傳核對登入期限，寫入操作另檢查 CSRF的結果
 
-    @staticmethod  # 此共用檢查不需要讀取物件狀態
-    def public_user(user, csrf=None):  # 只回傳介面需要的公開帳號欄位
+    def public_user(self, user, csrf=None):  # 回傳公開帳號與伺服器當地日期。
         result = {k: user[k] for k in ('status', 'username', 'name', 'bio', 'timezone')}  # 準備本次操作的回傳資料
         result.update(owner_id=user['id'], lumi_hatched=bool(user['hatched_at']))  # 合併本次明確設定的欄位
+        result['today'] = self.now().astimezone(ZoneInfo(user['timezone'])).date().isoformat()  # 建立草稿與截止日依伺服器判定。
         if csrf:  # 依目前條件選擇下一步處理分支
             result['csrf_token'] = csrf  # 保存「result['csrf_token']」供後續驗證或回傳使用
         return result  # 回傳只回傳介面需要的公開帳號欄位的結果
@@ -144,25 +145,7 @@ class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、�
     def _remember(c, owner, operation, request_id, fingerprint, response):  # 在目前交易記錄提交代碼、指紋與回應
         c.execute('INSERT INTO requests VALUES (?,?,?,?,?)', (owner, operation, request_id, fingerprint, encoded(response)))  # 新增去重請求；值以參數傳入
 
-    def create_goal(self, owner, data):  # 在同一交易建立目標、行動並孵化 Lumi
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
-            user = self._owned_user(c, owner)  # 準備目前帳號及其身分資料
-            require(bool(user['bio'] and user['name']), 409, 'bio_required', '請先完成 Bio。')  # 驗證限制：請先完成 Bio。
-            cached, fingerprint = self._cached(c, owner, 'goal:create', data.request_id, data.model_dump(mode='json'))  # 比較請求指紋，重送時回傳先前結果
-            if cached:  # 若為相同提交重送，沿用已保存結果
-                return cached  # 回傳先前成功結果，避免重送造成重複寫入
-            goal_id, now = uid(), self.now().isoformat()  # 保存「(goal_id, now)」供後續驗證或回傳使用
-            c.execute("INSERT INTO goals (id,owner_id,title,outcome,status,created_at) VALUES (?,?,?,?,'active',?)",
-                      (goal_id, owner, data.title, data.outcome, now))  # 新增目標；值以參數傳入
-            for position, action in enumerate(data.actions):  # 逐項處理清單中的資料，保留目前交易或查詢條件
-                c.execute('INSERT INTO actions VALUES (?,?,?,?,?,?,?,?,?)',
-                          (uid(), goal_id, owner, action.title, action.unit, action.target, action.level, encoded(action.weekdays), position))  # 新增目標行動；值以參數傳入
-            c.execute('UPDATE users SET hatched_at=COALESCE(hatched_at,?) WHERE id=?', (now, owner))  # 更新帳號與個人介紹；值以參數傳入
-            result = self._goal(c, goal_id, owner)  # 準備本次操作的回傳資料
-            self._remember(c, owner, 'goal:create', data.request_id, fingerprint, result)  # 把成功回應與去重提交代碼一起記入交易
-            return result  # 回傳在同一交易建立目標、行動並孵化 Lumi的結果
-
-    def _goal(self, c, goal_id, owner):  # 組合目標、行動與精確十進位累計
+    def _goal_base(self, c, goal_id, owner):  # 組合目標、行動與精確十進位累計
         goal = dict(self._owned(c, 'goals', goal_id, owner))  # 準備目前選定的目標資料
         actions = []  # 準備依畫面順序組合的目標行動清單
         for row in c.execute('SELECT * FROM actions WHERE goal_id=? AND owner_id=? ORDER BY position', (goal_id, owner)):  # 執行目前交易中的參數化查詢
@@ -179,15 +162,6 @@ class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、�
         with self.db.connect() as c:  # 在同一讀取交易取得一致資料
             self._onboarded(c, owner)  # 要求先建立 Bio 與第一個目標蛋
             return self._goal(c, goal_id, owner)  # 回傳讀取目標及其行動累計的結果
-
-    def calendar(self, owner, goal_id):  # 依目前每週規律產生 28 日預覽；月週期另項實作
-        with self.db.connect() as c:  # 在同一讀取交易取得一致資料
-            user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
-            goal = self._goal(c, goal_id, owner)  # 準備目前選定的目標資料
-            start = self.now().astimezone(ZoneInfo(user['timezone'])).date()  # 準備帳號當地時區的排程預覽起始日期
-            return [{'date': (start + timedelta(days=i)).isoformat(),
-                     'action_ids': [a['id'] for a in goal['actions'] if (start + timedelta(days=i)).weekday() in a['weekdays']]}
-                    for i in range(28)]  # 回傳依目前每週規律產生 28 日預覽；月週期另項實作的結果
 
     def _related(self, c, user, goal_id, person_id, contributions):  # 驗證目標、人物與行動貢獻的權限及相互關聯
         if goal_id:  # 依目標是否存在及其狀態選擇處理方式
@@ -276,15 +250,11 @@ class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、�
                 require(data.story_reviewed, 422, 'story_review_required', '請先核對這段故事的人物參與及提及。')  # 不將候選直接轉成正式角色
                 self._validate_story(c, owner, draft['raw_text'], data.story)  # 先核對全部來源與所有權
                 require(not data.person_id or data.person_id in [p.person_id for p in data.story.participants], 422, 'primary_not_participant', '主要關聯人物必須是本次參與者；提及者請在提及區配對。')  # 避免舊主要人物欄位誤用身分
-            if data.contributions and draft['goal_id']:  # 依目標是否存在及其狀態選擇處理方式
-                goal = self._owned(c, 'goals', draft['goal_id'], owner)  # 準備目前選定的目標資料
-                require(goal['status'] == 'active', 409, 'policy_required', '完成後的貢獻更正規則尚未定案；草稿已保留，可移除貢獻後只保存經歷。')  # 驗證限制：完成後的貢獻更正規則尚未定案；草稿已保留，可移除貢獻後只保存經歷。
             experience_id, now = uid(), self.now().isoformat()  # 保存「(experience_id, now)」供後續驗證或回傳使用
             c.execute('INSERT INTO experiences VALUES (?,?,?,?,?,?,?,?,?)',
                       (experience_id, owner, draft_id, draft['goal_id'], data.person_id,
                        draft['raw_text'], data.summary, draft['occurred_at'], now))  # 新增已確認經歷；值以參數傳入
-            for item in data.contributions:  # 逐項處理清單中的資料，保留目前交易或查詢條件
-                c.execute('INSERT INTO contributions VALUES (?,?,?,?,?)', (uid(), owner, experience_id, item.action_id, item.quantity))  # 新增行動貢獻；值以參數傳入
+            self._save_goal_contributions(c, owner, draft['goal_id'], experience_id, draft['occurred_at'], data.contributions)  # 經歷確認與待回顧貢獻分開處理。
             for title in data.tasks:  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 c.execute('INSERT INTO tasks (id,owner_id,experience_id,title) VALUES (?,?,?,?)', (uid(), owner, experience_id, title))  # 新增下一步待辦；值以參數傳入
             c.execute('INSERT INTO experience_stories(experience_id,owner_id) VALUES (?,?)', (experience_id, owner))  # 舊 API 先保留待核對狀態
@@ -333,7 +303,7 @@ class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、�
         checksum = hashlib.sha256(content).hexdigest()  # 準備上傳內容的 SHA-256 指紋
         with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             goal = self._owned(c, 'goals', goal_id, owner)  # 準備目前選定的目標資料
-            require(goal['status'] == 'active', 409, 'goal_completed', '完成後新增佐證的規則尚未開放。')  # 驗證限制：完成後新增佐證的規則尚未開放。
+            require(goal['status'] == 'active' and not goal['ended_at'], 409, 'goal_completed', '收藏後不再新增佐證。')  # 待回顧仍可提交完成佐證。
             old = c.execute('SELECT id,filename,mime,size,created_at FROM evidence WHERE owner_id=? AND goal_id=? AND digest=?',
                             (owner, goal_id, checksum)).fetchone()  # 查詢圖片佐證；值以參數傳入
             if old:  # 依目前條件選擇下一步處理分支
@@ -353,17 +323,21 @@ class LifeWorld(ConnectionsMixin, PeopleMixin):  # 目標、故事、人物、�
             self._onboarded(c, owner)  # 要求先建立 Bio 與第一個目標蛋
             goal = self._owned(c, 'goals', goal_id, owner)  # 準備目前選定的目標資料
             payload = dict(data.model_dump(mode='json'), goal_id=goal_id)  # 準備將送出或用於指紋比對的完整內容
+            if payload.get('expected_revision') is None: payload.pop('expected_revision', None)  # 保留舊完成請求的去重指紋。
             cached, fingerprint = self._cached(c, owner, 'goal:complete', data.request_id, payload)  # 比較請求指紋，重送時回傳先前結果
             if cached:  # 若為相同提交重送，沿用已保存結果
                 return cached  # 回傳先前成功結果，避免重送造成重複寫入
-            require(goal['status'] == 'active', 409, 'already_completed', '這個目標已完成。')  # 驗證限制：這個目標已完成。
+            require(goal['status'] == 'active' and not goal['ended_at'], 409, 'already_completed', '這次挑戰已完成或結束。')  # 不恢復歷史目標。
+            require(data.expected_revision is not None or goal['deadline'] is None, 422, 'revision_required', '請重新檢視目標並帶入版本後確認成果。')  # 新式目標不可略過版本；舊完成請求仍相容。
+            require(data.expected_revision is None or goal['revision'] == data.expected_revision, 409, 'revision_conflict', '目標已有更新，請重新核對成果。')  # 新介面帶入版本，舊重送仍相容。
             for evidence_id in data.evidence_ids:  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 evidence = self._owned(c, 'evidence', evidence_id, owner)  # 限制查詢資料表並核對資源所屬帳號
                 require(evidence['goal_id'] == goal_id, 404, 'not_found', '找不到此目標的佐證。')  # 驗證限制：找不到此目標的佐證。
             completion_id, now = uid(), self.now().isoformat()  # 保存「(completion_id, now)」供後續驗證或回傳使用
             c.execute('INSERT INTO completions VALUES (?,?,?,?,?,?)',
                       (completion_id, owner, goal_id, encoded(data.evidence_ids), data.reflection, now))  # 新增目標完成紀錄；值以參數傳入
-            c.execute("UPDATE goals SET status='completed',completed_at=?,reflection=? WHERE id=? AND owner_id=?", (now, data.reflection, goal_id, owner))  # 更新目標；值以參數傳入
+            c.execute("UPDATE goals SET status='completed',completed_at=?,reflection=?,revision=revision+1 WHERE id=? AND owner_id=?", (now, data.reflection, goal_id, owner))  # 成果與版本同時更新。
+            c.execute("UPDATE pending_contributions SET status='unapplied' WHERE goal_id=? AND owner_id=? AND status='pending'", (goal_id, owner))  # 保留未採計歷史。
             result = {'completion_id': completion_id, 'goal_id': goal_id, 'status': 'completed', 'evidence_ids': data.evidence_ids, 'confirmed_at': now}  # 準備本次操作的回傳資料
             self._remember(c, owner, 'goal:complete', data.request_id, fingerprint, result)  # 把成功回應與去重提交代碼一起記入交易
             return result  # 回傳檢查佐證與人工確認後收藏目標成果的結果

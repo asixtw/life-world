@@ -17,9 +17,15 @@ flowchart LR
 
 ## 資料
 
+逐表定義與實際 DB 查核請讀[完整 Table Schema](DATABASE_SCHEMA.md)：含 001–005 的 31 張表／201 欄位、鍵／索引、JSON／狀態、頁面對照與純結構快照。[Jerry 接續規劃](database/POSTGRESQL_HANDOFF.md)另列 PostgreSQL 與未實作能力的候選設計，不把規劃當已建立的資料表。
+
 `users` 的 owner ID 在 guest → registered 時保持不變。`sessions` 只保存 token 雜湊、CSRF 與失效時間，升級時撤銷舊工作階段並換新 token。
 
-`goals` 與三筆 `actions` 一次建立，並同交易寫入首次 `hatched_at`。星期規律屬於各行動；28 天為預覽視窗，沒有將 28 個布林值當永久排程。單日例外／歷史規則版本尚未開放。
+`goals` 與三筆 `actions` 一次建立，並同交易寫入首次 `hatched_at`。v0.4 的 `goals.py` 使用同一 SQLite 寫入交易檢查唯一未結束目標，固定目標時區、起訖日期及 revision。`actions.schedule_dates` 保存日期，星期與 month／week 保存快選及編輯方式；歷史星期及總量原樣保留，舊目標等待人工補設定。
+
+`goal_reviews` 保存不含遞迴歷史的前後快照。待回顧／待設定時，確認經歷的貢獻先進 `pending_contributions`，經歷與一次獎勵仍在原交易內保存；延長後獨立採計只新增正式貢獻，不再次新增 reward。公開生命週期由原狀態、結束欄位及時區日期共同決定，單純讀取不自動改帳。
+
+建立目標草稿例外使用 owner 分隔的本機 localStorage，包含名稱、期限與習慣設定，畫面明示僅目前裝置；它不是正式資料庫、不保存帳密／session，提交成功才清除。不承諾跨裝置同步或完整離線服務。
 
 `drafts` 保存原始記錄、帶時區轉 UTC 的發生時間、選填人物與貢獻、revision。正式確認產生 `experiences`、`contributions`、`tasks`、`reward_ledger`，全部放在同一寫入交易。任何步驟失敗都回滾，草稿仍可重試。
 

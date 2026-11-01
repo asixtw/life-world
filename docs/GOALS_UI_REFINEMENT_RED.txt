@@ -1,0 +1,14 @@
+F
+=================================== FAILURES ===================================
+______________ test_wizard_single_goal_end_and_history[viewport0] ______________
+browser_tests/test_goal_flow.py:41: in test_wizard_single_goal_end_and_history
+    if viewport['width'] == 390: assert not page.locator('.sidebar').is_visible()  # 首次引導不能被空白底部導覽遮住。
+E   AssertionError: assert not True
+E    +  where True = is_visible()
+E    +    where is_visible = <Locator frame=<Frame name= url='http://127.0.0.1:8002/#goal-new'> selector='.sidebar'>.is_visible
+E    +      where <Locator frame=<Frame name= url='http://127.0.0.1:8002/#goal-new'> selector='.sidebar'> = locator('.sidebar')
+E    +        where locator = <Page url='http://127.0.0.1:8002/#goal-new'>.locator
+=========================== short test summary info ============================
+FAILED browser_tests/test_goal_flow.py::test_wizard_single_goal_end_and_history[viewport0]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 1.09s

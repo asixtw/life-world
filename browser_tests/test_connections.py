@@ -27,7 +27,7 @@ def seed_stories(page):  # 建立真實 API 的虛構故事路徑
 
 
 def screenshot(page, name):  # 保存本輪獨立的虛構畫面證據
-    folder = Path(__file__).resolve().parent.parent / 'docs' / 'artifacts' / 'connections'  # 與先前星圖驗收分開
+    folder = Path(__file__).resolve().parent.parent / 'docs' / 'artifacts' / 'goals' / 'connections-regression'  # 與先前星圖驗收分開
     folder.mkdir(parents=True, exist_ok=True)  # 建立截圖目錄
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')  # 不容許手機橫向溢位
     page.screenshot(path=str(folder / name), full_page=True)  # 保留故事與來源資訊層級

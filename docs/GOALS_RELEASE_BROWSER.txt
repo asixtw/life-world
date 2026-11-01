@@ -1,0 +1,9 @@
+Life World v0.4.0｜發布前完整 Chromium 驗證摘要
+日期：2026-10-29（Asia/Taipei）
+工作位置：目前 App 來源的隔離副本
+命令形式：LIFEWORLD_TEST_URL=http://127.0.0.1:18029 LIFEWORLD_TEST_CLOCK_FILE=<隔離時鐘檔> <App虛擬環境Python> -m pytest browser_tests -q --tb=short
+結果：19 通過，0 失敗，0 跳過
+耗時：44.28 秒
+隔離方式：全新資料目錄、browser context、專用時鐘及本機服務；包含跨日案例。
+產生的畫面只寫入隔離副本，沒有覆寫現有驗收截圖。
+本檔是實際執行結果的公開摘要，原始 stdout 與完整實際環境路徑留本機。
