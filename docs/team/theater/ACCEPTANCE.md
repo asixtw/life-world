@@ -50,3 +50,9 @@
 - 未做 iOS／Safari、實機麥克風、真實轉錄、真實人物 AI、自主 C1 調度或實際費用量測。
 - 1v1 8 次、多人 6 次、每段最多 3 則、Lumi 2 次與技術重試 1 次只是線框測試配置，正式上限待工程提案及產品核准。
 - 線框資料僅在瀏覽器 localStorage；清除瀏覽器資料會消失，沒有後端權限或私密儲存保證。
+
+## 2026-11-02 獨立 Wireframe 可靠性與提示音（本地修復）
+
+詳細操作、狀態斷言、實際手機／桌面截圖及未驗項見[功能測試規格書](FUNCTIONAL_TEST_SPEC_2026-11-02.md)。本輪以隔離 Chromium 與虛構示例資料驗證，非正式 App 整合或 iOS／Safari 實機驗收。有效修復前紅燈記於 [RELIABILITY_RED_2026-11-02.txt](RELIABILITY_RED_2026-11-02.txt)；回歸結果以本輪新日誌為準，不沿用歷史通過數字。
+
+最終本地修復再將舊私人演練改成唯讀回顧，並為示例／清除加入可恢復日誌。故障注入驗證失敗回退及重載重入。`.venv` 未預裝，使用 `/tmp/lw-venv` 與系統 Chromium 執行兩套完整瀏覽器測試，前次結果 **77 passed，0 failed，0 skipped**，見 [前次日誌](RELIABILITY_FINAL_2026-11-02.txt)。補測與音效拒絕降級修復後的最終完整回歸 **94 passed，0 failed，0 skipped**，見 [擴充日誌](RELIABILITY_EXTENDED_2026-11-02.txt)。截圖與 PDF 已對應此最終程式。iOS／Safari、實機軟鍵盤與音效聽感未驗。

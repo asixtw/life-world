@@ -261,38 +261,39 @@ def test_beta_story_text_is_not_rendered_as_html(page, wireframe_url):
 
 @pytest.mark.parametrize('width', [390, 1440])
 def test_multi_person_private_rehearsal_is_explicit_persistent_and_isolated(page, wireframe_url, width, tmp_path):
-    """多人物由使用者明選；模擬往返不改人物、目標或真實經歷。"""
-    page.set_viewport_size({'width':width, 'height':844})
+    """新版多人場由使用者明選；舊引擎入口關閉，舊歷史唯讀且缺失人物不替代。"""
+    page.set_viewport_size({'width': width, 'height': 844})
     page.goto(wireframe_url)
     page.get_by_role('button', name='載入虛構示例', exact=True).click()
     before = page.evaluate("JSON.parse(localStorage.getItem('lifeworld:flow-wireframe:v1'))")
     page.get_by_role('button', name='人物劇場', exact=True).click()
-    page.get_by_role('button', name='開始多人演練', exact=True).click()
-    expect(page.get_by_role('status')).to_contain_text('至少選一位')
+    expect(page.get_by_role('button', name='開始多人演練', exact=True)).to_have_count(0)
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_label('你想模擬什麼情境？', exact=True).fill('練習三人協調作品分工。')
+    page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
     page.get_by_label('加入阿哲', exact=True).check()
     page.get_by_label('加入怡君', exact=True).check()
-    page.get_by_label('演練情境').fill('練習三人協調作品分工。')
-    page.get_by_role('button', name='開始多人演練', exact=True).click()
-    expect(page.get_by_role('heading', name='私人多人演練', exact=True)).to_be_visible()
-    assert page.get_by_label('回應對象').locator('option').all_text_contents() == ['阿哲','怡君']
-    page.get_by_label('回應對象').select_option('jun')
-    page.get_by_label('你的演練發言').fill('怡君，你希望負責哪個部分？')
-    page.get_by_role('button', name='模擬回應失敗', exact=True).click()
-    page.reload()
-    expect(page.get_by_label('你的演練發言')).to_have_value('怡君，你希望負責哪個部分？')
-    page.get_by_role('button', name='送出演練發言', exact=True).click()
-    expect(page.locator('[data-speaker="jun"]')).to_contain_text('預寫示意')
-    expect(page.locator('[data-speaker="an"]')).to_have_count(0)
-    page.get_by_role('button', name='結束演練並回顧', exact=True).click()
-    expect(page.get_by_role('heading', name='私人演練回顧', exact=True)).to_be_visible()
+    page.get_by_role('button', name='檢查本場設定', exact=True).click()
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current.personIds') == ['zhe', 'jun']
+    page.get_by_label('發言對象', exact=True).select_option('jun')
+    page.get_by_label('你的發言', exact=True).fill('怡君，你希望負責哪個部分？')
+    page.get_by_role('button', name='送出發言', exact=True).click()
+    page.get_by_role('button', name='結束本場', exact=True).click()
     after = page.evaluate("JSON.parse(localStorage.getItem('lifeworld:flow-wireframe:v1'))")
-    for key in ['people','records','goal','points']:
+    for key in ['people', 'records', 'goal', 'points']:
         assert before[key] == after[key], key
-    artifacts = Path(os.environ.get('LIFEWORLD_NEW_ARTIFACTS', str(tmp_path)))
+    page.evaluate("""() => {const key='lifeworld:flow-wireframe:v1',s=JSON.parse(localStorage.getItem(key));s.rehearsalHistory=[{context:'舊版故事',participants:['missing'],sources:[{personId:'missing',text:'舊來源'}],turns:[{speaker:'missing',text:'舊台詞'}],done:true}];localStorage.setItem(key,JSON.stringify(s));}""")
+    page.reload()
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.get_by_role('button', name='查看舊版回顧', exact=True).click()
+    expect(page.get_by_role('heading', name='舊版私人演練回顧', exact=True)).to_be_visible()
+    expect(page.locator('main')).to_contain_text('已刪除人物（missing）')
+    expect(page.get_by_role('button', name='送出演練發言', exact=True)).to_have_count(0)
+    artifacts = Path('docs/artifacts/theater-reliability')  # 舊版唯讀回顧截圖進功能測試規格書。
     artifacts.mkdir(parents=True, exist_ok=True)
-    page.screenshot(path=str(artifacts / f'multi-rehearsal-{width}.png'), full_page=True)
+    page.screenshot(path=str(artifacts / f'sr-legacy-readonly-{width}.png'), full_page=True)
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-
 
 def test_multiple_demo_roles_can_join_without_creating_real_people(page, wireframe_url):
     """示範角色多人同場，但不進入真實人物庫。"""
