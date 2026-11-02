@@ -10,6 +10,10 @@ python3 -m http.server 8011 --bind 127.0.0.1
 
 開啟 `http://127.0.0.1:8011/collaboration/flow-wireframe/`。也可直接用瀏覽器開啟 `index.html`；本機資料存於瀏覽器 localStorage，沒有跨裝置同步或私人資料安全承諾。
 
+## 本輪整合入口
+
+2026-11-02：接續 f1d09d2 的劇場修正，加上重試對象固定、跨場暫態清除、失效人物與就近表單提示。見[整合紀錄](../../docs/team/theater/PROTOTYPE_INTEGRATION_2026-11-02.md)及[提示驗收](../../docs/team/theater/VALIDATION_FEEDBACK_2026-11-02.md)。這是本機虛構原型，正式 AI／ASR 未接入。
+
 ## 完整動線
 
 1. 登入示意 → 稱呼 → 一個目標、三個習慣、月／週實際日期或每月第幾個星期幾 → 核對 → 世界與 Lumi。

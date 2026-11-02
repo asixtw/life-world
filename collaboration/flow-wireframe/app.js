@@ -38,9 +38,11 @@ const recordParticipants = r => Array.isArray(r.peopleLinks)?r.peopleLinks.filte
 const relatedPeople = g => [...new Set(s.records.filter(r=>r.goalId===g.id).flatMap(recordParticipants))];
 const personGoals = id => [...s.archived,...(s.goal&&!s.archived.some(g=>g.id===s.goal.id)?[s.goal]:[])].filter(g=>relatedPeople(g).includes(id));
 const allStories = () => [...stories,...s.records.filter(r=>recordParticipants(r).length).map(r=>({title:r.summary,date:r.occurred.slice(0,10),text:r.summary,people:recordParticipants(r),tags:'已確認的原型經歷'}))];
-const who = id => s.people.find(p=>p.id===id) || s.people[0];
+// 缺失人物保留原 ID 作為提示，不得冒名為第一位人物。
+const who = id => s.people.find(p=>p.id===id) || {id,name:'人物已不存在',role:'資料已失效',food:'尚未了解',missing:true};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(s));}catch{feedback='無法保存本機原型資料，請勿關閉頁面。';}}
-function say(text){feedback=text;$('#feedback').textContent=text;}
+function say(text){feedback=text;$('#feedback').textContent=text;FormUX.summary(document.querySelector('dialog[open] form,#app form'),text);}
+function reject(message,selector){say(message);FormUX.fail(message,selector);}
 function go(route){
   if(s.route==='theater-live'&&route!=='theater-live')TheaterUI.leave(); // 離開活動頁就作廢尚未展示的回應。
   if(s.route==='birth'&&route!=='birth'){stopHatch();if(s.hatch?.stage!=='complete'&&s.hatch)s.hatch.stage='idle';}
@@ -57,8 +59,8 @@ const link = (text,route,cls='') => `<button type="button" data-go="${route}" cl
 const navPaths={world:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',goal:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',records:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',connections:'<circle cx="8" cy="8" r="3"/><circle cx="17" cy="15" r="3"/><path d="m10.5 9.5 4 3.5M3 20c0-3 2-5 5-5h3"/>'};
 const navIcon = route => `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${navPaths[route]}</svg>`;
 const title = (text,implemented=true) => `<span class="tag ${implemented?'':'planned'}">${implemented?'App 已實作對應能力':'規劃模擬 · 尚未串接 App'}</span><h1 id="title" tabindex="-1">${esc(text)}</h1>`;
-const field = (label,id,value='',type='text',extra='') => `<label class="label" for="${id}">${label}</label><input id="${id}" type="${type}" value="${esc(value)}" ${extra}>`;
-const text = (label,id,value='') => `<label class="label" for="${id}">${label}</label><textarea id="${id}">${esc(value)}</textarea>`;
+const field = (label,id,value='',type='text',extra='') => `<label class="label" for="${id}">${label}</label><input id="${id}" type="${type}" value="${esc(value)}" ${extra} ${extra.includes('required')?`aria-describedby="${id}-hint"`:''}>${extra.includes('required')?`<p class="field-hint" id="${id}-hint">必填，完成後才能繼續；尚未完成可使用保留草稿或返回。</p>`:''}`;
+const text = (label,id,value='') => `<label class="label" for="${id}">${label}</label><textarea id="${id}" ${id==='raw'?`aria-describedby="raw-hint"`:''}>${esc(value)}</textarea>${id==='raw'?'<p class="field-hint" id="raw-hint">整理前請先寫下一段經歷，或選擇圖片／名片附件。不完整也可先存草稿。</p>':''}`;
 const check = (label,id,checked=false) => `<label class="check"><input id="${id}" type="checkbox" ${checked?'checked':''}>${label}</label>`;
 const dates = (start,end) => {const out=[];for(let d=start;d<=end&&out.length<10000;d=shift(d,1))out.push(d);return out;};
 // 舊版「週次＋單一星期」只轉為等價格子；新格子可獨立選取，月份不是固定 28 天。
@@ -234,6 +236,7 @@ function connections(){
 }
 function cards(){return title('人物收藏冊')+`<div class="row">${link('交會','connections')}${link('收藏冊','cards','secondary')}</div>${field('搜尋姓名、角色、目標或標籤','search',s.search||'')}<div class="grid">${s.people.filter(p=>(p.name+p.role+(p.tags||'')).includes(s.search||'')).map(p=>`<article class="card"><div class="person">${esc(p.name.slice(0,1))}</div><h2>${esc(p.name)}</h2><p>${esc(p.role)} · ${p.follow?'★ 已加星標':'未加星標'}</p><p class="muted">最近互動：虛構示例時間</p><button data-action="select:${p.id}">查看${esc(p.name)}</button></article>`).join('')}</div>${s.showSummary?`<section class="card"><h2>${esc(who(s.selected).name)}</h2><p>${esc(who(s.selected).role)} · 共同場合：虛構旅程</p><button data-action="follow" aria-pressed="${!!who(s.selected).follow}" title="${who(s.selected).follow?'再次點選可取消星標':'方便你之後找回，只有你自己看得到'}">${who(s.selected).follow?'★ 已加星標':'☆ 加入星標'}</button>${link('查看人物卡','person')}</section>`:''}`;}
 function person(){
+  if(who(s.selected).missing)return title('人物已不存在')+`<section class="card"><p>這位人物已刪除或無法讀取，請回收藏冊重新選擇；不會以其他人物替代。</p>${link('返回收藏冊','cards')}</section>`;
   const p=who(s.selected),tab=s.tab;
   return title(p.name+' · 人物 360°')+`<section class="card"><div class="person">${esc(p.name.slice(0,1))}</div><p>${esc(p.role)} · 虛構示例人物</p><div class="row"><span class="tag">參與 ${allStories().filter(x=>x.people.includes(p.id)).length} 段已記錄故事</span><span class="tag">僅提及 ${s.records.filter(r=>r.peopleLinks?.some(x=>x.id===p.id&&x.relation==='mentioned')).length} 次</span><span class="tag">見面次數：尚未分類</span></div></section><div class="row">${['人物總覽','共同經歷','合作與目標'].map(t=>button(t,'tab:'+t,t===tab?'secondary':'')).join('')}</div><section class="card">${tab==='人物總覽'?['興趣與嗜好','飲食偏好','專長與背景','互動習慣'].map(t=>`<details><summary><button data-action="dimension">${t}</button></summary><p>${t==='飲食偏好'?esc(p.food):'尚未了解'}</p>${t==='飲食偏好'&&p.food!=='尚未了解'&&p.source?button('查看來源','person-source'):''}</details>`).join('')+'<details><summary>共同關係／場合／交集</summary><p>共同旅行（虛構示例）；不推斷人物私人關係。</p></details>':tab==='共同經歷'?allStories().filter(x=>x.people.includes(p.id)).map(x=>`<article><h3>${esc(x.title)}</h3><p>${esc(x.date)} · ${esc(x.text)}</p></article>`).join(''):`<h2>相關目標</h2>${personGoals(p.id).map(g=>`<article><h3>${esc(g.title)}</h3><p>${goalLabel(g)}${g.reason?' · '+esc(g.reason):''}</p></article>`).join('')||'<p>尚未關聯目標</p>'}${s.goal&&goalStatus()==='進行中'?button('為此目標記錄經歷','record-goal-context'):''}`}</section><div class="actions">${button('記錄新經歷','record-context')}${link('開啟小劇場','theater')}${button('探索相關故事','person-explore')}${link('返回收藏冊','cards')}</div>`;
 }
@@ -265,7 +268,7 @@ function render(){
   nightPrompt();$('#feedback').textContent=feedback;
   if(s.route.startsWith('theater-')&&['theater-build','theater-preview','theater-live','theater-lumi','theater-recap','theater-history'].includes(s.route)){
     $('#app').innerHTML=TheaterUI.render(s.route);
-    $('#nav').innerHTML=[['世界','world'],['目標','goal'],['紀錄','records'],['關係','connections']].map(([t,r])=>link(t,r)).join('');
+    $('#nav').innerHTML=[['世界','world'],['目標','goal'],['紀錄','records'],['關係','connections']].map(([t,r])=>`<button type="button" data-go="${r}" ${r==='connections'?'aria-current="page"':''}>${navIcon(r)}<span>${t}</span></button>`).join('');
     return;
   }
   const pages={intro:()=>title('在故事開始之前')+`<form id="intro" class="card narrow">${field('你的稱呼','name',s.name,'text','required maxlength="80"')}<p>一次一個目標；每個目標三個重要習慣。</p><button class="primary">開始設定目標</button>${link('查看登入流程','login')}</form>`,login,recovery:()=>title('帳號恢復',false)+`<section class="card narrow"><p>一次性復原碼 → 設定新密碼 → 撤銷舊登入狀態；此原型只呈現流程，不接收憑證。</p><p>密碼及復原碼皆遺失時不能保證恢復；正式政策由帳號安全審查定案。</p>${button('模擬恢復失敗','recovery-fail')}${button('模擬恢復完成','login-new')}${link('返回登入','login')}</section>`,wizard,world,goal:goalPage,record,review,connections,cards,person,theater,'theater-hub':theaterHub,'group-theater':groupTheater,'demo-theater':demoTheater,memorial,settings,'goal-review':reviewGoal,journey,
@@ -373,7 +376,7 @@ document.addEventListener('click',async event=>{
     if(action==='schedule-deadline-open')a.deadlineOpen=!a.deadlineOpen;
     if(action==='schedule-deadline'){
       const deadline=$('#schedule-deadline').value,w=s.wizard;
-      if(!w||!deadline||deadline<w.start){say('截止日不可早於挑戰起始日。');return;}
+      if(!w||!deadline||deadline<w.start){reject('截止日不可早於挑戰起始日。','#schedule-deadline');return;}
       w.deadline=deadline;w.actions.forEach(item=>{item.dates=item.dates.filter(d=>d<=deadline);item.monthlyRule=null;});a.deadlineOpen=false;
     }
     save();const y=scrollY;render();scrollTo(0,y);return;
@@ -382,7 +385,7 @@ document.addEventListener('click',async event=>{
     const w=edit?null:s.wizard,a=edit?edit.actions[edit.index]:w?.actions[w.step-2];if(!a)return;
     const start=edit?shift(dateNow(),1):w.start,end=edit?(edit.deadline||s.goal.deadline):w.deadline;
     const month=(a.cursor||start).slice(0,7),rule=monthPattern(a,month);rule.month=month;
-    if(!rule.slots.length){say('請先選至少一格，再套用規律。');return;}
+    if(!rule.slots.length){reject('請先選至少一格，再套用規律。','.monthly-rule');return;}
     if(!end||end<start){say('請先設定有效截止日，或延長目標期間。');return;}
     const selected=dates(start,end).filter(day=>(rule.repeat||day.slice(0,7)===month)&&matchesMonthly(day,rule));
     if(!selected.length){say('目前期間沒有符合的日期；請調整週次或截止日。');return;}
@@ -409,7 +412,7 @@ document.addEventListener('click',async event=>{
   if(action==='sample'){s.draft.raw=s.draft.mode==='名片'?'虛構示例：林先生，作品交流夥伴。':'虛構示例：與朋友討論作品，圖片中有筆記。';save();render();return;}
   if(action==='remove-file'){attachment=null;delete s.draft.fileName;save();render();return;}
   if(action==='organize-fail'){say('模擬整理失敗；文字與附件資訊保留，可重試或手動整理。');return;}
-  if(action==='manual-review'){s.draft.manual=true;s.draft.summary=s.draft.raw;save();go('review');return;}
+  if(action==='manual-review'){if(!s.draft.raw.trim()&&!s.draft.fileName){reject('請先輸入一段經歷，或選擇附件；尚未整理也可以先存草稿。','#raw');return;}if(!$('#record').reportValidity())return;s.draft.manual=true;s.draft.summary=s.draft.raw;save();go('review');return;}
   if(action==='save-draft'){save();go('records');say('草稿已保存在此瀏覽器，尚未確認，不更新正式成果。');return;}
   if(action==='theater-v05-new'){TheaterUI.newDraft();return;}
   if(action==='theater-v05-history'){go('theater-history');return;}
@@ -444,13 +447,13 @@ document.addEventListener('click',async event=>{
   if(action==='copy-note'){try{await navigator.clipboard.writeText(privateText);say('已複製草稿，沒有發送。');}catch{say('無法使用剪貼簿，請手動選取筆記複製。');}return;}
   if(action==='record-context'||action==='record-goal-context'||kind==='record-action'){const contextualGoal=action!=='record-context'&&!!s.goal;s.draft={raw:'',occurred:eventNow(),created:eventNow(),person:kind!=='record-action',personId:kind!=='record-action'?s.selected:null,goal:contextualGoal,goalId:contextualGoal?s.goal.id:null,actionId:kind==='record-action'?value:null,mode:'文字',quantity:'1'};go('record');return;}
   if(action==='extend-goal'){
-    const deadline=$('#extend-deadline').value;if(!s.goal||!deadline||deadline<=s.goal.deadline||deadline<dateNow()){say('請選晚於原截止日且不早於今天的日期。');return;}
+    const deadline=$('#extend-deadline').value;if(!s.goal||!deadline||deadline<=s.goal.deadline||deadline<dateNow()){reject('請選晚於原截止日且不早於今天的日期。','#extend-deadline');return;}
     edit={actions:structuredClone(s.goal.actions),index:0,deadline};go('goal');say('延長為原型模擬；請檢視三個習慣的未來安排。');return;
   }
   if(action==='complete-goal'||action==='end-goal'){
     if(!s.goal||!['進行中','待回顧'].includes(goalStatus())){say('這次挑戰已收藏，請到目標旅程查看。');return;}
-    if(!$('#end-confirm').checked){say('請先明確確認。');return;}
-    if(action==='complete-goal'&&!$('#proof').files.length){say('請選成果佐證，再確認完成。');return;}
+    if(!$('#end-confirm').checked){reject('請先勾選「我已核對成果或結束選擇」，再繼續。','#end-confirm');return;}
+    if(action==='complete-goal'&&!$('#proof').files.length){reject('請選成果佐證，再確認完成。','#proof');return;}
     s.goal.status=action==='complete-goal'?'已完成':'曾經挑戰';s.goal.reason=action==='end-goal'?(dateNow()>s.goal.deadline?'到期未完成':'提前結束'):'已確認完成';s.goal.reflection=$('#reflection').value;s.records.filter(r=>r.goalId===s.goal.id&&r.pending).forEach(r=>{r.pending=false;r.unapplied=true;});s.historyTab=s.goal.status;s.goal.memorial={text:s.goal.reflection||'尚無回顧摘要。',records:s.records.filter(r=>r.goalId===s.goal.id).length,people:relatedPeople(s.goal)};s.archived.push(structuredClone(s.goal));go('journey');return;
   }
   if(kind==='history'){s.historyTab=value;go('journey');return;}
@@ -465,35 +468,40 @@ document.addEventListener('submit',event=>{
   event.preventDefault();capture();const id=event.target.id;
   if(id==='new-record-person'){
     const name=$('#new-person-name').value.trim(),role=$('#new-person-role').value.trim();
-    if(!name){$('#new-person-error').textContent='請先填寫人物稱呼。';return;}
+    if(!name){reject('請先填寫人物稱呼，不可只有空白。','#new-person-name');return;}
     const duplicate=[...s.people,...draftPeople()].find(p=>p.name.trim().toLocaleLowerCase()===name.toLocaleLowerCase());
-    if(duplicate){$('#new-person-error').textContent='已有同名人物，請取消新增後從已有人物選取，避免重複。';return;}
+    if(duplicate){$('#new-person-error').textContent='已有同名人物，請取消新增後從已有人物選取，避免重複。';reject('已有同名人物，請從已有人物選取，或更正稱呼。','#new-person-name');return;}
     draftPeople().push({key:'new-'+Date.now(),isNew:true,name,role,relation:'participant'});
     delete s.draft.newPersonDraft;$('#new-person-dialog').close();save();render();return;
   }
-  if(id==='intro'){s.name=$('#name').value;go('wizard');}
+  if(id==='intro'){if(!$('#name').value.trim()){reject('請填寫你的稱呼，再繼續。','#name');return;}s.name=$('#name').value.trim();go('wizard');}
   if(id==='wizard'){
     const w=s.wizard,a=w.actions[w.step-2];
-    if(w.step===1&&(!w.outcome.trim()||w.deadline<w.start)){say('請描述成果並選有效截止日。');return;}
-    if(a&&!a.dates.length){say('每個習慣至少安排一天。');return;}
+    if(w.step===0&&!w.title.trim()){reject('請填寫目標名稱，不可只有空白。','#goal-name');return;}
+    if(w.step===1&&!w.outcome.trim()){reject('請描述達成的樣子，方便之後回顧。','#goal-outcome');return;}
+    if(w.step===1&&(!w.deadline||w.deadline<w.start)){reject('請選不早於起始日的截止日。','#deadline');return;}
+    if(a&&!a.title.trim()){reject('請填寫習慣名稱，不可只有空白。','#habit-name');return;}
+    if(a&&!a.unit.trim()){reject('請填寫每次預期量的單位。','#habit-unit');return;}
+    if(a&&!a.dates.length){reject('每個習慣至少安排一天；可點日期，或使用平日／每月規律。','.schedule-editor');return;}
     if(w.step<5){w.step++;go('wizard');}else{s.goal={...structuredClone(w),id:'demo-goal-'+Date.now(),status:'進行中'};ensureActionIds(s.goal);s.wizard=null;if(s.lumiBorn){go('world');}else{s.lumiBorn=true;s.hatch={goalId:s.goal.id,stage:'idle'};go('birth');}}
   }
   if(id==='habit-edit'){
-    if(!$('#edit-confirm').checked){say('請核對修改。');return;}
+    if(!$('#edit-confirm').checked){reject('請先勾選核對變更與生效日，再確認修改。','#edit-confirm');return;}
     const from=shift(dateNow(),1);if(edit.actions.some(a=>!a.title.trim()||!a.dates.length||!Number.isFinite(Number(a.quantity))||Number(a.quantity)<=0)){say('請填有效名稱、正數及安排日期。');return;}
     if(edit.actions.some((a,i)=>a.quantity!==(s.goal.actions[i].next?.quantity||s.goal.actions[i].quantity)&&!a.dates.some(d=>d>=from))){say('沒有明天起的執行日期，請先延長或安排日期。');return;}
     if(edit.deadline){s.goal.deadline=edit.deadline;s.goal.status='進行中';}
     s.goal.actions=edit.actions.map((a,i)=>({...a,quantity:s.goal.actions[i].quantity,next:{from,quantity:a.quantity}}));edit=null;save();go('goal');say('本機示範安排已保存；不回算歷史。');
   }
-  if(id==='record'){if(!s.draft.raw.trim()&&!s.draft.fileName){say('先輸入內容或選擇附件。');return;}s.draft.summary=s.draft.raw;go('review');}
+  if(id==='record'){if(!s.draft.raw.trim()&&!s.draft.fileName){reject('請先輸入一段經歷，或選擇附件；尚未整理也可以先存草稿。','#raw');return;}s.draft.summary=s.draft.raw;go('review');}
   if(id==='review'){
     const d=s.draft,card=d.mode==='名片';
-    if(card){if(!$('#person-confirm').checked){say('請先確認人物資訊與來源。');return;}s.people.push({id:'card-'+Date.now(),name:$('#person-name').value,role:'名片來源',food:'尚未了解'});s.draft=null;go('cards');say('人物資料已保存；沒有新增見面、經歷或獎勵。');return;}
-    if(!$('#experience-confirm').checked||!$('#summary').value.trim()){say('請核對經歷摘要並明確確認。');return;}
+    if(card){if(!$('#person-name').value.trim()){reject('請填寫人物稱呼，不可只有空白。','#person-name');return;}if(!$('#person-confirm').checked){reject('請先勾選確認人物資訊與來源，再保存。','#person-confirm');return;}s.people.push({id:'card-'+Date.now(),name:$('#person-name').value,role:'名片來源',food:'尚未了解'});s.draft=null;go('cards');say('人物資料已保存；沒有新增見面、經歷或獎勵。');return;}
+    if(!$('#summary').value.trim()){reject('請填寫經歷摘要，再核對內容。','#summary');return;}
+    if(!$('#experience-confirm').checked){reject('請先勾選確認經歷內容正確，再保存。','#experience-confirm');return;}
     const contribution=!!$('#goal-confirm')?.checked,eligibility=contributionEligibility(d),associatedGoal=linkedGoal(d),associatedAction=linkedActivities(associatedGoal).find(a=>a.id===d.actionId);
     if(contribution&&!eligibility.allowed){say(eligibility.message);return;}
     const pending=contribution&&eligibility.pending;
-    if(d.followupRequested&&(!d.followupTitle?.trim()||!d.followupDate)){say('請填寫後續任務名稱與日期。');return;}
+    if(d.followupRequested&&(!d.followupTitle?.trim()||!d.followupDate)){reject('請填寫後續任務名稱與日期。',!d.followupTitle?.trim()?'#followup-title':'#followup-date');return;}
     const summary=$('#summary').value,peopleLinks=[];
     draftPeople().forEach((p,i)=>{
       if(!$('#person-link-confirm-'+i)?.checked)return;
@@ -511,7 +519,7 @@ document.addEventListener('submit',event=>{
     if(d.followupRequested)s.tasks.push({id:'task-'+Date.now(),title:d.followupTitle.trim(),dueDate:d.followupDate,goalId:associatedGoal?.id||null,sourceRecordId:s.records[s.records.length-1].id,status:'open'});
     s.draft=null;go('success');
   }
-  if(id==='settings'){const start=$('#night-start').value,end=$('#night-end').value;if(start===end){say('請設定不同的開始與結束時間。');return;}s.night={choice:$('#night-auto').checked,enabled:$('#night-auto').checked,start,end};nightOverride=null;save();render();say('夜間示範設定已保存，可隨時關閉。');}
+  if(id==='settings'){const start=$('#night-start').value,end=$('#night-end').value;if(!start||!end||start===end){reject('請設定不同的開始與結束時間。',!start?'#night-start':'#night-end');return;}s.night={choice:$('#night-auto').checked,enabled:$('#night-auto').checked,start,end};nightOverride=null;save();render();say('夜間示範設定已保存，可隨時關閉。');}
 });
 window.addEventListener('hashchange',()=>{if(location.hash==='#world')go('world');});
 render();

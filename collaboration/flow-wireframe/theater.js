@@ -54,7 +54,13 @@ const TheaterUI = (() => {
     catch (_) {state.error='尚未保存，請保留此頁並重試。';showSaveError();return false;}
   };
   const showSaveError = () => {const main=document.querySelector('.theater-main');if(!main)return;let p=main.querySelector('.theater-error');if(!p){p=document.createElement('p');p.className='theater-error';p.setAttribute('role','alert');main.querySelector('.theater-compose')?.before(p);}if(p)p.textContent=state.error;}; // 不重繪輸入框，保留可複製文字。
-  const nav = route => {if(persist())host.go(route);else host.go(host.route?.()||route);}; // 保存失敗保留畫面。
+  const nav = route => { // 重繪後把阻擋原因連回可修正的位置。
+    if(persist())host.go(route);else host.go(host.route?.()||route);
+    if(state.error){
+      const selector=route==='theater-build'?(state.stage==='situation'?'#theater-situation':'.theater-person-list'):route==='theater-preview'?'#title':route==='theater-live'?(state.error.includes('核對轉錄')?'#theater-asr-check':'#theater-speech'):route==='theater-lumi'?'#theater-lumi-input':null;
+      if(selector)FormUX.fail(state.error,selector);
+    }
+  };
   const btn = (label,action,cls='') => `<button type="button" data-theater="${action}" class="${cls}">${label}</button>`;
   const person = id => host.people().find(item => item.id===id);
   const chosen = () => state.draft.people.map(person).filter(Boolean); // 僅建場預覽可讀可變人物。
@@ -128,7 +134,7 @@ const TheaterUI = (() => {
     return '';
   }
   function generated(behavior,action) { // 角色只讀建場快照，絕不讀可變草稿。
-    const c=state.current,all=sessionCast(c),participants=c.recipient!=='all'?[...all.filter(p=>p.id===c.recipient),...all.filter(p=>p.id!==c.recipient)]:all;
+    const c=state.current,all=sessionCast(c),recipient=action.recipientIds[0],participants=recipient!=='all'?[...all.filter(p=>p.id===recipient),...all.filter(p=>p.id!==recipient)]:all;
     const base={sessionId:c.id,actionId:action.actionId,visibility:'queued'};
     if(behavior==='SILENCE'){c.events.push({...base,eventId:crypto.randomUUID(),speaker:participants[0].name,recipient:'你',behavior:'CHARACTER_SILENCE',text:'對方暫時沒有回應。你可以等待、澄清、再次發言或結束。',visibility:'displayed',displayedAt:Date.now()});c.unresolved='對方暫時沒有回應';return;}
     const phrases={ANSWER:'我們可以先釐清這次最重要的事。',ASK_BACK:'你認為誰先負責比較合適？',DEFER:'我需要再想一下，現在先不做承諾。',CLOSING:'今天先談到這裡，下次再討論。',EVADE:'我們先把其他事情說完吧。',MONOLOGUE:'我在意的有幾件事：時間、品質，還有是否能真的做到。'};
@@ -163,7 +169,9 @@ const TheaterUI = (() => {
     const behavior=state.qa;state.qa='ANSWER';
     if(behavior==='PROVIDER_ERROR'||behavior==='PROVIDER_REFUSAL'){attempt.status='failed';attempt.errorKind=behavior;action.status='failed';c.failed=behavior==='PROVIDER_ERROR';c.input=action.text;state.error=behavior==='PROVIDER_ERROR'?'服務故障（模擬），發言已保留，可重試。':'服務拒絕（模擬），發言已保留；可改寫或結束。';if(!persist()){state=before;state.error='尚未保存，請保留此頁並重試。';host.go('theater-live');return;}host.go('theater-live');sound('error');return;}
     attempt.status='succeeded';action.status='succeeded';c.failed=false;state.error='';
-    if(!c.events.some(e=>e.actionId===action.actionId&&e.speaker==='user'))c.events.push({eventId:crypto.randomUUID(),sessionId:c.id,actionId:action.actionId,speaker:'user',recipient:c.recipient==='all'?'全場':sessionCast(c).find(p=>p.id===c.recipient)?.name||'全場',text:action.text,visibility:'displayed',displayedAt:Date.now()});
+    // 重試固定原行動的對象，不讀取失敗後被改動的選單。
+    const recipient=action.recipientIds[0];
+    if(!c.events.some(e=>e.actionId===action.actionId&&e.speaker==='user'))c.events.push({eventId:crypto.randomUUID(),sessionId:c.id,actionId:action.actionId,speaker:'user',recipient:recipient==='all'?'全場':sessionCast(c).find(p=>p.id===recipient)?.name||'人物已不存在',text:action.text,visibility:'displayed',displayedAt:Date.now()});
     c.input='';generated(behavior,action);if(!persist()){state=before;state.error='尚未保存，請保留此頁並重試。';host.go('theater-live');return;}host.go('theater-live');sound('confirm');
     const epoch=c.generationEpoch,tId=attempt.attemptId;
     if(c.pending.length)timer=setTimeout(()=>showOne(c.id,action.actionId,tId,epoch),450);
@@ -193,6 +201,8 @@ const TheaterUI = (() => {
       if(c&&!c.endReason){cancelPending();c.endReason='新場取代';c.status='ENDED';c.endedAt=createdAt;state.history.push(structuredClone(c));}
       state.current={id:crypto.randomUUID(),revision:0,createdAt,situation:state.draft.situation,purpose:state.draft.purpose,scenarioSnapshot:{situation:state.draft.situation,purpose:state.draft.purpose},personIds:[...state.draft.people],participantSnapshots:snapshots,sourceIds:[...state.draft.sources],sourceSnapshots:sources,assumptionsSnapshot:[],mode:people.length>1?'多人情境演練':'1v1 情境演練',limitsSnapshot:{playerActions:people.length>1?6:8,characterEvents:3,lumi:2,technicalRetries:1},status:'ACTIVE',actions:0,actionRecords:[],lumiCount:0,retries:0,recipient:'all',input:'',events:[],pending:[],generationEpoch:0,paused:false,failed:false,endReason:null,unresolved:'',lumiPrivate:[]};
       state.viewingHistoryId=null;
+      // 新場清除上一場的輸入暫態；私人建議仍留在原場回顧資料內。
+      state.lumiInput='';state.asr='idle';state.asrText='';state.asrChecked=false;
       if(!persist()){state.current=before.current;state.history=before.history;host.go('theater-preview');return;}
       host.go('theater-live');sound('confirm');return;
     }

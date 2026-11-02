@@ -36,3 +36,15 @@
 body.quiet .theater-aside,body.quiet .theater-hub-hero,body.quiet .theater-event.mine{background:#e2e9e6}
 @media(max-width:700px){.theater-layout,.theater-scene,.theater-hub-hero{grid-template-columns:1fr}.theater-aside{display:none}.theater-hub-hero img{display:none}.theater-room{position:relative;top:auto;height:220px}.theater-room>img{object-fit:cover;object-position:center 55%}.theater-room-cast{top:27%;gap:.25rem}.theater-room-person{min-width:56px}.theater-room-person b{width:36px;height:36px}.theater-room-caption{padding:.5rem;font-size:.8rem}.theater-main{padding:1rem}.theater-transcript{max-height:none}.theater-event{max-width:100%}}
 @media(prefers-reduced-motion:reduce){.theater-event,.theater-room{animation:none!important;transition:none!important}}
+
+/* 手機讓故事在自己的捲動區累積，避免每輪把整頁越撐越長。 */
+@media(max-width:700px){
+  .theater-room{height:160px}
+  .theater-room-cast{top:10%}
+  .theater-room-caption{font-size:.75rem;line-height:1.5}
+  .theater-transcript{max-height:38dvh;min-height:150px;overscroll-behavior:contain}
+  .theater-compose .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .theater-compose .actions button{font-size:.88rem;padding:10px 8px}
+  .theater-compose .actions .primary{grid-column:1/-1}
+  .theater-compose textarea{min-height:82px}
+}
