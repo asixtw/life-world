@@ -8,6 +8,8 @@
 
 ## 依序閱讀
 
+劇場可靠性與本輪原型／提示規格：[Session 修復](team/theater/SESSION_RELIABILITY_SPEC.md)、[原型整合](team/theater/PROTOTYPE_INTEGRATION_2026-11-02.md)、[表單提示](team/theater/VALIDATION_FEEDBACK_2026-11-02.md)。資料庫接續：[SQLite 現況與 PG／劇場草案](database/schema-2026-11-02/README.md)，PG 未部署。
+
 | 文件 | 用途與狀態 |
 |---|---|
 | [產品基準](PRODUCT_BASELINE.md) | 共用名詞、核心旅程、不變條件、已實作與缺口 |

@@ -1,0 +1,29 @@
+{
+  "sqlite_tables": 31,
+  "columns": 201,
+  "foreign_keys": 60,
+  "indexes": 50,
+  "migration_files": 5,
+  "ddl_metadata_matches_current_migrations": true,
+  "historical_dictionary_columns_match": true,
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "real_database_opened": false,
+  "postgresql_execution": "not_executed",
+  "zip_sha256": "b7c6daf5a895129b39b5cc1980ae03b5a55d86fad4595c303f20704fd0227350",
+  "postgresql_syntax": {
+    "parser": "v7.22",
+    "results": {
+      "POSTGRESQL_CORE_DRAFT.sql": {
+        "statements": 104,
+        "syntax": "parsed",
+        "tables": 31
+      },
+      "POSTGRESQL_THEATER_PROPOSAL.sql": {
+        "statements": 21,
+        "syntax": "parsed",
+        "tables": 9
+      }
+    }
+  }
+}

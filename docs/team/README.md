@@ -6,6 +6,8 @@
 
 ## 先從這裡開始
 
+本輪交接：[劇場可靠性規格](theater/SESSION_RELIABILITY_SPEC.md)、[原型整合](theater/PROTOTYPE_INTEGRATION_2026-11-02.md)、[表單提示檢查](theater/VALIDATION_FEEDBACK_2026-11-02.md)、[Jerry Table Schema](../database/schema-2026-11-02/README.md)。草案與已實作分開，PG 未套用。
+
 | 讀者 | 先讀 | 第一份工作 |
 |---|---|---|
 | **Boyi（產品／體驗）** | [分工](RESPONSIBILITIES.md)、[流程／狀態](FLOWS_AND_STATES.md) | 確認畫面行為、優先順序與待決項，不需自行承擔工程整合 |
