@@ -15,7 +15,7 @@
 | 檔案 | 用途 |
 |---|---|
 | `collaboration/ui-kit/Dockerfile` | Node 24.22.2、pnpm 12.16.1、frozen install → verify → build → 非 root Nginx runtime |
-| `collaboration/ui-kit/cloud-nginx.conf` | 8080、SPA 路由、API 404、healthz、避免隱藏檔／map 外洩 |
+| `collaboration/ui-kit/cloud-nginx.conf` | 8080、SPA 路由、API 404、`/health`、避免隱藏檔／map 外洩 |
 | `collaboration/ui-kit/.dockerignore` | ui-kit 建構 context 白名單，排除快取、私人內容及環境檔 |
 | `deploy/cloudbuild.web.yaml` | 來源檢查 → React 測試 → build → 映像 → push → digest 部署 |
 
@@ -90,7 +90,13 @@ docker build --build-arg VCS_REF=local-unpublished -f collaboration/ui-kit/Docke
 docker run --rm -p 127.0.0.1:8080:8080 lw-web-local
 ```
 
-核對 `/` 為 UI gallery、`/healthz` 為 200／ok、`/candidate/deep-link` 可 SPA 回退；`/api`、`/api/missing`、`/missing.js`、隱藏檔與 source map 為 404。檢查 index.html 不被長快取，現有圖像／腳本不破圖。
+容器啟動後，在另一個終端機確認健康端點；預期 HTTP 200，內容為 `ok`：
+
+```sh
+curl -fsS -i http://127.0.0.1:8080/health
+```
+
+核對 `/` 為 UI gallery、`/health` 為 200／ok、`/candidate/deep-link` 可 SPA 回退；`/api`、`/api/missing`、`/missing.js`、隱藏檔與 source map 為 404。檢查 index.html 不被長快取，現有圖像／腳本不破圖。
 
 首次 Trigger 執行時，依序看到 validate-source、react-tests、react-build、image-build、image-push、deploy-staging 成功。Artifact Registry 記錄完整 Git SHA tag；Cloud Run revision 的 digest 與 pushed image 相同、port 8080、runtime SA 正確；確認未連正式 DB 或注入秘密。記錄 build ID、Git SHA、digest、revision 與 URL，不把 gallery 稱為完整 Life World。
 
