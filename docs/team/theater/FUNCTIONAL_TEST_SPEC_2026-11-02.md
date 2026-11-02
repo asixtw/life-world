@@ -1,6 +1,6 @@
 # Life World 獨立 Wireframe｜功能測試規格與實測證據
 
-日期：2026-11-02。範圍：`collaboration/flow-wireframe` 本機虛構資料；不代表正式 App、API、資料庫、真實 AI 或 ASR 已完成。基準為 `review/current-state-2026-11-01` 的 `6676b61243d8b86a76637e8c154878d6fcd9701a`。本次未 Commit、Push、合併或部署。
+日期：2026-11-02。範圍：`collaboration/flow-wireframe` 本機虛構資料；不代表正式 App、API、資料庫、真實 AI 或 ASR 已完成。基準為 `review/current-state-2026-11-01` 的 `6676b61243d8b86a76637e8c154878d6fcd9701a`。本輪成果提交至獨立 GitHub 審查分支；未合併或部署。
 
 ## 測試方式與資料
 
