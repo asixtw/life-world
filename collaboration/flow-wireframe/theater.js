@@ -42,9 +42,12 @@ const TheaterUI = (() => {
     if(state.current && !state.current.endReason){state.current.paused=true;state.current.pauseReason='舊版場次缺少可信快照，請結束回顧或另建新場。';state.current.legacySnapshotMissing=true;}
   }
   state.draft ||= emptyDraft(); state.history ||= []; state.viewingHistoryId ||= null;
-  if(state.current?.pending?.length){state.current.pending.forEach(e=>e.visibility='discarded');state.current.pending=[];state.current.generationEpoch=(state.current.generationEpoch||0)+1;} // 刷新不補播未展示內容。
+  if(state.current?.pending?.length){const action=state.current.actionRecords?.at(-1),attempt=action?.attempts?.at(-1);if(attempt?.status==='pending'){attempt.status='interrupted';if(action.status==='pending')action.status='interrupted';}state.current.pending.forEach(e=>e.visibility='discarded');state.current.pending=[];state.current.generationEpoch=(state.current.generationEpoch||0)+1;} // 刷新不補播未展示內容；未完成技術嘗試標為中斷。
   let host;
   let timer = null;
+  let soundEpoch = 0;
+  const sounding = new Set();
+  function stopSounds(){soundEpoch++;for(const oscillator of sounding){try{oscillator.stop();}catch(_){}}sounding.clear();}
   const persist = () => { // revision 防止舊分頁蓋掉新資料。
     if(loadError){state.error=loadError;return false;}
     try {const disk=JSON.parse(localStorage.getItem(KEY)||'null');if(disk && (disk.revision||0)!==state.revision){state.error='其他分頁已更新劇場資料。請複製目前輸入，再重新讀取；此頁不會覆寫。';showSaveError();return false;}const next={...state,revision:state.revision+1};localStorage.setItem(KEY,JSON.stringify(next));state.revision=next.revision;return true;}
@@ -75,7 +78,8 @@ const TheaterUI = (() => {
     return items.filter(item=>!item.visibility||item.visibility==='displayed').map(item=>`<article class="theater-event ${item.speaker==='user'?'mine':''}" data-theater-event data-speaker="${safe(item.speaker)}"><header><b>${safe(item.speaker==='user'?'你':item.speaker)}</b><span>→ ${safe(item.recipient||'全場')}</span>${item.behavior?`<small>${safe(behaviorLabels[item.behavior]||item.behavior)}</small>`:''}</header><p>${safe(item.text)}</p></article>`).join('');
   }
   let audioContext=null; // 音效只在明確開啟及使用者手勢後合成。
-  const sound = kind => {if(!state.soundEnabled)return;if(!window.AudioContext){state.soundEnabled=false;state.error='此裝置無法播放提示音；文字提示仍可使用。';showSaveError();persist();return;}try{audioContext ||= new AudioContext();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),now=audioContext.currentTime;oscillator.frequency.value=kind==='error'?220:kind==='complete'?660:440;gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.035,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.13);oscillator.connect(gain).connect(audioContext.destination);oscillator.start(now);oscillator.stop(now+.14);}catch(_){state.soundEnabled=false;state.error='此裝置無法播放提示音；文字提示仍可使用。';showSaveError();persist();}}; // 無音訊設備時降級。
+  const soundFailure = () => {stopSounds();state.soundEnabled=false;state.error='此裝置無法播放提示音；文字提示仍可使用。';const toggle=document.querySelector('[data-theater="sound-toggle"]');if(toggle)toggle.textContent='提示音：關閉（點此開啟）';showSaveError();persist();};
+  const sound = kind => {if(!state.soundEnabled)return;if(!window.AudioContext){soundFailure();return;}const epoch=soundEpoch;try{audioContext ||= new AudioContext();const play=()=>{if(epoch!==soundEpoch||!state.soundEnabled)return;try{const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),now=audioContext.currentTime;oscillator.frequency.value=kind==='error'?220:kind==='complete'?660:440;gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.035,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.13);oscillator.connect(gain).connect(audioContext.destination);sounding.add(oscillator);oscillator.onended=()=>sounding.delete(oscillator);oscillator.start(now);oscillator.stop(now+.14);}catch(_){soundFailure();}};if(audioContext.state==='suspended')Promise.resolve(audioContext.resume()).then(play).catch(()=>{if(epoch===soundEpoch)soundFailure();});else play();}catch(_){soundFailure();}}; // 拒絕解鎖或無音訊設備時保留文字提示。
   const soundControl = () => btn(state.soundEnabled?'提示音：開啟（點此靜音）':'提示音：關閉（點此開啟）','sound-toggle','secondary'); // 狀態始終可見。
   const modes = ['ANSWER','ASK_BACK','SILENCE','DEFER','CLOSING','EVADE','MONOLOGUE','PROVIDER_ERROR','PROVIDER_REFUSAL'];
   function asr() {
@@ -111,6 +115,7 @@ const TheaterUI = (() => {
   }
   function render(route) { return ({'theater-build':builder,'theater-preview':builder,'theater-live':live,'theater-lumi':lumi,'theater-recap':recap,'theater-history':history})[route]?.() || builder(); }
   function cancelPending() { // 已排隊但未展示的回應一律作廢。
+    stopSounds();
     if(timer)clearTimeout(timer);timer=null;
     const c=state.current;if(!c)return;
     c.generationEpoch=(c.generationEpoch||0)+1;
@@ -170,7 +175,7 @@ const TheaterUI = (() => {
     const disk=(()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(_){return null;}})(); // 按鈕命令也先做版本核對。
     if(disk&&(disk.revision||0)!==state.revision){state.error='其他分頁已更新劇場資料。請複製目前輸入，再重新讀取；此頁不會覆寫。';showSaveError();return;}
     state.error='';
-    if(action==='sound-toggle'){state.soundEnabled=!state.soundEnabled;nav('theater-live');if(state.soundEnabled)sound('confirm');return;}
+    if(action==='sound-toggle'){state.soundEnabled=!state.soundEnabled;if(!state.soundEnabled)stopSounds();nav('theater-live');if(state.soundEnabled)sound('confirm');return;}
     if (action==='hub') { cancelPending(); state.viewingHistoryId=null; nav('theater-hub'); return; }
     if (action==='history') { state.viewingHistoryId=null; nav('theater-history'); return; }
     if (action==='next') { if (!state.draft.situation.trim()) state.error='請描述這次想練習的情境。'; else state.stage='people'; nav('theater-build'); return; }
