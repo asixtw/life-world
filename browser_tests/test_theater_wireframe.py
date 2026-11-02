@@ -901,3 +901,16 @@ def test_sound_pending_unlock_respects_session_transition(page, wireframe_url, t
     page.evaluate('window.__resolveUnlock()')
     page.wait_for_timeout(50)
     assert page.evaluate('window.__tones') == expected
+
+# 完成音在回顧頁被拒絕時，不能只把錯誤藏在沒有 compose 的畫面後方。
+def test_sound_completion_resume_rejection_is_visible_on_recap(page, wireframe_url):
+    page.add_init_script("""window.__tones=[];window.__deny=false;window.AudioContext=class {constructor(){this.currentTime=0;this.destination={};this.state='suspended';}resume(){return window.__deny?Promise.reject(new Error('blocked')):Promise.resolve()}createOscillator(){return {frequency:{value:0},connect(){return this},start(){window.__tones.push(this.frequency.value)},stop(){}}}createGain(){return {gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){return this}}}};""")
+    begin(page, wireframe_url, multiple=False)
+    page.get_by_role('button', name='提示音：關閉（點此開啟）').click()
+    page.wait_for_function('window.__tones.length === 1')
+    page.evaluate('window.__deny=true')
+    page.get_by_role('button', name='結束本場', exact=True).click()
+    expect(page.get_by_role('heading', name='本場演練回顧')).to_be_visible()
+    expect(page.locator('.theater-error')).to_contain_text('文字提示仍可使用')
+    assert page.evaluate('TheaterUI.snapshot().soundEnabled') is False
+    assert page.evaluate('window.__tones') == [440]

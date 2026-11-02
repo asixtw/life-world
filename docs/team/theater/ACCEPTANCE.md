@@ -55,4 +55,4 @@
 
 詳細操作、狀態斷言、實際手機／桌面截圖及未驗項見[功能測試規格書](FUNCTIONAL_TEST_SPEC_2026-11-02.md)。本輪以隔離 Chromium 與虛構示例資料驗證，非正式 App 整合或 iOS／Safari 實機驗收。有效修復前紅燈記於 [RELIABILITY_RED_2026-11-02.txt](RELIABILITY_RED_2026-11-02.txt)；回歸結果以本輪新日誌為準，不沿用歷史通過數字。
 
-最終本地修復再將舊私人演練改成唯讀回顧，並為示例／清除加入可恢復日誌。故障注入驗證失敗回退及重載重入。`.venv` 未預裝，使用 `/tmp/lw-venv` 與系統 Chromium 執行兩套完整瀏覽器測試，前次結果 **77 passed，0 failed，0 skipped**，見 [前次日誌](RELIABILITY_FINAL_2026-11-02.txt)。補測與音效拒絕降級修復後的最終完整回歸 **93 passed，0 failed，0 skipped**，見 [擴充日誌](RELIABILITY_EXTENDED_2026-11-02.txt)。截圖與 PDF 已對應此最終程式。iOS／Safari、實機軟鍵盤與音效聽感未驗。
+最終本地修復再將舊私人演練改成唯讀回顧，並為示例／清除加入可恢復日誌。故障注入驗證失敗回退及重載重入。`.venv` 未預裝，使用 `/tmp/lw-venv` 與系統 Chromium 執行兩套完整瀏覽器測試，前次結果 **77 passed，0 failed，0 skipped**，見 [前次日誌](RELIABILITY_FINAL_2026-11-02.txt)。補測與音效拒絕降級修復後的最終完整回歸 **94 passed，0 failed，0 skipped**，見 [擴充日誌](RELIABILITY_EXTENDED_2026-11-02.txt)。截圖與 PDF 已對應此最終程式。iOS／Safari、實機軟鍵盤與音效聽感未驗。

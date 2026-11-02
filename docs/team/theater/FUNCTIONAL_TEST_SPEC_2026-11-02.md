@@ -12,7 +12,7 @@
 PLAYWRIGHT_BROWSERS_PATH=/tmp/lw-browsers /tmp/lw-venv/bin/python -m pytest browser_tests/test_theater_wireframe.py browser_tests/test_flow_wireframe.py -q --tb=short
 ```
 
-修復前以同一批新增瀏覽器案例在指定基準重跑：**SR-01、SR-04、SR-05 有效失敗**（人物漂移、歷史覆蓋活動場、刪歷史清空活動場）；SR-02／03 的舊入口停在非預期步驟，案例未走到交易斷言，列為入口紅燈。原始輸出見 [紅燈日誌](RELIABILITY_RED_2026-11-02.txt)。第一候選版完整回歸為 **71 passed，0 failed，0 skipped**，見 [候選版綠燈日誌](RELIABILITY_GREEN_2026-11-02.txt)。停止舊引擎新增入口與加入可恢復儲存日誌後的前次完整回歸為 **77 passed**，見 [前次日誌](RELIABILITY_FINAL_2026-11-02.txt)。補齊可在本機驗證的子情境與音效拒絕降級後，最終完整回歸為 **93 passed，0 failed，0 skipped**，見 [擴充驗收日誌](RELIABILITY_EXTENDED_2026-11-02.txt)。
+修復前以同一批新增瀏覽器案例在指定基準重跑：**SR-01、SR-04、SR-05 有效失敗**（人物漂移、歷史覆蓋活動場、刪歷史清空活動場）；SR-02／03 的舊入口停在非預期步驟，案例未走到交易斷言，列為入口紅燈。原始輸出見 [紅燈日誌](RELIABILITY_RED_2026-11-02.txt)。第一候選版完整回歸為 **71 passed，0 failed，0 skipped**，見 [候選版綠燈日誌](RELIABILITY_GREEN_2026-11-02.txt)。停止舊引擎新增入口與加入可恢復儲存日誌後的前次完整回歸為 **77 passed**，見 [前次日誌](RELIABILITY_FINAL_2026-11-02.txt)。補齊可在本機驗證的子情境與音效拒絕降級後，最終完整回歸為 **94 passed，0 failed，0 skipped**，見 [擴充驗收日誌](RELIABILITY_EXTENDED_2026-11-02.txt)。
 
 ## 狀態及舊欄位映射
 
@@ -65,7 +65,7 @@ PLAYWRIGHT_BROWSERS_PATH=/tmp/lw-browsers /tmp/lw-venv/bin/python -m pytest brow
 | 關閉 | 點擊靜音後 `soundEnabled=false` | 通過；[桌面靜音](../../artifacts/theater-reliability/sound-off-1440.png) |
 | 短提示音 | Web Audio 合成確認、完成、錯誤三種短音；文字提示獨立存在 | 通過（假 AudioContext）；確認、完成、錯誤音頻率與事件次數、雙擊去重已斷言；`test_sound_completion_error_and_resume_rejection`；真機聽感未驗 |
 | 中止／雙擊／刷新 | 沒有重播歷史事件的呼叫路徑；音效不排長時間隊列 | 通過（假 AudioContext）；刷新不補播、靜音不播放、離頁／暫停取消待解鎖音效、結束只播完成音；`test_sound_is_opt_in_and_no_refresh_replay`、`test_sound_pending_unlock_respects_session_transition`；真機聽感未驗 |
-| 音訊拒絕／不可用 | suspended `resume()` 拒絕或無 AudioContext 時自動關閉偏好、保留文字且無未處理 Promise | 通過（假裝置）；`test_sound_rejected_or_unavailable_falls_back_to_text`；[拒絕降級](../../artifacts/theater-reliability/sound-resume-denied.png) |
+| 音訊拒絕／不可用 | suspended `resume()` 拒絕或無 AudioContext 時自動關閉偏好、保留文字且無未處理 Promise | 通過（假裝置）；`test_sound_rejected_or_unavailable_falls_back_to_text`、`test_sound_completion_resume_rejection_is_visible_on_recap`（回顧頁文字提示）；[拒絕降級](../../artifacts/theater-reliability/sound-resume-denied.png) |
 
 ### 舊版歷史唯讀與取代失敗回退
 
