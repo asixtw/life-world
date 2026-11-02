@@ -2,6 +2,8 @@
 
 結論：可合併為「SQLite 現況文件＋PG／劇場設計草案」，不得當作正式 PG migration 或完整安全驗證。原 ZIP 沒有實際 DB，這輪沒有開啟、修改或上傳使用者資料庫。
 
+後續程式修正：原資料包指出的目標期間外貢獻採計缺口，已另補正式 App 交易內日期檢查；見[日期驗收](../../GOAL_RANGE_ACCEPTANCE.md)。本修正不改任何表／migration，因此本文件的結構重播結果仍適用，不能由此推論 PG 草案已實作。
+
 1. 從目前待發布程式獨立重播 001–005；逐檔與原包來源位元組一致。
 2. 在另一記憶體 SQLite 執行 SQLITE_FACT_SCHEMA.sql，逐表比對欄位、PK、FK、索引：31 表、201 欄、60 FK、50 索引，均一致；與原包 metadata 欄位及 FK 亦一致。
 3. 兩個空庫 integrity_check 均為 ok，foreign_key_check 無異常。不代表真實資料升級／備份還原已測。

@@ -28,6 +28,8 @@
 
 到期或待補設定時，經歷確認仍產生一次正常獎勵，貢獻進 `pending_contributions`；其狀態為 `pending`／`accepted`／`unapplied`，保留原數量與採計量。目標結束／完成後未採計項目標記 `unapplied`；逐筆採計須處於進行中，發生日期也必須在目標期間。
 
+2026-11-02 日期邊界修正：進行中目標的經歷貢獻，在 `/drafts/{id}/confirm` 交易內依目標固定 `schedule_timezone` 將 `occurred_at` 轉為日期，檢查 `start_date ≤ 日期 ≤ deadline`（含首尾日）。期外回 422／`contribution_out_of_range`，整筆確認回滾，原草稿保留；使用者可移除貢獻後保存同一段經歷，不自動刪除或改寫投入。沒有貢獻的舊經歷不受此採計限制。待回顧／待補設定仍保存待處理貢獻，不直接累計；延長後採計沿用逐筆日期檢查。進行中目標若缺必要期間／時區則回 409／`goal_setup_required`，不猜測標準。詳細驗證見[日期採計驗收](GOAL_RANGE_ACCEPTANCE.md)。
+
 新目標有未結束目標時回 `409 open_goal_exists`；版本衝突為 `409 revision_conflict`，新成果確認缺版本為 `422 revision_required`。相同成功請求先回既有回執；不因後來到期或結束重建資料。新建立表單與 API 呼叫端須一起更新，不能再送沒有截止日的舊建立格式。完整可執行契約見 [OpenAPI](openapi.json)。
 
 ## v0.3 交會 API

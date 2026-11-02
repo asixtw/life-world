@@ -83,6 +83,7 @@ def test_complete_browser_journey_with_upgrade_preserves_selected_goal_and_contr
     new_record(page)  # 經由紀錄主分頁進入新經歷表單
     page.locator('#goal-id').select_option(goal['id'])  # 選擇此案例需要的表單選項
     page.locator('#raw-text').fill('這一份原文，需要在升級帳號後完整保留。')  # 填入此步驟的虛構表單內容
+    in_period_time = page.locator('#occurred-at').input_value()  # 保存本場開始時的合法發生時間。
     page.locator('#occurred-at').fill('2001-01-01T23:50')  # 填入此步驟的虛構表單內容
     page.locator('#quantity-' + action_id).fill('0.25')  # 填入此步驟的虛構表單內容
     page.get_by_role('button', name='新增人物').click()  # 依使用者動線點擊畫面入口
@@ -98,7 +99,9 @@ def test_complete_browser_journey_with_upgrade_preserves_selected_goal_and_contr
     page.locator('#person-name').fill('虛構的同行朋友')  # 填入此步驟的虛構表單內容
     page.locator('#person-role').fill('一起創作')  # 填入此步驟的虛構表單內容
     page.get_by_role('button', name='保存人物').click()  # 依使用者動線點擊畫面入口
+    expect(page.locator('#account-dialog')).not_to_be_visible()  # 等待保存與表單還原完成，避免在仍開啟的 modal 背後改值。
     expect(page.locator('#quantity-' + action_id)).to_have_value('0.25')  # 等待並核對目前畫面狀態
+    page.locator('#occurred-at').fill(in_period_time)  # 舊日期已驗證升級保留；正式採計前由使用者改為目標期間內。
     page.get_by_role('button', name='保存草稿並進入核對').click()  # 依使用者動線點擊畫面入口
     expect(page.locator('#review-form')).to_be_visible()  # 等待並核對目前畫面狀態
     page.locator('#summary').fill('由我確認的四分之一小時練習。')  # 填入此步驟的虛構表單內容
@@ -139,6 +142,30 @@ def test_complete_browser_journey_with_upgrade_preserves_selected_goal_and_contr
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')  # 斷言真實瀏覽器完成升級旅程並保留所選目標與貢獻的預期結果
     page.screenshot(path=str(ARTIFACTS / 'mobile-world.png'), full_page=True)  # 保存畫面供原圖資訊層級比對
     assert errors == []  # 斷言真實瀏覽器完成升級旅程並保留所選目標與貢獻的預期結果
+
+
+def test_out_of_period_credit_shows_error_and_can_save_without_credit(page):
+    """期外錯誤不丟原文；清除採計量後可保存同一份經歷且只發一次原有獎勵。"""
+    onboarding(page)
+    goal = page.request.get(BASE + '/api/state').json()['goals'][0]
+    action_id = goal['actions'][0]['id']
+    new_record(page)
+    page.locator('#goal-id').select_option(goal['id'])
+    page.locator('#raw-text').fill('這是很久以前的經歷，不是新目標的投入。')
+    page.locator('#occurred-at').fill('2001-01-01T12:00')
+    page.locator('#quantity-' + action_id).fill('0.5')
+    page.get_by_role('button', name='保存草稿並進入核對').click()
+    page.get_by_role('button', name='我已核對，確認保存').click()
+    expect(page.locator('#notice')).to_contain_text('不在目標挑戰期間')
+    expect(page.locator('#summary')).to_have_value('這是很久以前的經歷，不是新目標的投入。')
+    assert page.request.get(BASE + '/api/state').json()['experiences'] == []
+    page.locator('#quantity-' + action_id).fill('')
+    page.get_by_role('button', name='我已核對，確認保存').click()
+    expect(page.locator('#review-form')).to_have_count(0)
+    state = page.request.get(BASE + '/api/state').json()
+    assert len(state['experiences']) == 1
+    assert state['goals'][0]['actions'][0]['progress'] == '0'
+    assert state['rewards']['total'] == 1
 
 
 def test_saved_draft_survives_refresh_and_logout_login(page):  # 驗證：瀏覽器刷新及登出登入後草稿仍在

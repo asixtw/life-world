@@ -48,7 +48,8 @@ def register(client, username='lumi_user'):  # 升級測試帳號並更新 CSRF 
 
 
 def draft(client, goal, **overrides):  # 建立可覆寫欄位的虛構經歷草稿
-    payload = {'raw_text': '今天練習了半小時，感到很充實。', 'occurred_at': '2026-10-26T23:50:00+08:00',
+    # 共用成功案例必須在新目標期間內；期外拒絕由專用邊界測試明確覆蓋。
+    payload = {'raw_text': '今天練習了半小時，感到很充實。', 'occurred_at': '2026-10-27T00:10:00+08:00',
                'goal_id': goal['id'], 'contributions': [{'action_id': goal['actions'][0]['id'], 'quantity': '0.5'}]}  # 準備將送出或用於指紋比對的完整內容
     payload.update(overrides)  # 合併本次明確設定的欄位
     response = client.post('/api/experiences/drafts', json=payload)  # 透過實際測試用戶端操作 API 並保留回應

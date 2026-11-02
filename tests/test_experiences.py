@@ -31,7 +31,7 @@ def test_confirm_partial_contribution_backdate_tasks_and_idempotency(client):  #
     assert len(state['tasks']) == 1  # 斷言人工部分貢獻、補記日期、下一步及確認去重的預期結果
     assert state['goals'][0]['actions'][0]['progress'] == '0.5'  # 斷言人工部分貢獻、補記日期、下一步及確認去重的預期結果
     exp = state['experiences'][0]  # 保存「exp」供後續驗證或回傳使用
-    assert exp['occurred_at'] == '2026-10-26T15:50:00+00:00'  # 斷言人工部分貢獻、補記日期、下一步及確認去重的預期結果
+    assert exp['occurred_at'] == '2026-10-26T16:10:00+00:00'  # 台北已是目標開始日；仍驗證補記原時間與 UTC 轉換。
     assert exp['created_at'] == '2026-10-27T07:00:00+00:00'  # 斷言人工部分貢獻、補記日期、下一步及確認去重的預期結果
     assert exp['person_id'] is None  # 斷言人工部分貢獻、補記日期、下一步及確認去重的預期結果
     assert exp['raw_text'] == d['raw_text']  # 斷言人工部分貢獻、補記日期、下一步及確認去重的預期結果
@@ -69,10 +69,11 @@ def test_invalid_event_time(client, when):  # 驗證：拒絕未來時間或無�
 
 
 def test_very_old_event_is_allowed_and_gets_points(client):  # 驗證：允許補記很久以前的真實經歷並正常計分
-    _, goal = onboard(client); d = draft(client, goal, occurred_at='2001-01-01T00:01:00+08:00')  # 完成訪客、Bio 與第一目標的測試前置流程
+    _, goal = onboard(client); d = draft(client, goal, occurred_at='2001-01-01T00:01:00+08:00', contributions=[])  # 舊經歷可補記，但不能當成本次目標投入。
     result = client.post('/api/drafts/' + d['id'] + '/confirm', json=confirm_payload(d))  # 透過實際測試用戶端操作 API 並保留回應
     assert result.status_code == 201  # 核對 HTTP 狀態，避免失敗請求被當成成功
     assert result.json()['points_awarded'] == 3  # 核對積分帳本符合本案例預期
+    assert client.get('/api/goals/' + goal['id']).json()['actions'][0]['progress'] == '0'  # 經歷獎勵與目標採計分開。
 
 
 def test_decimal_sum_is_exact_and_never_completes_goal(client):  # 驗證：十進位精確累計且不自動宣告成果完成

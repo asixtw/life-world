@@ -95,6 +95,11 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
         goal = self._goal(c, goal_id, owner)  # 交易內重新判定到期。
         require(goal['status'] not in {'completed', 'ended'}, 409, 'policy_required', '這次挑戰已收藏；可移除貢獻後保存經歷。')  # 歷史不再改正式投入。
         pending = goal['status'] in {'awaiting_review', 'needs_setup'}  # 不把到期後的活動默默累計。
+        if not pending:
+            # 只限制立即採計；到期或舊目標仍可保存為待處理，不猜測缺失的期間。
+            require(bool(goal['start_date'] and goal['deadline'] and goal['schedule_timezone']), 409, 'goal_setup_required', '請先補齊目標期間與時區，或移除貢獻後保存經歷。')
+            occurred = datetime.fromisoformat(occurred_at).astimezone(ZoneInfo(goal['schedule_timezone'])).date().isoformat()
+            require(goal['start_date'] <= occurred <= goal['deadline'], 422, 'contribution_out_of_range', '這段經歷不在目標挑戰期間；請移除貢獻後保存經歷。')
         for item in items:  # 每項貢獻保留穩定來源。
             if pending:  # 先保存待處理，經歷照常確認。
                 c.execute('INSERT INTO pending_contributions(id,owner_id,goal_id,experience_id,action_id,quantity) VALUES (?,?,?,?,?,?)', (str(uuid4()), owner, goal_id, experience_id, item.action_id, item.quantity))  # 此處不發獎。
