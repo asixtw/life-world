@@ -1,10 +1,13 @@
 """HTTP adapter; domain writes live in service.py, not in browser storage."""  # 說明此模組的責任與實作邊界
 from pathlib import Path  # 以跨平台方式組合檔案路徑
+from datetime import date  # 解析日曆查詢的實際日期。
 import logging  # 記錄服務錯誤類型而不輸出敏感本文
 import os  # 讀取資料目錄或測試網址等環境設定
 from typing import Literal, Optional  # 宣告可選欄位、清單與受限字串型別
 
-from fastapi import FastAPI, Request, UploadFile, File, Query  # 建立 HTTP API、請求與上傳欄位
+from fastapi import FastAPI, Request, UploadFile, File, Query, Form  # 建立 HTTP API、請求與上傳欄位
+from starlette.concurrency import run_in_threadpool
+import asyncio
 from fastapi.exceptions import RequestValidationError  # 捕捉輸入驗證錯誤
 from fastapi.responses import FileResponse, JSONResponse, Response  # 建立 JSON、圖片與首頁回應
 from fastapi.staticfiles import StaticFiles  # 提供前端靜態資源
@@ -15,6 +18,7 @@ from .db import Database  # 載入 SQLite 交易與遷移管理器
 from .errors import DomainError  # 共用領域錯誤與條件檢查
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
+from . import media
 
 logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的紀錄器
 
@@ -23,8 +27,10 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
     policy = policy or DemoPolicy()  # 準備本機開發設定
     data_dir = data_dir or os.environ.get('LIFEWORLD_DATA_DIR') or Path(__file__).resolve().parent.parent / 'data'  # 準備本次 App 使用的資料目錄
     service = LifeWorld(Database(data_dir), policy, clock)  # 準備負責交易與領域規則的服務物件
-    app = FastAPI(title='Life World Local API', version='0.3.0', description='本機開發版；開發設定不是正式產品規則。')  # 交會正式整合的增量版本
+    app = FastAPI(title='Life World Local API', version='0.4.0', description='本機開發版；開發設定不是正式產品規則。')  # 單一挑戰與人工回顧的增量版本
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
+    app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
+    app.add_middleware(media.MediaBodyLimit, max_bytes=policy.max_upload_bytes + 65536)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver', '[::1]'])  # 執行此模組的共用工具操作
 
     @app.exception_handler(DomainError)  # 註冊此 HTTP 路由、例外處理器或中介層
@@ -44,6 +50,11 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
 
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
+        if request.url.path == '/api/media/recognize':
+            # 在 multipart 解析前限制一般已知長度請求，路由內另有串流讀取上限。
+            length = request.headers.get('content-length', '')
+            if length.isdigit() and int(length) > policy.max_upload_bytes + 65536:
+                return JSONResponse({'error': {'code': 'upload_too_large', 'message': '素材超過目前本機傳輸上限。'}}, status_code=413)
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):  # 依目前條件選擇下一步處理分支
             origin = request.headers.get('origin')  # 保存「origin」供後續驗證或回傳使用
             expected = str(request.base_url).rstrip('/')  # 保存「expected」供後續驗證或回傳使用
@@ -57,11 +68,37 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
         if request.url.path == '/':  # 依目前條件選擇下一步處理分支
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
-            response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"  # 設定回應的安全或快取標頭
+            response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"  # Blob 音訊只供使用者主動試聽，不自動播放。
         return response  # 回傳檢查寫入來源並加入安全與快取標頭的結果
 
     def current(request, write=False):  # 驗證目前工作階段，寫入時同時檢查 CSRF
         return service.session(request.cookies.get('lw_session'), request.headers.get('X-CSRF-Token'), write)[0]  # 回傳驗證目前工作階段，寫入時同時檢查 CSRF的結果
+
+    @app.get('/api/media/capabilities', tags=['Media'])
+    def media_capabilities(request: Request):
+        """傳回實際可用能力與傳輸護欄，不把本機設定宣稱為正式素材政策。"""
+        current(request)
+        return {'recognition_available': app.state.media_provider is not None,
+                'max_bytes': policy.max_upload_bytes, 'server_retention': 'none',
+                'image_types': list(media.IMAGE_TYPES), 'audio_types': list(media.AUDIO_TYPES)}
+
+    @app.post('/api/media/recognize', tags=['Media'])
+    async def recognize_media(request: Request, file: UploadFile = File(...),
+                              kind: Literal['audio', 'image', 'screenshot', 'card'] = Form(...)):
+        """僅接受明確上傳；回應是候選文字，不建立人物、經歷、貢獻或獎勵。"""
+        try:
+            user = current(request, True)
+            with service.db.connect() as connection:
+                service._onboarded(connection, user['id'])
+            content = await file.read(policy.max_upload_bytes + 1)
+            mime = media.validate_media(kind, file.filename, file.content_type, content, policy.max_upload_bytes)
+            try:
+                return await asyncio.wait_for(run_in_threadpool(
+                    media.recognize, app.state.media_provider, kind, mime, content), timeout=30)
+            except asyncio.TimeoutError:
+                raise DomainError(504, 'media_recognition_timeout', '辨識逾時。素材仍保留，請稍後重試。')
+        finally:
+            await file.close()  # multipart 暫存檔隨請求關閉，不另行保存素材。
 
     def cookie(response, token):  # 設定不可由 JavaScript 讀取的工作階段 Cookie
         response.set_cookie('lw_session', token, httponly=True, secure=policy.secure_cookies,
@@ -127,8 +164,16 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
         return service.goal(current(request)['id'], goal_id)  # 回傳讀取目前帳號可存取的目標的結果
 
     @app.get('/api/goals/{goal_id}/calendar', tags=['Goals'])  # 註冊此 HTTP 路由、例外處理器或中介層
-    def calendar(goal_id: str, request: Request):  # 依目前每週規律產生 28 日預覽；月週期另項實作
-        return service.calendar(current(request)['id'], goal_id)  # 回傳依目前每週規律產生 28 日預覽；月週期另項實作的結果
+    def calendar(goal_id: str, request: Request, start: Optional[date] = None, end: Optional[date] = None):  # 依實際日期分頁查看安排。
+        return service.calendar(current(request)['id'], goal_id, start, end)  # 不固定四週或 28 天。
+
+    @app.post('/api/goals/{goal_id}/review', tags=['Goals'])  # 人工延長、結束與舊目標設定。
+    def review_goal(goal_id: str, request: Request, data: schemas.GoalReview):  # 與版本和去重一起驗證。
+        return service.review_goal(current(request, True)['id'], goal_id, data)  # 不自動宣告成果。
+
+    @app.post('/api/goals/{goal_id}/pending/{pending_id}/accept', tags=['Goals'])  # 延長後逐筆採計。
+    def accept_pending(goal_id: str, pending_id: str, request: Request, data: schemas.PendingAccept):  # 獨立於經歷確認交易。
+        return service.accept_pending(current(request, True)['id'], goal_id, pending_id, data)  # 不重複發獎。
 
     @app.post('/api/experiences/drafts', status_code=201, tags=['Experiences'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def create_draft(request: Request, data: schemas.DraftCreate):  # 保存尚未確認、不計分的原始經歷草稿

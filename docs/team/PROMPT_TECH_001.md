@@ -1,13 +1,19 @@
 # LW-TECH-001｜全端整合與部署審查指令
 
+> **2026-10-29 封測 v1.0 已確認：**本輪行為以[封測流程定稿基準](BETA_FLOW_SPEC.md)為準。私人演練＋示範情境入口已定；真實語音及圖片辨識是發布門檻。封測不整合積分／養分／兌換，保留完成紀念與未達成旅程摘要、人物及來源。完整資產製作包仍保留，展示／腳本／503 不能算真實辨識交付。
+
 主責：Jerry（全端），技術整合與程式審查。Boyi 確認產品與範圍，歐桑核對模型。可與歐桑完整獨立交付包同步審查契約；此包不建立雲端資源。
+
+2026-10-29 DB 交接新增：[完整 Table Schema](../DATABASE_SCHEMA.md)、[純結構快照](../database/schema_snapshot.json)、[Jerry 接續規劃](../database/POSTGRESQL_HANDOFF.md)。先確認包含工作樹 005 的一致來源版本，再規劃 PG 型別／併發／去重／匯入；不要直接對正式資料庫執行參考 DDL。
 
 ```text
 任務：LW-TECH-001，Life World 技術契約與部署審查。
 你是整合與程式審查負責人，不被假定全職承包全部功能。
 先回報可投入時間與實際可用環境，閱讀同一來源快照的
-docs/team/BASELINE.md、FLOWS_AND_STATES.md、INTEGRATION_REVIEW.md、
-既有 docs/API.md、ARCHITECTURE.md、OpenAPI 與實際程式。
+docs/team/BASELINE.md、docs/team/FLOWS_AND_STATES.md、
+docs/team/INTEGRATION_REVIEW.md、docs/API.md、docs/ARCHITECTURE.md、
+docs/DATABASE_SCHEMA.md、docs/database/POSTGRESQL_HANDOFF.md、
+docs/openapi.json 與實際程式。
 
 本輪方向：React＋TypeScript／Vite／React Router；保留 Python FastAPI；
 SQLite 遷移 PostgreSQL；前後端全放 GCP，POC 不做原生 App。

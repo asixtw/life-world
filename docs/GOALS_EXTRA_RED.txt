@@ -1,0 +1,19 @@
+[公開版註記] 僅將本機專案路徑（含截斷片段）替換為 <REPOSITORY>；失敗斷言、案例與結果原樣保留。
+...................................FF                                    [100%]
+=================================== FAILURES ===================================
+_____________ test_new_goal_completion_requires_reviewed_revision ______________
+tests/test_goal_journey.py:267: in test_new_goal_completion_requires_reviewed_revision
+    assert client.post(url, json=body).status_code == 422  # 新目標必須明確傳版本。
+E   AssertionError: assert 200 == 422
+E    +  where 200 = <Response [200 OK]>.status_code
+E    +    where <Response [200 OK]> = post('/api/goals/2bdec49c-a54e-43d9-8f2c-d8c8a6a4ec65/complete', json={'confirmed': True, 'evidence_ids': ['2141e7c4-3f00-4526-a563-4b9b7a9c9456'], 'request_id': 'complete-version'})
+E    +      where post = <starlette.testclient.TestClient object at 0x7ff180afe310>.post
+___________ test_browser_clock_server_refuses_actual_data_directory ____________
+tests/test_goal_journey.py:278: in test_browser_clock_server_refuses_actual_data_directory
+    assert result.returncode == 2 and '不能使用正式資料目錄' in result.stderr  # 必須在啟動服務前拒絕。
+E   AssertionError: assert (1 == 2)
+E    +  where 1 = CompletedProcess(args=['<REPOSITORY>/.venv/bin/python', '-m', 'br...<REPOSITORY>/.venv/bin/python: No module named browser_tests.clock_server\n').returncode
+=========================== short test summary info ============================
+FAILED tests/test_goal_journey.py::test_new_goal_completion_requires_reviewed_revision
+FAILED tests/test_goal_journey.py::test_browser_clock_server_refuses_actual_data_directory
+2 failed, 35 passed in 1.49s

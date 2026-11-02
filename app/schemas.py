@@ -1,4 +1,4 @@
-from datetime import datetime  # 處理 UTC、發生時間與期限
+from datetime import date, datetime  # 處理 UTC、實際日期與期限。
 from decimal import Decimal, InvalidOperation  # 以精確十進位處理貢獻量，避免浮點誤差
 from typing import List, Optional, Literal  # 宣告可選欄位、清單與受限字串型別
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError  # 使用 IANA 時區轉換日期與時間
@@ -64,12 +64,15 @@ class Login(Model):  # 登入與訪客衝突確認輸入
 
 class Action(Model):  # 單項行動的目標量、等級與每週規律
     title: str = Field(min_length=1, max_length=160)  # 設定標題的型別、預設值與輸入限制
-    unit: str = Field(min_length=1, max_length=20)  # 設定行動計量單位的型別、預設值與輸入限制
-    target: str  # 設定行動預期累計值的型別、預設值與輸入限制
-    level: StrictInt = Field(ge=1, le=3)  # 設定建立時的養分等級的型別、預設值與輸入限制
-    weekdays: List[StrictInt] = Field(min_length=1, max_length=7)  # 設定每週預計執行日（週一為 0）的型別、預設值與輸入限制
+    unit: str = Field(default='次', min_length=1, max_length=20)  # 設定行動計量單位的型別、預設值與輸入限制
+    target: Optional[str] = None  # 舊累計目標保留；新習慣依安排推算。
+    per_occurrence: str = '1'  # 每次預期量預設一次。
+    dates: List[date] = Field(default_factory=list, max_length=10000)  # 保存實際安排日期。
+    cycle: Literal['month', 'week'] = 'month'  # 預設按月編輯，可切換週。
+    level: StrictInt = Field(default=1, ge=1, le=3)  # 保留舊養分設定。
+    weekdays: List[StrictInt] = Field(default_factory=list, max_length=7)  # 允許只安排單日。
 
-    @field_validator('target', mode='before')  # 將下方驗證函式綁定到指定輸入欄位
+    @field_validator('target', 'per_occurrence', mode='before')  # 數量沿用精確正數限制。
     @classmethod  # 以模型類別呼叫欄位驗證
     def valid_target(cls, value):  # 驗證行動目標數值
         return decimal_string(value)  # 回傳驗證行動目標數值的結果
@@ -86,7 +89,8 @@ class GoalCreate(Model):  # 建立目標與三項行動的輸入
     request_id: str = Field(min_length=1, max_length=128)  # 設定重送去重用的提交代碼的型別、預設值與輸入限制
     title: str = Field(min_length=1, max_length=160)  # 設定標題的型別、預設值與輸入限制
     outcome: str = Field(min_length=1, max_length=4000)  # 設定目標的終極成果說明的型別、預設值與輸入限制
-    actions: List[Action] = Field(min_length=3, max_length=3)  # 設定三項可自主完成的目標行動的型別、預設值與輸入限制
+    deadline: date  # 截止日必須由使用者明確選擇。
+    actions: List[Action] = Field(min_length=3, max_length=3)  # 固定三個重要習慣。
 
 
 class Contribution(Model):  # 一項行動的人工貢獻量
@@ -284,6 +288,7 @@ class ConnectionCreate(Model):  # 兩位人物間的明確關係輸入
 
 
 class Complete(Model):  # 附佐證與人工確認的目標完成輸入
+    expected_revision: Optional[StrictInt] = Field(default=None, ge=1)  # 新版頁面檢查目標版本，舊請求仍可重試。
     request_id: str = Field(min_length=1, max_length=128)  # 設定重送去重用的提交代碼的型別、預設值與輸入限制
     evidence_ids: List[str] = Field(min_length=1, max_length=10)  # 設定完成目標所引用的佐證識別碼的型別、預設值與輸入限制
     confirmed: Literal[True]  # 設定必須由使用者明確確認的旗標的型別、預設值與輸入限制
@@ -348,3 +353,53 @@ class MentionMatch(Revision):  # 只核對身分，不改參與角色
 class StoryAvailability(Revision):  # 撤回或恢復交會展示
     request_id: str = Field(min_length=1, max_length=128)  # 保存可重送操作
     available: bool = Field(strict=True)  # 不刪除原始經歷
+
+
+class HabitSchedule(Model):  # 依穩定行動 ID 更新安排，不重建歷史。
+    action_id: str = Field(min_length=1, max_length=128)  # 必須屬於同一目標。
+    dates: List[date] = Field(min_length=1, max_length=10000)  # 明確檢視的新安排。
+    weekdays: List[StrictInt] = Field(default_factory=list, max_length=7)  # 保存星期快選。
+    cycle: Literal['month', 'week'] = 'month'  # 保存編輯週期。
+    title: Optional[str] = Field(default=None, min_length=1, max_length=160)
+    per_occurrence: Optional[str] = None
+    expected_effective_from: Optional[date] = None
+
+    @field_validator('per_occurrence', mode='before')
+    @classmethod
+    def valid_planned_quantity(cls, value):
+        """只接受正數；缺省表示保留原標準，不接受明確的 null。"""
+        return decimal_string(value)
+
+
+class GoalReview(Model):  # 延長、結束與設定的明確確認。
+    request_id: str = Field(min_length=1, max_length=128)  # 防止重送。
+    expected_revision: StrictInt = Field(ge=1)  # 防止舊頁面覆蓋。
+    decision: Literal['extend', 'end', 'setup', 'schedule']  # 成果完成仍沿用 complete。
+    confirmed: Literal[True]  # 使用者明確確認。
+    deadline: Optional[date] = None  # 延長與舊目標設定需提供。
+    schedules: Optional[List[HabitSchedule]] = Field(default=None, min_length=3, max_length=3)  # 同時檢視三個習慣。
+    reflection: str = Field(default='', max_length=4000)  # 保存回顧感想。
+
+    @field_validator('confirmed', mode='before')  # 拒絕隱式轉型。
+    @classmethod  # 使用類別驗證。
+    def explicit_confirm(cls, value):  # 只有布林 True 代表確認。
+        if value is not True: raise ValueError('請明確確認本次操作')  # 不接受數字代替。
+        return value  # 回傳確認旗標。
+
+
+class PendingAccept(Model):  # 延長後逐筆核對採計。
+    request_id: str = Field(min_length=1, max_length=128)  # 避免重複入帳。
+    expected_revision: StrictInt = Field(ge=1)  # 使用最新版本。
+    quantity: str  # 核對後的實際數量。
+    confirmed: Literal[True]  # 明確採計確認。
+
+    @field_validator('quantity', mode='before')  # 沿用精確正數規則。
+    @classmethod  # 使用類別驗證。
+    def valid_quantity(cls, value):  # 驗證合法數量。
+        return decimal_string(value)  # 保留原有精度上限。
+
+    @field_validator('confirmed', mode='before')  # 不允許隱式確認。
+    @classmethod  # 使用類別驗證。
+    def explicit_confirm(cls, value):  # 只接受布林 True。
+        if value is not True: raise ValueError('請明確確認採計')  # 防止數字轉型。
+        return value  # 回傳確認旗標。

@@ -27,8 +27,8 @@ def guest(client):  # 取得既有訪客身分或建立新的訪客世界
 
 
 def goal_payload(request_id='goal-1'):  # 建立含三項行動的目標測試資料
-    return {'request_id': request_id, 'title': '靠近更好的自己', 'outcome': '完成一個自己的作品',
-            'actions': [{'title': title, 'unit': unit, 'target': '10', 'level': i + 1, 'weekdays': [0, 2, 4]}
+    return {'request_id': request_id, 'title': '靠近更好的自己', 'outcome': '完成一個自己的作品', 'deadline': '2026-11-30',
+            'actions': [{'title': title, 'unit': unit, 'target': '10', 'level': i + 1, 'weekdays': [0, 2, 4], 'dates': ['2026-10-' + str(day) for day in [28, 30]] + ['2026-11-' + str(day).zfill(2) for day in [2, 4, 6, 9, 11, 13, 16, 18, 20, 23, 25, 27, 30]]}
                         for i, (title, unit) in enumerate([('練習', '小時'), ('記錄', '篇'), ('交流', '次')])]}  # 回傳後續測試步驟所需資料
 
 
@@ -48,7 +48,8 @@ def register(client, username='lumi_user'):  # 升級測試帳號並更新 CSRF 
 
 
 def draft(client, goal, **overrides):  # 建立可覆寫欄位的虛構經歷草稿
-    payload = {'raw_text': '今天練習了半小時，感到很充實。', 'occurred_at': '2026-10-26T23:50:00+08:00',
+    # 共用成功案例必須在新目標期間內；期外拒絕由專用邊界測試明確覆蓋。
+    payload = {'raw_text': '今天練習了半小時，感到很充實。', 'occurred_at': '2026-10-27T00:10:00+08:00',
                'goal_id': goal['id'], 'contributions': [{'action_id': goal['actions'][0]['id'], 'quantity': '0.5'}]}  # 準備將送出或用於指紋比對的完整內容
     payload.update(overrides)  # 合併本次明確設定的欄位
     response = client.post('/api/experiences/drafts', json=payload)  # 透過實際測試用戶端操作 API 並保留回應

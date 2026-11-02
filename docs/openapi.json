@@ -3,9 +3,69 @@
   "info": {
     "title": "Life World Local API",
     "description": "本機開發版；開發設定不是正式產品規則。",
-    "version": "0.3.0"
+    "version": "0.4.0"
   },
   "paths": {
+    "/api/media/capabilities": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Media Capabilities",
+        "description": "傳回實際可用能力與傳輸護欄，不把本機設定宣稱為正式素材政策。",
+        "operationId": "media_capabilities_api_media_capabilities_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/recognize": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Recognize Media",
+        "description": "僅接受明確上傳；回應是候選文字，不建立人物、經歷、貢獻或獎勵。",
+        "operationId": "recognize_media_api_media_recognize_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_recognize_media_api_media_recognize_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "tags": [
@@ -308,8 +368,151 @@
               "type": "string",
               "title": "Goal Id"
             }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End"
+            }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/goals/{goal_id}/review": {
+      "post": {
+        "tags": [
+          "Goals"
+        ],
+        "summary": "Review Goal",
+        "operationId": "review_goal_api_goals__goal_id__review_post",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalReview"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/goals/{goal_id}/pending/{pending_id}/accept": {
+      "post": {
+        "tags": [
+          "Goals"
+        ],
+        "summary": "Accept Pending",
+        "operationId": "accept_pending_api_goals__goal_id__pending__pending_id__accept_post",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          },
+          {
+            "name": "pending_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pending Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PendingAccept"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1808,17 +2011,49 @@
             "type": "string",
             "maxLength": 20,
             "minLength": 1,
-            "title": "Unit"
+            "title": "Unit",
+            "default": "次"
           },
           "target": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Target"
+          },
+          "per_occurrence": {
+            "type": "string",
+            "title": "Per Occurrence",
+            "default": "1"
+          },
+          "dates": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "maxItems": 10000,
+            "title": "Dates"
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "month",
+              "week"
+            ],
+            "title": "Cycle",
+            "default": "month"
           },
           "level": {
             "type": "integer",
             "maximum": 3.0,
             "minimum": 1.0,
-            "title": "Level"
+            "title": "Level",
+            "default": 1
           },
           "weekdays": {
             "items": {
@@ -1826,20 +2061,40 @@
             },
             "type": "array",
             "maxItems": 7,
-            "minItems": 1,
             "title": "Weekdays"
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "title",
-          "unit",
-          "target",
-          "level",
-          "weekdays"
+          "title"
         ],
         "title": "Action"
+      },
+      "Body_recognize_media_api_media_recognize_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "image",
+              "screenshot",
+              "card"
+            ],
+            "title": "Kind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "kind"
+        ],
+        "title": "Body_recognize_media_api_media_recognize_post"
       },
       "Body_upload_api_goals__goal_id__evidence_post": {
         "properties": {
@@ -1857,6 +2112,18 @@
       },
       "Complete": {
         "properties": {
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Revision"
+          },
           "request_id": {
             "type": "string",
             "maxLength": 128,
@@ -2308,6 +2575,11 @@
             "minLength": 1,
             "title": "Outcome"
           },
+          "deadline": {
+            "type": "string",
+            "format": "date",
+            "title": "Deadline"
+          },
           "actions": {
             "items": {
               "$ref": "#/components/schemas/Action"
@@ -2324,6 +2596,7 @@
           "request_id",
           "title",
           "outcome",
+          "deadline",
           "actions"
         ],
         "title": "GoalCreate"
@@ -2357,6 +2630,79 @@
         ],
         "title": "GoalLink"
       },
+      "GoalReview": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "extend",
+              "end",
+              "setup",
+              "schedule"
+            ],
+            "title": "Decision"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed"
+          },
+          "deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
+          },
+          "schedules": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/HabitSchedule"
+                },
+                "type": "array",
+                "maxItems": 3,
+                "minItems": 3
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedules"
+          },
+          "reflection": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Reflection",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "expected_revision",
+          "decision",
+          "confirmed"
+        ],
+        "title": "GoalReview"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2369,6 +2715,86 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HabitSchedule": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Action Id"
+          },
+          "dates": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "maxItems": 10000,
+            "minItems": 1,
+            "title": "Dates"
+          },
+          "weekdays": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 7,
+            "title": "Weekdays"
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "month",
+              "week"
+            ],
+            "title": "Cycle",
+            "default": "month"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "per_occurrence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Per Occurrence"
+          },
+          "expected_effective_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Effective From"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action_id",
+          "dates"
+        ],
+        "title": "HabitSchedule"
       },
       "InteractionEdit": {
         "properties": {
@@ -2559,6 +2985,39 @@
           "content"
         ],
         "title": "NoteCreate"
+      },
+      "PendingAccept": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "expected_revision",
+          "quantity",
+          "confirmed"
+        ],
+        "title": "PendingAccept"
       },
       "PersonCreate": {
         "properties": {

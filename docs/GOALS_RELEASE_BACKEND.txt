@@ -1,0 +1,8 @@
+Life World v0.4.0｜發布前後端驗證摘要
+日期：2026-10-29（Asia/Taipei）
+工作位置：App Repository 根目錄
+命令：.venv/bin/python -m pytest -q --tb=short
+結果：137 通過，0 失敗，0 跳過
+耗時：7.94 秒
+隔離方式：pytest fixture 使用獨立測試資料；未對日常資料庫再次執行遷移。
+本檔是實際執行結果的公開摘要，原始 stdout 留本機，不直接複製私人原件。

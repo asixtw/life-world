@@ -1,0 +1,22 @@
+.gj-calendar { margin-top: 20px; } /* 讓數量與日期設定有清楚層次。 */
+.gj-weekdays, .gj-date-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; } /* 一週七欄且允許手機縮排。 */
+.gj-weekdays button { padding: 10px 0; min-width: 0; } /* 保留可觸控的星期選項。 */
+.gj-weekdays [aria-pressed="true"] { background: var(--mint, #d9eade); color: #214d3c; } /* 星期快選有明確選取狀態。 */
+.gj-month-title { display: flex; align-items: center; justify-content: space-between; margin: 16px 0; gap: 8px; } /* 日期導覽方向固定。 */
+.gj-day { border: 1px solid #c6d9cc; border-radius: 12px; background: #fffdfa; color: #325548; min-width: 0; min-height: 54px; padding: 6px 1px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; } /* 小螢幕仍顯示日期與安排語意。 */
+.gj-day small { font-size: 10px; line-height: 1.2; } /* 不使用完成打勾混淆狀態。 */
+.gj-day.selected { background: #dcece2; border: 2px solid #60987e; color: #254b3a; } /* 日期安排與未選日期可區分。 */
+.gj-day:disabled { opacity: .38; background: #eceeea; cursor: default; } /* 目標期間外不可編輯。 */
+.gj-day:focus-visible, .gj-weekdays button:focus-visible { outline: 3px solid #5c89b6; outline-offset: 2px; } /* 鍵盤操作可看見焦點。 */
+.gj-summary-item { padding: 16px 0; border-bottom: 1px solid #e1e8df; } /* 三個習慣與來源分段清楚。 */
+.gj-quantity { padding: 12px; border: 1px solid #dce6dd; border-radius: 12px; } /* 進階數量可收合。 */
+.gj-schedule-summary { padding: 12px; border-radius: 12px; background: #f0f6ee; } /* 即時回報安排數量。 */
+.gj-date-list { overflow-wrap: anywhere; line-height: 1.9; } /* 大量日期不撐破手機版面。 */
+.pending-accept-form { padding: 12px; background: #f4f6ef; border-radius: 12px; } /* 待採計與正式投入分開呈現。 */
+@media (max-width: 480px) { /* 手機一樣保持七欄並避免水平捲動。 */
+  .gj-date-grid { gap: 3px; } /* 日期格之間縮小空隙。 */
+  .gj-day { border-radius: 8px; min-height: 48px; } /* 維持可點擊高度。 */
+  .gj-weekdays { gap: 3px; } /* 星期快選與日期欄位對齊。 */
+} /* 結束手機版調整。 */
+
+@media (max-width: 680px) { .sidebar.before-world { display: none; } } /* 首次建立前不讓空白導覽列遮住月曆。 */

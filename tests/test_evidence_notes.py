@@ -20,7 +20,7 @@ def test_goal_needs_evidence_and_explicit_human_confirmation(client):  # 驗證�
     assert evidence.status_code == 201, evidence.text  # 核對 HTTP 狀態，避免失敗請求被當成成功
     eid = evidence.json()['id']  # 保存「eid」供後續驗證或回傳使用
     assert client.post(path, json={'request_id': 'done-1', 'evidence_ids': [eid], 'confirmed': False}).status_code == 422  # 核對 HTTP 狀態，避免失敗請求被當成成功
-    body = {'request_id': 'done-1', 'evidence_ids': [eid], 'confirmed': True, 'reflection': '我確認已完成成果'}  # 保存「body」供後續驗證或回傳使用
+    body = {'expected_revision': goal['revision'], 'request_id': 'done-1', 'evidence_ids': [eid], 'confirmed': True, 'reflection': '我確認已完成成果'}  # 保存「body」供後續驗證或回傳使用
     result = client.post(path, json=body)  # 透過實際測試用戶端操作 API 並保留回應
     assert result.status_code == 200, result.text  # 核對 HTTP 狀態，避免失敗請求被當成成功
     assert client.post(path, json=body).json() == result.json()  # 斷言完成成果須有佐證與使用者明確確認的預期結果
@@ -46,18 +46,19 @@ def test_invalid_upload(client, content, name, mime, code):  # 驗證：拒絕�
 def test_other_goal_and_other_owner_evidence_rejected(app, client):  # 驗證：拒絕引用其他目標或帳號的佐證
     _, goal = onboard(client); evidence = upload(client, goal).json()  # 完成訪客、Bio 與第一目標的測試前置流程
     from conftest import goal_payload  # 共用測試資料與前置流程
+    assert client.post('/api/goals/' + goal['id'] + '/complete', json={'expected_revision': goal['revision'], 'request_id': 'first-done', 'evidence_ids': [evidence['id']], 'confirmed': True}).status_code == 200  # 單一目標規則要求先完成前一個。
     second = client.post('/api/goals', json=goal_payload('goal-2')).json()  # 透過實際測試用戶端操作 API 並保留回應
-    assert client.post('/api/goals/' + second['id'] + '/complete', json={'request_id': 'done', 'evidence_ids': [evidence['id']], 'confirmed': True}).status_code == 404  # 核對 HTTP 狀態，避免失敗請求被當成成功
+    assert client.post('/api/goals/' + second['id'] + '/complete', json={'expected_revision': second['revision'], 'request_id': 'done', 'evidence_ids': [evidence['id']], 'confirmed': True}).status_code == 404  # 核對 HTTP 狀態，避免失敗請求被當成成功
     with TestClient(app) as other:  # 以區塊生命週期確保資源在結束時關閉
         _, g = onboard(other)  # 完成訪客、Bio 與第一目標的測試前置流程
         assert other.get('/api/evidence/' + evidence['id']).status_code == 404  # 核對 HTTP 狀態，避免失敗請求被當成成功
         assert upload(other, goal).status_code == 404  # 核對 HTTP 狀態，避免失敗請求被當成成功
-        assert other.post('/api/goals/' + g['id'] + '/complete', json={'request_id': 'done', 'evidence_ids': [evidence['id']], 'confirmed': True}).status_code == 404  # 核對 HTTP 狀態，避免失敗請求被當成成功
+        assert other.post('/api/goals/' + g['id'] + '/complete', json={'expected_revision': g['revision'], 'request_id': 'done', 'evidence_ids': [evidence['id']], 'confirmed': True}).status_code == 404  # 核對 HTTP 狀態，避免失敗請求被當成成功
 
 
 def test_completed_goal_contribution_policy_is_explicit_and_preserves_draft(client):  # 驗證：已完成目標的貢獻更正被明確限制且草稿保留
     _, goal = onboard(client); d = draft(client, goal); e = upload(client, goal).json()  # 完成訪客、Bio 與第一目標的測試前置流程
-    assert client.post('/api/goals/' + goal['id'] + '/complete', json={'request_id': 'done', 'evidence_ids': [e['id']], 'confirmed': True}).status_code == 200  # 核對 HTTP 狀態，避免失敗請求被當成成功
+    assert client.post('/api/goals/' + goal['id'] + '/complete', json={'expected_revision': goal['revision'], 'request_id': 'done', 'evidence_ids': [e['id']], 'confirmed': True}).status_code == 200  # 核對 HTTP 狀態，避免失敗請求被當成成功
     result = client.post('/api/drafts/' + d['id'] + '/confirm', json=confirm_payload(d))  # 透過實際測試用戶端操作 API 並保留回應
     assert result.status_code == 409  # 核對 HTTP 狀態，避免失敗請求被當成成功
     assert result.json()['error']['code'] == 'policy_required'  # 斷言已完成目標的貢獻更正被明確限制且草稿保留的預期結果

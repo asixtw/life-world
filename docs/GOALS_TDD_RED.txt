@@ -1,0 +1,128 @@
+[公開版註記] 僅移除行尾空白；失敗案例、斷言與結果保留。
+F..............FFFFFFFFFFFFF                                             [100%]
+=================================== FAILURES ===================================
+________ test_goal_requires_exactly_three_habits_and_explicit_deadline _________
+tests/test_goal_journey.py:39: in test_goal_requires_exactly_three_habits_and_explicit_deadline
+    goal = create(client)  # 使用明確截止日建立。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+___________ test_one_open_goal_and_idempotency_before_and_after_end ____________
+tests/test_goal_journey.py:70: in test_one_open_goal_and_idempotency_before_and_after_end
+    goal = create(client)  # 第一次成功。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+___________________ test_concurrent_creates_only_one_commits ___________________
+tests/test_goal_journey.py:93: in test_concurrent_creates_only_one_commits
+    assert sorted(results) == [201, 409]  # 只能一個成功。
+E   assert [422, 422] == [201, 409]
+E
+E     At index 0 diff: 422 != 201
+E     Use -v to get more diff
+_ test_expiry_respects_goal_timezone[2026-10-28T15:59:59+00:00-Asia/Taipei-active] _
+tests/test_goal_journey.py:100: in test_expiry_respects_goal_timezone
+    goal = create(client)  # 固定目標的日期基準。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_ test_expiry_respects_goal_timezone[2026-10-28T16:00:00+00:00-Asia/Taipei-awaiting_review] _
+tests/test_goal_journey.py:100: in test_expiry_respects_goal_timezone
+    goal = create(client)  # 固定目標的日期基準。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_ test_expiry_respects_goal_timezone[2026-10-29T03:59:59+00:00-America/New_York-active] _
+tests/test_goal_journey.py:100: in test_expiry_respects_goal_timezone
+    goal = create(client)  # 固定目標的日期基準。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_ test_expiry_respects_goal_timezone[2026-10-29T04:00:00+00:00-America/New_York-awaiting_review] _
+tests/test_goal_journey.py:100: in test_expiry_respects_goal_timezone
+    goal = create(client)  # 固定目標的日期基準。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+____________ test_calendar_uses_real_dates[2028-02-28-2028-03-01-3] ____________
+tests/test_goal_journey.py:110: in test_calendar_uses_real_dates
+    goal = create(client, deadline=end, dates=[start, end])  # 只安排首尾兩天。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+____________ test_calendar_uses_real_dates[2026-12-31-2027-01-01-2] ____________
+tests/test_goal_journey.py:110: in test_calendar_uses_real_dates
+    goal = create(client, deadline=end, dates=[start, end])  # 只安排首尾兩天。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+____________ test_calendar_uses_real_dates[2026-10-31-2026-11-01-2] ____________
+tests/test_goal_journey.py:110: in test_calendar_uses_real_dates
+    goal = create(client, deadline=end, dates=[start, end])  # 只安排首尾兩天。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+______ test_pending_progress_requires_explicit_acceptance_after_extension ______
+tests/test_goal_journey.py:118: in test_pending_progress_requires_explicit_acceptance_after_extension
+    goal = create(client)  # 建立短期挑戰。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________________ test_ended_pending_is_retained_but_not_counted ________________
+tests/test_goal_journey.py:144: in test_ended_pending_is_retained_but_not_counted
+    goal = create(client)  # 建立短期目標。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________________ test_review_conflict_and_cross_owner_are_safe _________________
+tests/test_goal_journey.py:159: in test_review_conflict_and_cross_owner_are_safe
+    goal = create(client)  # 建立其目標。
+tests/test_goal_journey.py:25: in create
+    assert result.status_code == 201, result.text  # 缺功能應在此形成有效紅燈。
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["actions.0.target","actions.0.level","actions.0.per_occurrence","actions.0.dates","actions.0.cycle","actions.1.target","actions.1.level","actions.1.per_occurrence","actions.1.dates","actions.1.cycle","actions.2.target","actions.2.level","actions.2.per_occurrence","actions.2.dates","actions.2.cycle","deadline"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+___________ test_old_database_is_preserved_without_invented_deadline ___________
+tests/test_goal_journey.py:180: in test_old_database_is_preserved_without_invented_deadline
+    assert len(rows) == 2 and all(row['deadline'] is None for row in rows)  # 不猜日期、不自動結束。
+tests/test_goal_journey.py:180: in <genexpr>
+    assert len(rows) == 2 and all(row['deadline'] is None for row in rows)  # 不猜日期、不自動結束。
+E   IndexError: No item with that key
+=========================== short test summary info ============================
+FAILED tests/test_goal_journey.py::test_goal_requires_exactly_three_habits_and_explicit_deadline
+FAILED tests/test_goal_journey.py::test_one_open_goal_and_idempotency_before_and_after_end
+FAILED tests/test_goal_journey.py::test_concurrent_creates_only_one_commits
+FAILED tests/test_goal_journey.py::test_expiry_respects_goal_timezone[2026-10-28T15:59:59+00:00-Asia/Taipei-active]
+FAILED tests/test_goal_journey.py::test_expiry_respects_goal_timezone[2026-10-28T16:00:00+00:00-Asia/Taipei-awaiting_review]
+FAILED tests/test_goal_journey.py::test_expiry_respects_goal_timezone[2026-10-29T03:59:59+00:00-America/New_York-active]
+FAILED tests/test_goal_journey.py::test_expiry_respects_goal_timezone[2026-10-29T04:00:00+00:00-America/New_York-awaiting_review]
+FAILED tests/test_goal_journey.py::test_calendar_uses_real_dates[2028-02-28-2028-03-01-3]
+FAILED tests/test_goal_journey.py::test_calendar_uses_real_dates[2026-12-31-2027-01-01-2]
+FAILED tests/test_goal_journey.py::test_calendar_uses_real_dates[2026-10-31-2026-11-01-2]
+FAILED tests/test_goal_journey.py::test_pending_progress_requires_explicit_acceptance_after_extension
+FAILED tests/test_goal_journey.py::test_ended_pending_is_retained_but_not_counted
+FAILED tests/test_goal_journey.py::test_review_conflict_and_cross_owner_are_safe
+FAILED tests/test_goal_journey.py::test_old_database_is_preserved_without_invented_deadline
+14 failed, 14 passed in 1.21s

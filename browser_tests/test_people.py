@@ -76,8 +76,8 @@ def test_original_people_flow_views_sources_and_context(page, width):  # 驗證�
     expect(page.locator('[data-person="'+p['id']+'"]').first).to_be_visible()  # 等待並核對目前畫面狀態
     page.locator('[data-person="'+p['id']+'"]').first.click()  # 依使用者動線點擊畫面入口
     expect(page.locator('.person-summary')).to_contain_text('創業交流會')  # 等待並核對目前畫面狀態
-    page.get_by_role('button',name='設為關注',exact=True).click()  # 依使用者動線點擊畫面入口
-    expect(page.get_by_role('button',name='已關注',exact=True)).to_be_visible()  # 等待並核對目前畫面狀態
+    page.get_by_role('button',name='☆ 加入星標',exact=True).click()  # 依使用者動線點擊畫面入口
+    expect(page.get_by_role('button',name='★ 已加星標',exact=True)).to_have_attribute('aria-pressed','true')  # 等待並核對目前畫面狀態
     page.get_by_role('tab',name='交會',exact=True).click()  # 新探索入口可切換
     expect(page.locator('#connections-explorer')).to_be_visible()  # 沒有已審閱新故事時也有退路
     page.get_by_role('tab',name='收藏冊',exact=True).click()  # 回到人物管理
