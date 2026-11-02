@@ -7,6 +7,14 @@ from playwright.sync_api import expect
 from test_journey import page
 from test_flow_wireframe import wireframe_url
 
+# 截圖只包含隔離 Chromium 的虛構示例資料。
+EVIDENCE = Path('docs/artifacts/theater-reliability')
+
+def capture_evidence(page, name):
+    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    page.screenshot(path=str(EVIDENCE / name), full_page=True)
+
+
 
 def begin(page, url, multiple=True):
     """從完整流程進入建立器，不直接注入場次資料。"""
@@ -51,7 +59,7 @@ def test_v05_builder_bounded_group_stop_lumi_and_recap(page, wireframe_url, widt
     speak(page)
     state = page.evaluate('TheaterUI.snapshot()')
     assert 1 <= len(state['current']['pending']) <= 2
-    unseen = [e['text'] for e in state['current']['pending']]
+    unseen = [e['eventId'] for e in state['current']['pending']]  # 同文字的新回應不等於舊 queued 復活。
     page.get_by_role('button', name='暫停演練', exact=True).click()
     assert page.evaluate('TheaterUI.snapshot().current.pending.length') == 0
     page.get_by_role('button', name='私下問 Lumi', exact=True).click()
@@ -66,8 +74,8 @@ def test_v05_builder_bounded_group_stop_lumi_and_recap(page, wireframe_url, widt
     page.screenshot(path=str(artifacts/f'theater-dialogue-{width}.png'), full_page=True)
     page.get_by_role('button', name='結束本場', exact=True).click()
     expect(page.get_by_role('heading', name='本場演練回顧', exact=True)).to_be_visible()
-    for text in unseen:
-        expect(page.locator('.recap-events')).not_to_contain_text(text)
+    for event_id in unseen:
+        assert event_id not in [e['eventId'] for e in page.evaluate('TheaterUI.snapshot().current.events')]  # 以穩定事件 ID 查取消後作廢。
     after = page.evaluate("JSON.parse(localStorage.getItem('lifeworld:flow-wireframe:v1'))")
     for key in ['people', 'records', 'goal', 'points']:
         assert before[key] == after[key]
@@ -210,3 +218,435 @@ def test_named_recipient_responds_first_with_readable_behavior(page, wireframe_u
     response=page.locator('[data-theater-event]:not([data-speaker="user"])').first
     expect(response).to_have_attribute('data-speaker','怡君')
     expect(response.locator('header small')).to_have_text('回應')
+
+# 以實際操作檢查草稿與活動場隔離；舊畫面測試不足以攔下人物漂移。
+def test_sr01_active_cast_is_immutable_while_editing_new_draft(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    original = page.evaluate('TheaterUI.snapshot().current')
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.once('dialog', lambda dialog: dialog.accept())
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    if page.get_by_role('button', name='返回修改人物', exact=True).count():
+        page.get_by_role('button', name='返回修改人物', exact=True).click()
+    if page.get_by_role('button', name='下一步：選擇人物', exact=True).count():
+        page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
+    page.get_by_label('加入阿哲', exact=True).uncheck()
+    page.get_by_label('加入怡君', exact=True).check()
+    page.get_by_role('button', name='返回情境描述', exact=True).click()
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.get_by_role('button', name='繼續目前演練', exact=True).click()
+    current = page.evaluate('TheaterUI.snapshot().current')
+    assert current['id'] == original['id']
+    assert current['personIds'] == original['personIds']
+    expect(page.get_by_label('本場在場人物示意')).to_contain_text('阿哲')
+    expect(page.get_by_label('本場在場人物示意')).not_to_contain_text('怡君')
+    capture_evidence(page, 'sr01-active-cast.png')
+
+
+# 查看歷史後刷新仍須有原活動場，而非把歷史複本當成活動場。
+def test_sr04_history_view_keeps_active_session(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.get_by_role('button', name='結束本場', exact=True).click()
+    page.get_by_role('button', name='再練一次', exact=True).click()
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    active_id = page.evaluate('TheaterUI.snapshot().current.id')
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.get_by_role('button', name='演練歷史', exact=True).click()
+    page.get_by_role('button', name='查看本場回顧', exact=True).click()
+    page.reload()
+    assert page.evaluate('TheaterUI.snapshot().current.id') == active_id
+    assert page.evaluate('TheaterUI.snapshot().viewingHistoryId') is not None
+    capture_evidence(page, 'sr04-history-view.png')
+
+# 新場取代須留下唯一歷史，取消時不得清空原場輸入。
+def test_sr02_sr03_replace_transaction(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.get_by_label('你的發言', exact=True).fill('原場尚未送出')
+    active = page.evaluate('TheaterUI.snapshot().current.id')
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
+    page.get_by_role('button', name='檢查本場設定', exact=True).click()
+    page.once('dialog', lambda d: d.dismiss())
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current.id') == active
+    assert page.evaluate('TheaterUI.snapshot().current.input') == '原場尚未送出'
+    capture_evidence(page, 'sr02-cancel-new-session.png')
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    state = page.evaluate('TheaterUI.snapshot()')
+    assert state['current']['id'] != active
+    assert state['current']['actions'] == 0
+    assert state['history'][-1]['id'] == active
+    assert len([h for h in state['history'] if h['id'] == active]) == 1
+
+
+# 快照、來源撤回及技術重試要以狀態欄位驗證。
+def test_sr06_sr07_sr08_snapshots_revocation_and_retry(page, wireframe_url):
+    page.goto(wireframe_url)
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    page.get_by_role('button', name='人物劇場', exact=True).click()
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_label('你想模擬什麼情境？', exact=True).fill('討論作品')
+    page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
+    page.get_by_label('加入阿哲', exact=True).check()
+    page.get_by_role('button', name='檢查本場設定', exact=True).click()
+    page.get_by_label('使用 阿哲 的已記錄來源', exact=True).check()
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    original = page.evaluate('TheaterUI.snapshot().current')
+    page.evaluate("""() => {const k='lifeworld:flow-wireframe:v1';const s=JSON.parse(localStorage.getItem(k));s.people[0].name='改名後';localStorage.setItem(k,JSON.stringify(s));}""")
+    page.reload()
+    expect(page.get_by_label('本場在場人物示意')).to_contain_text('阿哲')
+    assert page.evaluate('TheaterUI.snapshot().current.sourceSnapshots') == original['sourceSnapshots']
+    page.evaluate("""() => {const k='lifeworld:flow-wireframe:v1';const s=JSON.parse(localStorage.getItem(k));s.people[0].source='已撤回';localStorage.setItem(k,JSON.stringify(s));}""")
+    page.reload()
+    state = page.evaluate('TheaterUI.snapshot().current')
+    assert state['paused'] and state['actions'] == 0
+    assert state['sourceSnapshots'][0]['validity'] == 'invalid'
+    expect(page.locator('.theater-main')).to_contain_text('已撤回或變更')
+    capture_evidence(page, 'sr07-source-revoked.png')
+
+
+# 服務失敗時行動已接受且只計一次，重試沿用原行動。
+def test_sr08_sr09_retry_ids_and_last_action(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    qa(page, 'PROVIDER_ERROR')
+    page.get_by_label('你的發言', exact=True).fill('重試不另計次')
+    page.get_by_role('button', name='送出發言', exact=True).click()
+    failed = page.evaluate('TheaterUI.snapshot().current')
+    assert failed['actions'] == 1 and len(failed['actionRecords']) == 1
+    page.get_by_role('button', name='重試本次發言', exact=True).click()
+    success = page.evaluate('TheaterUI.snapshot().current')
+    assert success['actions'] == 1
+    assert success['actionRecords'][0]['actionId'] == failed['actionRecords'][0]['actionId']
+    assert len(success['actionRecords'][0]['attempts']) == 2
+    assert len([e for e in success['events'] if e['speaker'] == 'user']) == 1
+    capture_evidence(page, 'sr08-retry.png')
+
+
+# 清除前取消不動兩個資料域，確認後保留無關 key。
+def test_sr13_reset_scoped_keys(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.evaluate("localStorage.setItem('unrelated:test','keep')")
+    page.once('dialog', lambda d: d.dismiss())
+    page.get_by_role('button', name='清除本原型資料', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current') is not None
+    capture_evidence(page, 'sr13-cancel-reset.png')
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='清除本原型資料', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current') is None
+    assert page.evaluate("localStorage.getItem('unrelated:test')") == 'keep'
+
+
+# 舊頁 revision 必須拒絕寫入，保留未送文字。
+def test_sr20_second_tab_conflict(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    other = page.context.new_page()
+    other.goto(wireframe_url)
+    other.get_by_label('你的發言', exact=True).fill('第二頁先寫')
+    page.get_by_label('你的發言', exact=True).fill('第一頁未送文字')
+    expect(page.locator('.theater-error')).to_contain_text('其他分頁已更新')
+    assert page.evaluate('TheaterUI.snapshot().current.input') == '第一頁未送文字'
+    assert other.evaluate('TheaterUI.snapshot().current.input') == '第二頁先寫'
+    capture_evidence(page, 'sr20-conflict.png')
+    other.close()
+
+# 同一份虛構場次在手機與桌面實際截圖，並核對畫面沒有橫向溢出。
+@pytest.mark.parametrize('width,height', [(390, 844), (1440, 1050)])
+def test_sr19_mobile_desktop_and_sound_toggle(page, wireframe_url, width, height):
+    page.set_viewport_size({'width': width, 'height': height})
+    begin(page, wireframe_url, multiple=True)
+    assert page.evaluate('TheaterUI.snapshot().soundEnabled') is False
+    expect(page.get_by_role('button', name='提示音：關閉（點此開啟）')).to_be_visible()
+    capture_evidence(page, f'sr19-live-{width}.png')
+    page.get_by_role('button', name='提示音：關閉（點此開啟）').click()
+    assert page.evaluate('TheaterUI.snapshot().soundEnabled') is True
+    page.reload()
+    assert page.evaluate('TheaterUI.snapshot().soundEnabled') is True
+    page.get_by_role('button', name='提示音：開啟（點此靜音）').click()
+    assert page.evaluate('TheaterUI.snapshot().soundEnabled') is False
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    capture_evidence(page, f'sound-off-{width}.png')
+
+# 刷新不補播已排隊內容；舊版歷史可讀但沒有被偽造的來源快照。
+def test_sr11_sr16_refresh_pending_and_legacy_migration(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.get_by_label('你的發言', exact=True).fill('刷新前已送')
+    page.get_by_role('button', name='送出發言', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current.pending.length') == 1
+    page.reload()
+    state = page.evaluate('TheaterUI.snapshot()')
+    assert state['current']['pending'] == []
+    assert len([e for e in state['current']['events'] if e['speaker'] != 'user']) == 0
+    assert state['current']['actions'] == 1
+    page.evaluate("""() => { const key='lifeworld:theater-wireframe:v05';localStorage.setItem(key,JSON.stringify({stage:'situation',draft:{situation:'',purpose:'理解立場',people:[],sources:[]},current:null,history:[{id:'old-one',situation:'舊版故事',events:[{speaker:'user',text:'曾說過的話'}],actions:1,endReason:'由你結束'}]})); }""")
+    page.reload()
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.get_by_role('button', name='演練歷史', exact=True).click()
+    expect(page.locator('main')).to_contain_text('缺少當時人物／來源版本')
+    assert page.evaluate('TheaterUI.snapshot().history[0].sourceSnapshots') is None
+    capture_evidence(page, 'sr16-legacy-history.png')
+
+# 刪歷史採穩定 ID；取消刪除和刪 H1 都不影響活動場與 H2。
+def test_sr05_delete_one_history_preserves_other_and_active(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.get_by_role('button', name='結束本場', exact=True).click()
+    page.get_by_role('button', name='再練一次', exact=True).click()
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    page.get_by_role('button', name='結束本場', exact=True).click()
+    page.get_by_role('button', name='再練一次', exact=True).click()
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    page.get_by_label('你的發言', exact=True).fill('目前場次輸入')
+    before = page.evaluate('TheaterUI.snapshot()')
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.get_by_role('button', name='演練歷史', exact=True).click()
+    page.once('dialog', lambda d: d.dismiss())
+    page.get_by_role('button', name='刪除本場紀錄', exact=True).first.click()
+    assert page.evaluate('TheaterUI.snapshot().history.length') == 2
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='刪除本場紀錄', exact=True).first.click()
+    after = page.evaluate('TheaterUI.snapshot()')
+    assert [h['id'] for h in after['history']] == [before['history'][1]['id']]
+    assert after['current']['id'] == before['current']['id']
+    assert after['current']['input'] == '目前場次輸入'
+    capture_evidence(page, 'sr05-history-delete.png')
+
+
+# 示例載入先確認；取消保留目前場，確認後清除舊場與歷史。
+def test_sr14_demo_replace_prompt(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    active = page.evaluate('TheaterUI.snapshot().current.id')
+    page.once('dialog', lambda d: d.dismiss())
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current.id') == active
+    capture_evidence(page, 'sr14-cancel-demo.png')
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current') is None
+    assert page.evaluate('TheaterUI.snapshot().history') == []
+
+
+# 已有場次與資料錯誤不應靜默重置原始儲存內容。
+def test_sr15_corrupt_and_newer_schema_are_readonly(page, wireframe_url):
+    page.goto(wireframe_url)
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    key = 'lifeworld:theater-wireframe:v05'
+    page.evaluate("k => localStorage.setItem(k,'{bad-json')", key)
+    page.reload()
+    page.get_by_role('button', name='人物劇場', exact=True).click()
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    assert page.evaluate('localStorage.getItem("lifeworld:theater-wireframe:v05")') == '{bad-json'
+    page.evaluate("k => localStorage.setItem(k,JSON.stringify({schemaVersion:999,revision:7,draft:{situation:'future',people:[],sources:[]},history:[]}))", key)
+    page.reload()
+    assert page.evaluate('JSON.parse(localStorage.getItem("lifeworld:theater-wireframe:v05")).schemaVersion') == 999
+
+# 暫停與介入作廢 queued；晚到回應不能回到 events。
+def test_sr10_epoch_discards_queued_after_pause(page, wireframe_url):
+    begin(page, wireframe_url, multiple=True)
+    speak(page, '先說明我的想法')
+    queued = page.evaluate('TheaterUI.snapshot().current.pending.map(e => e.eventId)')
+    assert queued
+    previous_epoch = page.evaluate('TheaterUI.snapshot().current.generationEpoch')
+    page.get_by_role('button', name='暫停演練', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current.generationEpoch') > previous_epoch
+    page.wait_for_timeout(600)
+    state = page.evaluate('TheaterUI.snapshot().current')
+    assert state['pending'] == []
+    assert not any(e['eventId'] in queued for e in state['events'])
+    capture_evidence(page, 'sr10-pause-discard.png')
+
+
+# 私訊獨立保存，回顧只含已展示事件，再練不帶前場承諾或額度。
+def test_sr17_lumi_private_and_repractice(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.get_by_role('button', name='私下問 Lumi', exact=True).click()
+    page.get_by_label('想問 Lumi 什麼？', exact=True).fill('我的私訊')
+    page.get_by_role('button', name='取得私人建議', exact=True).click()
+    state = page.evaluate('TheaterUI.snapshot().current')
+    assert len(state['lumiPrivate']) == 1
+    assert all('我的私訊' not in e['text'] for e in state['events'])
+    page.get_by_role('button', name='返回演練', exact=True).click()
+    page.get_by_role('button', name='結束本場', exact=True).click()
+    page.get_by_role('button', name='再練一次', exact=True).click()
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    fresh = page.evaluate('TheaterUI.snapshot().current')
+    assert fresh['actions'] == 0 and fresh['events'] == [] and fresh['lumiPrivate'] == []
+
+# 建立入口的接續／取代／取消三種選擇，只有明確取代才重設草稿。
+def test_sr12_builder_draft_choices(page, wireframe_url):
+    page.goto(wireframe_url)
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    page.get_by_role('button', name='人物劇場', exact=True).click()
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_label('你想模擬什麼情境？', exact=True).fill('尚未完成的草稿')
+    draft_id = page.evaluate('TheaterUI.snapshot().draft.id')
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().draft.id') == draft_id
+    expect(page.get_by_label('你想模擬什麼情境？', exact=True)).to_have_value('尚未完成的草稿')
+    page.get_by_role('button', name='返回人物劇場', exact=True).click()
+    def cancel_choices(dialog):
+        dialog.dismiss()
+    page.on('dialog', cancel_choices)
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.remove_listener('dialog', cancel_choices)
+    assert page.evaluate('TheaterUI.snapshot().draft.id') == draft_id
+    choices = iter([False, True])
+    def replace_choice(dialog):
+        dialog.accept() if next(choices) else dialog.dismiss()
+    page.on('dialog', replace_choice)
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.remove_listener('dialog', replace_choice)
+    assert page.evaluate('TheaterUI.snapshot().draft.id') != draft_id
+    expect(page.get_by_label('你想模擬什麼情境？', exact=True)).to_have_value('')
+
+# 最後一個玩家額度已計次，技術失敗後仍可沿同一 actionId 重試。
+def test_sr09_last_action_retry_uses_existing_budget(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.evaluate("""() => {const key='lifeworld:theater-wireframe:v05';const s=JSON.parse(localStorage.getItem(key));s.current.actions=7;localStorage.setItem(key,JSON.stringify(s));}""")
+    page.reload()
+    qa(page, 'PROVIDER_ERROR')
+    page.get_by_label('你的發言', exact=True).fill('最後一次')
+    page.get_by_role('button', name='送出發言', exact=True).click()
+    failed = page.evaluate('TheaterUI.snapshot().current')
+    assert failed['actions'] == 8
+    page.get_by_role('button', name='重試本次發言', exact=True).click()
+    success = page.evaluate('TheaterUI.snapshot().current')
+    assert success['actions'] == 8
+    assert success['actionRecords'][-1]['actionId'] == failed['actionRecords'][-1]['actionId']
+    assert len(success['actionRecords'][-1]['attempts']) == 2
+
+
+# 模擬儲存額滿，不能說已保存或丟掉螢幕上的草稿。
+def test_sr15_storage_quota_keeps_visible_draft(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.evaluate("""() => {const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='lifeworld:theater-wireframe:v05')throw new DOMException('Quota','QuotaExceededError');return original.call(this,key,value);};}""")
+    page.get_by_label('你的發言', exact=True).fill('無法儲存的文字')
+    expect(page.get_by_label('你的發言', exact=True)).to_have_value('無法儲存的文字')
+    expect(page.locator('.theater-error')).to_contain_text('尚未保存')
+    page.get_by_role('button', name='送出發言', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current.actions') == 0
+    expect(page.get_by_label('你的發言', exact=True)).to_have_value('無法儲存的文字')
+    capture_evidence(page, 'sr15-storage-failure.png')
+
+
+# 使用假的音訊裝置計數，驗證靜音、手勢後確認音與刷新不補播。
+def test_sound_is_opt_in_and_no_refresh_replay(page, wireframe_url):
+    page.add_init_script("""window.__tones=0;window.AudioContext=class {constructor(){this.currentTime=0;this.destination={};this.state='running';}createOscillator(){return {frequency:{value:0},connect(){return this},start(){window.__tones++},stop(){}}}createGain(){return {gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){return this}}}resume(){return Promise.resolve()}};""")
+    begin(page, wireframe_url, multiple=False)
+    assert page.evaluate('window.__tones') == 0
+    page.get_by_role('button', name='提示音：關閉（點此開啟）').click()
+    assert page.evaluate('window.__tones') == 1
+    page.get_by_label('你的發言', exact=True).fill('有提示音的行動')
+    page.get_by_role('button', name='送出發言', exact=True).click()
+    assert page.evaluate('window.__tones') == 2
+    page.reload()
+    assert page.evaluate('window.__tones') == 0
+    page.get_by_role('button', name='提示音：開啟（點此靜音）').click()
+    assert page.evaluate('window.__tones') == 0
+
+# 第二個 key 寫入失敗時，示例取代退回原本兩份原始位元組。
+def test_sr14_two_key_failure_rolls_back_and_retries(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    before = page.evaluate("""() => ({main:localStorage.getItem('lifeworld:flow-wireframe:v1'),theater:localStorage.getItem('lifeworld:theater-wireframe:v05')})""")
+    page.evaluate("""() => {const original=Storage.prototype.removeItem;window.__removeItem=original;let failed=false;Storage.prototype.removeItem=function(key){if(key==='lifeworld:theater-wireframe:v05'&&!failed){failed=true;throw new DOMException('Injected','UnknownError');}return original.call(this,key);};}""")
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    expect(page.get_by_role('status')).to_contain_text('原有內容已保留')
+    after = page.evaluate("""() => ({main:localStorage.getItem('lifeworld:flow-wireframe:v1'),theater:localStorage.getItem('lifeworld:theater-wireframe:v05')})""")
+    assert before == after
+    assert page.evaluate('TheaterUI.snapshot().current') is not None
+    capture_evidence(page, 'sr14-transaction-rollback.png')
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    assert page.evaluate('TheaterUI.snapshot().current') is None
+    assert page.evaluate("localStorage.getItem('lifeworld:flow-wireframe:transaction:v1')") is None
+
+
+# 模擬中斷的 prepared 與 committed 日誌；每次重載都得到一致狀態。
+def test_sr13_transaction_journal_recovery_is_idempotent(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    before = page.evaluate("""() => ({main:localStorage.getItem('lifeworld:flow-wireframe:v1'),theater:localStorage.getItem('lifeworld:theater-wireframe:v05')})""")
+    page.evaluate("""saved => {const next=JSON.parse(saved.main);next.name='交易後示例';next.route='world';const tx={version:1,phase:'prepared',beforeMain:saved.main,beforeTheater:saved.theater,nextMain:JSON.stringify(next),nextTheater:null};localStorage.setItem('lifeworld:flow-wireframe:transaction:v1',JSON.stringify(tx));localStorage.setItem('lifeworld:flow-wireframe:v1',tx.nextMain);}""", before)
+    page.reload()
+    assert page.evaluate("localStorage.getItem('lifeworld:flow-wireframe:v1')") == before['main']
+    assert page.evaluate("localStorage.getItem('lifeworld:theater-wireframe:v05')") == before['theater']
+    assert page.evaluate("localStorage.getItem('lifeworld:flow-wireframe:transaction:v1')") is None
+    page.evaluate("""saved => {const next=JSON.parse(saved.main);next.name='交易後示例';next.route='world';const tx={version:1,phase:'committed',beforeMain:saved.main,beforeTheater:saved.theater,nextMain:JSON.stringify(next),nextTheater:null};localStorage.setItem('lifeworld:flow-wireframe:transaction:v1',JSON.stringify(tx));}""", before)
+    page.reload()
+    assert page.evaluate("JSON.parse(localStorage.getItem('lifeworld:flow-wireframe:v1')).name") == '交易後示例'
+    assert page.evaluate("localStorage.getItem('lifeworld:theater-wireframe:v05')") is None
+    assert page.evaluate("localStorage.getItem('lifeworld:flow-wireframe:transaction:v1')") is None
+    page.reload()
+    assert page.evaluate("JSON.parse(localStorage.getItem('lifeworld:flow-wireframe:v1')).name") == '交易後示例'
+
+# 清除失敗不能只剩一個資料域；取消與成功重試之後仍保留無關 key。
+def test_sr13_reset_failure_is_recoverable(page, wireframe_url):
+    begin(page, wireframe_url, multiple=False)
+    page.evaluate("localStorage.setItem('unrelated:test','keep')")
+    before = page.evaluate("""() => ({main:localStorage.getItem('lifeworld:flow-wireframe:v1'),theater:localStorage.getItem('lifeworld:theater-wireframe:v05')})""")
+    page.evaluate("""() => {const original=Storage.prototype.removeItem;let failed=false;Storage.prototype.removeItem=function(key){if(key==='lifeworld:theater-wireframe:v05'&&!failed){failed=true;throw Error('Injected reset failure');}return original.call(this,key);};}""")
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='清除本原型資料', exact=True).click()
+    expect(page.get_by_role('status')).to_contain_text('原有內容已保留')
+    assert page.evaluate("localStorage.getItem('lifeworld:flow-wireframe:v1')") == before['main']
+    assert page.evaluate("localStorage.getItem('lifeworld:theater-wireframe:v05')") == before['theater']
+    page.once('dialog', lambda d: d.accept())
+    page.get_by_role('button', name='清除本原型資料', exact=True).click()
+    assert page.evaluate("localStorage.getItem('lifeworld:theater-wireframe:v05')") is None
+    assert page.evaluate("localStorage.getItem('unrelated:test')") == 'keep'
+
+# 草稿人物 ID 已失效時必須明示，不能回退成第一位真人。
+def test_sr07_missing_person_id_blocks_start(page, wireframe_url):
+    page.goto(wireframe_url)
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    page.get_by_role('button', name='人物劇場', exact=True).click()
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_label('你想模擬什麼情境？', exact=True).fill('失效人物案例')
+    page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
+    page.evaluate("""() => {const key='lifeworld:theater-wireframe:v05',s=JSON.parse(localStorage.getItem(key));s.draft.people=['missing-id'];localStorage.setItem(key,JSON.stringify(s));}""")
+    page.reload()
+    page.get_by_role('button', name='檢查本場設定', exact=True).click()
+    expect(page.locator('.theater-error')).to_contain_text('人物已不存在')
+    assert page.evaluate('TheaterUI.snapshot().current') is None
+
+
+# 雙擊開始與送出仍只建立一場及一筆玩家行動。
+def test_sr03_sr09_double_click_is_idempotent(page, wireframe_url):
+    page.goto(wireframe_url)
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    page.get_by_role('button', name='人物劇場', exact=True).click()
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_label('你想模擬什麼情境？', exact=True).fill('雙擊測試')
+    page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
+    page.get_by_label('加入阿哲', exact=True).check()
+    page.get_by_role('button', name='檢查本場設定', exact=True).click()
+    page.get_by_role('button', name='確認開始演練', exact=True).dblclick()
+    started = page.evaluate('TheaterUI.snapshot()')
+    assert started['current']['actions'] == 0 and started['history'] == []
+    page.get_by_label('你的發言', exact=True).fill('雙擊不重送')
+    page.get_by_role('button', name='送出發言', exact=True).dblclick()
+    result = page.evaluate('TheaterUI.snapshot().current')
+    assert result['id'] == started['current']['id']
+    assert result['actions'] == 1 and len(result['actionRecords']) == 1
+    assert len([e for e in result['events'] if e['speaker'] == 'user']) == 1
+
+# 長姓名在 390px 預覽及活動場仍不應造成橫向溢出。
+def test_sr19_long_name_mobile_layout(page, wireframe_url):
+    page.set_viewport_size({'width': 390, 'height': 844})
+    page.goto(wireframe_url)
+    page.get_by_role('button', name='載入虛構示例', exact=True).click()
+    page.evaluate("""() => {const key='lifeworld:flow-wireframe:v1',s=JSON.parse(localStorage.getItem(key));s.people[0].name='超長虛構人物名字'.repeat(12);localStorage.setItem(key,JSON.stringify(s));}""")
+    page.reload()
+    page.get_by_role('button', name='人物劇場', exact=True).click()
+    page.get_by_role('button', name='建立我的情境', exact=True).click()
+    page.get_by_label('你想模擬什麼情境？', exact=True).fill('長姓名版面')
+    page.get_by_role('button', name='下一步：選擇人物', exact=True).click()
+    page.locator('[data-theater-person="zhe"]').check()
+    page.get_by_role('button', name='檢查本場設定', exact=True).click()
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.get_by_role('button', name='確認開始演練', exact=True).click()
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    capture_evidence(page, 'sr19-long-name-390.png')

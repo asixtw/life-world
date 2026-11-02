@@ -17,6 +17,7 @@ s.archived ||= [];
 s.demo ||= {pack:0,role:0,scenario:0,turns:[],done:false};
 s.privateDrafts ||= {};
 s.roster ||= [];s.rehearsalHistory ||= [];s.rehearsalSources ||= [];
+s.rehearsalHistory.forEach((item,index)=>{item.legacyId ||= `legacy-${index}`;}); // 舊紀錄新增穩定檢視 ID，不補造快照。
 s.tasks ||= [];
 // 重整後不會有舊計時器；中斷的視覺流程回到可點擊起點，目標資料保留。
 if(s.hatch&&s.hatch.stage!=='complete')s.hatch.stage='idle';
@@ -41,6 +42,7 @@ const who = id => s.people.find(p=>p.id===id) || s.people[0];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(s));}catch{feedback='無法保存本機原型資料，請勿關閉頁面。';}}
 function say(text){feedback=text;$('#feedback').textContent=text;}
 function go(route){
+  if(s.route==='theater-live'&&route!=='theater-live')TheaterUI.leave(); // 離開活動頁就作廢尚未展示的回應。
   if(s.route==='birth'&&route!=='birth'){stopHatch();if(s.hatch?.stage!=='complete'&&s.hatch)s.hatch.stage='idle';}
   const continuing=route==='theater-live'&&s.route===route;
   s.route=route;feedback='';save();render();
@@ -235,12 +237,16 @@ function person(){
   const p=who(s.selected),tab=s.tab;
   return title(p.name+' · 人物 360°')+`<section class="card"><div class="person">${esc(p.name.slice(0,1))}</div><p>${esc(p.role)} · 虛構示例人物</p><div class="row"><span class="tag">參與 ${allStories().filter(x=>x.people.includes(p.id)).length} 段已記錄故事</span><span class="tag">僅提及 ${s.records.filter(r=>r.peopleLinks?.some(x=>x.id===p.id&&x.relation==='mentioned')).length} 次</span><span class="tag">見面次數：尚未分類</span></div></section><div class="row">${['人物總覽','共同經歷','合作與目標'].map(t=>button(t,'tab:'+t,t===tab?'secondary':'')).join('')}</div><section class="card">${tab==='人物總覽'?['興趣與嗜好','飲食偏好','專長與背景','互動習慣'].map(t=>`<details><summary><button data-action="dimension">${t}</button></summary><p>${t==='飲食偏好'?esc(p.food):'尚未了解'}</p>${t==='飲食偏好'&&p.food!=='尚未了解'&&p.source?button('查看來源','person-source'):''}</details>`).join('')+'<details><summary>共同關係／場合／交集</summary><p>共同旅行（虛構示例）；不推斷人物私人關係。</p></details>':tab==='共同經歷'?allStories().filter(x=>x.people.includes(p.id)).map(x=>`<article><h3>${esc(x.title)}</h3><p>${esc(x.date)} · ${esc(x.text)}</p></article>`).join(''):`<h2>相關目標</h2>${personGoals(p.id).map(g=>`<article><h3>${esc(g.title)}</h3><p>${goalLabel(g)}${g.reason?' · '+esc(g.reason):''}</p></article>`).join('')||'<p>尚未關聯目標</p>'}${s.goal&&goalStatus()==='進行中'?button('為此目標記錄經歷','record-goal-context'):''}`}</section><div class="actions">${button('記錄新經歷','record-context')}${link('開啟小劇場','theater')}${button('探索相關故事','person-explore')}${link('返回收藏冊','cards')}</div>`;
 }
-function theater(){privateText=s.privateDrafts[s.selected+':'+scene]||'';return title('與 '+who(s.selected).name+' 的私人小劇場')+`<section class="card"><div class="row">${['見面前準備','情境演練','傳達心意','相遇後回顧'].map(t=>button(t,'scene:'+t,scene===t?'secondary':'')).join('')}</div><p class="callout">${scene==='情境演練'?'模擬不代表對方真實反應。':scene==='傳達心意'?'訊息草稿不自動發送。':scene==='相遇後回顧'?'請另記真實經歷並經人工確認。':'可參考已確認來源，筆記保持私人。'}</p>${scene==='相遇後回顧'?button('記錄真實經歷','record-context'):text('私人筆記','private-note',privateText)+`<div class="actions">${button('保存私人筆記','save-note')}${scene==='傳達心意'?button('複製草稿','copy-note'):''}</div>`}<h3>已保存私人筆記</h3>${s.notes.filter(n=>n.person===s.selected).map(n=>`<p>${esc(n.scene)}：${esc(n.text)}</p>`).join('')||'<p>尚無筆記。</p>'}<div class="actions">${link('返回人物卡','person')}${button('建立與此人物的情境','theater-v05-person','primary')}${button('加入其他人物一起演練','expand-rehearsal')}${link('返回人物劇場','theater-hub')}</div></section>`;}
-function theaterHub(){return title('人物劇場',false)+`<section class="card theater-hub-hero"><div><p class="steps">一場、一個具體情境</p><h2>先試著說說看</h2><p>從已建立人物出發，練習一次現實對話。</p><div class="actions">${button('建立我的情境','theater-v05-new','primary')}${button('演練歷史','theater-v05-history')}${TheaterUI.snapshot().current?.status==='ACTIVE'?button('繼續目前演練','theater-v05-resume'):''}</div></div><img src="assets/idle@256.png" alt="Lumi 陪伴你準備演練"></section><section class="card"><h2>我的人物演練</h2><p>私人準備、演練與訊息草稿；不預測對方真實反應。</p>${s.people.map(p=>button('與'+esc(p.name)+'演練','private-person:'+p.id)).join('')}<h3>選擇同場人物</h3><p>可選本人已建立的任何人物；不會自動讓所有人加入。</p>${s.people.map(p=>check('加入'+esc(p.name),'roster-'+p.id,s.roster.includes(p.id))).join('')}${text('演練情境','rehearsal-context',s.rehearsalContext||'')}<details><summary>選取本次使用的來源</summary>${s.people.filter(p=>s.roster.includes(p.id)).map(p=>p.source?check('來源：'+esc(p.name),'rehearsal-source-'+p.id,s.rehearsalSources.includes(p.id))+'<p>'+esc(p.source)+'</p>':'<p>'+esc(p.name)+'：尚無可選來源，回應不能當成已知事實。</p>').join('')}</details>${button('開始多人演練','rehearsal-start','primary')}${s.rehearsal?link('繼續私人演練','group-theater'):''}${s.rehearsalHistory.length?'<h3>先前私人演練</h3>'+s.rehearsalHistory.map((r,i)=>button(esc(r.context||'私人演練')+'（'+r.participants.length+'位）','rehearsal-history:'+i)).join(''):''}</section><section class="card"><h2>示範情境</h2><p>三組十五位示範角色，與你的正式人物資料分開。</p>${link('情境體驗（示範角色）','demo-theater')}</section>`;}
-// 私人多人物場次獨立保存；逐輪指定回應對象，避免無限自動互聊。
-function groupTheater(){
-  const r=s.rehearsal;if(!r)return link('返回人物劇場','theater-hub');
-  return title(r.done?'私人演練回顧':'私人多人演練',false)+`<section class="card"><p class="callout">預寫示意，非真人反應或即時 AI；不更新正式人物／經歷。</p><h2>${esc(r.context||'私人演練')}</h2><p>在場：${r.participants.map(id=>esc(who(id).name)).join('、')}</p><details><summary>本場來源（只含明確選取內容）</summary>${r.sources.map(x=>'<p>'+esc(who(x.personId).name)+'：'+esc(x.text)+'</p>').join('')||'<p>未選來源；請勿把模擬當已知事實。</p>'}</details>${r.turns.map(t=>`<article data-speaker="${esc(t.speaker)}"><b>${esc(t.speaker==='user'?'你':who(t.speaker).name)}</b><p>${esc(t.text)}</p></article>`).join('')}${!r.done?`<label class="label" for="rehearsal-recipient">回應對象</label><select id="rehearsal-recipient">${r.participants.map(id=>`<option value="${esc(id)}" ${id===r.recipient?'selected':''}>${esc(who(id).name)}</option>`).join('')}</select>${text('你的演練發言','rehearsal-input',r.input||'')}<div class="actions">${button('送出演練發言','rehearsal-send','primary')}${button('模擬回應失敗','rehearsal-fail')}${button('結束演練並回顧','rehearsal-end')}</div>`:''}${link('返回人物劇場','theater-hub')}</section>`;
+function theater(){privateText=s.privateDrafts[s.selected+':'+scene]||'';return title('與 '+who(s.selected).name+' 的私人小劇場')+`<section class="card"><div class="row">${['見面前準備','情境演練','傳達心意','相遇後回顧'].map(t=>button(t,'scene:'+t,scene===t?'secondary':'')).join('')}</div><p class="callout">${scene==='情境演練'?'模擬不代表對方真實反應。':scene==='傳達心意'?'訊息草稿不自動發送。':scene==='相遇後回顧'?'請另記真實經歷並經人工確認。':'可參考已確認來源，筆記保持私人。'}</p>${scene==='相遇後回顧'?button('記錄真實經歷','record-context'):text('私人筆記','private-note',privateText)+`<div class="actions">${button('保存私人筆記','save-note')}${scene==='傳達心意'?button('複製草稿','copy-note'):''}</div>`}<h3>已保存私人筆記</h3>${s.notes.filter(n=>n.person===s.selected).map(n=>`<p>${esc(n.scene)}：${esc(n.text)}</p>`).join('')||'<p>尚無筆記。</p>'}<div class="actions">${link('返回人物卡','person')}${button('建立與此人物的情境','theater-v05-person','primary')}${button('建立與此人物的多人情境','theater-v05-person')}${link('返回人物劇場','theater-hub')}</div></section>`;}
+function theaterHub(){ // 新場一律進 v0.5 Builder；舊引擎只提供唯讀歷史。
+  const legacy=s.rehearsalHistory.map(item=>`<article><h3>${esc(item.context||'舊版私人演練')}</h3>${button('查看舊版回顧','rehearsal-history:'+item.legacyId)}</article>`).join('');
+  return title('人物劇場',false)+`<section class="card theater-hub-hero"><div><p class="steps">一場、一個具體情境</p><h2>先試著說說看</h2><p>從已建立人物出發，練習一次現實對話。</p><div class="actions">${button('建立我的情境','theater-v05-new','primary')}${button('演練歷史','theater-v05-history')}${TheaterUI.snapshot().current?.status==='ACTIVE'?button('繼續目前演練','theater-v05-resume'):''}</div></div><img src="assets/idle@256.png" alt="Lumi 陪伴你準備演練"></section><section class="card"><h2>我的人物演練</h2><p>私人準備、演練與訊息草稿；不預測對方真實反應。</p>${s.people.map(p=>button('與'+esc(p.name)+'演練','private-person:'+p.id)).join('')}<h3>舊版私人演練回顧</h3><p>舊場次只供查看，建立新情境請使用上方入口。</p>${s.rehearsal?button('查看舊版目前場次','rehearsal-current'):''}${legacy||(!s.rehearsal?'<p>沒有舊版演練紀錄。</p>':'')}</section><section class="card"><h2>示範情境</h2><p>三組十五位示範角色，與你的正式人物資料分開。</p>${link('情境體驗（示範角色）','demo-theater')}</section>`;
+}
+function groupTheater(){ // 缺失人物不以其他人代替；舊來源不假造版本。
+  const r=s.legacyViewingId==='legacy-active'?s.rehearsal:s.rehearsalHistory.find(item=>item.legacyId===s.legacyViewingId);
+  if(!r)return title('舊版紀錄不存在')+`<section class="card">${link('返回人物劇場','theater-hub')}</section>`;
+  const name=id=>id==='user'?'你':s.people.find(p=>p.id===id)?.name||`已刪除人物（${id}）`;
+  return title('舊版私人演練回顧',false)+`<section class="card"><p class="callout">舊版紀錄缺少當時人物／來源快照，只供唯讀查看。無法核對的來源不會用於新場次。</p><h2>${esc(r.context||'私人演練')}</h2><p>當時人物 ID：${(r.participants||[]).map(id=>esc(name(id))).join('、')}</p><details><summary>舊版來源文字（版本未保存）</summary>${(r.sources||[]).map(x=>`<p>${esc(name(x.personId))}：${esc(x.text)}</p>`).join('')||'<p>沒有保存來源。</p>'}</details>${(r.turns||[]).map(t=>`<article data-speaker="${esc(t.speaker)}"><b>${esc(name(t.speaker))}</b><p>${esc(t.text)}</p></article>`).join('')}${link('返回人物劇場','theater-hub')}</section>`;
 }
 function demoTheater(){
   const d=s.demo,p=packs[d.pack];d.participants ||= [d.role||0];
@@ -281,7 +287,12 @@ function capture(){
   save();
 }
 function showSource(value){$('#source-text').textContent=value;$('#source').showModal();}
-function sampleData(){s=initial();s.lumiBorn=true;s.name='虛構體驗者';s.goal={title:'完成作品',outcome:'完成一份可分享的作品',start:dateNow(),deadline:shift(dateNow(),30),id:'demo-goal-'+Date.now(),status:'進行中',actions:['閱讀','整理','分享'].map(title=>({title,quantity:'1',unit:'次',dates:[dateNow(),shift(dateNow(),1)],cycle:'month'}))};ensureActionIds(s.goal);go('world');}
+function sampleData(){ // 取代前須同時核對主原型與劇場資料域。
+  if((s.name||s.goal||s.records.length||s.draft||TheaterUI.hasData())&&!confirm('載入示例將取代主原型、建立草稿、活動場與劇場歷史。確定繼續？'))return;
+  const next=initial();next.lumiBorn=true;next.name='虛構體驗者';next.goal={title:'完成作品',outcome:'完成一份可分享的作品',start:dateNow(),deadline:shift(dateNow(),30),id:'demo-goal-'+Date.now(),status:'進行中',actions:['閱讀','整理','分享'].map(title=>({title,quantity:'1',unit:'次',dates:[dateNow(),shift(dateNow(),1)],cycle:'month'}))};ensureActionIds(next.goal);next.route='world';
+  if(!WireframeStorage.replace(JSON.stringify(next))){say(WireframeStorage.error);return;} // 成功後才切換兩個記憶體狀態。
+  TheaterUI.resetMemory();s=next;go('world');
+}
 document.addEventListener('input',event=>{
   capture();
   if(event.target.id==='new-person-name'||event.target.id==='new-person-role'){
@@ -330,7 +341,7 @@ document.addEventListener('click',async event=>{
   if(action==='login-existing'){sampleData();return;}
   if(action==='login-fail'||action==='recovery-fail'){say(action==='login-fail'?'登入未成功：請核對帳號或使用恢復入口（模擬）。':'恢復未成功：復原碼無效或已使用（模擬）。');return;}
   if(action==='demo'){sampleData();return;}
-  if(action==='reset'){if(confirm('只清除本原型的虛構資料？')){s=initial();nightOverride=null;attachment=null;edit=null;go('intro');}return;}
+  if(action==='reset'){if(confirm('清除主原型、建立草稿、活動場、劇場歷史與舊私人演練資料？其他網站資料不受影響。')){const next=initial();if(!WireframeStorage.replace(JSON.stringify(next))){say(WireframeStorage.error);return;}TheaterUI.resetMemory();s=next;nightOverride=null;attachment=null;edit=null;go('intro');}return;}
   if(action==='wizard-back'){s.wizard.step--;go('wizard');return;}
   if(action==='night-yes'||action==='night-no'){s.night.choice=action==='night-yes';s.night.enabled=s.night.choice;nightOverride=null;save();render();return;}
   if(action==='demo-time'){s.demoTime=$('#demo-time').value;nightOverride=null;save();render();return;}
@@ -400,23 +411,13 @@ document.addEventListener('click',async event=>{
   if(action==='organize-fail'){say('模擬整理失敗；文字與附件資訊保留，可重試或手動整理。');return;}
   if(action==='manual-review'){s.draft.manual=true;s.draft.summary=s.draft.raw;save();go('review');return;}
   if(action==='save-draft'){save();go('records');say('草稿已保存在此瀏覽器，尚未確認，不更新正式成果。');return;}
-  if(action==='theater-v05-new'){go('theater-build');return;}
+  if(action==='theater-v05-new'){TheaterUI.newDraft();return;}
   if(action==='theater-v05-history'){go('theater-history');return;}
   if(action==='theater-v05-resume'){go('theater-live');return;}
   if(action==='theater-v05-person'){TheaterUI.openForPerson(s.selected);return;}
-  if(action==='expand-rehearsal'){s.roster=[...new Set([...s.roster,s.selected])];go('theater-hub');return;}
-  if(action==='rehearsal-start'){
-    const ids=s.roster.filter(id=>s.people.some(p=>p.id===id));if(!ids.length){say('至少選一位已建立人物。');return;}
-    if(s.rehearsal){if(!confirm('建立新場次？原場次會保留於私人演練歷史。'))return;s.rehearsalHistory.push(structuredClone(s.rehearsal));}
-    s.rehearsal={participants:[...new Set(ids)],context:s.rehearsalContext||'',sources:s.people.filter(p=>ids.includes(p.id)&&s.rehearsalSources.includes(p.id)&&p.source).map(p=>({personId:p.id,text:p.source})),recipient:ids[0],turns:[],input:'',done:false};go('group-theater');return;
-  }
-  if(kind==='rehearsal-history'){s.rehearsal=structuredClone(s.rehearsalHistory[Number(value)]);go('group-theater');return;}
-  if(action==='rehearsal-send'){
-    const r=s.rehearsal;if(!r||r.done)return;if(!r.input.trim()||!r.participants.includes(r.recipient)){say('請輸入發言並選在場人物。');return;}
-    r.turns.push({speaker:'user',recipient:r.recipient,text:r.input},{speaker:r.recipient,recipient:'user',text:'預寫示意：我們可以先釐清這次討論的目標，這不是對方的真實反應。'});r.input='';save();render();return;
-  }
-  if(action==='rehearsal-fail'){say('回應失敗（模擬）；發言與場次已保留，可以重試。');return;}
-  if(action==='rehearsal-end'){s.rehearsal.done=true;save();render();return;}
+  if(action==='rehearsal-current'){s.legacyViewingId='legacy-active';go('group-theater');return;} // 舊場唯讀。
+  if(kind==='rehearsal-history'){s.legacyViewingId=value;go('group-theater');return;} // 歷史按穩定 ID 檢視。
+  if(action.startsWith('rehearsal-')||action==='expand-rehearsal'){say('舊版演練只供回顧，請由「建立我的情境」開始新場。');return;} // 停止舊引擎新增與回覆。
   if(kind==='memorial'){s.memorialId=value;go('memorial');return;}
   if(kind==='memorial-person'||kind==='private-person'){s.selected=value;go(kind==='memorial-person'?'person':'theater');return;}
   if(kind==='demo-pack'){if(s.demo.started&&!confirm('切換情境組將重設本次示範對話，是否繼續？'))return;s.demo={pack:Number(value),role:0,scenario:0,turns:[],done:false};save();render();return;}
