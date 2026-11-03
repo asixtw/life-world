@@ -4,13 +4,13 @@
 
 只使用 `life-world-513506`／`asia-east1` 的現有 `lw-api-main`。既有 stable Revision 保持 100% 流量、`LIFEWORLD_ENABLE_BUSINESS_API=false`。測試 Revision 0%、tag `e2e`，只有它啟用業務。沿用同一映像 digest、Runtime SA／Private VPC 與 Cloud SQL 執行個體；不建立 staging Git 分支或另一個長期服務。
 
-工具、SQL 與本機證據見 [Step 18 交付](../docs/STEP18_API_E2E_ACCEPTANCE.md)。
+工具、SQL 與本機證據見 [Step 18 交付](../docs/STEP18_API_E2E_ACCEPTANCE.md)。PR #11 補正後，四份來源必須附同批匯出時間／原始檔 SHA256 證據，兩個實際 Revision 也必須通過 Direct VPC 預檢。
 
 ## 1. 先記錄與凍結現況
 
 使用者在 Console 記下 Project number、Cloud SQL instance connection name、Cloud Run **stable Revision 名稱**、100% 流量、服務標準 URL、image digest、Runtime SA、VPC／subnet／egress、環境變數與 secret 版本。從匯出 Service JSON 的 `status.url` 取得標準 URL，不自行用 tag URL 當 audience。
 
-驗收期間不要讓其他人部署或搬動 `e2e` tag。工具依賴 15 分鐘內的真實配置匯出；它不自行讀取／鎖定 GCP 控制平面。若配置有變，停止並重新匯出，不能繼續用舊 plan。一般流量須固定既有 Revision 名稱，不使用可能指向新修訂的 `LATEST`。
+驗收期間不要讓其他人部署或搬動 `e2e` tag。工具核對每份來源的匯出起訖時間與 SHA256，以及四份來源／Plan 的內容一致性，整批最早匯出起點距離執行不得超過 15 分鐘。建立 Plan 只記錄另列的 `created_at`，不能重設來源時間。證據是操作者本機記錄，非 GCP 簽章；工具不能偵測匯出後的所有 GCP 外部變更，也不會鎖定控制平面，因此驗收期間必須凍結配置。若配置有變，停止並重新唯讀匯出整批，不能用舊來源產生新 Plan。一般流量須固定既有 Revision 名稱，不使用可能指向新修訂的 `LATEST`。
 
 保留 Require authentication／Invoker IAM check，不加入 `allUsers`、`allAuthenticatedUsers`，不關閉 Invoker IAM check。呼叫者使用**已具此服務 Invoker 權限且可無金鑰 impersonate 的 SA**；不假設 Runtime SA 自動有 Invoker。若目前沒有合適呼叫身分，由使用者另行完成最小範圍權限審查，工具不代為授權。
 
@@ -70,6 +70,15 @@ Cloud Run → `lw-api-main` → 記錄 stable Revision → Edit and deploy new r
 | `LIFEWORLD_DB_POOL_SIZE` | 沿用已審查限制；可保守設 `2`，不可忽略同 instance 的總連線容量 |
 | `PORT` | Cloud Run 注入 `8080`；不自行設定 K_SERVICE |
 
+stable 與 e2e 的**實際 v1 Revision `metadata.annotations`** 均須符合：
+
+```yaml
+run.googleapis.com/network-interfaces: '[{"network":"lw-vpc-staging","subnetwork":"lw-subnet-staging"}]'
+run.googleapis.com/vpc-access-egress: private-ranges-only
+```
+
+這是既有網路名稱，不改名為 main。只允許單一 Direct VPC interface；明確核對 network／subnetwork／egress，兩個 Revision 設定（含已設定的 network tags）一致。不得存在有效的 `run.googleapis.com/vpc-access-connector`。同專案 ID 或 Project number 的完整 resource path 可正規化比較，其他專案／region／network／subnet 一律拒絕；不從 service template 或不存在的 v1 spec 欄位推測。
+
 禁止 `GOOGLE_APPLICATION_CREDENTIALS`／Service Account JSON Key。登入 session Cookie 與 IAM token 是不同驗證：工具把 IAM token 放 `X-Serverless-Authorization`，App 仍走原 Session／CSRF／Origin，沒有新增公開端點。
 
 ## 5. 使用者匯出配置，工具離線預檢
@@ -81,24 +90,45 @@ $Project = 'life-world-513506'
 $Region = 'asia-east1'
 $Stable = '填入原本100%流量的確切Revision名稱'
 $TestRevision = '填入0%且e2e標籤指向的確切Revision名稱'
-$Dir = '.test-runs/cloud-e2e'
+$BatchId = [guid]::NewGuid().ToString('N')
+$BatchStarted = [DateTimeOffset]::UtcNow.ToString('o')
+$Dir = ".test-runs/cloud-e2e/$BatchId"
 New-Item -ItemType Directory -Force $Dir | Out-Null
-function Save-E2ESnapshot([string]$SnapshotFile, [string[]]$GcloudArgs) {
+$Snapshots = [ordered]@{}
+function Save-E2ESnapshot([string]$SourceKey, [string]$SnapshotFile, [string[]]$GcloudArgs) {
+  $ExportStarted = [DateTimeOffset]::UtcNow.ToString('o')
   $SnapshotJson = & gcloud @GcloudArgs
   if ($LASTEXITCODE -ne 0) { throw 'Snapshot export failed; stop without reusing old files' }
-  $SnapshotJson | Out-File -Encoding utf8 $SnapshotFile
+  $ExportFinished = [DateTimeOffset]::UtcNow.ToString('o')
+  [System.IO.File]::WriteAllText([System.IO.Path]::GetFullPath($SnapshotFile),
+    ($SnapshotJson -join "`n") + "`n", [System.Text.UTF8Encoding]::new($false))
+  $Snapshots[$SourceKey] = [ordered]@{
+    filename = [System.IO.Path]::GetFileName($SnapshotFile)
+    batch_id = $BatchId
+    export_started_at = $ExportStarted
+    exported_at = $ExportFinished
+    sha256 = (Get-FileHash -LiteralPath $SnapshotFile -Algorithm SHA256).Hash.ToLowerInvariant()
+    command = @('gcloud') + $GcloudArgs
+  }
 }
-Save-E2ESnapshot "$Dir/service.json" @('run','services','describe','lw-api-main',"--project=$Project","--region=$Region",'--format=json')
-Save-E2ESnapshot "$Dir/main.json" @('run','revisions','describe',$Stable,"--project=$Project","--region=$Region",'--format=json')
-Save-E2ESnapshot "$Dir/tag.json" @('run','revisions','describe',$TestRevision,"--project=$Project","--region=$Region",'--format=json')
-Save-E2ESnapshot "$Dir/iam.json" @('run','services','get-iam-policy','lw-api-main',"--project=$Project","--region=$Region",'--format=json')
+Save-E2ESnapshot 'service' "$Dir/service.json" @('run','services','describe','lw-api-main',"--project=$Project","--region=$Region",'--format=json')
+Save-E2ESnapshot 'main_revision' "$Dir/main.json" @('run','revisions','describe',$Stable,"--project=$Project","--region=$Region",'--format=json')
+Save-E2ESnapshot 'tag_revision' "$Dir/tag.json" @('run','revisions','describe',$TestRevision,"--project=$Project","--region=$Region",'--format=json')
+Save-E2ESnapshot 'iam_policy' "$Dir/iam.json" @('run','services','get-iam-policy','lw-api-main',"--project=$Project","--region=$Region",'--format=json')
+$Evidence = [ordered]@{
+  version = 1; batch_id = $BatchId; started_at = $BatchStarted
+  completed_at = [DateTimeOffset]::UtcNow.ToString('o'); sources = $Snapshots
+}
+$Evidence | ConvertTo-Json -Depth 50 | Out-File -Encoding utf8 "$Dir/snapshot-evidence.json"
 $ProjectNumber = gcloud projects describe $Project --format='value(projectNumber)'
 if ($LASTEXITCODE -ne 0) { throw 'Project number lookup failed' }
-& $Py -X utf8 -m scripts.e2e_plan --service "$Dir/service.json" --main-revision "$Dir/main.json" --tag-revision "$Dir/tag.json" --iam-policy "$Dir/iam.json" --project-number $ProjectNumber --out "$Dir/plan.json"
+& $Py -X utf8 -m scripts.e2e_plan --service "$Dir/service.json" --main-revision "$Dir/main.json" --tag-revision "$Dir/tag.json" --iam-policy "$Dir/iam.json" --snapshot-evidence "$Dir/snapshot-evidence.json" --project-number $ProjectNumber --out "$Dir/plan.json"
 if ($LASTEXITCODE -ne 0) { throw 'E2E plan rejected; do not run HTTP acceptance' }
 ```
 
-預檢會核對專案／區域、Ready、stable 100% 固定名稱、e2e 0%、不同 Revision、同 digest／instance、DB／login、固定 secret 版本、私人 IAM、Hosts／Origin。任一安全資訊缺失或為明文 secret 都停止，不能直接修改主要 Revision 來繞過，也不能手填假的配置宣稱通過。
+四份 JSON 與 `snapshot-evidence.json` 必須來自上方同一批次。缺少紀錄、任一來源超過 15 分鐘／時間逆序／不合理未來時間、批次不同、原始檔 SHA256 不符均拒絕。Builder 先檢查實際 bytes（包含 BOM／換行）對匯出紀錄的 SHA256，再把來源解析後的穩定 JSON 指紋寫入 Plan；執行驗收時再次核對 Plan 四份內容與各自指紋／來源時間，報告也保留 batch ID、時間與指紋。僅改 JSON 格式也會造成原始檔 hash 不符，應重新匯出，不重寫舊紀錄時間。
+
+其他預檢仍核對專案／區域、Ready、stable 100% 固定名稱、e2e 0%、不同 Revision、同 digest／instance、DB／login、固定 secret 版本、私人 IAM、Hosts／Origin，以及上述 Direct VPC annotations。任一安全資訊缺失或為明文 secret 都停止，不能直接修改主要 Revision 來繞過，也不能手填假的配置宣稱通過。
 
 ## 6. 正式驗收指令
 
@@ -128,8 +158,8 @@ $RunId = (Get-Content "$Dir/result.json" -Raw | ConvertFrom-Json).run_id
 ## 7. 清理與恢復（即使驗收失敗也要做）
 
 1. 使用者確認 stable 仍為原名稱 100%、business=false；先移除 `e2e` tag，測試 Revision 維持 0%，不要把流量搬到它。
-2. 停止使用／刪除這次 0% 測試 Revision（包含前段取得 URL 用的安全修訂），等待 in-flight requests 結束。若 Console 不允許刪除 latest Ready Revision，可從原 stable 配置建立**新的 0%、business=false** 修訂作安全 template（依舊取消立即提供流量），再刪除測試 Revision。未來部署不可直接沿用 business=true 的測試 template。
-3. 保留先前 `tag.json` 作退休核對，重新匯出 service／main／IAM、重新產生 plan（同第5節但 `e2e_plan` 加 `--retired`）。Tag 必須已不存在；以新 token 執行 `e2e_acceptance ... --retired`，此模式只 GET main，不能建立訪客。保留原 stable 100% 的證據。
+2. **先保留尚存在但 0%／無 tag 的測試 Revision**，依第5節重新唯讀匯出四份來源（含該 Revision），建立新批次證據，再以 `e2e_plan ... --retired` 建立退休 Plan。不得沿用或重寫先前 `tag.json` 的時間。Tag 必須已不存在；以新 token 執行 `e2e_acceptance ... --retired --report "$Dir/retired-result.json"`，此模式只 GET main，不能建立訪客。保留原 stable 100% 的證據。
+3. 退休檢查完成後停止使用／刪除這次 0% 測試 Revision（包含前段取得 URL 用的安全修訂），等待 in-flight requests 結束。若 Console 不允許刪除 latest Ready Revision，可從原 stable 配置建立**新的 0%、business=false** 修訂作安全 template（依舊取消立即提供流量），再刪除測試 Revision。未來部署不可直接沿用 business=true 的測試 template。若已先刪除而無法匯出該 Revision，不能偽造新證據繞過退休預檢，應由操作者另外記錄實際刪除／stable 狀態。
 4. 使用者以 DBA 在 **life_world_e2e** 執行 `90_cleanup.sql`。先提交 `lw_e2e_app NOLOGIN`／撤銷此 DB CONNECT，再終止該 login 在此 DB 的連線；確認已排空後清空 30 張業務表並重設 Identity。保留 31 張表與 migration metadata，不 DROP DB、不碰 dev。沒有終止連線權限時交 DBA，不能改用高權限 API Runtime。
 5. 要看見 `E2E_CLEANUP_PASS`、`retained_tables=31`、`runtime_login=false`、`runtime_sessions=0`。SQL 內逐表確認全部業務列數為 0。這才是清理完成證據，不能單憑移除 tag 或 HTTP passed 就宣稱資料已清乾淨。
 6. 由使用者停用／移除測試專用 secret 版本及臨時呼叫者授權（若本次另外新增）；不變更 dev secret 或其他既有權限。報告保留，TLS／測試憑證不進 Git；工具沒有保存 session/token 檔案。
@@ -142,5 +172,6 @@ $RunId = (Get-Content "$Dir/result.json" -Raw | ConvertFrom-Json).run_id
 - [服務間驗證](https://docs.cloud.google.com/run/docs/authenticating/service-to-service)：tagged request 的 audience 仍為 service URL，並可使用 X-Serverless-Authorization。
 - [ID token impersonation 指令](https://docs.cloud.google.com/sdk/gcloud/reference/auth/print-identity-token)：無 SA JSON Key 的短期 token。
 - [v1 Service resource](https://docs.cloud.google.com/run/docs/reference/rest/v1/namespaces.services)：工具核對輸入的 spec／status／traffic 形狀。
+- [Direct VPC 官方 v1 YAML](https://docs.cloud.google.com/run/docs/configuring/vpc-direct-vpc#yaml)：Revision annotations 的 network-interfaces／vpc-access-egress 格式與網路設定。
 
 真實 IAM signature／Invoker、特定 service 的 IAM policy、tag 路由／流量、Private VPC／Secret Manager／ADC、Cloud SQL DBA 的實際權限及平台 Console UI 均仍須由使用者實測。操作機器要能依既有 ingress／網路政策到達服務；不要為了讓測試通過放寬政策。工具不以本機 HMAC edge model 冒充 Google IAM，也不自動修復雲端配置。

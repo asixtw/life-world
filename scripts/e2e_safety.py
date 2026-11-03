@@ -1,10 +1,18 @@
 """驗收前的離線配置防護；不呼叫 GCP、不接觸資料庫。"""
 import base64
 from datetime import datetime
+import hashlib
 import json
 import re
 import time
 from urllib.parse import urlsplit
+
+SOURCE_KEYS = ('service','main_revision','tag_revision','iam_policy')
+
+
+def source_digest(resource):
+    """Plan 內解析後 JSON 的穩定指紋；原始檔 byte SHA256 另外由 builder 核對。"""
+    return hashlib.sha256(json.dumps(resource,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode('utf-8')).hexdigest()
 
 
 class SafetyError(Exception):
@@ -14,6 +22,56 @@ class SafetyError(Exception):
 def require(condition, code):
     if not condition:
         raise SafetyError(code)
+
+
+def validate_snapshot_evidence(plan):
+    """只接受匯出當下記錄的同批四份證據；建立 Plan 不得重設來源時間。"""
+    evidence = plan['snapshot_evidence']
+    require(type(evidence['version']) is int and evidence['version']==1, 'snapshot_evidence_version')
+    batch = evidence['batch_id']
+    require(isinstance(batch,str) and re.fullmatch(r'[0-9a-f]{32}',batch), 'snapshot_evidence_batch')
+    require(set(evidence['sources'])==set(SOURCE_KEYS), 'snapshot_evidence_sources')
+    now = time.time()
+    def exported_time(value):
+        stamp = datetime.fromisoformat(value)
+        require(stamp.tzinfo is not None and -60<=now-stamp.timestamp()<=900, 'stale_snapshot_source')
+        return stamp.timestamp()
+    started = exported_time(evidence['started_at']); completed = exported_time(evidence['completed_at'])
+    require(started<=completed and plan['captured_at']==evidence['started_at'], 'snapshot_evidence_time')
+    for key in SOURCE_KEYS:
+        record = evidence['sources'][key]
+        require(record['batch_id']==batch, 'snapshot_evidence_batch')
+        require(isinstance(record['filename'],str) and record['filename'] and
+                '/' not in record['filename'] and '\\' not in record['filename'], 'snapshot_evidence_filename')
+        first = exported_time(record['export_started_at']); last = exported_time(record['exported_at'])
+        require(started<=first<=last<=completed, 'snapshot_evidence_time')
+        require(isinstance(record['sha256'],str) and re.fullmatch(r'[0-9a-f]{64}',record['sha256']), 'snapshot_source_hash')
+        require(record['content_sha256']==source_digest(plan[key]), 'snapshot_plan_content_hash')
+
+
+def direct_vpc(revision, project_number):
+    """讀取實際 v1 Revision metadata.annotations，不從 service template 或虛構欄位推導。"""
+    annotations = revision['metadata'].get('annotations',{})
+    require(not annotations.get('run.googleapis.com/vpc-access-connector'), 'direct_vpc_connector_forbidden')
+    require(annotations.get('run.googleapis.com/vpc-access-egress')=='private-ranges-only', 'direct_vpc_egress')
+    try:
+        interfaces = json.loads(annotations['run.googleapis.com/network-interfaces'])
+        require(isinstance(interfaces,list) and len(interfaces)==1 and isinstance(interfaces[0],dict), 'direct_vpc_interfaces')
+        interface = dict(interfaces[0])
+        projects = ('life-world-513506',project_number)
+        networks = {'lw-vpc-staging',*[f'projects/{p}/global/networks/lw-vpc-staging' for p in projects]}
+        subnets = {'lw-subnet-staging',*[f'projects/{p}/regions/asia-east1/subnetworks/lw-subnet-staging' for p in projects]}
+        require(interface.get('network') in networks and interface.get('subnetwork') in subnets, 'direct_vpc_network_or_subnet')
+        interface.update(network='lw-vpc-staging',subnetwork='lw-subnet-staging')
+        tags = interface.get('tags',[])
+        if isinstance(tags,str): tags = [v.strip() for v in tags.split(',') if v.strip()]
+        require(isinstance(tags,list) and all(isinstance(v,str) for v in tags), 'direct_vpc_tags')
+        interface['tags'] = sorted(set(tags))
+        return interface
+    except SafetyError:
+        raise
+    except Exception:
+        raise SafetyError('direct_vpc_interfaces') from None
 
 
 def env_values(revision):
@@ -39,8 +97,7 @@ def validate_plan(plan, *, allow_local=False, retired=False):
         local = plan.get('mode')=='local-simulation'
         require(plan.get('mode') in ('cloud','local-simulation'), 'invalid_mode')
         require(not local or allow_local, 'local_simulation_requires_opt_in')
-        captured = datetime.fromisoformat(plan['captured_at'])
-        require(captured.tzinfo is not None and -60<=time.time()-captured.timestamp()<=900, 'stale_snapshot')
+        validate_snapshot_evidence(plan)
         require(plan['project_id']=='life-world-513506', 'wrong_project')
         namespace = str(plan['project_number']); require(namespace.isdigit(), 'invalid_project_number')
         service, main, tag = plan['service'],plan['main_revision'],plan['tag_revision']
@@ -80,6 +137,7 @@ def validate_plan(plan, *, allow_local=False, retired=False):
                 require(revision['spec']['serviceAccountName']=='lw-api-runtime@life-world-513506.iam.gserviceaccount.com', 'wrong_runtime_sa')
         main_env,_ = env_values(main); tag_env,_ = env_values(tag)
         if not local:
+            require(direct_vpc(main,namespace)==direct_vpc(tag,namespace), 'direct_vpc_mismatch')
             instance = tag_env.get('LIFEWORLD_INSTANCE_CONNECTION_NAME','')
             require(instance.startswith('life-world-513506:asia-east1:') and main_env.get('LIFEWORLD_INSTANCE_CONNECTION_NAME')==instance, 'wrong_sql_instance')
             digests = [r['status']['imageDigest'].split('@')[-1] for r in (main,tag)]

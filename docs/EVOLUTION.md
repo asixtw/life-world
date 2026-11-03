@@ -138,3 +138,7 @@ Build SA改為lw-build-main，部署目標改為lw-web-main，保留lw-web-runti
 ## Step 18 受控 Tagged Revision 驗收工具｜2026-11-03
 
 新增離線 plan 防護、只用既有 API 的合成 e2e、Token stdin／安全報告、唯一 canonical schema SQL 產生器、專用 life_world_e2e／lw_e2e_app 最小權限及清理腳本。保留主 Revision 100% 且業務關閉，未修改 App／Cloud Build／Dockerfile 或執行 GCP；工具及本機驗證見 [Step 18 交付](STEP18_API_E2E_ACCEPTANCE.md)。
+
+## PR #11 合併前預檢修正｜2026-11-03
+
+Plan 改為保留匯出時的來源批次／時間／SHA256，不能用建立時間刷新舊來源；執行時再核對 Plan 內容指紋與15分鐘時限。新增實際 Revision annotations 的 Direct VPC／相同設定檢查，保持既有API與基礎建設設定。退休流程也要求四份新來源，在刪除測試Revision前完成核對；驗收期間凍結配置仍屬必要條件。測試與限制見 [補正交接](STEP18_API_E2E_ACCEPTANCE.md)。

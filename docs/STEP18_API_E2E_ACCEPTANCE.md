@@ -73,3 +73,15 @@ $env:LIFEWORLD_TEST_DOCKER_ARGV='["wsl","-d","Ubuntu-24.04","-u","root","--exec"
 前幾輪本機準備失敗分別是隔離 PG 的 psql 埠未指定及系統 OpenSSL 配置差異，均已修正重跑；不把 setup error 當功能紅燈或驗收成功。所有失敗報告只留固定階段／SQLSTATE，不輸出密碼、Token、Cookie 或資料列。
 
 尚未驗證：真實 Cloud Run v1 匯出形狀、Console tag 管理介面／Revision 退休限制、實際 Google IAM／呼叫者權限、Private VPC／Secret Manager／ADC／Cloud SQL 管理者權限與雲端 SQL。使用者若遇配置缺失／權限不符，應停止處理該項，不以公開 IAM、高權限 Runtime、修改 dev 或主流量來讓測試變綠。亦未執行 UI 瀏覽器、負載或平台故障驗收。
+
+## PR #11 合併前補正｜快照來源與 Direct VPC
+
+P1 修正建立 Plan 自行更新 captured_at 的缺口：由操作者的同批唯讀匯出記錄 batch ID、整批與每檔匯出起訖時間、原始 byte SHA256。Builder 逐檔核對外部證據與實際 JSON，保留最早匯出時間作 captured_at，另列 created_at；Plan 內解析後 JSON 再以穩定內容 SHA256 綁定，執行時重驗四份來源紀錄、時間與內容。缺少證據、超過15分鐘、未來／逆序時間、跨批次或任一指紋不符均拒絕；重新建立 Plan 不能讓舊來源變新。成功報告保留來源時間與指紋供追溯。
+
+P2 從實際 stable／e2e v1 Revision `metadata.annotations` 檢查 `run.googleapis.com/network-interfaces` 與 `run.googleapis.com/vpc-access-egress`：只允許同一專案的 `lw-vpc-staging`／`lw-subnet-staging`、`private-ranges-only`，兩修訂的 Direct VPC 設定相同，拒絕有效的 `run.googleapis.com/vpc-access-connector`。不從 service template 或不存在的 spec 欄位推測。格式依據見 [官方 Direct VPC v1 YAML](https://docs.cloud.google.com/run/docs/configuring/vpc-direct-vpc#yaml)。
+
+本輪在原短期分支實測：新增負向案例先得到 **34 failed／29 passed**；修正後工具單元 **63 passed**，完整回歸 **294 passed／14 skipped（38.04秒）**，PG18.6＋HTTPS **49項**、退休／清理 **9項**、Web契約 **9項（1.725秒）**通過。文件的 PowerShell 整批匯出流程以本機 gcloud 替身執行，四份 JSON 的原始 SHA256 與離線 Plan 成功核對；沒有執行真正 gcloud。
+
+本輪原始證據保存在 `C:\LifeWorld_project\pr11-fix-evidence\`：`red.log/xml`、`unit.log/xml`、`regression.log/xml`、`local-e2e.log/json`、`web-contract.log`、`export-mock.log`。不納入 Git。清理結果仍為30張業務表空、runtime NOLOGIN／0連線，dev合成資料指紋不變。API、核心 DDL、DML 權限 SQL、Dockerfile、Cloud Build YAML 及既有安全配置不變。
+
+這些時間與指紋是本機匯出證據，不是 GCP 簽章或持續狀態監測。工具不能偵測匯出後的所有 GCP 外部變更；**驗收期間必須凍結配置**。真實 Direct VPC 路由／Google IAM／Cloud SQL 雲端驗收仍未執行；本機模型不冒充這些結果。

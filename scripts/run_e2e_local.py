@@ -26,6 +26,7 @@ from app.main import create_app
 from app.runtime import RuntimeSettings
 from scripts.e2e_flow import run_acceptance
 from scripts.e2e_sql import schema_sql, audit_sql
+from scripts.e2e_safety import SOURCE_KEYS, source_digest
 
 ROOT = Path(__file__).resolve().parent.parent
 driver.paramstyle = 'qmark'
@@ -52,6 +53,16 @@ def free_port():
         return sock.getsockname()[1]
 
 
+def local_evidence(plan):
+    """本機模型四份 JSON 的合成匯出證據；不代表已向 Google 取得任何快照。"""
+    stamp = datetime.now(timezone.utc).isoformat(); batch = uuid4().hex
+    plan['captured_at'] = stamp
+    plan['snapshot_evidence'] = {'version':1,'batch_id':batch,'started_at':stamp,'completed_at':stamp,
+        'sources':{key:{'filename':key+'.json','batch_id':batch,'export_started_at':stamp,'exported_at':stamp,
+                        'sha256':source_digest(plan[key]),'content_sha256':source_digest(plan[key])} for key in SOURCE_KEYS}}
+    return plan
+
+
 def local_plan(main_url, tag_url):
     """同一 v1 snapshot 形狀；local 模式只允許 loopback HTTPS，CLI 不接受此模式。"""
     def revision(name, enabled, database, user, url):
@@ -63,13 +74,13 @@ def local_plan(main_url, tag_url):
                 'status':{'conditions':[{'type':'Ready','status':'True'}]}}
     routes = [{'revisionName':'lw-api-main-stable','percent':100},
               {'revisionName':'lw-api-main-e2e','tag':'e2e','url':tag_url}]
-    return {'mode':'local-simulation','project_id':'life-world-513506','project_number':'123456',
+    return local_evidence({'mode':'local-simulation','project_id':'life-world-513506','project_number':'123456',
             'captured_at':datetime.now(timezone.utc).isoformat(),
             'service':{'metadata':{'name':'lw-api-main','namespace':'123456','labels':{'cloud.googleapis.com/location':'asia-east1'}},
                        'spec':{'traffic':routes},'status':{'url':main_url,'traffic':routes,'conditions':[{'type':'Ready','status':'True'}]}},
             'main_revision':revision('lw-api-main-stable','false','life_world_dev','lw_app',main_url),
             'tag_revision':revision('lw-api-main-e2e','true','life_world_e2e','lw_e2e_app',tag_url),
-            'iam_policy':{'bindings':[{'role':'roles/run.invoker','members':['synthetic-local-only']}]}}
+            'iam_policy':{'bindings':[{'role':'roles/run.invoker','members':['synthetic-local-only']}]}})
 
 
 def main():
@@ -210,6 +221,7 @@ def main():
             result['local_database_audit']['identity_insert_rollback_and_direct_sequence_denied']=True
             # 先模擬移除 tag，驗收退休模式只 GET main，再停 API，最後清理資料。
             for field in ('spec','status'): plan['service'][field]['traffic'] = plan['service'][field]['traffic'][:1]
+            local_evidence(plan)  # 模型已移除 tag，重新取得此時的本機模型快照；非雲端證據。
             retired = run_acceptance(plan,token,ca_file=str(cert),allow_local=True,retired=True)
             assert retired['passed']; result['local_retirement_checks']=len(retired['checks'])
             for server,thread in servers:

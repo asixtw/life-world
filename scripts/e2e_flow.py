@@ -23,6 +23,10 @@ def run_acceptance(plan, token, *, transport=None, ca_file=None, allow_local=Fal
     try:
         config = validate_plan(plan,allow_local=allow_local,retired=retired)
         check_token(token,config['audience']); expect('preflight',True)
+        evidence = plan['snapshot_evidence']
+        report['snapshot_provenance'] = {'batch_id':evidence['batch_id'],'captured_at':plan['captured_at'],
+            'sources':{key:{field:record[field] for field in ('filename','export_started_at','exported_at','sha256','content_sha256')}
+                       for key,record in evidence['sources'].items()}}
     except Exception as error:
         reason = str(error) if isinstance(error,SafetyError) else 'unsafe_or_malformed_configuration'
         checks.append({'name':'preflight','expected':'safe_target_and_token','actual':'rejected','status':'FAIL','reason':reason})
