@@ -115,3 +115,8 @@ App 與原型各自編號。v0.1／v0.2 下方保留歷史結果；v0.3.0 的 10
 ## 早前文件維護｜2026-10-28
 
 建立本紀錄、完整研發指引及兩層 AGENTS 入口；將頭腦風暴的完成項轉入本頁，保留未整合與待決內容，新增後續規劃並修正入口。只變更 Markdown，未更動產品程式／API／資料庫／原始交接包，未推送 GitHub。
+
+
+## Web部署來源與名稱統一main 2026 11 03
+
+Build SA改為lw-build-main，部署目標改為lw-web-main，保留lw-web-runtime、lw-containers、唯一tag及digest部署；step、environment label與映像title同步main。現行部署README改名並更新入口，歷史驗證保留。僅本機設定與驗證，不改PG／FastAPI工程，不刪舊服務／分支，未操作GCP。見 [Web main交接](../deploy/README.web-main.md)。

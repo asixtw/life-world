@@ -16,6 +16,8 @@
 
 ## 啟動
 
+Web 展示站的 main 部署設定、私人存取與 Console 切換方式見 [Web main 部署交接](deploy/README.web-main.md)。該展示站使用獨立 React 容器，不包含 FastAPI／資料庫；本輪只在本機準備與驗證設定，沒有操作 GCP。
+
 Jerry 的資料庫交接：[完整 Table Schema／31 表資料字典](docs/DATABASE_SCHEMA.md)、[PostgreSQL 與功能缺口規劃](docs/database/POSTGRESQL_HANDOFF.md)。依實際 SQLite 及 001–005 查核，不含使用者資料；候選新表與現有結構分開。
 
 **最新完整流程 Wireframe：[開啟原型](collaboration/flow-wireframe/index.html)／[操作說明](collaboration/flow-wireframe/README.md)。**原型獨立呈現目前及規劃流程，全部使用虛構資料；錄音、辨識與夜間明示模擬，與實際 App 分開。習慣調整及本輪驗收見[交付紀錄](docs/HABIT_WIREFRAME_ACCEPTANCE.md)。

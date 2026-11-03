@@ -1,5 +1,5 @@
 # 只適用獨立 React 候選展示站；不是正式 FastAPI 或資料庫部署。
-serviceAccount: projects/life-world-513506/serviceAccounts/lw-build-stg@life-world-513506.iam.gserviceaccount.com
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com
 timeout: 1200s
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -62,7 +62,7 @@ steps:
       - push
       - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:${COMMIT_SHA}-${BUILD_ID}
 
-  - id: deploy-staging
+  - id: deploy-main
     name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     entrypoint: bash
     args:
@@ -72,7 +72,7 @@ steps:
         DIGEST="$$(gcloud artifacts docker images describe "$${IMAGE}:${COMMIT_SHA}-${BUILD_ID}" --project=life-world-513506 --format='value(image_summary.digest)')"
         printf '%s\n' "$${DIGEST}" | grep -Eq '^sha256:[0-9a-f]{64}$$'
         # 查詢本次建置的唯一 tag，固定以實際 digest 部署。
-        gcloud run deploy lw-web-staging \
+        gcloud run deploy lw-web-main \
           --project=life-world-513506 \
           --region=asia-east1 \
           --platform=managed \
@@ -85,7 +85,7 @@ steps:
           --cpu=1 \
           --timeout=60 \
           --concurrency=80 \
-          --labels=app=life-world,component=ui-candidate,environment=staging,commit-sha=$COMMIT_SHA \
+          --labels=app=life-world,component=ui-candidate,environment=main,commit-sha=$COMMIT_SHA \
           --quiet
 
 # 明確 push 後才部署；此欄亦讓 Cloud Build 記錄應用映像。
