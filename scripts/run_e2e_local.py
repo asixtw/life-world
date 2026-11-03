@@ -29,6 +29,7 @@ from scripts.e2e_sql import schema_sql, audit_sql
 from scripts.e2e_safety import SOURCE_KEYS, source_digest
 
 ROOT = Path(__file__).resolve().parent.parent
+DBA = 'lw_e2e_local_dba'  # 本機合成容器內的非 superuser 管理者，模擬 Cloud SQL DBA 權限
 driver.paramstyle = 'qmark'
 
 
@@ -126,33 +127,52 @@ def main():
             subprocess.run([sys.executable,'-X','utf8','-m','scripts.pg_test_bootstrap'],cwd=ROOT,env=env,check=True,capture_output=True)
             version = run('exec',name,'postgres','--version').stdout.decode().strip()
             assert '18.6' in version
-            def sql(database, text):
-                # psql 不加 -a/-e，密碼只由本機 socket／短期 env 持有。
-                return run('exec','-i',name,'psql','-X','-p','55438','-v','ON_ERROR_STOP=1','-v','VERBOSITY=sqlstate','-U','lw_step10_admin','-d',database,
-                           input=text.encode()).stdout.decode()
+            def sql(database, text, user='lw_step10_admin', stop=True):
+                # psql 不加 -a/-e，密碼只由本機 socket／短期 env 持有；stop=False 模擬未設 ON_ERROR_STOP 的 client。
+                argv = ['exec','-i',name,'psql','-X','-p','55438','-v','VERBOSITY=sqlstate','-U',user,'-d',database]
+                if stop: argv[7:7] = ['-v','ON_ERROR_STOP=1']
+                return run(*argv,input=text.encode()).stdout.decode()
+            def rejected(database, text, user=DBA):
+                # 守門必須以錯誤停止；不能只看錯誤訊息而讓 psql 回傳成功。
+                try:
+                    sql(database,text,user)
+                except subprocess.CalledProcessError:
+                    return True
+                raise RuntimeError('SQL guard did not reject')
+            e2e_sql = lambda file: (ROOT/'deploy/postgres/e2e'/file).read_text(encoding='utf-8')
             stage = 'dev_sentinel'
             sql('life_world_dev',"INSERT INTO lw_core_draft.users(id,status,created_at) VALUES ('step18-dev-sentinel','guest',now());")
+            # Cloud SQL 管理者不是 superuser：以 CREATEDB／CREATEROLE＋pg_signal_backend 身分執行交付 SQL。
+            sql('postgres','CREATE ROLE '+DBA+' LOGIN NOSUPERUSER CREATEDB CREATEROLE NOBYPASSRLS; GRANT pg_signal_backend TO '+DBA+';')
             stage = 'dev_fingerprint'
             before = fingerprint()
             stage = 'create_e2e_database'
-            sql('postgres',(ROOT/'deploy/postgres/e2e/00_database.sql').read_text(encoding='utf-8'))
+            sql('postgres',e2e_sql('00_database.sql'),DBA)
             stage = 'create_31_tables'
-            sql('life_world_e2e',schema_sql())
+            sql('life_world_e2e',schema_sql(),DBA)
             stage = 'grant_e2e_runtime'
-            sql('life_world_e2e',(ROOT/'deploy/postgres/e2e/02_grants.sql').read_text(encoding='utf-8'))
-            sql('life_world_e2e',(ROOT/'deploy/postgres/e2e/03_verify_permissions.sql').read_text(encoding='utf-8'))
-            sql('life_world_dev',(ROOT/'deploy/postgres/e2e/04_dev_role_probe.sql').read_text(encoding='utf-8'))
+            sql('life_world_e2e',e2e_sql('02_grants.sql'),DBA)
+            sql('life_world_e2e',e2e_sql('03_verify_permissions.sql'),DBA)
+            probe = sql('life_world_dev',e2e_sql('04_dev_role_probe.sql'),DBA)
+            assert 'E2E_DEV_ROLE_ISOLATION_PASS' in probe
+            stage = 'sql_guard_negative'
+            # 重複建立不得接管既有物件；PUBLIC 額外權限必須被核對擋下，且未設 ON_ERROR_STOP 也不得印出 PASS。
+            rejected('postgres',e2e_sql('00_database.sql'))
+            for script in ('02_grants.sql','03_verify_permissions.sql','20_enable.sql'):
+                rejected('life_world_dev',e2e_sql(script))
+            sql('life_world_e2e','GRANT TRIGGER ON lw_core_draft.users TO PUBLIC;')
+            rejected('life_world_e2e',e2e_sql('03_verify_permissions.sql'))
+            assert 'E2E_PERMISSIONS_PASS' not in sql('life_world_e2e',e2e_sql('03_verify_permissions.sql'),DBA,stop=False)
+            sql('life_world_e2e','REVOKE TRIGGER ON lw_core_draft.users FROM PUBLIC;')
+            sql('life_world_e2e',e2e_sql('03_verify_permissions.sql'),DBA)
             with connection() as raw, closing(raw.cursor()) as c:
                 c.execute("SELECT format('ALTER ROLE lw_e2e_app PASSWORD %L', ?::text)",(password,)); c.execute(c.fetchone()[0])
-                # 真正 SQL guard：在 dev 執行清理必須在任何資料變更前拒絕。
-            try:
-                sql('life_world_dev',(ROOT/'deploy/postgres/e2e/90_cleanup.sql').read_text(encoding='utf-8'))
-                raise RuntimeError('wrong-database cleanup guard failed')
-            except subprocess.CalledProcessError:
-                pass
+            # 真正 SQL guard：在 dev 執行清理必須在任何資料變更前拒絕，未設 ON_ERROR_STOP 也不得印出 PASS。
+            rejected('life_world_dev',e2e_sql('90_cleanup.sql'))
+            assert 'E2E_CLEANUP_PASS' not in sql('life_world_dev',e2e_sql('90_cleanup.sql'),DBA,stop=False)
             assert fingerprint()==before
             stage = 'enable_e2e_runtime'
-            sql('life_world_e2e',(ROOT/'deploy/postgres/e2e/20_enable.sql').read_text(encoding='utf-8'))
+            sql('life_world_e2e',e2e_sql('20_enable.sql'),DBA)
             with connection('life_world_dev','lw_e2e_app') as raw, closing(raw.cursor()) as c:
                 try:
                     c.execute('INSERT INTO lw_core_draft.users(id,status,created_at) VALUES (\'forbidden\',\'guest\',now())')
@@ -194,7 +214,10 @@ def main():
             if not result['passed']:
                 raise RuntimeError('HTTP acceptance failed')
             stage = 'database_audit'
-            sql('life_world_e2e',audit_sql(result['run_id']))
+            assert 'E2E_DATABASE_AUDIT_PASS' in sql('life_world_e2e',audit_sql(result['run_id']),DBA)
+            # 稽核 SQL 在錯誤 DB 也必須拒絕，且不得印出 PASS。
+            rejected('life_world_dev',audit_sql(result['run_id']))
+            assert 'E2E_DATABASE_AUDIT_PASS' not in sql('life_world_dev',audit_sql(result['run_id']),DBA,stop=False)
             # 獨立 DB 連線查持久化、角色／sequence 限制；不依賴 API 內記憶體。
             with connection() as raw, closing(raw.cursor()) as c:
                 counts = {}
@@ -204,8 +227,14 @@ def main():
                 assert counts=={'SELECT':30,'INSERT':30,'UPDATE':17,'DELETE':6}
                 c.execute("SELECT count(*) FROM pg_tables WHERE schemaname='lw_core_draft'"); assert c.fetchone()[0]==31
                 c.execute("SELECT count(*) FROM information_schema.columns WHERE table_schema='lw_core_draft' AND is_identity='YES'"); assert c.fetchone()[0]==2
+                c.execute("SELECT has_database_privilege('lw_e2e_app','life_world_dev','CONNECT'),has_database_privilege('lw_e2e_app','life_world_dev','TEMP')")
+                dev_connect, dev_temp = c.fetchone()
             result['local_database_audit'] = {'passed':True,'tables':31,'privileges':counts,'independent_connection_read':True,
-                'wrong_database_cleanup_rejected':True,'e2e_runtime_dev_write_denied':True}
+                'wrong_database_cleanup_rejected':True,'e2e_runtime_dev_write_denied':True,
+                'sql_runner':'non_superuser_createdb_createrole_dba','repeat_create_rejected':True,
+                'wrong_database_scripts_rejected':True,'public_trigger_grant_rejected_without_false_pass':True,
+                # dev 既有 PUBLIC CONNECT／TEMP 只回報，不由工具修改。
+                'dev_connect_possible':dev_connect,'dev_temp_possible':dev_temp}
             # 新 Runtime 身分實際走 Identity INSERT，再 rollback；不授予 sequence 操作權。
             with connection(user='lw_e2e_app') as raw, closing(raw.cursor()) as c:
                 raw.autocommit = False
@@ -228,7 +257,7 @@ def main():
                 server.should_exit=True; thread.join(timeout=10); assert not thread.is_alive()
             servers.clear()
             stage = 'cleanup_and_verify'
-            cleanup = sql('life_world_e2e',(ROOT/'deploy/postgres/e2e/90_cleanup.sql').read_text(encoding='utf-8'))
+            cleanup = sql('life_world_e2e',e2e_sql('90_cleanup.sql'),DBA)
             assert 'E2E_CLEANUP_PASS' in cleanup
             assert fingerprint()==before
             result['database_cleanup']='verified_local_all_30_business_tables_empty_runtime_nologin'

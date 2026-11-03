@@ -100,3 +100,7 @@
 ## PR #11 快照與 Direct VPC 補正驗收｜2026-11-03
 
 來源批次時間／原始檔 SHA256／Plan 內容指紋及實際 v1 Revision Direct VPC annotations 已加入預檢。功能紅燈34項，修正後工具63 passed、完整回歸294 passed／14 skipped、本機PG18.6 E2E49項、退休清理9項、Web契約9項通過。唯讀匯出文件以本機gcloud替身驗證，未操作GCP；來源新鮮度與外部變更限制見 [補正紀錄](STEP18_API_E2E_ACCEPTANCE.md#pr-11-合併前補正快照來源與-direct-vpc)。
+
+## PR #11 獨立複審修正驗收｜2026-11-03
+
+修正 SQL PASS 誤印、非 superuser DBA 無法執行 dev 探測、權限核對缺口、退休殘留路由、Direct VPC 未知欄位／多容器及 00 接管既有 DB。紅燈 9 failed／65 passed 與 PG18.6 情境紀錄後修正；工具 74 passed、完整回歸 305 passed／14 skipped、PG18.6 模式全套 319 passed、PG18.6＋HTTPS 49 項及退休 9 項、SQL 負向情境、Web 契約 9 tests 通過，未操作 GCP。dev 的 PUBLIC CONNECT／TEMP 是否撤銷待使用者決定。見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md#pr-11-獨立複審修正2026-11-03)。

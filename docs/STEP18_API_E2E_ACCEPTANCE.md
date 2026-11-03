@@ -85,3 +85,21 @@ P2 從實際 stable／e2e v1 Revision `metadata.annotations` 檢查 `run.googlea
 本輪原始證據保存在 `C:\LifeWorld_project\pr11-fix-evidence\`：`red.log/xml`、`unit.log/xml`、`regression.log/xml`、`local-e2e.log/json`、`web-contract.log`、`export-mock.log`。不納入 Git。清理結果仍為30張業務表空、runtime NOLOGIN／0連線，dev合成資料指紋不變。API、核心 DDL、DML 權限 SQL、Dockerfile、Cloud Build YAML 及既有安全配置不變。
 
 這些時間與指紋是本機匯出證據，不是 GCP 簽章或持續狀態監測。工具不能偵測匯出後的所有 GCP 外部變更；**驗收期間必須凍結配置**。真實 Direct VPC 路由／Google IAM／Cloud SQL 雲端驗收仍未執行；本機模型不冒充這些結果。
+
+## PR #11 獨立複審修正｜2026-11-03
+
+由獨立審查者以 Head `f89bf147f5d9db09771daf391a3c5380be37c3fc` 的實際程式與真實 PG18.6 重驗，修正下列缺陷；API、核心 DDL、02 授權矩陣、IAM／Cloud Run 架構與既有 VPC 名稱不變。
+
+| 等級 | 缺陷 | 修正 |
+|---|---|---|
+| P1 | 03／04／90 與產生的 `30_verify_run.sql` 在 client 未設 ON_ERROR_STOP 時，前面檢查失敗仍印出 PASS 且 psql exit 0（Cloud SQL Studio 路徑可得到錯誤的成功證據）。 | PASS 列與檢查同一交易（驗證檔為唯讀交易）；清理提交後再以唯讀交易重驗最終狀態。 |
+| P2 | `04_dev_role_probe.sql` 以文字名稱解析 dev 表，非 superuser 的 Cloud SQL 管理者無 dev schema USAGE 時 42501，正式流程第5步無法完成。 | 改用 OID 版權限函式並以 CASE 限定 relkind。 |
+| P2 | 03 未核對 TRUNCATE 以外的 REFERENCES／TRIGGER／MAINTAIN、欄位級授權、資料庫 CREATE／TEMP、任一 schema CREATE、擁有物件與 SECURITY DEFINER 函式；PUBLIC 額外授權不會被發現。 | 補齊上述 effective privilege 檢查。 |
+| P2 | 退休預檢只確認 `e2e` tag 消失；其他 tag／解析到測試修訂的路由仍可到達 business=true 修訂。 | 測試修訂只能有唯一 e2e 路由，退休後不得留下任何路由。 |
+| P2 | Direct VPC interface 接受兩修訂相同的未知欄位；多容器 Revision 只檢查 `containers[0]`。 | interface 只允許 network／subnetwork／tags；Revision 必須單一容器。 |
+| P2 | `00_database.sql` 未設 ON_ERROR_STOP 時 guard 失敗仍繼續，可替既有同名 DB 改寫 marker 並撤銷 PUBLIC CONNECT。 | 建角色與標記 DB 各包在 guard 交易，只標記 owner 為 `lw_e2e_owner` 且無 marker 的新 DB。 |
+| P3 | 手冊匯出區塊用 `[System.IO.Path]::GetFullPath`，PS 5.1 從其他目錄開啟後 `cd` 會寫到錯誤位置，Plan 必被拒。 | 改由 PowerShell 解析路徑。 |
+
+修正前：新增 11 個單元案例中 9 failed／65 passed；PG18.6 情境記錄 PASS 誤印、04 權限不足、6 種 PUBLIC／欄位授權未被發現及 00 接管既有 DB；新版 harness 對原 SQL 於 `grant_e2e_runtime` 以 SQLSTATE 42501 失敗；文件匯出替身流程 Plan 被拒。修正後：工具單元 74 passed；完整 SQLite／工具回歸 305 passed／14 skipped；同一套測試在獨立 PG18.6 合成容器模式 319 passed（含 14 個 PG 專用案例）；PG18.6＋HTTPS 49 項、退休 9 項通過，harness 改以非 superuser CREATEDB／CREATEROLE 管理者執行交付 SQL，並實測重複建立、錯誤 DB、PUBLIC TRIGGER 授權均被拒且不印 PASS；dev 合成指紋不變；Web 契約 9 tests OK；文件匯出替身流程離線 Plan 驗證通過。
+
+仍需使用者決定：dev 保留 PUBLIC 預設 CONNECT／TEMP 時，`lw_e2e_app` 可登入 `life_world_dev`（無任何表／欄位／序號／建立物件權限）。撤銷屬 dev 變更，本工具只在 04 輸出 `dev_connect_possible`／`dev_temp_possible` 回報，不自動修改。原始證據在 `C:\LifeWorld_project\pr11-review-evidence\`，不納入 Git。

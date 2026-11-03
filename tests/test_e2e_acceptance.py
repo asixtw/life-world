@@ -6,6 +6,7 @@ import hashlib
 import json
 import io
 from pathlib import Path
+import re
 import sys
 import time
 from uuid import uuid4
@@ -271,3 +272,84 @@ def test_direct_vpc_accepts_same_project_fully_qualified_resource_names():
         'subnetwork':'projects/123456/regions/asia-east1/subnetworks/lw-subnet-staging'}])
     seal(p)
     assert e2e.validate_plan(p)['target'].startswith('https://e2e---')
+
+
+def test_direct_vpc_accepts_identical_network_tags_on_both_revisions():
+    p=plan()
+    for revision in ('main_revision','tag_revision'):
+        p[revision]['metadata']['annotations']['run.googleapis.com/network-interfaces']=json.dumps([{
+            'network':'lw-vpc-staging','subnetwork':'lw-subnet-staging','tags':['lw-api']}])
+    seal(p)
+    assert e2e.validate_plan(p)['target'].startswith('https://e2e---')
+
+
+def test_direct_vpc_rejects_unknown_interface_settings_even_when_identical():
+    # 兩個 Revision 相同不代表安全；未知欄位可能改變 Direct VPC 行為，必須 fail-closed。
+    p=plan()
+    for revision in ('main_revision','tag_revision'):
+        p[revision]['metadata']['annotations']['run.googleapis.com/network-interfaces']=json.dumps([{
+            'network':'lw-vpc-staging','subnetwork':'lw-subnet-staging','unreviewed_setting':'synthetic'}])
+    seal(p)
+    with pytest.raises(e2e.SafetyError,match='direct_vpc'):
+        e2e.validate_plan(p)
+
+
+@pytest.mark.parametrize('retired', [False,True])
+def test_business_revision_cannot_stay_reachable_through_other_routes(retired):
+    # e2e 以外的 tag（或解析到測試 Revision 的 latest 路由）仍可直達 business=true 修訂。
+    p=plan()
+    for field in ('spec','status'):
+        routes=p['service'][field]['traffic']
+        if retired: del routes[1]
+        routes.append({'revisionName':'lw-api-main-e2e','tag':'leftover','url':'https://leftover---lw-api-main-example.a.run.app'})
+    seal(p)
+    with pytest.raises(e2e.SafetyError,match='tag_not_removed' if retired else 'tag_not_zero'):
+        e2e.validate_plan(p,retired=retired)
+
+
+def test_retired_plan_accepts_only_the_stable_route():
+    p=plan()
+    for field in ('spec','status'): p['service'][field]['traffic']=p['service'][field]['traffic'][:1]
+    seal(p)
+    assert e2e.validate_plan(p,retired=True)['target'] is None
+
+
+@pytest.mark.parametrize('revision', ['main_revision','tag_revision'])
+def test_multi_container_revision_is_rejected(revision):
+    # 只檢查 containers[0] 時，排在後面的實際服務容器可改用 dev DB 或開啟業務。
+    p=plan(); containers=p[revision]['spec']['containers']
+    second=deepcopy(containers[0])
+    second['env']=[v for v in second['env'] if v['name'] not in ('LIFEWORLD_DB_NAME','LIFEWORLD_ENABLE_BUSINESS_API')]+[
+        {'name':'LIFEWORLD_DB_NAME','value':'life_world_dev'},{'name':'LIFEWORLD_ENABLE_BUSINESS_API','value':'true'}]
+    containers.append(second)
+    seal(p)
+    with pytest.raises(e2e.SafetyError,match='single_container_required'):
+        e2e.validate_plan(p)
+
+
+SQL_PASS_MARKERS = [('03_verify_permissions.sql','E2E_PERMISSIONS_PASS'),
+                    ('04_dev_role_probe.sql','E2E_DEV_ROLE_ISOLATION_PASS'),
+                    ('90_cleanup.sql','E2E_CLEANUP_PASS')]
+
+
+def assert_pass_marker_bound_to_checks(text, marker):
+    """PASS 列須與前面的檢查 DO 同一交易：檢查失敗使交易中止，未設 ON_ERROR_STOP 也印不出 PASS。"""
+    head = text[:text.index("'"+marker+"'")]
+    # 只認交易層 BEGIN;／BEGIN READ ONLY;，不把 PL/pgSQL 區塊的 BEGIN 當成交易開始。
+    starts = [m.start() for m in re.finditer(r'(?m)^BEGIN( READ ONLY)?;$',head)]
+    begin, commit, check = (starts[-1] if starts else -1), head.rfind('\nCOMMIT;'), head.rfind('DO $')
+    assert begin>commit and begin<check, marker+' is not bound to its checks'
+    assert '\nCOMMIT;' in text[len(head):]
+
+
+@pytest.mark.parametrize('name,marker', SQL_PASS_MARKERS)
+def test_sql_pass_markers_cannot_follow_failed_checks(name, marker):
+    root = Path(__file__).resolve().parent.parent
+    assert_pass_marker_bound_to_checks((root/'deploy/postgres/e2e'/name).read_text(encoding='utf-8'),marker)
+
+
+def test_generated_audit_pass_marker_cannot_follow_failed_checks():
+    from scripts.e2e_sql import audit_sql
+    text = audit_sql(uuid4().hex)
+    assert_pass_marker_bound_to_checks(text,'E2E_DATABASE_AUDIT_PASS')
+    assert text.lstrip().startswith('BEGIN READ ONLY;')

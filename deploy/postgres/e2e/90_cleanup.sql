@@ -50,7 +50,31 @@ BEGIN
   IF total<>0 THEN RAISE EXCEPTION 'E2E data cleanup incomplete'; END IF;
 END $cleanup$;
 COMMIT;
+-- 提交後另以唯讀交易重驗最終狀態；前段任一步失敗（含 client 未設 ON_ERROR_STOP）時此處中止，不會印出 PASS。
+BEGIN READ ONLY;
+DO $verified$
+DECLARE item record; remaining bigint;
+BEGIN
+  IF current_database()<>'life_world_e2e' OR
+     shobj_description((SELECT oid FROM pg_database WHERE datname=current_database()),'pg_database')
+       IS DISTINCT FROM 'LIFEWORLD_E2E_SYNTHETIC_ONLY_v1' OR
+     (SELECT datdba FROM pg_database WHERE datname=current_database())<>'lw_e2e_owner'::regrole OR
+     (SELECT count(*) FROM pg_tables WHERE schemaname='lw_core_draft')<>31 OR
+     EXISTS (SELECT FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+             WHERE c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema')
+             AND n.nspname NOT LIKE 'pg_toast%' AND n.nspname NOT LIKE 'pg_temp%'
+             AND n.nspname<>'lw_core_draft') OR
+     EXISTS (SELECT FROM pg_roles WHERE rolname='lw_e2e_app' AND rolcanlogin) OR
+     EXISTS (SELECT FROM pg_stat_activity WHERE datname='life_world_e2e' AND usename='lw_e2e_app') THEN
+    RAISE EXCEPTION 'E2E cleanup final state not verified';
+  END IF;
+  FOR item IN SELECT tablename FROM pg_tables WHERE schemaname='lw_core_draft' AND tablename<>'schema_migrations' LOOP
+    EXECUTE format('SELECT count(*) FROM lw_core_draft.%I',item.tablename) INTO remaining;
+    IF remaining<>0 THEN RAISE EXCEPTION 'E2E data cleanup incomplete'; END IF;
+  END LOOP;
+END $verified$;
 SELECT 'E2E_CLEANUP_PASS' AS result,
   (SELECT count(*) FROM pg_tables WHERE schemaname='lw_core_draft') AS retained_tables,
   (SELECT rolcanlogin FROM pg_roles WHERE rolname='lw_e2e_app') AS runtime_login,
   (SELECT count(*) FROM pg_stat_activity WHERE datname='life_world_e2e' AND usename='lw_e2e_app') AS runtime_sessions;
+COMMIT;

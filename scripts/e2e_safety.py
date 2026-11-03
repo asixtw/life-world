@@ -58,6 +58,8 @@ def direct_vpc(revision, project_number):
         interfaces = json.loads(annotations['run.googleapis.com/network-interfaces'])
         require(isinstance(interfaces,list) and len(interfaces)==1 and isinstance(interfaces[0],dict), 'direct_vpc_interfaces')
         interface = dict(interfaces[0])
+        # 只接受已審查的欄位；兩修訂相同的未知設定仍可能改變網路行為。
+        require(set(interface)<={'network','subnetwork','tags'}, 'direct_vpc_unknown_setting')
         projects = ('life-world-513506',project_number)
         networks = {'lw-vpc-staging',*[f'projects/{p}/global/networks/lw-vpc-staging' for p in projects]}
         subnets = {'lw-subnet-staging',*[f'projects/{p}/regions/asia-east1/subnetworks/lw-subnet-staging' for p in projects]}
@@ -75,7 +77,10 @@ def direct_vpc(revision, project_number):
 
 
 def env_values(revision):
-    values = revision['spec']['containers'][0]['env']
+    # 多容器時 containers[0] 未必是實際服務容器；只核對單一容器才不會漏看。
+    containers = revision['spec']['containers']
+    require(isinstance(containers,list) and len(containers)==1, 'single_container_required')
+    values = containers[0]['env']
     require(len({v['name'] for v in values}) == len(values), 'duplicate_env')
     return {v['name']:v.get('value') for v in values}, {v['name']:v for v in values}
 
@@ -117,11 +122,14 @@ def validate_plan(plan, *, allow_local=False, retired=False):
             require(len(positive)==1 and positive[0].get('percent')==100 and
                     positive[0].get('revisionName')==main_name and not positive[0].get('latestRevision'), 'main_not_pinned_100')
             tagged = [r for r in routes if r.get('tag')=='e2e']
+            # business=true 的測試修訂只能經由唯一 e2e tag 到達；退休後不得留下任何路由。
+            test_routes = [r for r in routes if r.get('revisionName')==tag_name]
             if retired:
-                require(not tagged, 'tag_not_removed')
+                require(not tagged and not test_routes, 'tag_not_removed')
             else:
                 require(len(tagged)==1 and tagged[0].get('revisionName')==tag_name and
-                        tagged[0].get('percent',0)==0 and not tagged[0].get('latestRevision'), 'tag_not_zero')
+                        tagged[0].get('percent',0)==0 and not tagged[0].get('latestRevision') and
+                        test_routes==tagged, 'tag_not_zero')
         main_url = origin(service['status']['url'],local)
         target = None if retired else origin(next(r['url'] for r in service['status']['traffic'] if r.get('tag')=='e2e'),local)
         for revision,enabled,db,user in ((main,'false','life_world_dev','lw_app'),(tag,'true','life_world_e2e','lw_e2e_app')):

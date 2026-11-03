@@ -27,15 +27,15 @@ $Py = '.venv/Scripts/python.exe'
 
 | 順序 | 連線 DB | SQL／動作 |
 |---|---|---|
-| 1 | `postgres` | `00_database.sql`；單獨執行，不能包進外層 transaction。建立 `life_world_e2e`、NOLOGIN owner `lw_e2e_owner`、NOLOGIN runtime `lw_e2e_app`；同名物件已存在就停止，不接管。 |
+| 1 | `postgres` | `00_database.sql`；單獨執行，不能包進外層 transaction。建立 `life_world_e2e`、NOLOGIN owner `lw_e2e_owner`、NOLOGIN runtime `lw_e2e_app`；同名物件已存在就停止，不接管。建角色與標記資料庫分別在 guard 交易內，只標記由 `lw_e2e_owner` 擁有且尚無 marker 的新 DB。 |
 | 2 | `life_world_e2e` | 產生的 `01_schema.sql`，以唯一 canonical 31 表 DDL 建立 schema。DB 名稱／marker guard 與 DDL 在同一 transaction，失敗就回滾。 |
 | 3 | `life_world_e2e` | `02_grants.sql`：30 表 SELECT／INSERT、17 UPDATE、6 DELETE；無 DDL／TRUNCATE／migration 表與直接 sequence 權限。 |
-| 4 | `life_world_e2e` | `03_verify_permissions.sql`：核對 effective privileges、owner／繼承及序號限制，必須得到 `E2E_PERMISSIONS_PASS`。 |
-| 5 | `life_world_dev` | **只讀 metadata** 的 `04_dev_role_probe.sql`，確認 E2E login 無 dev 業務表權限，得到 `E2E_DEV_ROLE_ISOLATION_PASS`。沒有資料列查詢／DML／GRANT／REVOKE；若 PUBLIC 既有權限造成失敗，停止交 DBA，不自動改 dev。 |
+| 4 | `life_world_e2e` | `03_verify_permissions.sql`：核對 effective privileges（含欄位級授權）、owner／繼承、序號限制，以及無 TRUNCATE／REFERENCES／TRIGGER／MAINTAIN、資料庫 CREATE／TEMP、任何 schema CREATE、擁有物件或可執行 SECURITY DEFINER 函式，必須得到 `E2E_PERMISSIONS_PASS`。 |
+| 5 | `life_world_dev` | **只讀 metadata** 的 `04_dev_role_probe.sql`（唯讀交易、以 OID 核對，非 superuser 的 Cloud SQL 管理者也可執行），確認 E2E login 無 dev 表／欄位／序號權限與建立物件權限，得到 `E2E_DEV_ROLE_ISOLATION_PASS`。沒有資料列查詢／DML／GRANT／REVOKE；若 PUBLIC 既有權限造成失敗，停止交 DBA，不自動改 dev。同列的 `dev_connect_possible`／`dev_temp_possible` 為 `t` 表示 dev 仍保留 PUBLIC 預設 CONNECT／TEMP：E2E 帳號可登入 dev 但無資料權限，是否由 DBA 撤銷屬 dev 變更，須由使用者決定。 |
 | 6 | 管理連線 | 由使用者安全設定 `lw_e2e_app` 的新密碼，例如可信任管理用 psql 的互動 `\password lw_e2e_app`；密碼不放 SQL 檔、命令列或查詢歷史。將同一密碼以 Secret Manager 保存為測試專用 secret 的固定數字版本。 |
 | 7 | `life_world_e2e` | `20_enable.sql`：確認 schema 與角色安全後才允許 E2E login。 |
 
-使用 psql 執行 SQL 時加 `-X -v ON_ERROR_STOP=1`；使用 Cloud SQL Studio 時核對所選資料庫並逐檔執行，任一錯誤即停止。不要把 canonical DDL 原檔直接對 dev 執行。產生器不維護第二套 schema，`01_schema.sql` 由 `docs/database/schema-2026-11-02/POSTGRESQL_CORE_DRAFT.sql` 加入交易內防護而成。
+使用 psql 執行 SQL 時加 `-X -v ON_ERROR_STOP=1`；使用 Cloud SQL Studio 時核對所選資料庫並逐檔執行，任一錯誤即停止。各檔的 PASS 列與其檢查在同一交易，前面任一檢查失敗時不會印出 PASS；但出現任何 ERROR 仍視為失敗，不能只找 PASS 字樣。不要把 canonical DDL 原檔直接對 dev 執行。產生器不維護第二套 schema，`01_schema.sql` 由 `docs/database/schema-2026-11-02/POSTGRESQL_CORE_DRAFT.sql` 加入交易內防護而成。
 
 專用 DB 具 marker `LIFEWORLD_E2E_SYNTHETIC_ONLY_v1`，owner 是 `lw_e2e_owner`。`lw_e2e_app` 沒有 migration membership、superuser、CREATEDB／CREATEROLE／BYPASSRLS，與 dev 的 `lw_app` 密碼及角色分開。新 secret 若需要授權，只由使用者讓 `lw-api-runtime` 讀取該 secret；不授予公開存取或廣泛 Secret 管理權。
 
@@ -77,7 +77,7 @@ run.googleapis.com/network-interfaces: '[{"network":"lw-vpc-staging","subnetwork
 run.googleapis.com/vpc-access-egress: private-ranges-only
 ```
 
-這是既有網路名稱，不改名為 main。只允許單一 Direct VPC interface；明確核對 network／subnetwork／egress，兩個 Revision 設定（含已設定的 network tags）一致。不得存在有效的 `run.googleapis.com/vpc-access-connector`。同專案 ID 或 Project number 的完整 resource path 可正規化比較，其他專案／region／network／subnet 一律拒絕；不從 service template 或不存在的 v1 spec 欄位推測。
+這是既有網路名稱，不改名為 main。只允許單一 Direct VPC interface，且 interface 只能有 `network`／`subnetwork`／`tags` 欄位；明確核對 network／subnetwork／egress，兩個 Revision 設定（含已設定的 network tags）一致。兩個 Revision 都只能有單一容器（工具不核對 sidecar）。不得存在有效的 `run.googleapis.com/vpc-access-connector`。同專案 ID 或 Project number 的完整 resource path 可正規化比較，其他專案／region／network／subnet 一律拒絕；不從 service template 或不存在的 v1 spec 欄位推測。
 
 禁止 `GOOGLE_APPLICATION_CREDENTIALS`／Service Account JSON Key。登入 session Cookie 與 IAM token 是不同驗證：工具把 IAM token 放 `X-Serverless-Authorization`，App 仍走原 Session／CSRF／Origin，沒有新增公開端點。
 
@@ -100,7 +100,9 @@ function Save-E2ESnapshot([string]$SourceKey, [string]$SnapshotFile, [string[]]$
   $SnapshotJson = & gcloud @GcloudArgs
   if ($LASTEXITCODE -ne 0) { throw 'Snapshot export failed; stop without reusing old files' }
   $ExportFinished = [DateTimeOffset]::UtcNow.ToString('o')
-  [System.IO.File]::WriteAllText([System.IO.Path]::GetFullPath($SnapshotFile),
+  # Windows PowerShell 5.1 的 .NET 目前目錄不隨 cd 改變；路徑由 PowerShell 解析，避免寫到別的資料夾。
+  $SnapshotPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($SnapshotFile)
+  [System.IO.File]::WriteAllText($SnapshotPath,
     ($SnapshotJson -join "`n") + "`n", [System.Text.UTF8Encoding]::new($false))
   $Snapshots[$SourceKey] = [ordered]@{
     filename = [System.IO.Path]::GetFileName($SnapshotFile)
@@ -128,7 +130,7 @@ if ($LASTEXITCODE -ne 0) { throw 'E2E plan rejected; do not run HTTP acceptance'
 
 四份 JSON 與 `snapshot-evidence.json` 必須來自上方同一批次。缺少紀錄、任一來源超過 15 分鐘／時間逆序／不合理未來時間、批次不同、原始檔 SHA256 不符均拒絕。Builder 先檢查實際 bytes（包含 BOM／換行）對匯出紀錄的 SHA256，再把來源解析後的穩定 JSON 指紋寫入 Plan；執行驗收時再次核對 Plan 四份內容與各自指紋／來源時間，報告也保留 batch ID、時間與指紋。僅改 JSON 格式也會造成原始檔 hash 不符，應重新匯出，不重寫舊紀錄時間。
 
-其他預檢仍核對專案／區域、Ready、stable 100% 固定名稱、e2e 0%、不同 Revision、同 digest／instance、DB／login、固定 secret 版本、私人 IAM、Hosts／Origin，以及上述 Direct VPC annotations。任一安全資訊缺失或為明文 secret 都停止，不能直接修改主要 Revision 來繞過，也不能手填假的配置宣稱通過。
+其他預檢仍核對專案／區域、Ready、stable 100% 固定名稱、e2e 0% 且為測試 Revision 唯一路由、不同 Revision、單一容器、同 digest／instance、DB／login、固定 secret 版本、私人 IAM、Hosts／Origin，以及上述 Direct VPC annotations。任一安全資訊缺失或為明文 secret 都停止，不能直接修改主要 Revision 來繞過，也不能手填假的配置宣稱通過。
 
 ## 6. 正式驗收指令
 
@@ -158,7 +160,7 @@ $RunId = (Get-Content "$Dir/result.json" -Raw | ConvertFrom-Json).run_id
 ## 7. 清理與恢復（即使驗收失敗也要做）
 
 1. 使用者確認 stable 仍為原名稱 100%、business=false；先移除 `e2e` tag，測試 Revision 維持 0%，不要把流量搬到它。
-2. **先保留尚存在但 0%／無 tag 的測試 Revision**，依第5節重新唯讀匯出四份來源（含該 Revision），建立新批次證據，再以 `e2e_plan ... --retired` 建立退休 Plan。不得沿用或重寫先前 `tag.json` 的時間。Tag 必須已不存在；以新 token 執行 `e2e_acceptance ... --retired --report "$Dir/retired-result.json"`，此模式只 GET main，不能建立訪客。保留原 stable 100% 的證據。
+2. **先保留尚存在但 0%／無 tag 的測試 Revision**，依第5節重新唯讀匯出四份來源（含該 Revision），建立新批次證據，再以 `e2e_plan ... --retired` 建立退休 Plan。不得沿用或重寫先前 `tag.json` 的時間。Tag 必須已不存在，Service spec／status 也不得留下任何指向測試 Revision 的路由（包含其他 tag 或解析到它的 latest 路由）；以新 token 執行 `e2e_acceptance ... --retired --report "$Dir/retired-result.json"`，此模式只 GET main，不能建立訪客。保留原 stable 100% 的證據。
 3. 退休檢查完成後停止使用／刪除這次 0% 測試 Revision（包含前段取得 URL 用的安全修訂），等待 in-flight requests 結束。若 Console 不允許刪除 latest Ready Revision，可從原 stable 配置建立**新的 0%、business=false** 修訂作安全 template（依舊取消立即提供流量），再刪除測試 Revision。未來部署不可直接沿用 business=true 的測試 template。若已先刪除而無法匯出該 Revision，不能偽造新證據繞過退休預檢，應由操作者另外記錄實際刪除／stable 狀態。
 4. 使用者以 DBA 在 **life_world_e2e** 執行 `90_cleanup.sql`。先提交 `lw_e2e_app NOLOGIN`／撤銷此 DB CONNECT，再終止該 login 在此 DB 的連線；確認已排空後清空 30 張業務表並重設 Identity。保留 31 張表與 migration metadata，不 DROP DB、不碰 dev。沒有終止連線權限時交 DBA，不能改用高權限 API Runtime。
 5. 要看見 `E2E_CLEANUP_PASS`、`retained_tables=31`、`runtime_login=false`、`runtime_sessions=0`。SQL 內逐表確認全部業務列數為 0。這才是清理完成證據，不能單憑移除 tag 或 HTTP passed 就宣稱資料已清乾淨。

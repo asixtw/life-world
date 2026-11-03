@@ -33,7 +33,8 @@ def audit_sql(run_id, points=1):
     """只允許 UUID hex 與正整數進入產生的固定驗證 SQL，不接收任意 SQL／識別字。"""
     if not re.fullmatch(r'[0-9a-f]{32}',run_id) or type(points) is not int or points<1:
         raise ValueError('Invalid synthetic run identifier or points')
-    return GUARD+f"""
+    # Guard、查核與 PASS 同一唯讀交易；任一檢查失敗即中止，未設 ON_ERROR_STOP 也印不出 PASS。
+    return 'BEGIN READ ONLY;\n'+GUARD+f"""
 DO $audit$
 DECLARE a text; b text;
 BEGIN
@@ -56,6 +57,7 @@ BEGIN
  END IF;
 END $audit$;
 SELECT 'E2E_DATABASE_AUDIT_PASS' AS result;
+COMMIT;
 """
 
 
