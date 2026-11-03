@@ -134,3 +134,7 @@ Build SA改為lw-build-main，部署目標改為lw-web-main，保留lw-web-runti
 ## Step 11 FastAPI／PostgreSQL 整合至 main｜2026-11-03
 
 合併 SQLite／PG18 Adapter、依賴鎖定、測試工具與非 root API 容器；API YAML 的 Build SA 改為 lw-build-main，仍只 Build／Test／Push，未加入 deploy。未來 API Trigger／Cloud Run 統一 lw-api-main、來源 ^main$；Web main 部署檔保持不變。原 dirty 工作樹保留，實際重新驗證與發布界線見 [Step 11 交接](STEP11_API_MAIN_INTEGRATION.md)。
+
+## Step 18 受控 Tagged Revision 驗收工具｜2026-11-03
+
+新增離線 plan 防護、只用既有 API 的合成 e2e、Token stdin／安全報告、唯一 canonical schema SQL 產生器、專用 life_world_e2e／lw_e2e_app 最小權限及清理腳本。保留主 Revision 100% 且業務關閉，未修改 App／Cloud Build／Dockerfile 或執行 GCP；工具及本機驗證見 [Step 18 交付](STEP18_API_E2E_ACCEPTANCE.md)。

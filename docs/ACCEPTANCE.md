@@ -92,3 +92,7 @@
 ## Step 11 API main 整合驗收｜2026-11-03
 
 由最新 main 4b920e8 建立隔離工作樹，保留 Web main 與 Step 10-4 完整工程；本輪 Windows／Linux SQLite 各 231 passed／14 skipped，PG18.6 各 245 passed；API image build、8080／8091 smoke、10,314 layer 檔掃描、3 項 API 建置契約及 9 項 Web main 契約通過。Linux PG 留有 1 個 Pydantic alias warning，未隱藏。完整命令及限制見 [Step 11 交接](STEP11_API_MAIN_INTEGRATION.md)。本輪只建立本機 commit，未發布 GitHub 或操作 GCP；lw_app 正式寫入仍待 DML 審核。
+
+## Step 18 API e2e 準備驗收｜2026-11-03
+
+本輪新工作樹實際 PG18.6＋HTTPS：49 個驗收檢查、9 個退休／main 關閉檢查，以及 SQL 持久化／最小權限／Identity／清理通過；dev 合成指紋不變。完整 SQLite／工具回歸 259 passed／14 skipped，Web 契約 9 tests OK。Google IAM／Cloud Run／Cloud SQL 真實端對端仍待使用者操作，不能用本機 HMAC 模型代替。見 [交付與證據](STEP18_API_E2E_ACCEPTANCE.md)。

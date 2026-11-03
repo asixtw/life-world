@@ -1,0 +1,83 @@
+{
+  "base_main": "5f015a616f3497a4fb948b143b09d8e625005f74",
+  "branch": "work/api-e2e-acceptance",
+  "files": [
+    {
+      "path": "README.md",
+      "change": "modified"
+    },
+    {
+      "path": "deploy/README.api-e2e.md",
+      "change": "added"
+    },
+    {
+      "path": "deploy/postgres/e2e/00_database.sql",
+      "change": "added"
+    },
+    {
+      "path": "deploy/postgres/e2e/02_grants.sql",
+      "change": "added"
+    },
+    {
+      "path": "deploy/postgres/e2e/03_verify_permissions.sql",
+      "change": "added"
+    },
+    {
+      "path": "deploy/postgres/e2e/04_dev_role_probe.sql",
+      "change": "added"
+    },
+    {
+      "path": "deploy/postgres/e2e/20_enable.sql",
+      "change": "added"
+    },
+    {
+      "path": "deploy/postgres/e2e/90_cleanup.sql",
+      "change": "added"
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "change": "modified"
+    },
+    {
+      "path": "docs/EVOLUTION.md",
+      "change": "modified"
+    },
+    {
+      "path": "docs/STEP18_API_E2E_ACCEPTANCE.md",
+      "change": "added"
+    },
+    {
+      "path": "docs/STEP18_FILE_MANIFEST.json",
+      "change": "added"
+    },
+    {
+      "path": "scripts/e2e_acceptance.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/e2e_flow.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/e2e_plan.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/e2e_safety.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/e2e_sql.py",
+      "change": "added"
+    },
+    {
+      "path": "scripts/run_e2e_local.py",
+      "change": "added"
+    },
+    {
+      "path": "tests/test_e2e_acceptance.py",
+      "change": "added"
+    }
+  ],
+  "status": "Local uncommitted delivery; no push, merge or GCP operations"
+}
