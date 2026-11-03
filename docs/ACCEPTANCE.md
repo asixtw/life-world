@@ -4,6 +4,20 @@
 
 本輪實測 **137 項後端、19 項 Chromium 全數通過，0 失敗、0 跳過**。涵蓋分步建立、月／週日期、返回草稿、到期回顧、逐筆採計、歷史與原有完整回歸；27 個既有資料表原欄位遷移前後一致。完整命令、有效紅燈、手機／桌面圖與限制見[單一目標驗收](GOAL_FLOW_ACCEPTANCE.md)。下方數字是各舊版本當時結果。2026-10-29 發布準備另行重跑的命令與結果見[v0.4 發布檢查](GITHUB_PUBLISH_V0_4.md)，不覆寫初次 TDD 證據。
 
+## Windows 環境安裝修正（2026-10-30）
+
+`greenlet` 3.2.5 沒有任何 Windows 預編譯檔，`python scripts/setup.py` 在沒有 C++ 編譯器的 Windows 會失敗。`requirements.lock` 改為 Windows 鎖 3.2.4，其他平台維持 3.2.5，保留其 Python 3.9／3.10 結束時崩潰的修正；並補鎖 Windows 專用的 `colorama` 0.4.6。`scripts/setup.py` 另增加損壞環境重建、移除鎖定外套件與 `--check` 比對。`greenlet` 僅供 Playwright 使用，App 仍為 v0.3.0。
+
+- 環境：Windows 11、Python 3.14.7、Playwright 1.60.0、greenlet 3.2.4。
+- 紅燈／綠燈：`tests/test_dependency_lock.py` 先因鎖定 `greenlet==3.2.5` 失敗，改版後通過。Codex 兩輪獨立檢驗指出解析可被行末註解、等價版本寫法及其他 Python 條件繞過，也會誤判安全寫法；補案例確認紅燈後，改以 `packaging` 依版本語意及 Python 3.9～3.14 判斷。
+- 測試規格修正：`tests/test_setup_script.py` 原有「直譯器無法啟動就重建」兩項案例已改為「暫時性失敗不得清除環境」。依據是 Codex 注入一次性 `PermissionError` 證實原行為會誤刪可用環境，且探測沒有期限；改為只依 `pyvenv.cfg` 記錄的基礎 Python 判斷損壞，不執行直譯器。
+- 安裝：全新環境執行 `python scripts/setup.py` 成功，Windows 生效的 35 項鎖定套件全數安裝，除 pip 外沒有未鎖定套件。基礎 Python 路徑失效的 `.venv`（結束碼 103）可由 `setup.py` 重建，環境完整時不重建。
+- 環境同步：`setup.py --check` 直接比對已安裝版本與鎖定檔，取代先前的安裝指紋。實測版本變更、套件遺失、移出鎖定檔的 `tomli` 都能同步；只改換行不會重裝；安裝失敗時環境維持不一致，不會誤報成功。
+- 平台：以 `pip install --dry-run --only-binary=:all:` 核對 Python 3.9／3.12／3.14 與 Windows x64／macOS arm64／Linux x86_64 的組合，均有預編譯檔；同一檢查對 3.2.5＋Windows＋Python 3.14 確實失敗。該檢查於鎖定檔分平台前執行，macOS／Linux 的 3.2.5 另由 PyPI 發行檔確認有預編譯檔。實際安裝只在 Windows 執行，macOS／Linux 未執行。Windows ARM64 沒有 3.2.4 預編譯檔。
+- 後端：`.venv\Scripts\python.exe -m pytest -q`，**125 passed**。其中 `test_migration_preserves_legacy_rows_and_rewards` 原本在繁體中文 Windows（cp950）失敗，與本次依賴無關：`tests/test_connections.py:185` 的 `read_text()` 未指定編碼，無法讀取 UTF-8 遷移檔。已改為 `encoding='utf-8'`，斷言未變更。
+- 瀏覽器：**14 passed**，由 Codex 於鎖定檔分平台後，在獨立複本以內建 Chromium 執行回報。此後 `requirements.lock` 未再變更，後續改動限 `setup.py`、測試與倉庫外的啟動檔，未重跑。此套件會覆寫 `docs/artifacts/connections` 的截圖，須在複本內執行或事後還原。
+- 未驗證：真實重新開機未執行，以停止後重新啟動代替。未建立 CI 安裝矩陣，`NO_WINDOWS_WHEELS` 只防護已知版本，不保證未來版本都有預編譯檔。網站執行中更新鎖定檔不會同步，須停止網站後重新啟動。
+
 ## v0.3.0 交會與完整體驗（2026-10-28）
 
 最新實際結果為 **100 項後端通過、14 項 Chromium 旅程通過**，含既有目標、草稿、人物及小劇場回歸，並驗證交會取代星圖後的來源、配對、返回與失敗退路。完整紅燈／綠燈、手機／桌面截圖、卡頓量測及 22 表資料升級檢查見[交會整合與體驗報告](CONNECTIONS_ACCEPTANCE.md)。下方是 v0.1／v0.2 歷史，不當成本輪結果。
@@ -69,3 +83,12 @@
 ## Web main部署設定驗收 2026 11 03
 
 本輪獨立工作樹由origin/main 0bf4ce2開工；9項部署契約、Docker內18檔55項React測試、TypeScript／Vite build、nginx -t及9項本機HTTP檢查通過。runtime為UID101，保留私人IAM原則；未執行GCP建置／Push／Deploy或雲端IAM驗證。完整命令與限制見 [Web main交接](../deploy/README.web-main.md)。
+
+
+## Step 10 4 PG18 與 API 容器驗收 2026 11 03
+
+完整本輪命令、實際通過數與限制見 [工程交接](STEP10_4_PG_API_HANDOFF.md)。新增PG18真實約束／角色／identity、兩個獨立App並行、去重與rollback；容器測試含8080／自訂PORT、health／ready、nonroot及各層秘密排除。既有SQLite歷史資料案例保留。GCP連線、Cloud Build、部署及UI瀏覽器驗收未執行，本輪結果不能作雲端部署成功證據。
+
+## Step 11 API main 整合驗收｜2026-11-03
+
+由最新 main 4b920e8 建立隔離工作樹，保留 Web main 與 Step 10-4 完整工程；本輪 Windows／Linux SQLite 各 231 passed／14 skipped，PG18.6 各 245 passed；API image build、8080／8091 smoke、10,314 layer 檔掃描、3 項 API 建置契約及 9 項 Web main 契約通過。Linux PG 留有 1 個 Pydantic alias warning，未隱藏。完整命令及限制見 [Step 11 交接](STEP11_API_MAIN_INTEGRATION.md)。本輪只建立本機 commit，未發布 GitHub 或操作 GCP；lw_app 正式寫入仍待 DML 審核。

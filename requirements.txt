@@ -4,3 +4,5 @@ python-multipart==0.0.20
 pwdlib[argon2]==0.2.1
 Pillow==11.3.0
 pydantic==2.13.5
+tzdata==2026.5
+pg8000==1.31.6

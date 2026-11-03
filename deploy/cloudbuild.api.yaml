@@ -1,0 +1,68 @@
+# 僅備妥 Build／Push；本檔不部署、不變更 IAM／Cloud SQL／Web，也不建立 Trigger。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com
+timeout: 1800s
+options:
+  logging: CLOUD_LOGGING_ONLY
+steps:
+  - id: validate-source
+    name: ubuntu:24.04
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        test "$PROJECT_ID" = "life-world-513506"
+        printf '%s\n' "$COMMIT_SHA" | grep -Eq '^[0-9a-f]{40}$$'
+        printf '%s\n' "$BUILD_ID" | grep -Eq '^[0-9a-f-]{36}$$'
+        test -f deploy/Dockerfile.api
+        mkdir -p .step10-tests
+        # 只供此 build 的合成 PG 密碼；不讀 Secret Manager 或 Cloud SQL 密碼。
+        printf 'POSTGRES_USER=lw_step10_admin\nPOSTGRES_DB=postgres\nPOSTGRES_PASSWORD=' > .step10-tests/synthetic.env
+        od -An -N24 -tx1 /dev/urandom | tr -d ' \n' >> .step10-tests/synthetic.env
+        printf '\n' >> .step10-tests/synthetic.env
+
+  - id: start-synthetic-pg18
+    name: gcr.io/cloud-builders/docker
+    args: ['run', '-d', '--rm', '--name', 'lw-pg18-tests', '--network', 'cloudbuild', '--env-file', '/workspace/.step10-tests/synthetic.env', 'postgres:18.6', '-c', 'cluster_name=lifeworld-step10-4-synthetic']
+
+  - id: sqlite-and-real-pg18-tests
+    name: python:3.12-slim
+    entrypoint: bash
+    env: ['PYTHONUTF8=1', 'LIFEWORLD_TEST_PG_HOST=lw-pg18-tests', 'LIFEWORLD_TEST_PG_PORT=5432']
+    args:
+      - -ceu
+      - |
+        python -m pip install --disable-pip-version-check -r requirements.api-test.lock
+        python -m pytest tests -q --junitxml=.step10-tests/sqlite.xml
+        export LIFEWORLD_TEST_PG_PASSWORD="$$(sed -n 's/^POSTGRES_PASSWORD=//p' .step10-tests/synthetic.env)"
+        python scripts/pg_test_bootstrap.py
+        LIFEWORLD_TEST_BACKEND=postgresql python -m pytest tests -q --junitxml=.step10-tests/postgres.xml
+
+  - id: api-image-build
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '--build-arg', 'VCS_REF=${COMMIT_SHA}', '-f', 'deploy/Dockerfile.api', '-t', 'asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID}', '.']
+
+  - id: api-container-verification
+    name: gcr.io/cloud-builders/docker
+    entrypoint: sh
+    args:
+      - -ceu
+      - |
+        # Docker builder 沒有 Python；用既有測試 Python container 執行檢查，透過 daemon socket。
+        cp "$$(command -v docker)" /workspace/.step10-tests/docker
+        docker run --rm --network cloudbuild \
+          -v /var/run/docker.sock:/var/run/docker.sock -v /workspace:/workspace -w /workspace \
+          --entrypoint python python:3.12-slim scripts/smoke_api_container.py \
+          --image asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID} \
+          --network cloudbuild --pg-host lw-pg18-tests --pg-port 5432 \
+          --password-env-file .step10-tests/synthetic.env --docker-in-container
+
+  - id: cleanup-synthetic-pg18
+    name: gcr.io/cloud-builders/docker
+    args: ['rm', '-f', '-v', 'lw-pg18-tests']
+
+  - id: api-image-push
+    name: gcr.io/cloud-builders/docker
+    args: ['push', 'asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID}']
+
+images:
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID}

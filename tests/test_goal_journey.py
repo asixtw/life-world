@@ -230,7 +230,9 @@ def test_profile_timezone_change_does_not_shift_existing_goal(app, client):  # �
     assert updated['status'] == 'awaiting_review' and updated['schedule_timezone'] == 'Asia/Taipei'  # 不延長或縮短原挑戰。
 
 
-def test_old_multi_goal_requires_explicit_cleanup(app, client):  # 舊多目標不替使用者選擇保留者。
+def test_old_multi_goal_requires_explicit_cleanup(sqlite_app, sqlite_client):  # 舊多目標不替使用者選擇保留者。
+    # 舊 SQLite 可存在重複開啟目標；PG 草案的 unique index 不允許建出此舊狀態。
+    app, client = sqlite_app, sqlite_client
     me = setup_user(client)  # 取得測試 owner。
     goal = create(client)  # 先建立合法資料。
     with app.state.service.db.connect(write=True) as c:  # 僅修改隔離測試資料庫。

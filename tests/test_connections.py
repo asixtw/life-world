@@ -182,7 +182,7 @@ def test_migration_preserves_legacy_rows_and_rewards(tmp_path):  # 遷移：v0.2
     c = sqlite3.connect(str(path))  # 建立尚無新遷移的 SQLite
     c.execute('CREATE TABLE schema_migrations (version TEXT PRIMARY KEY)')  # 建立既有版本標記
     for name in ['001_initial.sql', '002_people_360.sql']:  # 僅套用舊版結構
-        c.executescript((Path(__file__).parents[1] / 'app/migrations' / name).read_text())  # 使用原始舊遷移
+        c.executescript((Path(__file__).parents[1] / 'app/migrations' / name).read_text(encoding='utf-8'))  # 使用原始舊遷移；指定編碼以免依系統語系讀錯
         c.execute('INSERT INTO schema_migrations VALUES (?)', (name,))  # 記錄已執行版本
     c.execute("INSERT INTO users(id,status,created_at) VALUES ('u','registered','2026-01-01')")  # 建立虛構舊帳號
     c.execute("INSERT INTO drafts VALUES ('d','u',NULL,NULL,'舊原文','2026-01-01','[]','confirmed',1,'2026-01-01','2026-01-01')")  # 建立原草稿

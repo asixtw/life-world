@@ -23,3 +23,7 @@ test-results/
 *.key
 *.p12
 *.pfx
+.tools/
+.test-runs/
+.local-pg/
+.step10-tests/

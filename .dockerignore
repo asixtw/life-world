@@ -1,0 +1,22 @@
+# API build context 採 deny-all；React 用自己的 collaboration/ui-kit context。
+**
+!app/
+!app/**
+!requirements.api.lock
+!deploy/
+!deploy/Dockerfile.api
+# 最後再拒絕開發快取、資料與秘密；即使日後出現在 app/ 也不送進 context。
+**/__pycache__/**
+**/*.pyc
+**/*.sqlite*
+**/*.db
+**/.env*
+**/*service-account*.json
+**/*service_account*.json
+**/*credentials*.json
+**/*.pem
+**/*.key
+**/data/**
+**/.git/**
+**/.tools/**
+**/.venv/**

@@ -37,7 +37,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
 
     def _person_stats(self, c, owner, person_id):  # 以互動事件計數，只有實體見面計入見面次數
         row = c.execute('''SELECT COUNT(*) AS interactions,
-            COALESCE(SUM(e.kind='in_person'),0) AS meetings, MAX(e.occurred_at) AS last_interaction_at
+            COALESCE(SUM(CASE WHEN e.kind='in_person' THEN 1 ELSE 0 END),0) AS meetings, MAX(e.occurred_at) AS last_interaction_at
             FROM interaction_events e JOIN interaction_people p ON p.event_id=e.id
             WHERE e.owner_id=? AND p.person_id=?''', (owner, person_id)).fetchone()  # 查詢真實互動事件；值以參數傳入
         return dict(row)  # 回傳以互動事件計數，只有實體見面計入見面次數的結果
@@ -74,7 +74,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             return {'items': people[offset:offset + limit], 'total':len(people), 'offset':offset, 'limit':limit}  # 回傳共用人物查詢，依透明分層規則穩定排序的結果
 
     def edit_person(self, owner, person_id, data):  # 檢查版本後更新使用者明確送出的欄位
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner)  # 要求完成初始旅程且已建立本機帳號
             p = self._owned(c, 'people', person_id, owner)  # 準備目前人物的完整基本資料
             self._revision(p, data.expected_revision)  # 檢查樂觀鎖版本，避免覆蓋他人的較新修改
@@ -82,7 +82,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             for key, value in fields.items():  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 assert key in ('name', 'roles', 'tags', 'category', 'followed', 'notes', 'common_context')  # 限制動態資料表或欄位名稱為程式內白名單
                 c.execute('UPDATE people SET ' + key + '=? WHERE id=? AND owner_id=?',
-                          (js(value) if key in ('roles', 'tags') else int(value) if key == 'followed' else value, person_id, owner))  # 更新人物基本資料；值以參數傳入
+                          (js(value) if key in ('roles', 'tags') else value, person_id, owner))  # 保留原生 boolean 參數。
             if 'roles' in fields:  # 依目前條件選擇下一步處理分支
                 c.execute('UPDATE people SET role=? WHERE id=?', ('、'.join(fields['roles']), person_id))  # 更新人物基本資料；值以參數傳入
             c.execute('UPDATE people SET revision=revision+1 WHERE id=?', (person_id,))  # 更新人物基本資料；值以參數傳入
@@ -98,7 +98,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
         return [dict(r, status=self._goal_status(dict(r), self._owned_user(c, owner)), link_kind='manual' if r['label'] is not None else 'experience') for r in rows]  # 關聯目標使用同一生命週期。
 
     def link_person_goal(self, owner, person_id, data):  # 以可重送的提交建立人物與目標關聯
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner); self._owned(c, 'people', person_id, owner)  # 要求完成初始旅程且已建立本機帳號
             self._owned(c, 'goals', data.goal_id, owner)  # 限制查詢資料表並核對資源所屬帳號
             op = 'person:goal:' + person_id  # 準備分隔操作與人物的去重範圍
@@ -156,7 +156,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
         return event_id  # 回傳將經歷加入已選事件，或建立指定類型的新事件的結果
 
     def edit_interaction(self, owner, event_id, data):  # 檢查版本後重新分類互動事件
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner)  # 要求完成初始旅程且已建立本機帳號
             event = self._resource(c, 'interaction_events', owner, event_id)  # 準備目前處理的互動事件
             self._revision(event, data.expected_revision)  # 檢查樂觀鎖版本，避免覆蓋他人的較新修改
@@ -164,7 +164,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             return dict(self._resource(c, 'interaction_events', owner, event_id))  # 回傳檢查版本後重新分類互動事件的結果
 
     def merge_interactions(self, owner, event_id, data):  # 合併同一次互動，保留經歷與既有積分
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner)  # 要求完成初始旅程且已建立本機帳號
             target = self._resource(c, 'interaction_events', owner, event_id)  # 準備互動合併要保留的主要事件
             op = 'interaction:merge:' + event_id  # 準備分隔操作與人物的去重範圍
@@ -175,7 +175,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
                     422, 'invalid_merge', '請選擇不同的來源互動。')  # 驗證限制：請選擇不同的來源互動。
             for source_id in data.source_event_ids:  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 self._resource(c, 'interaction_events', owner, source_id)  # 限定人物事實與事件資料表並檢查所屬帳號
-                c.execute('INSERT OR IGNORE INTO interaction_people SELECT ?,person_id FROM interaction_people WHERE event_id=?', (event_id, source_id))  # 新增事件參與人物；值以參數傳入
+                c.execute('INSERT INTO interaction_people SELECT ?,person_id FROM interaction_people WHERE event_id=? ON CONFLICT(event_id,person_id) DO NOTHING', (event_id, source_id))  # 明確指出允許去重的唯一鍵。
                 c.execute('UPDATE interaction_experiences SET event_id=? WHERE event_id=?', (event_id, source_id))  # 更新事件與經歷關聯；值以參數傳入
                 c.execute('DELETE FROM interaction_people WHERE event_id=?', (source_id,))  # 刪除事件參與人物；值以參數傳入
                 c.execute('DELETE FROM interaction_events WHERE id=?', (source_id,))  # 刪除真實互動事件；值以參數傳入
@@ -224,7 +224,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
         return dict(self._fact(c, owner, person_id, fact_id))  # 回傳正規化同值資訊、增加來源並保留使用者指定的衝突的結果
 
     def create_fact(self, owner, person_id, data):  # 明確確認來源後新增人物資訊，支援重送去重
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner); self._owned(c, 'people', person_id, owner)  # 要求完成初始旅程且已建立本機帳號
             op = 'person:fact:' + person_id  # 準備分隔操作與人物的去重範圍
             cached, fingerprint = self._cached(c, owner, op, data.request_id, data.model_dump())  # 比較請求指紋，重送時回傳先前結果
@@ -246,7 +246,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             return {'fact':dict(fact), 'sources':self._fact_sources(c, fact_id, owner)}  # 回傳回傳指定人物資訊與有效來源經歷的結果
 
     def resolve_fact(self, owner, person_id, fact_id, data):  # 人工採用一項資訊並封存同組衝突項
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner); fact = self._fact(c, owner, person_id, fact_id)  # 要求完成初始旅程且已建立本機帳號
             self._revision(fact, data.expected_revision)  # 檢查樂觀鎖版本，避免覆蓋他人的較新修改
             require(bool(self._fact_sources(c, fact_id, owner)), 409, 'source_required', '沒有有效來源，無法採用為正式資訊。')  # 驗證限制：沒有有效來源，無法採用為正式資訊。
@@ -257,7 +257,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             return dict(self._fact(c, owner, person_id, fact_id))  # 回傳人工採用一項資訊並封存同組衝突項的結果
 
     def revoke_fact_source(self, owner, person_id, fact_id, data):  # 撤回來源；最後來源失效時將資訊改為不可用
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner); fact = self._fact(c, owner, person_id, fact_id)  # 要求完成初始旅程且已建立本機帳號
             self._revision(fact, data.expected_revision)  # 檢查樂觀鎖版本，避免覆蓋他人的較新修改
             require(c.execute('SELECT 1 FROM fact_sources WHERE fact_id=? AND experience_id=? AND revoked_at IS NULL', (fact_id, data.experience_id)).fetchone(),
@@ -268,7 +268,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             return dict(self._fact(c, owner, person_id, fact_id))  # 回傳撤回來源；最後來源失效時將資訊改為不可用的結果
 
     def create_connection(self, owner, person_id, data):  # 核對兩端人物與來源後保存明確關係
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner)  # 要求完成初始旅程且已建立本機帳號
             self._owned(c, 'people', person_id, owner); self._owned(c, 'people', data.other_person_id, owner)  # 限制查詢資料表並核對資源所屬帳號
             require(person_id != data.other_person_id, 422, 'invalid_connection', '請選擇另一位人物。')  # 驗證限制：請選擇另一位人物。
@@ -307,9 +307,9 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             tasks = [dict(r) for r in c.execute('''SELECT t.* FROM tasks t JOIN experiences x ON x.id=t.experience_id
                        WHERE t.owner_id=? AND x.person_id=? ORDER BY t.id''', (owner, person_id))]  # 查詢下一步待辦；值以參數傳入
             story_ids = c.execute('''SELECT s.experience_id FROM experience_stories s JOIN experience_participants p ON p.experience_id=s.experience_id
-                JOIN experiences x ON x.id=s.experience_id WHERE s.owner_id=? AND s.reviewed=1 AND s.available=1 AND p.person_id=? ORDER BY x.occurred_at DESC,x.id DESC LIMIT 20''', (owner, person_id)).fetchall()  # 參與故事不要求有直接互動
+                JOIN experiences x ON x.id=s.experience_id WHERE s.owner_id=? AND s.reviewed=TRUE AND s.available=TRUE AND p.person_id=? ORDER BY x.occurred_at DESC,x.id DESC LIMIT 20''', (owner, person_id)).fetchall()  # 使用兩後端皆支援的布林常值。
             mention_ids = c.execute('''SELECT DISTINCT s.experience_id,x.occurred_at FROM experience_stories s JOIN experience_mentions m ON m.experience_id=s.experience_id
-                JOIN experiences x ON x.id=s.experience_id WHERE s.owner_id=? AND s.reviewed=1 AND s.available=1 AND m.person_id=? AND m.status='matched' ORDER BY x.occurred_at DESC,s.experience_id DESC LIMIT 20''', (owner, person_id)).fetchall()  # 只將人工配對的提及列到人物卡
+                JOIN experiences x ON x.id=s.experience_id WHERE s.owner_id=? AND s.reviewed=TRUE AND s.available=TRUE AND m.person_id=? AND m.status='matched' ORDER BY x.occurred_at DESC,s.experience_id DESC LIMIT 20''', (owner, person_id)).fetchall()  # 提及仍不算直接互動。
             return {'person':person, 'stats':person['stats'], 'facts':facts, 'interactions':self._events(c, owner, person_id),
                     'goals':self._person_goals(c, owner, person_id), 'tasks':tasks, 'connections':connections,
                     'notes':self._notes(c, owner, person_id), 'fact_history':fact_history,

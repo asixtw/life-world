@@ -35,7 +35,7 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
         for p in result['participants']: p['interacted'] = bool(p['interacted'])  # 直接互動與參與分開呈現
         result['mentions'] = [dict(r) for r in c.execute('''SELECT m.*,p.name AS person_name FROM experience_mentions m
             LEFT JOIN people p ON p.id=m.person_id AND p.owner_id=m.owner_id WHERE m.experience_id=? AND m.owner_id=? ORDER BY m.start,m.id''', (experience_id, owner))]  # 每個原文位置有各自配對狀態
-        if manage: result['history'] = [dict(r) for r in c.execute('SELECT action,before_json,after_json,created_at FROM story_history WHERE owner_id=? AND experience_id=? ORDER BY rowid', (owner, experience_id))]  # 本人可追溯人工更正
+        if manage: result['history'] = [dict(r) for r in c.execute('SELECT action,before_json,after_json,created_at FROM story_history WHERE owner_id=? AND experience_id=? ORDER BY ' + self.db.audit_column('story_history'), (owner, experience_id))]  # 本人可追溯人工更正
         return result  # 原文與摘要明確分離
 
     def story_detail(self, owner, experience_id, manage=False):  # 提供 HTTP 來源讀取
@@ -47,7 +47,7 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
         with self.db.connect() as c:  # 同一快照計算總數及頁面
             self._onboarded(c, owner)  # 拒絕未完成旅程存取
             if person_id: self._owned(c, 'people', person_id, owner)  # 人物焦點也核對所屬帳號
-            clauses, args = ['s.owner_id=?', 'x.owner_id=?', 's.available=1', 's.reviewed=?'], [owner, owner, 0 if involvement == 'legacy' else 1]  # 未審閱來源只在管理清單
+            clauses, args = ['s.owner_id=?', 'x.owner_id=?', 's.available=TRUE', 's.reviewed=?'], [owner, owner, involvement != 'legacy']  # 未審閱來源只在管理清單
             if person_id:  # 依明確關聯角色分流
                 if involvement == 'legacy': clauses.append('x.person_id=?')  # 不推測舊關聯是參與
                 elif involvement == 'mention': clauses.append("EXISTS(SELECT 1 FROM experience_mentions m WHERE m.experience_id=x.id AND m.person_id=? AND m.status='matched')")  # 未配對姓名不歸到人物
@@ -64,10 +64,10 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
         self._validate_story(c, owner, raw, story)  # 先核對全部輸入才改資料
         c.execute('DELETE FROM experience_participants WHERE experience_id=?', (experience_id,))  # 更正只影響這一份來源
         c.execute('DELETE FROM experience_mentions WHERE experience_id=?', (experience_id,))  # 舊線索 ID 失效，歷史仍保留
-        c.execute('UPDATE experience_stories SET title=?,reviewed=1 WHERE experience_id=?', (story.title, experience_id))  # 只接受人工審閱的標題與角色
-        for p in story.participants: c.execute('INSERT INTO experience_participants VALUES (?,?,?)', (experience_id, p.person_id, int(p.interacted)))  # 參與本身不增加統計
+        c.execute('UPDATE experience_stories SET title=?,reviewed=TRUE WHERE experience_id=?', (story.title, experience_id))  # 只接受人工審閱的標題與角色
+        for p in story.participants: c.execute('INSERT INTO experience_participants VALUES (?,?,?)', (experience_id, p.person_id, p.interacted))  # 參與本身不增加統計
         for m in story.mentions:  # 保存未配對或使用者指定的原文身分
-            c.execute('INSERT INTO experience_mentions(id,owner_id,experience_id,name,start,end,status,person_id) VALUES (?,?,?,?,?,?,?,?)', (str(uuid4()), owner, experience_id, m.name, m.start, m.end, 'matched' if m.person_id else 'unmatched', m.person_id))  # 正式配對與原名分開
+            c.execute('INSERT INTO experience_mentions(id,owner_id,experience_id,name,"start","end",status,person_id) VALUES (?,?,?,?,?,?,?,?)', (str(uuid4()), owner, experience_id, m.name, m.start, m.end, 'matched' if m.person_id else 'unmatched', m.person_id))  # 正式配對與原名分開
 
     def _attach_story_event(self, c, owner, experience_id, story, data, occurred_at):  # 只有人工指定直接互動者才接事件統計
         ids = [p.person_id for p in story.participants if p.interacted]  # 同場但未互動者不加入
@@ -80,14 +80,14 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             require(data.interaction_type == 'unknown' or data.interaction_type == event['kind'], 409, 'interaction_conflict', '互動類型不同，請先分類後再關聯。')  # 不能無聲改類型
             require(any(c.execute('SELECT 1 FROM interaction_people WHERE event_id=? AND person_id=?', (event_id, pid)).fetchone() for pid in ids), 422, 'unrelated_interaction', '請選擇與本次人物相關的互動事件。')  # 必須有共同直接互動者
         else: c.execute('INSERT INTO interaction_events(id,owner_id,kind,occurred_at) VALUES (?,?,?,?)', (event_id, owner, data.interaction_type, occurred_at))  # 類型由使用者選擇
-        for pid in ids: c.execute('INSERT OR IGNORE INTO interaction_people VALUES (?,?)', (event_id, pid))  # 同事件不重複增加同一人物
+        for pid in ids: c.execute('INSERT INTO interaction_people VALUES (?,?) ON CONFLICT(event_id,person_id) DO NOTHING', (event_id, pid))  # 同事件不重複增加同一人物
         c.execute('INSERT INTO interaction_experiences VALUES (?,?)', (experience_id, event_id))  # 單筆來源只屬於一個事件
         return event_id  # 將原事件回執交回確認交易
 
     def _sync_story_event(self, c, experience_id):  # 人工更正後同步事件人物，仍保留舊未審閱記錄
         row = c.execute('SELECT event_id FROM interaction_experiences WHERE experience_id=?', (experience_id,)).fetchone()  # 找出受影響的已存在事件
         if not row:  # 舊無人物故事也可能由本人補確認直接互動
-            ids = c.execute('SELECT person_id FROM experience_participants WHERE experience_id=? AND interacted=1', (experience_id,)).fetchall()  # 只採明確直接互動者
+            ids = c.execute('SELECT person_id FROM experience_participants WHERE experience_id=? AND interacted=TRUE', (experience_id,)).fetchall()  # 只採明確直接互動者
             if not ids: return  # 沒有直接互動不造事件
             x = c.execute('SELECT owner_id,occurred_at FROM experiences WHERE id=?', (experience_id,)).fetchone()  # 沿用原始日期與帳號
             event_id = str(uuid4())  # 為首次確認的互動建立固定 ID
@@ -95,17 +95,15 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             c.execute('INSERT INTO interaction_experiences VALUES (?,?)', (experience_id, event_id))  # 舊原文仍保持獨立來源
         else: event_id = row[0]  # 保留已有事件的分類與識別碼
         c.execute('DELETE FROM interaction_people WHERE event_id=?', (event_id,))  # 由每份原文的直接互動者重新組合統計名單
-        c.execute('''INSERT OR IGNORE INTO interaction_people SELECT ?,p.person_id FROM experience_participants p
-            JOIN interaction_experiences l ON l.experience_id=p.experience_id WHERE l.event_id=? AND p.interacted=1''', (event_id, event_id))  # 保留其他故事的明確互動者
-        c.execute('''INSERT OR IGNORE INTO interaction_people SELECT ?,x.person_id FROM experiences x JOIN interaction_experiences l ON l.experience_id=x.id
-            JOIN experience_stories s ON s.experience_id=x.id WHERE l.event_id=? AND s.reviewed=0 AND x.person_id IS NOT NULL''', (event_id, event_id))  # 尚未人工更正的舊統計不被遷移改寫
+        c.execute('INSERT INTO interaction_people SELECT ?,p.person_id FROM experience_participants p JOIN interaction_experiences l ON l.experience_id=p.experience_id WHERE l.event_id=? AND p.interacted=TRUE ON CONFLICT(event_id,person_id) DO NOTHING', (event_id, event_id))  # 保留其他故事的明確互動者
+        c.execute('INSERT INTO interaction_people SELECT ?,x.person_id FROM experiences x JOIN interaction_experiences l ON l.experience_id=x.id JOIN experience_stories s ON s.experience_id=x.id WHERE l.event_id=? AND s.reviewed=FALSE AND x.person_id IS NOT NULL ON CONFLICT(event_id,person_id) DO NOTHING', (event_id, event_id))  # 尚未人工更正的舊統計不被遷移改寫
         c.execute('UPDATE interaction_events SET revision=revision+1 WHERE id=?', (event_id,))  # 避免與分類／合併修改互相覆蓋
 
     def _story_history(self, c, owner, experience_id, action, before, after):  # 保存人工操作來源及前後狀態
-        c.execute('INSERT INTO story_history VALUES (?,?,?,?,?,?,?)', (str(uuid4()), owner, experience_id, action, json.dumps(before, ensure_ascii=False), json.dumps(after, ensure_ascii=False), self.now().isoformat()))  # 與操作同交易保存，不改積分帳本
+        c.execute('INSERT INTO story_history(id,owner_id,experience_id,action,before_json,after_json,created_at) VALUES (?,?,?,?,?,?,?)', (str(uuid4()), owner, experience_id, action, json.dumps(before, ensure_ascii=False), json.dumps(after, ensure_ascii=False), self.now().isoformat()))  # 與操作同交易保存，不改積分帳本
 
     def edit_story_people(self, owner, experience_id, data):  # 人工確認舊故事或更正角色
-        with self.db.connect(write=True) as c:  # 全部角色、版本與歷史原子提交
+        with self.db.connect(write=True, owner=owner) as c:  # 全部角色、版本與歷史原子提交
             self._people_user(c, owner)  # 人物寫入須正式帳號
             before = self._story_detail(c, owner, experience_id, True)  # 本人可修正待核對來源
             op = 'story:people:' + experience_id  # 去重範圍限定來源
@@ -121,7 +119,7 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             return after  # 不呼叫獎勵或貢獻服務
 
     def match_mention(self, owner, mention_id, data):  # 人工核對原文所指身分
-        with self.db.connect(write=True) as c:  # 版本、配對與歷史一致提交
+        with self.db.connect(write=True, owner=owner) as c:  # 版本、配對與歷史一致提交
             self._people_user(c, owner)  # 限制正式人物操作
             row = c.execute('SELECT * FROM experience_mentions WHERE id=? AND owner_id=?', (mention_id, owner)).fetchone()  # 不洩露別人線索
             require(row is not None, 404, 'not_found', '找不到這處人物提及，請重新載入來源。')  # 舊線索失效須重讀
@@ -140,14 +138,14 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             return after  # 提及不發積分、不算見面
 
     def story_availability(self, owner, experience_id, data):  # 撤回派生探索來源，原經歷仍可讀
-        with self.db.connect(write=True) as c:  # 展示狀態與歷史同交易
+        with self.db.connect(write=True, owner=owner) as c:  # 展示狀態與歷史同交易
             self._people_user(c, owner)  # 本人正式帳號可管理故事
             before = self._story_row(c, owner, experience_id, True)  # 已撤回資料仍可恢復
             op = 'story:available:' + experience_id  # 限制來源範圍的去重 key
             cached, fingerprint = self._cached(c, owner, op, data.request_id, data.model_dump())  # 重試不反覆修改
             if cached: return cached  # 回原回執
             self._revision(before, data.expected_revision)  # 避免覆寫較新角色／配對
-            c.execute('UPDATE experience_stories SET available=?,revision=revision+1 WHERE experience_id=?', (int(data.available), experience_id))  # 不刪原文與獎勵
+            c.execute('UPDATE experience_stories SET available=?,revision=revision+1 WHERE experience_id=?', (data.available, experience_id))  # 不刪原文與獎勵
             self._story_history(c, owner, experience_id, 'availability', {'available': bool(before['available'])}, {'available': data.available})  # 清楚記錄撤回與恢復
             after = self._story_detail(c, owner, experience_id, True)  # 回傳本人可管理狀態
             self._remember(c, owner, op, data.request_id, fingerprint, after)  # 保存成功結果

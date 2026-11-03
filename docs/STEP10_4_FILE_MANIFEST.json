@@ -1,0 +1,233 @@
+{
+  "base_commit": "7fbe00ba0a992cfb1403f698442936002d902c69",
+  "branch": "work/step10-4-pg-api",
+  "committed": false,
+  "original_workspace_untouched": true,
+  "files": [
+    {
+      "path": ".gitignore",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "README.md",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "app/connections.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/db.py",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "app/goals.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/main.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/people.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/service.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "docs/EVOLUTION.md",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "pyproject.toml",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "requirements.lock",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "requirements.txt",
+      "git_status": "M",
+      "origin": "inherited_plus_step10_4"
+    },
+    {
+      "path": "scripts/export_openapi.py",
+      "git_status": "M",
+      "origin": "inherited_only"
+    },
+    {
+      "path": "scripts/setup.py",
+      "git_status": "M",
+      "origin": "inherited_only"
+    },
+    {
+      "path": "tests/conftest.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_connections.py",
+      "git_status": "M",
+      "origin": "inherited_only"
+    },
+    {
+      "path": "tests/test_evidence_notes.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_goal_journey.py",
+      "git_status": "M",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_people.py",
+      "git_status": "M",
+      "origin": "inherited_only"
+    },
+    {
+      "path": ".dockerignore",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/postgres.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/runtime.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "app/serve.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "deploy/Dockerfile.api",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "deploy/cloudbuild.api.yaml",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "deploy/postgres/app_dml_grants.review.sql",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "docs/STEP10_4_FILE_MANIFEST.json",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "docs/STEP10_4_PG_API_HANDOFF.md",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "docs/database/APP_DML_REVIEW_STEP10_4.md",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "requirements.api-test.in",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "requirements.api-test.lock",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "requirements.api.in",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "requirements.api.lock",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "scripts/pg_test_bootstrap.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "scripts/run_postgres_tests.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "scripts/smoke_api_container.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/pg_support.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_api_build_config.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_api_runtime.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_container_safety.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_dependency_lock.py",
+      "git_status": "??",
+      "origin": "inherited_only"
+    },
+    {
+      "path": "tests/test_postgres_adapter.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_postgres_integration.py",
+      "git_status": "??",
+      "origin": "step10_4"
+    },
+    {
+      "path": "tests/test_setup_script.py",
+      "git_status": "??",
+      "origin": "inherited_only"
+    }
+  ]
+}

@@ -83,7 +83,12 @@ def test_data_survives_new_app_instance(app, client, tmp_path):  # 驗證：重�
     _, goal = onboard(client); d = draft(client, goal)  # 完成訪客、Bio 與第一目標的測試前置流程
     client.post('/api/drafts/' + d['id'] + '/confirm', json=confirm_payload(d))  # 透過實際測試用戶端操作 API 並保留回應
     register(client)  # 升級測試帳號並更新 CSRF 標頭
-    with TestClient(create_app(data_dir=tmp_path, policy=app.state.service.policy, clock=app.state.service.clock)) as restarted:  # 以區塊生命週期確保資源在結束時關閉
+    # 重啟必須沿用同一 backend；PG 不可藉建立空 SQLite 假裝驗證持久性。
+    database = None
+    if app.state.service.db.backend == 'postgresql':
+        from app.postgres import PostgresDatabase
+        database = PostgresDatabase(app.state.service.db.settings)
+    with TestClient(create_app(data_dir=tmp_path, database=database, policy=app.state.service.policy, clock=app.state.service.clock)) as restarted:  # 以區塊生命週期確保資源在結束時關閉
         assert restarted.post('/api/auth/login', json={'username': 'lumi_user', 'password': 'a-good-password-2026'}).status_code == 200  # 核對 HTTP 狀態，避免失敗請求被當成成功
         state = restarted.get('/api/state').json()  # 透過實際測試用戶端操作 API 並保留回應
         assert state['rewards']['total'] == 3  # 核對積分帳本符合本案例預期

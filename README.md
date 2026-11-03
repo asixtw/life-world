@@ -1,5 +1,9 @@
 # Life World · Python 本機 App
 
+> **2026-11-03 Step 11：** [API main 整合與重新驗證](docs/STEP11_API_MAIN_INTEGRATION.md)、[API main 建置／Console 交接](deploy/README.api-main.md)。保留 SQLite 與 PG18；API YAML 只 Build／Test／Push，沒有自動部署，雲端 lw_app 寫入仍待 DML 審核。
+
+> **2026-11-03 Step 10-4 本機工程：** [PG18 Adapter、API Container 與 GCP 設定交接](docs/STEP10_4_PG_API_HANDOFF.md)。原 SQLite 模式保留；新 PG18 模式在獨立合成容器驗證，API 的 GCP 連線與部署尚未執行。API 建置使用 `deploy/cloudbuild.api.yaml`，不影響 React Web。
+
 > **2026-11-02 後續審查：**[原型修正、Table Schema 與驗收界線](docs/RELEASE_REVIEW_2026-11-02.md)。SQLite 結構已獨立核對；PG／劇場新表僅草案，沒有套用實際資料庫。正式 App 與獨立 Prototype 的狀態請分別查看。
 
 > **2026-11-01 審查快照：**請先讀[目前版本與已知問題](docs/REVIEW_CURRENT_2026-11-01.md)，內含 App／原型差異、啟動方式、審查重點及本次測試。此分支供同仁檢查，尚未合併 main 或部署。
@@ -10,7 +14,7 @@
 
 開發入口：[共同產品研發指引](docs/PRODUCT_GUIDE.md)、[Codex 專案規則](AGENTS.md)、[App 與原型功能演進](docs/EVOLUTION.md)。App 目前為 v0.4.0；交會已取代星圖，接入真實經歷、來源與人工人物配對。原 Connections v0.3 設計原型另外保留。
 
-團隊先讀[共同規格入口](docs/SPEC_INDEX.md)、[檔案／素材存放規則](docs/STORAGE_RULES.md)、[分支與審查規則](CONTRIBUTING.md)，再到[三人協作入口](docs/team/README.md)領取任務與完整指令。共同起點以本次發布的 Git commit 為準；本機快照保留作歷史備份。React＋TypeScript／PostgreSQL／GCP 為暫定目標，尚未遷移；AI 供應商未定。文件發布不提升 App 版本，v0.4 候選的測試與待發範圍見[發布檢查](docs/GITHUB_PUBLISH_V0_4.md)；[v0.3 發布紀錄](docs/GITHUB_PUBLISH.md)保留為歷史。
+團隊先讀[共同規格入口](docs/SPEC_INDEX.md)、[檔案／素材存放規則](docs/STORAGE_RULES.md)、[分支與審查規則](CONTRIBUTING.md)，再到[三人協作入口](docs/team/README.md)領取任務與完整指令。共同起點以本次發布的 Git commit 為準；本機快照保留作歷史備份。PostgreSQL 已新增本機 PG18 Adapter；React Web main 已依使用者回報部署；API 的 GCP 建置、連線與部署仍待驗收；AI 供應商未定。文件發布不提升 App 版本，v0.4 候選的測試與待發範圍見[發布檢查](docs/GITHUB_PUBLISH_V0_4.md)；[v0.3 發布紀錄](docs/GITHUB_PUBLISH.md)保留為歷史。
 
 **具名分工：Boyi（產品／體驗）、Jerry／jerry（全端整合／審查）、歐桑（資料庫／Pro 協作及製作）。**歐桑從[任務總入口](docs/team/PROMPT_OUSANG_START.md)讀取[完整規格 v1.1](docs/team/ART_DELIVERY_SPEC.md)及[三組十五位／可玩模組](docs/team/PROMPT_SIMULATION_001.md)。原十三類加音效第十四類，按 P0 操作核心、P1 房間／角色／美術／動效、P2 音效分批製作／審查，最後整包交齊。Boyi 已確認本機修訂；新版尚未公告／發布或完成工程驗收，既有候選先核對沿用與缺口。十五位／三封面維持 demo，封測入口與正式版保留待評估。
 
@@ -38,7 +42,7 @@ python3 scripts/setup.py
 .venv/bin/python -m app
 ```
 
-目前支援 Python 3.9 以上；新環境建議使用仍受維護的 Python 版本。`setup.py` 會在專案內建立 `.venv` 並安裝鎖定的依賴，需要下載套件。
+目前支援 Python 3.9 以上；新環境建議使用仍受維護的 Python 版本。`setup.py` 會在專案內建立 `.venv` 並安裝鎖定的依賴，需要下載套件；環境讓 `requirements.lock` 成為唯一來源，基礎 Python 被移除時會重建 `.venv`，不在鎖定檔內的套件也會被移除，手動裝進 `.venv` 的套件不會保留。可用 `python scripts/setup.py --check`（以 `.venv` 的 Python 執行）確認環境與鎖定一致。
 
 另選埠號或資料位置：
 

@@ -1,6 +1,6 @@
 # Life World｜App 與原型功能演進
 
-建立／最後更新：2026-10-28（Asia/Taipei）。維護原則見[共同研發指引](PRODUCT_GUIDE.md)。這是功能演進的完整紀錄入口；[ROADMAP](ROADMAP.md)保存後續工作，驗收證據仍保留於原文件。
+建立／最後更新：2026-11-03（Asia/Taipei）。維護原則見[共同研發指引](PRODUCT_GUIDE.md)。這是功能演進的完整紀錄入口；[ROADMAP](ROADMAP.md)保存後續工作，驗收證據仍保留於原文件。
 
 ## 版本與證據如何閱讀
 
@@ -13,6 +13,11 @@
 App 與原型各自編號。v0.1／v0.2 下方保留歷史結果；v0.3.0 的 100／14 是本輪實際執行，不混用先前測試。
 
 ## App 演進
+
+### 環境修正｜Windows 可直接安裝鎖定依賴
+
+- 日期：2026-10-30。`greenlet` 3.2.5 沒有 Windows 預編譯檔，使 `scripts/setup.py` 在沒有 C++ 編譯器的 Windows 失敗；`requirements.lock` 改為 Windows 鎖 3.2.4，其他平台維持 3.2.5，並補鎖 Windows 專用的 `colorama`。
+- `scripts/setup.py` 現在讓環境與鎖定檔一致：基礎 Python 被移除時重建 `.venv`，移除鎖定外的套件，並提供 `--check` 比對實際安裝內容。損壞判定只看檔案結構，暫時性錯誤不會清除環境。新增 `tests/test_dependency_lock.py`、`tests/test_setup_script.py`。App 功能、資料與 API 未變，仍為 v0.3.0；驗證結果與已知限制見[驗收紀錄](ACCEPTANCE.md)。
 
 ### 具名正式任務｜歐桑模擬人物與完整 UI／美術交付指令
 
@@ -120,3 +125,12 @@ App 與原型各自編號。v0.1／v0.2 下方保留歷史結果；v0.3.0 的 10
 ## Web部署來源與名稱統一main 2026 11 03
 
 Build SA改為lw-build-main，部署目標改為lw-web-main，保留lw-web-runtime、lw-containers、唯一tag及digest部署；step、environment label與映像title同步main。現行部署README改名並更新入口，歷史驗證保留。僅本機設定與驗證，不改PG／FastAPI工程，不刪舊服務／分支，未操作GCP。見 [Web main交接](../deploy/README.web-main.md)。
+
+
+## Step 10 4 原 FastAPI 新增 PG18 模式 2026 11 03
+
+原本業務模組共用 SQLite／PostgreSQL DB介面；新增明確backend、pg8000／Private IP Connector準備、有界pool、owner交易鎖、型別與audit_seq邊界，沒有縮減API。新增非root API Dockerfile及只Build／Push的Cloud Build設定，Cloud Run業務預設關閉。權限審查SQL僅在本機合成PG執行，原工作樹／Web設定保留。實際驗證與未完成事項見 [工程交接](STEP10_4_PG_API_HANDOFF.md)。
+
+## Step 11 FastAPI／PostgreSQL 整合至 main｜2026-11-03
+
+合併 SQLite／PG18 Adapter、依賴鎖定、測試工具與非 root API 容器；API YAML 的 Build SA 改為 lw-build-main，仍只 Build／Test／Push，未加入 deploy。未來 API Trigger／Cloud Run 統一 lw-api-main、來源 ^main$；Web main 部署檔保持不變。原 dirty 工作樹保留，實際重新驗證與發布界線見 [Step 11 交接](STEP11_API_MAIN_INTEGRATION.md)。

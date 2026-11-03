@@ -10,5 +10,5 @@ from app.main import create_app  # 使用正式 App 工廠建立服務或測試�
 if __name__ == '__main__':  # 只在直接執行此檔時啟動工具
     with TemporaryDirectory() as directory:  # 以區塊生命週期確保資源在結束時關閉
         schema = create_app(data_dir=directory).openapi()  # 準備由實際 App 匯出的 OpenAPI 規格
-    (ROOT / 'docs' / 'openapi.json').write_text(json.dumps(schema, ensure_ascii=False, indent=2) + '\n')  # 將工具產生的內容寫入指定文字檔
+    (ROOT / 'docs' / 'openapi.json').write_text(json.dumps(schema, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')  # 將工具產生的內容寫入指定文字檔
     print('Exported docs/openapi.json')  # 輸出此工具的執行結果

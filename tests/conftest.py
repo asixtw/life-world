@@ -1,6 +1,7 @@
 from datetime import datetime, timezone  # 處理 UTC、發生時間與期限
 
 import pytest  # 使用測試資源、參數化及例外斷言
+import os
 from fastapi.testclient import TestClient  # 載入此模組需要的相依工具
 
 from app.main import create_app  # 使用正式 App 工廠建立服務或測試實例
@@ -9,7 +10,11 @@ from app.config import DemoPolicy  # 載入本機開發設定
 
 @pytest.fixture  # 註冊可由 pytest 注入並清理的測試資源
 def app(tmp_path):  # 建立使用暫存資料庫與固定時鐘的測試 App
-    return create_app(data_dir=tmp_path, policy=DemoPolicy(points_per_experience=3, max_upload_bytes=4096),
+    database = None
+    if os.environ.get('LIFEWORLD_TEST_BACKEND') == 'postgresql':
+        from pg_support import database as pg_database
+        database = pg_database()
+    return create_app(data_dir=tmp_path, database=database, policy=DemoPolicy(points_per_experience=3, max_upload_bytes=4096),
                       clock=lambda: datetime(2026, 10, 27, 7, 0, tzinfo=timezone.utc))  # 回傳後續測試步驟所需資料
 
 
@@ -17,6 +22,19 @@ def app(tmp_path):  # 建立使用暫存資料庫與固定時鐘的測試 App
 def client(app):  # 提供自動關閉的 FastAPI 測試用戶端
     with TestClient(app) as client:  # 以區塊生命週期確保資源在結束時關閉
         yield client  # 提供區塊或測試使用的資源，之後繼續清理
+
+
+@pytest.fixture
+def sqlite_app(tmp_path):
+    """專門重現 SQLite 歷史上可存在、PG 約束已禁止的舊資料狀態。"""
+    return create_app(data_dir=tmp_path, policy=DemoPolicy(points_per_experience=3, max_upload_bytes=4096),
+                      clock=lambda: datetime(2026,10,27,7,0,tzinfo=timezone.utc))
+
+
+@pytest.fixture
+def sqlite_client(sqlite_app):
+    with TestClient(sqlite_app) as client:
+        yield client
 
 
 def guest(client):  # 取得既有訪客身分或建立新的訪客世界
