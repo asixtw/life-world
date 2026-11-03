@@ -36,7 +36,7 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
         require(len(weekdays) == len(set(weekdays)) and all(0 <= day <= 6 for day in weekdays), 422, 'invalid_weekdays', '星期必須是不重複的 0 至 6。')  # 回顧沿用同樣限制。
 
     def create_goal(self, owner, data):  # 同一交易保證只啟動一個目標。
-        with self.db.connect(write=True) as c:  # 寫鎖序列化兩個視窗的競爭。
+        with self.db.connect(write=True, owner=owner) as c:  # 寫鎖序列化兩個視窗的競爭。
             user = self._owned_user(c, owner)  # 核對原帳號。
             require(bool(user['bio'] and user['name']), 409, 'bio_required', '請先完成 Bio。')  # 保留首次引導限制。
             cached, fingerprint = self._cached(c, owner, 'goal:create', data.request_id, data.model_dump(mode='json'))  # 先處理重試，再檢查單一名額。
@@ -49,7 +49,7 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
             c.execute("INSERT INTO goals(id,owner_id,title,outcome,status,created_at,start_date,deadline,schedule_timezone) VALUES (?,?,?,?,'active',?,?,?,?)", (goal_id, owner, data.title, data.outcome, now, start.isoformat(), data.deadline.isoformat(), user['timezone']))  # 保存明確期限與固定時區。
             for position, action in enumerate(data.actions):  # 固定三個習慣，保留顯示順序。
                 target = action.target or format_decimal(Decimal(action.per_occurrence) * len(action.dates))  # 新習慣依每次量推算安排總量。
-                c.execute('INSERT INTO actions(id,goal_id,owner_id,title,unit,target,level,weekdays,position,per_occurrence,schedule_dates,cycle,target_is_derived) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', (str(uuid4()), goal_id, owner, action.title, action.unit, target, action.level, encoded(action.weekdays), position, action.per_occurrence, encoded(sorted(day.isoformat() for day in action.dates)), action.cycle, int(action.target is None)))  # 不將安排寫入貢獻或帳本。
+                c.execute('INSERT INTO actions(id,goal_id,owner_id,title,unit,target,level,weekdays,position,per_occurrence,schedule_dates,cycle,target_is_derived) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', (str(uuid4()), goal_id, owner, action.title, action.unit, target, action.level, encoded(action.weekdays), position, action.per_occurrence, encoded(sorted(day.isoformat() for day in action.dates)), action.cycle, (action.target is None)))  # 不將安排寫入貢獻或帳本。
             c.execute('INSERT INTO habit_quantity_versions(action_id,effective_from,quantity,created_at) SELECT id,?,per_occurrence,? FROM actions WHERE goal_id=?', (start.isoformat(), now, goal_id))
             c.execute('UPDATE users SET hatched_at=COALESCE(hatched_at,?) WHERE id=?', (now, owner))  # 只有第一個成功目標孵化 Lumi。
             result = self._goal(c, goal_id, owner)  # 組合已提交內容。
@@ -66,7 +66,7 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
             action['quantity_versions'] = [dict(row) for row in c.execute('SELECT effective_from,quantity,created_at FROM habit_quantity_versions WHERE action_id=? ORDER BY effective_from', (action['id'],))]
             action['per_occurrence'] = planned_quantity(action['quantity_versions'], goal['today'])
         goal['pending_contributions'] = [dict(row) for row in c.execute('SELECT p.*,e.occurred_at,e.summary,a.title,a.unit FROM pending_contributions p JOIN experiences e ON e.id=p.experience_id JOIN actions a ON a.id=p.action_id WHERE p.owner_id=? AND p.goal_id=? ORDER BY e.occurred_at,p.id', (owner, goal_id))]  # 保留支持採計的真實來源。
-        goal['reviews'] = [dict(row) for row in c.execute('SELECT id,decision,reflection,created_at,previous_state,new_state FROM goal_reviews WHERE owner_id=? AND goal_id=? ORDER BY created_at,rowid', (owner, goal_id))]  # 回顧歷史可追溯。
+        goal['reviews'] = [dict(row) for row in c.execute('SELECT id,decision,reflection,created_at,previous_state,new_state FROM goal_reviews WHERE owner_id=? AND goal_id=? ORDER BY created_at,' + self.db.audit_column('goal_reviews'), (owner, goal_id))]  # PG 以 identity 取代 rowid。
         goal['allowed_actions'] = ['record', 'complete', 'end', 'schedule'] if goal['status'] == 'active' else ['record', 'complete', 'extend', 'end'] if goal['status'] == 'awaiting_review' else ['setup', 'complete', 'end'] if goal['status'] == 'needs_setup' else []  # 前後端使用同一行為來源。
         return goal  # 不因讀取而改狀態或資料。
 
@@ -108,7 +108,7 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
         c.execute('UPDATE goals SET revision=revision+1 WHERE id=? AND owner_id=?', (goal_id, owner))  # 防止回顧頁忽略新保存資料。
 
     def review_goal(self, owner, goal_id, data):  # 設定舊目標、調整安排、延長或結束。
-        with self.db.connect(write=True) as c:  # 與版本、歷史及去重一起提交。
+        with self.db.connect(write=True, owner=owner) as c:  # 與版本、歷史及去重一起提交。
             goal = self._goal(c, goal_id, owner)  # 先核對所有權，避免透露他人資源。
             user = self._onboarded(c, owner)  # 再核對自身引導狀態。
             payload = dict(data.model_dump(mode='json'), goal_id=goal_id)  # 去重包含完整選擇。
@@ -158,13 +158,13 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
                 c.execute('UPDATE goals SET start_date=?,deadline=?,schedule_timezone=COALESCE(schedule_timezone,?),revision=revision+1 WHERE id=? AND owner_id=?', (start.isoformat(), deadline.isoformat(), user['timezone'], goal_id, owner))  # 新期限與三安排一起提交。
             updated = self._goal(c, goal_id, owner)  # 取得新生命週期與版本。
             snapshot = lambda value: {key: value[key] for key in ('id', 'status', 'start_date', 'deadline', 'schedule_timezone', 'revision', 'ended_at', 'end_reason', 'actions')}  # 不把過往回顧遞迴包入新快照。
-            c.execute('INSERT INTO goal_reviews VALUES (?,?,?,?,?,?,?,?)', (str(uuid4()), owner, goal_id, data.decision, encoded(snapshot(goal)), encoded(snapshot(updated)), data.reflection, now))  # 僅保存本次相關前後狀態。
+            c.execute('INSERT INTO goal_reviews(id,owner_id,goal_id,decision,previous_state,new_state,reflection,created_at) VALUES (?,?,?,?,?,?,?,?)', (str(uuid4()), owner, goal_id, data.decision, encoded(snapshot(goal)), encoded(snapshot(updated)), data.reflection, now))  # 不寫 PG identity；保持原快照欄位。
             result = self._goal(c, goal_id, owner)  # 包含本次回顧紀錄。
             self._remember(c, owner, operation, data.request_id, fingerprint, result)  # 回顧重試不重複。
             return result  # 回傳新版本。
 
     def accept_pending(self, owner, goal_id, pending_id, data):  # 延長後逐筆人工採計，不重新確認經歷。
-        with self.db.connect(write=True) as c:  # 同時處理採計、版本與去重。
+        with self.db.connect(write=True, owner=owner) as c:  # 同時處理採計、版本與去重。
             user = self._onboarded(c, owner)  # 核對帳號。
             goal = self._goal(c, goal_id, owner)  # 核對目標歸屬。
             pending = c.execute('SELECT p.*,e.occurred_at FROM pending_contributions p JOIN experiences e ON e.id=p.experience_id WHERE p.id=? AND p.goal_id=? AND p.owner_id=?', (pending_id, goal_id, owner)).fetchone()  # 不允許跨目標或跨帳號。

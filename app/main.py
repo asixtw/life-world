@@ -1,6 +1,9 @@
 """HTTP adapter; domain writes live in service.py, not in browser storage."""  # 說明此模組的責任與實作邊界
 from pathlib import Path  # 以跨平台方式組合檔案路徑
 from datetime import date  # 解析日曆查詢的實際日期。
+from contextlib import asynccontextmanager
+from dataclasses import replace
+from threading import Lock
 import logging  # 記錄服務錯誤類型而不輸出敏感本文
 import os  # 讀取資料目錄或測試網址等環境設定
 from typing import Literal, Optional  # 宣告可選欄位、清單與受限字串型別
@@ -15,6 +18,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware  # 限制此�
 
 from .config import DemoPolicy  # 載入本機開發設定
 from .db import Database  # 載入 SQLite 交易與遷移管理器
+from .runtime import RuntimeSettings
 from .errors import DomainError  # 共用領域錯誤與條件檢查
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
@@ -23,15 +27,37 @@ from . import media
 logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的紀錄器
 
 
-def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務與靜態頁面入口
-    policy = policy or DemoPolicy()  # 準備本機開發設定
+def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None):  # PG factory 不執行 DDL
+    settings = settings or getattr(database, 'settings', None) or RuntimeSettings.from_env()
+    policy = policy or DemoPolicy()
+    if settings.secure_cookies:
+        policy = replace(policy, secure_cookies=True)
     data_dir = data_dir or os.environ.get('LIFEWORLD_DATA_DIR') or Path(__file__).resolve().parent.parent / 'data'  # 準備本次 App 使用的資料目錄
-    service = LifeWorld(Database(data_dir), policy, clock)  # 準備負責交易與領域規則的服務物件
-    app = FastAPI(title='Life World Local API', version='0.4.0', description='本機開發版；開發設定不是正式產品規則。')  # 單一挑戰與人工回顧的增量版本
+    if database is None and settings.backend == 'postgresql':
+        from .postgres import PostgresDatabase
+        database = PostgresDatabase(settings)
+    service = LifeWorld(database or Database(data_dir), policy, clock)
+    lifespan_lock, active_lifespans = Lock(), 0
+
+    @asynccontextmanager
+    async def lifespan(app):
+        nonlocal active_lifespans
+        with lifespan_lock:
+            active_lifespans += 1
+        try:
+            yield
+        finally:
+            with lifespan_lock:
+                active_lifespans -= 1
+                if active_lifespans == 0:
+                    service.db.close()
+
+    app = FastAPI(title='Life World Local API', version='0.4.0', description='本機開發版；開發設定不是正式產品規則。', lifespan=lifespan)
+    app.state.settings = settings
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
     app.add_middleware(media.MediaBodyLimit, max_bytes=policy.max_upload_bytes + 65536)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver', '[::1]'])  # 執行此模組的共用工具操作
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts))
 
     @app.exception_handler(DomainError)  # 註冊此 HTTP 路由、例外處理器或中介層
     async def domain_error(request, exc):  # 將領域錯誤轉成一致的 HTTP 回應
@@ -50,6 +76,9 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
 
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
+        # 未核准的 Cloud Run revision 只供健康／連線驗證，不接業務讀寫。
+        if not settings.business_enabled and request.url.path not in ('/health', '/ready', '/api/health'):
+            return JSONResponse({'error': {'code': 'business_api_disabled', 'message': '此服務尚未開放業務操作。'}}, status_code=503)
         if request.url.path == '/api/media/recognize':
             # 在 multipart 解析前限制一般已知長度請求，路由內另有串流讀取上限。
             length = request.headers.get('content-length', '')
@@ -57,7 +86,7 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
                 return JSONResponse({'error': {'code': 'upload_too_large', 'message': '素材超過目前本機傳輸上限。'}}, status_code=413)
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):  # 依目前條件選擇下一步處理分支
             origin = request.headers.get('origin')  # 保存「origin」供後續驗證或回傳使用
-            expected = str(request.base_url).rstrip('/')  # 保存「expected」供後續驗證或回傳使用
+            expected = settings.external_origin or str(request.base_url).rstrip('/')
             if origin and origin != expected:  # 依目前條件選擇下一步處理分支
                 return JSONResponse({'error': {'code': 'origin_rejected', 'message': '不允許跨來源寫入。'}}, status_code=403)  # 回傳檢查寫入來源並加入安全與快取標頭的結果
         response = await call_next(request)  # 保存「response」供後續驗證或回傳使用
@@ -106,7 +135,20 @@ def create_app(data_dir=None, policy=None, clock=None):  # 建立 API、服務�
 
     @app.get('/api/health', tags=['System'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def health():  # 回報本機服務的健康狀態
-        return {'status': 'ok', 'mode': 'local-development'}  # 回傳回報本機服務的健康狀態的結果
+        return {'status': 'ok', 'mode': 'cloud-preparation' if settings.cloud_run else 'local-development'}
+
+    @app.get('/health', tags=['System'])
+    def process_health():
+        return {'status': 'ok'}
+
+    @app.get('/ready', tags=['System'])
+    def readiness():
+        try:
+            service.db.check_ready()
+        except Exception as exc:
+            logger.warning('Readiness failed (%s)', type(exc).__name__)
+            return JSONResponse({'status': 'unavailable'}, status_code=503, headers={'Cache-Control': 'no-store'})
+        return JSONResponse({'status': 'ready'}, headers={'Cache-Control': 'no-store'})
 
     @app.post('/api/auth/guest', tags=['Identity'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def guest(request: Request, response: Response):  # 取得既有訪客身分或建立新的訪客世界

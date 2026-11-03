@@ -245,7 +245,7 @@ def test_upgrade_migrates_legacy_without_inventing_facts_or_changing_rewards(tmp
     from app.main import create_app  # 使用正式 App 工廠建立服務或測試實例
     db = tmp_path / 'lifeworld.sqlite3'  # 保存「db」供後續驗證或回傳使用
     with sqlite3.connect(db) as c:  # 以區塊生命週期確保資源在結束時關閉
-        c.executescript((Path('app/migrations/001_initial.sql')).read_text())  # 執行目前交易中的參數化查詢
+        c.executescript((Path('app/migrations/001_initial.sql')).read_text(encoding='utf-8'))  # 執行目前交易中的參數化查詢
         c.execute('CREATE TABLE schema_migrations(version TEXT PRIMARY KEY)')  # 定義已套用遷移版本
         c.execute("INSERT INTO schema_migrations VALUES ('001_initial.sql')")  # 新增已套用遷移版本
         c.execute("INSERT INTO users(id,status,name,bio,created_at,hatched_at) VALUES ('u','registered','u','bio','2026-01-01','2026-01-01')")  # 新增帳號與個人介紹

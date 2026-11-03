@@ -1,4 +1,4 @@
-"""Domain operations. Every confirmation is one SQLite transaction."""  # 說明此模組的責任與實作邊界
+"""領域操作；每次人工確認在所選 backend 的單一交易內提交。"""  # 說明此模組的責任與實作邊界
 from datetime import datetime, timedelta, timezone  # 處理 UTC、發生時間與期限
 from decimal import Decimal  # 以精確十進位處理貢獻量，避免浮點誤差
 from io import BytesIO  # 將圖片內容包裝成記憶體檔案
@@ -8,7 +8,6 @@ from zoneinfo import ZoneInfo  # 使用 IANA 時區轉換日期與時間
 import hashlib  # 計算工作階段、圖片或請求內容的雜湊
 import json  # 序列化資料與還原資料庫中的清單
 import secrets  # 產生隨機驗證代碼並進行固定時間比較
-import sqlite3  # 讀寫 SQLite、執行遷移與一致性備份
 import warnings  # 將過大圖片的解壓縮警告改為拒絕
 
 from PIL import Image, UnidentifiedImageError  # 解析並驗證實際圖片內容
@@ -76,14 +75,14 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             return self.public_user(user, csrf), token, True  # 回傳取得既有訪客身分或建立新的訪客世界的結果
 
     def profile(self, owner, data):  # 保存個人介紹與時區
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             c.execute('UPDATE users SET name=?,bio=?,timezone=? WHERE id=?', (data.name, data.bio, data.timezone, owner))  # 更新帳號與個人介紹；值以參數傳入
             return self.public_user(c.execute('SELECT * FROM users WHERE id=?', (owner,)).fetchone())  # 執行目前交易中的參數化查詢
 
     def claim(self, user, data):  # 將原訪客世界升級為本機帳號並輪換工作階段
         require(user['status'] == 'guest', 409, 'already_registered', '目前已是本機帳號。')  # 驗證限制：目前已是本機帳號。
         password_hash = PASSWORDS.hash(data.password)  # 以密碼雜湊保存認證資料，不儲存明文
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=user['id']) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             current = self._owned_user(c, user['id'])  # 準備交易內重新讀取的帳號狀態
             require(current['status'] == 'guest', 409, 'already_registered', '帳號狀態已變更，請重新整理。')  # 驗證限制：帳號狀態已變更，請重新整理。
             require(not c.execute('SELECT 1 FROM users WHERE username=?', (data.username,)).fetchone(),
@@ -178,7 +177,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
 
     def create_draft(self, owner, data):  # 保存尚未確認、不計分的原始經歷草稿
         self._valid_time(data.occurred_at)  # 拒絕尚未發生的真實經歷
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             self._related(c, user, data.goal_id, data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
             draft_id, now = uid(), self.now().isoformat()  # 保存「(draft_id, now)」供後續驗證或回傳使用
@@ -202,7 +201,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
 
     def edit_draft(self, owner, draft_id, data):  # 檢查版本後更新尚未確認的草稿
         self._valid_time(data.occurred_at)  # 拒絕尚未發生的真實經歷
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             draft = self._draft(c, owner, draft_id)  # 準備目前尚未確認的原始經歷
             require(draft['status'] == 'draft', 409, 'already_confirmed', '已確認的原始紀錄不可用草稿方式修改。')  # 驗證限制：已確認的原始紀錄不可用草稿方式修改。
@@ -232,7 +231,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
         return event_id  # 回傳新增唯一經歷積分帳目的結果
 
     def confirm(self, owner, draft_id, data):  # 以單一交易保存經歷、貢獻、人物更新與一次積分
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             draft = self._draft(c, owner, draft_id)  # 準備目前尚未確認的原始經歷
             payload = data.model_dump(mode='json')  # 準備將送出或用於指紋比對的完整內容
@@ -271,7 +270,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             return result  # 回傳以單一交易保存經歷、貢獻、人物更新與一次積分的結果
 
     def create_person(self, owner, data):  # 建立人物並保留舊角色欄位的相容性
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             require_registered(user)  # 驗證限制：條件不成立即拒絕操作，避免部分寫入
             person_id = uid()  # 準備新人物的唯一識別碼
@@ -279,7 +278,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             c.execute('''INSERT INTO people(id,owner_id,name,role,notes,created_at,roles,tags,category,followed,common_context)
                          VALUES (?,?,?,?,?,?,?,?,?,?,?)''',
                       (person_id, owner, data.name, data.role or '、'.join(roles), data.notes, self.now().isoformat(),
-                       encoded(roles), encoded(data.tags), data.category, int(data.followed), data.common_context))  # 新增人物基本資料；值以參數傳入
+                       encoded(roles), encoded(data.tags), data.category, data.followed, data.common_context))  # 原生 bool 同時適用 SQLite 與 PG。
             return self._person(c, owner, person_id)  # 回傳建立人物並保留舊角色欄位的相容性的結果
 
     def upload(self, owner, goal_id, filename, mime, content):  # 驗證權限與圖片內容後保存目標佐證
@@ -301,7 +300,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
         except (UnidentifiedImageError, OSError, ValueError, SyntaxError, Image.DecompressionBombError, Image.DecompressionBombWarning):  # 處理此類預期例外並保留明確失敗結果
             raise DomainError(415, 'invalid_image', '圖片格式不符或檔案已損毀。')  # 中止目前操作並向呼叫端傳遞錯誤
         checksum = hashlib.sha256(content).hexdigest()  # 準備上傳內容的 SHA-256 指紋
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             goal = self._owned(c, 'goals', goal_id, owner)  # 準備目前選定的目標資料
             require(goal['status'] == 'active' and not goal['ended_at'], 409, 'goal_completed', '收藏後不再新增佐證。')  # 待回顧仍可提交完成佐證。
             old = c.execute('SELECT id,filename,mime,size,created_at FROM evidence WHERE owner_id=? AND goal_id=? AND digest=?',
@@ -319,7 +318,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             return dict(self._owned(c, 'evidence', evidence_id, owner))  # 回傳讀取所屬帳號可存取的佐證內容的結果
 
     def complete(self, owner, goal_id, data):  # 檢查佐證與人工確認後收藏目標成果
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._onboarded(c, owner)  # 要求先建立 Bio 與第一個目標蛋
             goal = self._owned(c, 'goals', goal_id, owner)  # 準備目前選定的目標資料
             payload = dict(data.model_dump(mode='json'), goal_id=goal_id)  # 準備將送出或用於指紋比對的完整內容
@@ -343,7 +342,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             return result  # 回傳檢查佐證與人工確認後收藏目標成果的結果
 
     def create_note(self, owner, data):  # 保存私人準備、模擬或訊息草稿，不改正式成果
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             if data.person_id:  # 依人物選擇或人物資料狀態套用限制
                 require_registered(user)  # 驗證限制：條件不成立即拒絕操作，避免部分寫入
@@ -357,10 +356,10 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             return dict(self._owned(c, 'notes', note_id, owner), source_experience_ids=data.source_experience_ids)  # 回傳保存私人準備、模擬或訊息草稿，不改正式成果的結果
 
     def edit_task(self, owner, task_id, data):  # 更新待辦，不重複增加積分或行動進度
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+        with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._onboarded(c, owner)  # 要求先建立 Bio 與第一個目標蛋
             self._owned(c, 'tasks', task_id, owner)  # 限制查詢資料表並核對資源所屬帳號
-            c.execute('UPDATE tasks SET done=? WHERE id=? AND owner_id=?', (int(data.done), task_id, owner))  # 更新下一步待辦；值以參數傳入
+            c.execute('UPDATE tasks SET done=? WHERE id=? AND owner_id=?', (data.done, task_id, owner))  # 不以整數寫入 PG boolean。
             return dict(self._owned(c, 'tasks', task_id, owner))  # 回傳更新待辦，不重複增加積分或行動進度的結果
 
     def state(self, owner):  # 組合目前帳號的世界資料與開發設定
