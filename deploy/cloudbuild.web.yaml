@@ -51,7 +51,7 @@ steps:
       - --build-arg
       - VCS_REF=$COMMIT_SHA
       - -t
-      - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:$COMMIT_SHA
+      - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:${COMMIT_SHA}-${BUILD_ID}
       - -f
       - collaboration/ui-kit/Dockerfile
       - collaboration/ui-kit
@@ -60,7 +60,7 @@ steps:
     name: gcr.io/cloud-builders/docker
     args:
       - push
-      - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:$COMMIT_SHA
+      - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:${COMMIT_SHA}-${BUILD_ID}
 
   - id: deploy-staging
     name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
@@ -69,9 +69,9 @@ steps:
       - -ceu
       - |
         IMAGE="asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web"
-        DIGEST="$$(gcloud artifacts docker images describe "$${IMAGE}:$COMMIT_SHA" --project=life-world-513506 --format='value(image_summary.digest)')"
+        DIGEST="$$(gcloud artifacts docker images describe "$${IMAGE}:${COMMIT_SHA}-${BUILD_ID}" --project=life-world-513506 --format='value(image_summary.digest)')"
         printf '%s\n' "$${DIGEST}" | grep -Eq '^sha256:[0-9a-f]{64}$$'
-        # 固定 digest 部署，不因同一 SHA tag 被後續重建而換掉執行內容。
+        # 查詢本次建置的唯一 tag，固定以實際 digest 部署。
         gcloud run deploy lw-web-staging \
           --project=life-world-513506 \
           --region=asia-east1 \
@@ -90,4 +90,4 @@ steps:
 
 # 明確 push 後才部署；此欄亦讓 Cloud Build 記錄應用映像。
 images:
-  - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:$COMMIT_SHA
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:${COMMIT_SHA}-${BUILD_ID}
