@@ -348,6 +348,44 @@ def test_sql_pass_markers_cannot_follow_failed_checks(name, marker):
     assert_pass_marker_bound_to_checks((root/'deploy/postgres/e2e'/name).read_text(encoding='utf-8'),marker)
 
 
+def granted_tables(text, privilege, grantee):
+    match = re.search(r'GRANT '+privilege+r' ON TABLE(.*?) TO '+grantee+';',text,re.S)
+    assert match, privilege+' grant list missing'
+    return sorted(re.findall(r'lw_core_draft\.(\w+)',match.group(1)))
+
+
+def verify_whitelist(text, name):
+    match = re.search(name+r' CONSTANT text\[\] := ARRAY\[(.*?)\];',text,re.S)
+    assert match, name+' whitelist missing'
+    return sorted(re.findall(r"'(\w+)'",match.group(1)))
+
+
+def test_verify_permissions_uses_exact_per_table_whitelist():
+    # 只比總數時「撤一張、補另一張」仍會 PASS；核對清單必須與授權檔逐表一致。
+    root = Path(__file__).resolve().parent.parent
+    grants = (root/'deploy/postgres/e2e/02_grants.sql').read_text(encoding='utf-8')
+    dev = (root/'deploy/postgres/app_dml_grants.review.sql').read_text(encoding='utf-8')
+    verify = (root/'deploy/postgres/e2e/03_verify_permissions.sql').read_text(encoding='utf-8')
+    for name,privilege,size in (('dml_tables','SELECT, INSERT',30),('update_tables','UPDATE',17),('delete_tables','DELETE',6)):
+        tables = verify_whitelist(verify,name)
+        assert len(tables)==len(set(tables))==size and 'schema_migrations' not in tables
+        assert tables==granted_tables(grants,privilege,'lw_e2e_app')==granted_tables(dev,privilege,'lw_app_role')
+    assert 'schema_migrations' in verify and 'IS DISTINCT FROM' in verify
+
+
+def test_database_bootstrap_cannot_continue_after_failed_guard():
+    # CREATE DATABASE 不能放進交易；以 session 唯讀預設擋住它，只有角色交易成功提交才解除。
+    text = (Path(__file__).resolve().parent.parent/'deploy/postgres/e2e/00_database.sql').read_text(encoding='utf-8')
+    gate = text.index("SET default_transaction_read_only = on;")
+    first = text.index('\nBEGIN READ WRITE;')
+    unlock = text.index('SET default_transaction_read_only = off;')
+    create = text.index('\nCREATE DATABASE life_world_e2e')
+    assert gate < first < unlock < text.index('\nCOMMIT;',first) < create
+    assert not re.search(r'(?m)^BEGIN;$',text[:create]) and text[:gate].count('\nBEGIN')==0
+    mark = text.index('COMMENT ON DATABASE')
+    assert create < text.index("current_setting('lw_e2e.bootstrap_stage',true)",create) < mark
+
+
 def test_generated_audit_pass_marker_cannot_follow_failed_checks():
     from scripts.e2e_sql import audit_sql
     text = audit_sql(uuid4().hex)

@@ -104,3 +104,5 @@
 ## PR #11 獨立複審修正驗收｜2026-11-03
 
 修正 SQL PASS 誤印、非 superuser DBA 無法執行 dev 探測、權限核對缺口、退休殘留路由、Direct VPC 未知欄位／多容器及 00 接管既有 DB。紅燈 9 failed／65 passed 與 PG18.6 情境紀錄後修正；工具 74 passed、完整回歸 305 passed／14 skipped、PG18.6 模式全套 319 passed、PG18.6＋HTTPS 49 項及退休 9 項、SQL 負向情境、Web 契約 9 tests 通過，未操作 GCP。dev 的 PUBLIC CONNECT／TEMP 是否撤銷待使用者決定。見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md#pr-11-獨立複審修正2026-11-03)。
+
+定點修正：03 改為逐表白名單（總數相同的權限互換實測會誤判 PASS），00 分段並以 session 唯讀預設擋住 guard 失敗後的 CREATE DATABASE／標記（實測曾改寫既有未標記 DB）。紅燈 2 failed／74 passed 與 harness 兩處失敗後修正；工具 76 passed、PG18.6＋HTTPS 49 項、退休 9 項、SQL 負向情境通過。

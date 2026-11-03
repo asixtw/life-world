@@ -146,6 +146,24 @@ def main():
             sql('postgres','CREATE ROLE '+DBA+' LOGIN NOSUPERUSER CREATEDB CREATEROLE NOBYPASSRLS; GRANT pg_signal_backend TO '+DBA+';')
             stage = 'dev_fingerprint'
             before = fingerprint()
+            stage = 'database_bootstrap_negative'
+            def e2e_database_state():
+                with connection('postgres') as raw, closing(raw.cursor()) as c:
+                    c.execute("SELECT pg_get_userbyid(datdba),shobj_description(oid,'pg_database'),has_database_privilege('public',oid,'CONNECT') "
+                              "FROM pg_database WHERE datname='life_world_e2e'")
+                    row = c.fetchone()
+                    return tuple(row) if row else None
+            # 前次中斷留下 owner=lw_e2e_owner、無 marker 的同名 DB：不論是否設 ON_ERROR_STOP 都不得標記或撤銷 PUBLIC。
+            sql('postgres','CREATE ROLE lw_e2e_owner NOLOGIN; CREATE ROLE lw_e2e_app NOLOGIN NOINHERIT; GRANT lw_e2e_owner TO '+DBA+';')
+            sql('postgres','CREATE DATABASE life_world_e2e OWNER lw_e2e_owner TEMPLATE template0;')
+            rejected('postgres',e2e_sql('00_database.sql'))
+            sql('postgres',e2e_sql('00_database.sql'),DBA,stop=False)
+            assert e2e_database_state()==('lw_e2e_owner',None,True)
+            # 角色已存在而 DB 不存在：guard 失敗後 CREATE DATABASE 不得繼續。
+            sql('postgres','DROP DATABASE life_world_e2e;')
+            sql('postgres',e2e_sql('00_database.sql'),DBA,stop=False)
+            assert e2e_database_state() is None
+            sql('postgres','DROP ROLE lw_e2e_app; DROP ROLE lw_e2e_owner;')
             stage = 'create_e2e_database'
             sql('postgres',e2e_sql('00_database.sql'),DBA)
             stage = 'create_31_tables'
@@ -160,10 +178,19 @@ def main():
             rejected('postgres',e2e_sql('00_database.sql'))
             for script in ('02_grants.sql','03_verify_permissions.sql','20_enable.sql'):
                 rejected('life_world_dev',e2e_sql(script))
-            sql('life_world_e2e','GRANT TRIGGER ON lw_core_draft.users TO PUBLIC;')
-            rejected('life_world_e2e',e2e_sql('03_verify_permissions.sql'))
-            assert 'E2E_PERMISSIONS_PASS' not in sql('life_world_e2e',e2e_sql('03_verify_permissions.sql'),DBA,stop=False)
-            sql('life_world_e2e','REVOKE TRIGGER ON lw_core_draft.users FROM PUBLIC;')
+            # 總數不變的權限互換（含經 PUBLIC 開放 schema_migrations）必須依逐表白名單拒絕。
+            for unsafe, restore in (
+                    ('GRANT TRIGGER ON lw_core_draft.users TO PUBLIC;','REVOKE TRIGGER ON lw_core_draft.users FROM PUBLIC;'),
+                    ('REVOKE UPDATE ON lw_core_draft.tasks FROM lw_e2e_app; GRANT UPDATE ON lw_core_draft.sessions TO lw_e2e_app;',
+                     'GRANT UPDATE ON lw_core_draft.tasks TO lw_e2e_app; REVOKE UPDATE ON lw_core_draft.sessions FROM lw_e2e_app;'),
+                    ('REVOKE SELECT ON lw_core_draft.users FROM lw_e2e_app; GRANT SELECT ON lw_core_draft.schema_migrations TO PUBLIC;',
+                     'GRANT SELECT ON lw_core_draft.users TO lw_e2e_app; REVOKE SELECT ON lw_core_draft.schema_migrations FROM PUBLIC;'),
+                    ('REVOKE DELETE ON lw_core_draft.sessions FROM lw_e2e_app; GRANT DELETE ON lw_core_draft.users TO lw_e2e_app;',
+                     'GRANT DELETE ON lw_core_draft.sessions TO lw_e2e_app; REVOKE DELETE ON lw_core_draft.users FROM lw_e2e_app;')):
+                sql('life_world_e2e',unsafe)
+                rejected('life_world_e2e',e2e_sql('03_verify_permissions.sql'))
+                assert 'E2E_PERMISSIONS_PASS' not in sql('life_world_e2e',e2e_sql('03_verify_permissions.sql'),DBA,stop=False)
+                sql('life_world_e2e',restore)
             sql('life_world_e2e',e2e_sql('03_verify_permissions.sql'),DBA)
             with connection() as raw, closing(raw.cursor()) as c:
                 c.execute("SELECT format('ALTER ROLE lw_e2e_app PASSWORD %L', ?::text)",(password,)); c.execute(c.fetchone()[0])
@@ -233,6 +260,8 @@ def main():
                 'wrong_database_cleanup_rejected':True,'e2e_runtime_dev_write_denied':True,
                 'sql_runner':'non_superuser_createdb_createrole_dba','repeat_create_rejected':True,
                 'wrong_database_scripts_rejected':True,'public_trigger_grant_rejected_without_false_pass':True,
+                'same_count_privilege_swaps_rejected':4,'existing_unmarked_database_untouched':True,
+                'create_database_blocked_after_failed_guard':True,
                 # dev 既有 PUBLIC CONNECT／TEMP 只回報，不由工具修改。
                 'dev_connect_possible':dev_connect,'dev_temp_possible':dev_temp}
             # 新 Runtime 身分實際走 Identity INSERT，再 rollback；不授予 sequence 操作權。

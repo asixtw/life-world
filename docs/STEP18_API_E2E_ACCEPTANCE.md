@@ -102,4 +102,10 @@ P2 從實際 stable／e2e v1 Revision `metadata.annotations` 檢查 `run.googlea
 
 修正前：新增 11 個單元案例中 9 failed／65 passed；PG18.6 情境記錄 PASS 誤印、04 權限不足、6 種 PUBLIC／欄位授權未被發現及 00 接管既有 DB；新版 harness 對原 SQL 於 `grant_e2e_runtime` 以 SQLSTATE 42501 失敗；文件匯出替身流程 Plan 被拒。修正後：工具單元 74 passed；完整 SQLite／工具回歸 305 passed／14 skipped；同一套測試在獨立 PG18.6 合成容器模式 319 passed（含 14 個 PG 專用案例）；PG18.6＋HTTPS 49 項、退休 9 項通過，harness 改以非 superuser CREATEDB／CREATEROLE 管理者執行交付 SQL，並實測重複建立、錯誤 DB、PUBLIC TRIGGER 授權均被拒且不印 PASS；dev 合成指紋不變；Web 契約 9 tests OK；文件匯出替身流程離線 Plan 驗證通過。
 
+### 定點修正｜逐表權限白名單與 00 分段防護
+
+以 Head `9abf0d4` 在真實 PG18.6、非 superuser 管理者實測：(A) 03 只比各權限總數，「撤一張表、補另一張表」的 UPDATE／DELETE 互換，以及撤一張業務表 SELECT／INSERT 後經 PUBLIC 開放 `schema_migrations`，四種情境都印出 `E2E_PERMISSIONS_PASS`；(B) 未設 ON_ERROR_STOP 時，既有 owner=`lw_e2e_owner`、marker 為 NULL 的同名 DB 被標記並撤銷 PUBLIC CONNECT，角色已存在而 DB 不存在時也會在 guard 失敗後建立並標記 DB。
+
+修正：03 改以 30／17／6 逐表白名單（與 02 及 dev 審查矩陣一致）比對表級與欄位級 effective privileges，表集合須正好是白名單加 `schema_migrations`，並明確禁止 runtime 存取 `schema_migrations`。00 拆成建角色、CREATE DATABASE、標記三階段；開頭設 session 唯讀預設，只有建角色交易提交才解除，標記階段另要求本 session 完成旗標。紅燈：新增 2 個單元案例 2 failed／74 passed；新版 harness 對原 SQL 在 `database_bootstrap_negative`、對原 03 在 `sql_guard_negative` 失敗。綠燈：首次建立正常；已存在、owner 正確但無 marker、角色殘留、錯誤 DB、外部同名 DB 等情境（含不設 ON_ERROR_STOP）皆不改 marker／owner／PUBLIC，也不新建 DB；四種互換與欄位級授權都被拒；工具單元 76 passed，完整 PG18.6 模式 321 passed（1 個既有 Pydantic alias warning）、SQLite 307 passed／14 skipped，PG18.6＋HTTPS 49 項、退休 9 項及清理通過。
+
 仍需使用者決定：dev 保留 PUBLIC 預設 CONNECT／TEMP 時，`lw_e2e_app` 可登入 `life_world_dev`（無任何表／欄位／序號／建立物件權限）。撤銷屬 dev 變更，本工具只在 04 輸出 `dev_connect_possible`／`dev_temp_possible` 回報，不自動修改。原始證據在 `C:\LifeWorld_project\pr11-review-evidence\`，不納入 Git。

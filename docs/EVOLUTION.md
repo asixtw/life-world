@@ -146,3 +146,5 @@ Plan 改為保留匯出時的來源批次／時間／SHA256，不能用建立時
 ## PR #11 獨立複審｜2026-11-03
 
 E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STOP；權限核對補齊 PUBLIC／欄位級／DDL 路徑並改以 OID 支援非 superuser 管理者；00 不再接管既有 DB。預檢另要求測試修訂只有唯一 e2e 路由、單一容器及僅含已審查欄位的 Direct VPC interface；本機 harness 改以非 superuser 管理者執行交付 SQL。API、核心 DDL 與授權矩陣不變，見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md)。
+
+定點修正：權限核對由各權限總數改為逐表白名單；00 拆成建角色、建 DB、標記三階段，前段失敗時 session 維持唯讀，不再建立或改寫同名 DB。

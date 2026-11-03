@@ -27,10 +27,10 @@ $Py = '.venv/Scripts/python.exe'
 
 | 順序 | 連線 DB | SQL／動作 |
 |---|---|---|
-| 1 | `postgres` | `00_database.sql`；單獨執行，不能包進外層 transaction。建立 `life_world_e2e`、NOLOGIN owner `lw_e2e_owner`、NOLOGIN runtime `lw_e2e_app`；同名物件已存在就停止，不接管。建角色與標記資料庫分別在 guard 交易內，只標記由 `lw_e2e_owner` 擁有且尚無 marker 的新 DB。 |
+| 1 | `postgres` | `00_database.sql`；單獨執行，不能包進外層 transaction。建立 `life_world_e2e`、NOLOGIN owner `lw_e2e_owner`、NOLOGIN runtime `lw_e2e_app`；同名物件已存在就停止，不接管。腳本分三階段：建角色（guard 交易）→ CREATE DATABASE → 標記與 DB 權限（guard 交易）；開頭把 session 設為唯讀預設，只有建角色交易成功提交才解除，因此前段失敗時 CREATE DATABASE 與標記都會被拒，既有 DB 的 marker／owner／PUBLIC 權限不會改變。失敗後請關閉該連線再檢查。 |
 | 2 | `life_world_e2e` | 產生的 `01_schema.sql`，以唯一 canonical 31 表 DDL 建立 schema。DB 名稱／marker guard 與 DDL 在同一 transaction，失敗就回滾。 |
 | 3 | `life_world_e2e` | `02_grants.sql`：30 表 SELECT／INSERT、17 UPDATE、6 DELETE；無 DDL／TRUNCATE／migration 表與直接 sequence 權限。 |
-| 4 | `life_world_e2e` | `03_verify_permissions.sql`：核對 effective privileges（含欄位級授權）、owner／繼承、序號限制，以及無 TRUNCATE／REFERENCES／TRIGGER／MAINTAIN、資料庫 CREATE／TEMP、任何 schema CREATE、擁有物件或可執行 SECURITY DEFINER 函式，必須得到 `E2E_PERMISSIONS_PASS`。 |
+| 4 | `life_world_e2e` | `03_verify_permissions.sql`：依逐表白名單核對 effective privileges（30 表 SELECT／INSERT、指定 17 表 UPDATE、指定 6 表 DELETE；表級與欄位級都須完全相符，`schema_migrations` 一律禁止，PUBLIC／繼承一併計入），另核對 owner／繼承、序號限制，以及無 TRUNCATE／REFERENCES／TRIGGER／MAINTAIN、資料庫 CREATE／TEMP、任何 schema CREATE、擁有物件或可執行 SECURITY DEFINER 函式，必須得到 `E2E_PERMISSIONS_PASS`。 |
 | 5 | `life_world_dev` | **只讀 metadata** 的 `04_dev_role_probe.sql`（唯讀交易、以 OID 核對，非 superuser 的 Cloud SQL 管理者也可執行），確認 E2E login 無 dev 表／欄位／序號權限與建立物件權限，得到 `E2E_DEV_ROLE_ISOLATION_PASS`。沒有資料列查詢／DML／GRANT／REVOKE；若 PUBLIC 既有權限造成失敗，停止交 DBA，不自動改 dev。同列的 `dev_connect_possible`／`dev_temp_possible` 為 `t` 表示 dev 仍保留 PUBLIC 預設 CONNECT／TEMP：E2E 帳號可登入 dev 但無資料權限，是否由 DBA 撤銷屬 dev 變更，須由使用者決定。 |
 | 6 | 管理連線 | 由使用者安全設定 `lw_e2e_app` 的新密碼，例如可信任管理用 psql 的互動 `\password lw_e2e_app`；密碼不放 SQL 檔、命令列或查詢歷史。將同一密碼以 Secret Manager 保存為測試專用 secret 的固定數字版本。 |
 | 7 | `life_world_e2e` | `20_enable.sql`：確認 schema 與角色安全後才允許 E2E login。 |
