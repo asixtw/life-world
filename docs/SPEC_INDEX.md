@@ -53,3 +53,13 @@
 十五位人物／三封面是測試／POC／封測 demo，正式版是否保留待 Boyi 評估。「人物劇場 → 情境體驗（示範角色）」已確認為封測入口，不混入真實人物庫或績效，也不宣稱 App 已接入。
 
 App 儲存庫外的原型與完整工作區沒有隨這次提交上傳；共同實作所需的現況、規則、驗收對照與指令均在本儲存庫內。需要原型檔案時另由產品負責人提供已核對的設計參考，不把本機路徑當成 GitHub 可點連結。
+
+- [Goal Dashboard：資料口徑、API與驗收](GOAL_DASHBOARD.md)（2026-11-03，發布候選；合併狀態見本批審查）。
+
+- [Goal Detail v0.2 產品規格](team/goal-detail/PRODUCT_SPEC_v0.2.md)／[UI交接參考](team/goal-detail/UI_COMPONENT_SPEC_v0.2.md)：本輪詳情重構，實作差異與驗收見[Dashboard紀錄](GOAL_DASHBOARD.md)。
+
+- [HabitScheduleDisclosure v0.3來源](team/goal-detail/HABIT_SCHEDULE_v0.3.md)／[月曆實作與驗收](HABIT_SCHEDULE_ACCEPTANCE.md)：只讀排程，不含每日實際投入API。
+
+- [首頁三習慣摘要與驗收](HOME_HABIT_OVERVIEW.md)：首頁單一挑戰、精確用量及下一安排；[來源包](team/home-habits/README.md)。
+
+- [本批發布審查與未驗證事項](RELEASE_HOME_HABITS_20261103.md)。

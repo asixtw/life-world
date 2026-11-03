@@ -205,6 +205,11 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def get_goal(goal_id: str, request: Request):  # 讀取目前帳號可存取的目標
         return service.goal(current(request)['id'], goal_id)  # 回傳讀取目前帳號可存取的目標的結果
 
+    @app.get('/api/goals/{goal_id}/dashboard', tags=['Goals'])
+    def goal_dashboard(goal_id: str, request: Request):
+        """只讀 owner 的目標儀表板，不更新進度或帳本。"""
+        return service.goal_dashboard(current(request)['id'], goal_id)
+
     @app.get('/api/goals/{goal_id}/calendar', tags=['Goals'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def calendar(goal_id: str, request: Request, start: Optional[date] = None, end: Optional[date] = None):  # 依實際日期分頁查看安排。
         return service.calendar(current(request)['id'], goal_id, start, end)  # 不固定四週或 28 天。
