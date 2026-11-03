@@ -8,6 +8,8 @@
 
 ## 啟動
 
+Web 容器使用 main 中已驗證的來源建置；[部署交接](../../deploy/README.web-main.md)說明 `lw-web-main`、`lw-build-main` 與私人存取。此設定未在本輪部署 GCP。
+
 需求：Node 24、pnpm 12。於本目錄執行：
 
 ```powershell

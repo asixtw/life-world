@@ -64,3 +64,8 @@
 以上證明本機 Python MVP 與本輪測試的行為，不代表舊交接包全部 98 案已逐案驗收，也不代表正式雲端認證／PostgreSQL／AI／部署已完成。未做 Safari、實機相機權限、完整無障礙稽核、負載與公開部署測試。
 
 開發用計分、圖片條件、完成後更正等規則詳見 `REQUIREMENTS.md` 與 `ROADMAP.md`。目前不啟用未裁定的負向衰減與主動結束規則。
+
+
+## Web main部署設定驗收 2026 11 03
+
+本輪獨立工作樹由origin/main 0bf4ce2開工；9項部署契約、Docker內18檔55項React測試、TypeScript／Vite build、nginx -t及9項本機HTTP檢查通過。runtime為UID101，保留私人IAM原則；未執行GCP建置／Push／Deploy或雲端IAM驗證。完整命令與限制見 [Web main交接](../deploy/README.web-main.md)。

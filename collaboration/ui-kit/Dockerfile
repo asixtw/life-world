@@ -20,7 +20,7 @@ RUN pnpm run build
 
 FROM nginxinc/nginx-unprivileged:1.28-alpine AS runtime
 ARG VCS_REF=local-unpublished
-LABEL org.opencontainers.image.title="Life World UI candidate staging" \
+LABEL org.opencontainers.image.title="Life World UI candidate main" \
       org.opencontainers.image.revision="${VCS_REF}"
 COPY cloud-nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /site/dist /usr/share/nginx/html
