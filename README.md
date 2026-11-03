@@ -1,5 +1,7 @@
 # Life World · Python 本機 App
 
+> **2026-11-03 Step 18：** [API 雲端 e2e 準備與本機證據](docs/STEP18_API_E2E_ACCEPTANCE.md)、[Console／驗收／清理操作](deploy/README.api-e2e.md)。使用既有 lw-api-main 的 0% Tagged Revision 與獨立合成 DB；本輪只做工具及本機驗證，沒有 GCP 操作。
+
 > **2026-11-03 Step 11：** [API main 整合與重新驗證](docs/STEP11_API_MAIN_INTEGRATION.md)、[API main 建置／Console 交接](deploy/README.api-main.md)。保留 SQLite 與 PG18；API YAML 只 Build／Test／Push，沒有自動部署，雲端 lw_app 寫入仍待 DML 審核。
 
 > **2026-11-03 Step 10-4 本機工程：** [PG18 Adapter、API Container 與 GCP 設定交接](docs/STEP10_4_PG_API_HANDOFF.md)。原 SQLite 模式保留；新 PG18 模式在獨立合成容器驗證，API 的 GCP 連線與部署尚未執行。API 建置使用 `deploy/cloudbuild.api.yaml`，不影響 React Web。

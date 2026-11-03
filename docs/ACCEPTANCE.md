@@ -92,3 +92,17 @@
 ## Step 11 API main 整合驗收｜2026-11-03
 
 由最新 main 4b920e8 建立隔離工作樹，保留 Web main 與 Step 10-4 完整工程；本輪 Windows／Linux SQLite 各 231 passed／14 skipped，PG18.6 各 245 passed；API image build、8080／8091 smoke、10,314 layer 檔掃描、3 項 API 建置契約及 9 項 Web main 契約通過。Linux PG 留有 1 個 Pydantic alias warning，未隱藏。完整命令及限制見 [Step 11 交接](STEP11_API_MAIN_INTEGRATION.md)。本輪只建立本機 commit，未發布 GitHub 或操作 GCP；lw_app 正式寫入仍待 DML 審核。
+
+## Step 18 API e2e 準備驗收｜2026-11-03
+
+本輪新工作樹實際 PG18.6＋HTTPS：49 個驗收檢查、9 個退休／main 關閉檢查，以及 SQL 持久化／最小權限／Identity／清理通過；dev 合成指紋不變。完整 SQLite／工具回歸 259 passed／14 skipped，Web 契約 9 tests OK。Google IAM／Cloud Run／Cloud SQL 真實端對端仍待使用者操作，不能用本機 HMAC 模型代替。見 [交付與證據](STEP18_API_E2E_ACCEPTANCE.md)。
+
+## PR #11 快照與 Direct VPC 補正驗收｜2026-11-03
+
+來源批次時間／原始檔 SHA256／Plan 內容指紋及實際 v1 Revision Direct VPC annotations 已加入預檢。功能紅燈34項，修正後工具63 passed、完整回歸294 passed／14 skipped、本機PG18.6 E2E49項、退休清理9項、Web契約9項通過。唯讀匯出文件以本機gcloud替身驗證，未操作GCP；來源新鮮度與外部變更限制見 [補正紀錄](STEP18_API_E2E_ACCEPTANCE.md#pr-11-合併前補正快照來源與-direct-vpc)。
+
+## PR #11 獨立複審修正驗收｜2026-11-03
+
+修正 SQL PASS 誤印、非 superuser DBA 無法執行 dev 探測、權限核對缺口、退休殘留路由、Direct VPC 未知欄位／多容器及 00 接管既有 DB。紅燈 9 failed／65 passed 與 PG18.6 情境紀錄後修正；工具 74 passed、完整回歸 305 passed／14 skipped、PG18.6 模式全套 319 passed、PG18.6＋HTTPS 49 項及退休 9 項、SQL 負向情境、Web 契約 9 tests 通過，未操作 GCP。dev 的 PUBLIC CONNECT／TEMP 是否撤銷待使用者決定。見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md#pr-11-獨立複審修正2026-11-03)。
+
+定點修正：03 改為逐表白名單（總數相同的權限互換實測會誤判 PASS），00 分段並以 session 唯讀預設擋住 guard 失敗後的 CREATE DATABASE／標記（實測曾改寫既有未標記 DB）。紅燈 2 failed／74 passed 與 harness 兩處失敗後修正；工具 76 passed、PG18.6＋HTTPS 49 項、退休 9 項、SQL 負向情境通過。

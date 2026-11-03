@@ -134,3 +134,17 @@ Build SA改為lw-build-main，部署目標改為lw-web-main，保留lw-web-runti
 ## Step 11 FastAPI／PostgreSQL 整合至 main｜2026-11-03
 
 合併 SQLite／PG18 Adapter、依賴鎖定、測試工具與非 root API 容器；API YAML 的 Build SA 改為 lw-build-main，仍只 Build／Test／Push，未加入 deploy。未來 API Trigger／Cloud Run 統一 lw-api-main、來源 ^main$；Web main 部署檔保持不變。原 dirty 工作樹保留，實際重新驗證與發布界線見 [Step 11 交接](STEP11_API_MAIN_INTEGRATION.md)。
+
+## Step 18 受控 Tagged Revision 驗收工具｜2026-11-03
+
+新增離線 plan 防護、只用既有 API 的合成 e2e、Token stdin／安全報告、唯一 canonical schema SQL 產生器、專用 life_world_e2e／lw_e2e_app 最小權限及清理腳本。保留主 Revision 100% 且業務關閉，未修改 App／Cloud Build／Dockerfile 或執行 GCP；工具及本機驗證見 [Step 18 交付](STEP18_API_E2E_ACCEPTANCE.md)。
+
+## PR #11 合併前預檢修正｜2026-11-03
+
+Plan 改為保留匯出時的來源批次／時間／SHA256，不能用建立時間刷新舊來源；執行時再核對 Plan 內容指紋與15分鐘時限。新增實際 Revision annotations 的 Direct VPC／相同設定檢查，保持既有API與基礎建設設定。退休流程也要求四份新來源，在刪除測試Revision前完成核對；驗收期間凍結配置仍屬必要條件。測試與限制見 [補正交接](STEP18_API_E2E_ACCEPTANCE.md)。
+
+## PR #11 獨立複審｜2026-11-03
+
+E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STOP；權限核對補齊 PUBLIC／欄位級／DDL 路徑並改以 OID 支援非 superuser 管理者；00 不再接管既有 DB。預檢另要求測試修訂只有唯一 e2e 路由、單一容器及僅含已審查欄位的 Direct VPC interface；本機 harness 改以非 superuser 管理者執行交付 SQL。API、核心 DDL 與授權矩陣不變，見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md)。
+
+定點修正：權限核對由各權限總數改為逐表白名單；00 拆成建角色、建 DB、標記三階段，前段失敗時 session 維持唯讀，不再建立或改寫同名 DB。
