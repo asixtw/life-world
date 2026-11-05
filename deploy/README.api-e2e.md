@@ -1,5 +1,7 @@
 # LIFE WORLD Step 18｜Cloud Run API 受控端對端驗收
 
+> **2026-11-06 注意：**下方歷史部署步驟共用 `lw-api-main`，會覆寫最新模板，不能與正式模板修復並行。已提出[獨立 E2E 服務與一次性恢復方案](README.api-template-recovery.md)，尚未建立新資源或停用任何現行程序；需 Owner 確認部署改向／暫停後才執行恢復。原 Tag／Revision 與驗收工具本輪不修改。
+
 本文件是**由使用者逐步執行的操作方案**。本輪只開發工具並驗證本機 PostgreSQL 18.6，沒有操作 GCP、Push、Merge 或部署。使用者提供的 Cloud SQL `/ready=200`、CRUD／Identity／ROLLBACK 成功及正式 `lw_app` DML 權限屬前置背景，非本輪重新查驗結果。
 
 只使用 `life-world-513506`／`asia-east1` 的現有 `lw-api-main`。既有 stable Revision 保持 100% 流量、`LIFEWORLD_ENABLE_BUSINESS_API=false`。測試 Revision 0%、tag `e2e`，只有它啟用業務。沿用同一映像 digest、Runtime SA／Private VPC 與 Cloud SQL 執行個體；不建立 staging Git 分支或另一個長期服務。

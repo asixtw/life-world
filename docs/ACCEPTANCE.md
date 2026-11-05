@@ -1,5 +1,9 @@
 # TDD 與實際驗收紀錄
 
+## PR #14 正式模板恢復方案（2026-11-06，未執行變更）
+
+僅查指定API：現有兩個main Trigger沒有E2E部署項；歷史E2E指引仍指向main，Audit確認使用者身分於台北03:01執行gcloud.run.deploy並建立00008-kgk，不能宣稱已停止再部署。完整比對正式Revision可寫模板與latest，差異為DB／DB user／Secret參照／business／Trusted Hosts；所有非env模板欄位、容量／Probe一致。根據live v2 schema構造完整正式template與具名traffic，以最新etag送validateOnly=true，請求已接受；前後etag／generation／latestCreatedRevision／template／trafficStatuses完全相同，沒有實際建立Revision。真實恢復、恢復後Preflight、IAM授權、Merge、Cloud Build、Cloud SQL業務Session讀取均未執行。PR的Gateway Origin已依實際Service URI設定，audience一致；YAML解析／Origin靜態核對通過，發布器與gateway程式相對0bb4c9d未改。完整方案與停止／回復條件見[恢復提案](../deploy/README.api-template-recovery.md)。
+
 ## PR #14 雲端唯讀入口準備（2026-11-06，未授權啟用／Merge）
 
 既有檔新增正式 business true／e2e false 邊界，先重現3 failed／3 passed；最終 `python -X utf8 -m pytest --noconftest deploy/tests/test_release.py -q --tb=short -p no:cacheprovider -k api`：6 passed／22 deselected，無擴充測試專案。只放行指定業務開關差異，DB名稱／使用者、Secret名稱／版本、VPC與Runtime SA差異仍拒絕；候選完整比較仍檢查business。Cloud Run v2實際Service URI與Gateway固定Origin／audience一致。修正後真實唯讀preflight仍BLOCKED，原因另有 `life_world_dev/lw_app` 對 `life_world_e2e/lw_e2e_app` 及不同Secret參照；沒有放寬或套用修正來掩蓋它。只讀IAM未見Web runtime在API服務／project的直接binding；沒有授權或查組織政策。Gateway Origin仍空、PR保持Draft，Cloud Build／候選發布／真實Cloud SQL業務讀取均未執行；e2e false、hostfix與正式流量保持原狀。

@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-06 E2E／正式模板隔離提案（待授權）
+
+不再放寬發布器的DB／Secret比對。準備從正式100%Revision完整複製可版本化配置，以etag及固定全部traffic／Tag建立0%正式基準；只驗證validateOnly、不套用。確認人工E2E仍有部署main入口，提出另行核准獨立Cloud Run服務的最小改向方案，沒有新建資源。PR #14 Gateway Origin已設定為核對過的canonical URI，仍Draft、未授IAM或部署。
+
 ## 2026-11-06 PR #14 發布政策最小修正（Draft）
 
 以100%正式revision的明確business=true作唯一政策來源，只在比較複本容許latest/e2e的false差異；新候選顯式true，候選完整Runtime比較不排除business，其他DB／Secret／VPC／SA差異維持拒絕。6項相關測試通過；實際環境另有e2e資料庫、使用者與Secret參照不同，故唯讀預檢仍安全阻擋。未執行IAM授權、Gateway啟用、Merge、部署、Migration或GRANT。

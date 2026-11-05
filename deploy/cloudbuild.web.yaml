@@ -5,8 +5,8 @@ timeout: 2700s
 options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
-  # 維持關閉；一次性授權確認後才填入核准的 canonical API origin。
-  _WEB_API_ORIGIN: ''
+  # 已核對 Cloud Run v2 Service URI；PR 尚未 Merge，服務層級 IAM 仍待授權。
+  _WEB_API_ORIGIN: 'https://lw-api-main-u5py2jttpa-de.a.run.app'
 
 steps:
   - id: validate-source
