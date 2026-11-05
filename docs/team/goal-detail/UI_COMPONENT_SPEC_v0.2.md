@@ -1,7 +1,7 @@
 # Life World｜Goal Detail / Dashboard——UI 與美術元件交接規格
 
-**文件 ID：LW-GOAL-DETAIL-ART-002｜版本：v0.2 審查草案｜日期：2026-11-03**  
-**交接對象：**UI／UX、美術與元件製作（歐桑），由 Boyi 驗收、Jerry 審技術接入。  
+**文件 ID：LW-GOAL-DETAIL-ART-002｜版本：v0.2 審查草案｜日期：2026-11-03**<br>
+**交接對象：**UI／UX、美術與元件製作（歐桑），由 Boyi 驗收、Jerry 審技術接入。<br>
 **對應工程規格：**`01_Goal_Detail_產品工程規格_v0.2.md`。本文件**不授權重畫現有 Lumi、目標蛋、房間或更改正式 UI Kit 的全域 tokens**。
 
 ## 1. 版面原則

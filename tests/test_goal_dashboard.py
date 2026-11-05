@@ -101,15 +101,15 @@ def test_versions_today_quantity_and_legacy_unknown_period(app,client):
 
 
 def test_seven_days_cutoff_and_read_only_archived_goal(app,client):
+    from dataclasses import replace
+    # 七日統計測試以較長的合成Session開始，不擴張PG runtime的sessions UPDATE權限。
+    app.state.service.policy=replace(app.state.service.policy,session_hours=24*40)
     setup_user(client)
     g=create(client,deadline='2026-11-15',dates=['2026-10-27','2026-11-02'])
     d=draft(client,g)
     assert client.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d)).status_code==201
     advance(app,'2026-11-02T07:00:00+00:00')
     assert sum(x['confirmedExperienceCount'] for x in dashboard(client,g)['trend']['days'])==1
-    # 此例只驗七日統計，延長隔離測試session避免訪客到期遮蔽日期斷言。
-    with app.state.service.db.connect(write=True) as c:
-        c.execute("UPDATE sessions SET expires_at='2026-12-01T00:00:00+00:00'")
     advance(app,'2026-11-03T07:00:00+00:00')
     assert sum(x['confirmedExperienceCount'] for x in dashboard(client,g)['trend']['days'])==0
     fresh=client.get('/api/goals/'+g['id']).json()

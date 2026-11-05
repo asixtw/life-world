@@ -1,6 +1,6 @@
 # Life World｜HomeHabitOverview UI／美術元件交接規格
 
-**文件 ID**：LW-HOME-HABIT-ART-001　**版本**：v0.1 審查草案　**日期**：2026-11-03  
+**文件 ID**：LW-HOME-HABIT-ART-001　**版本**：v0.1 審查草案　**日期**：2026-11-03<br>
 **收件人**：歐桑（UI／美術與 React 候選元件）；Boyi 負責產品視覺驗收；Jerry 負責正式 App 接入。
 
 ## 0. 適用範圍與既有資產

@@ -1,7 +1,7 @@
 # Life World｜Goal Detail / Dashboard 頁面重構——產品與工程交接規格
 
-**文件 ID：LW-GOAL-DETAIL-002｜版本：v0.2 審查草案｜日期：2026-11-03**  
-**適用範圍：**既有「目標」分頁中的單一目標詳情；不新增第五個主分頁。  
+**文件 ID：LW-GOAL-DETAIL-002｜版本：v0.2 審查草案｜日期：2026-11-03**<br>
+**適用範圍：**既有「目標」分頁中的單一目標詳情；不新增第五個主分頁。<br>
 **審查依據：**使用者 2026-11-03 上傳之頁面截圖；GitHub 已核對 `app/static/app.js` 之 `goalCard()`、`worldView()`、`goalProgress()`，與 `app/static/goals.js` 之 `list()`、`detail()`，以及既有 `docs/API.md`／封測 v1.1 決策。**本文件為待核准的重構方案，非已實作行為。**
 
 ## 1. 一句話決策

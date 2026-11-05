@@ -1,10 +1,10 @@
 # Life World｜HabitScheduleDisclosure 月曆與單日用量規格書
 
-**文件 ID：LW-GD-SCHEDULE-003**  
-**版本：v0.3（審查草案）**  
-**日期：2026-11-03**  
-**範圍：Goal Detail → 三個重要習慣 →「查看日期與用量」**  
-**交付對象：Boyi（產品驗收）、Jerry／前端（資料與互動實作）、歐桑（UI Kit 與視覺）**  
+**文件 ID：LW-GD-SCHEDULE-003**<br>
+**版本：v0.3（審查草案）**<br>
+**日期：2026-11-03**<br>
+**範圍：Goal Detail → 三個重要習慣 →「查看日期與用量」**<br>
+**交付對象：Boyi（產品驗收）、Jerry／前端（資料與互動實作）、歐桑（UI Kit 與視覺）**<br>
 **優先級：P1 UX；若修改導致資料損失或錯誤採計，該缺陷提升為 P0**
 
 > **文件關係與依據：**本文件是 `Goal Detail 產品／工程規格 v0.2` 與 `Goal Detail UI／美術規格 v0.2` 的局部增補，針對 GD07 `HabitScheduleDisclosure`；返回與頁面狀態遵守 `LW-NAV-001 Navigation Contract v0.1`。以使用者 2026-11-03 提供的「369 個日期長文字清單」截圖、已核對的 GitHub `asixtw/life-world` `main`（2026-11-03 審查基準 commit `5f015a616f34`）`app/static/goals.js` 與 `docs/API.md` 為來源。本文提及的新增 ViewModel 與 UI 元件**不是已實作 API 或已核准設計**。
