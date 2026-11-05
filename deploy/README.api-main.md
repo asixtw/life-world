@@ -1,5 +1,19 @@
 # LIFE WORLD API main 建置交接
 
+## 2026-11-05 自動發布（現行實作）
+
+`cloudbuild.api.yaml` 保留 SQLite／PG18.6 合成測試、容器驗證與明確 image push，最後使用共用 `release.py` 發布候選；不連 Cloud SQL 執行 migration、SQL 管理或合成資料寫入。候選 `/health`、`/ready` 使用 IAM ID token；通過後自動發布到明確 revision，正式網址檢查失敗自動回復。程序健康不能取代 `/ready`，也不把 readiness 當作業務 DML 授權證明。
+
+API 正式設定從當時 100% 正式流量的 revision 取得，不使用 latest hostfix 的 localhost Origin。只有當 latest 與正式 revision 的 VPC、Cloud SQL／Secret 參照、容量及其他執行設定完全相符，才覆寫兩個必要變數：正式 `LIFEWORLD_EXTERNAL_ORIGIN`、正式 `LIFEWORLD_TRUSTED_HOSTS` 加該候選精確 hostname。其他設定保持不變。任何差異或不明配置皆禁止自動發布。
+
+`hostfix` 必須持續指向 `lw-api-main-00004-yiv`，既有 URL 不改。發布器只新增／清理自己的 `c-<Build ID>` tag，不刪除或重指派 hostfix。讀取當下完整流量作為回復來源，不能硬編碼一個舊 revision。
+
+Trigger `6ffa2066-8edd-4406-9f3f-31f967da57dc` 的 `includedFiles` 已於本輪更新並讀回為 `release.py` 的 `API_FILES`。原先單一含空白字串已拆成 12 個獨立 pattern，包含測試實際讀取的 canonical PostgreSQL schema。只修改此欄；既有 Trigger／連線／`^main$`／Build SA 保留，未啟動建置。
+
+發布鎖、來源新舊護欄、一次性 Build 狀態讀取及 ID token 權限與 [Web 自動發布](README.web-main.md) 相同。本批不修改 IAM 或正式流量。唯讀預檢：`python deploy/release.py --component api --preflight`；它不取得發布鎖、不部署、不呼叫資料庫。缺少權限、正式設定不明或健康檢查失敗都會明確阻擋；不引入逐版人工核准。
+
+以下保留先前 Build／Test／Push 的歷史交接；「不自動部署」及逐版 Console 操作不再描述新版 YAML。
+
 此設定將 FastAPI／PostgreSQL 工程整合至 `main`，目前只執行 **Build／Test／Push**，沒有自動部署。Step 11 本機驗證及發布狀態見 [整合交接](../docs/STEP11_API_MAIN_INTEGRATION.md)；[Step 10-4](../docs/STEP10_4_PG_API_HANDOFF.md) 保留歷史紀錄。
 
 ## GitHub 發布與未來 Console 設定

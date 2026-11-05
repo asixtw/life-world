@@ -1,4 +1,4 @@
-# 僅備妥 Build／Push；本檔不部署、不變更 IAM／Cloud SQL／Web，也不建立 Trigger。
+# API main：保留合成測試與容器驗證；正式設定隔離及候選健康檢查失敗時禁止發布。
 serviceAccount: projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com
 timeout: 1800s
 options:
@@ -19,6 +19,11 @@ steps:
         printf 'POSTGRES_USER=lw_step10_admin\nPOSTGRES_DB=postgres\nPOSTGRES_PASSWORD=' > .step10-tests/synthetic.env
         od -An -N24 -tx1 /dev/urandom | tr -d ' \n' >> .step10-tests/synthetic.env
         printf '\n' >> .step10-tests/synthetic.env
+
+  - id: release-safety-tests
+    name: python:3.12-slim
+    entrypoint: python
+    args: ['-m', 'unittest', 'discover', '-s', 'deploy/tests', '-p', 'test_release.py', '-q']
 
   - id: start-synthetic-pg18
     name: gcr.io/cloud-builders/docker
@@ -64,5 +69,18 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ['push', 'asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID}']
 
-images:
-  - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID}
+  - id: deploy-main
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: python3
+    args:
+      - deploy/release.py
+      - --component
+      - api
+      - --commit
+      - $COMMIT_SHA
+      - --build-id
+      - $BUILD_ID
+      - --branch
+      - $BRANCH_NAME
+
+# api-image-push 已明確上傳；發布是最後一步，不在切流量後再上傳映像。
