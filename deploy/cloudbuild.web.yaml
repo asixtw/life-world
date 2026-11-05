@@ -1,6 +1,7 @@
 # React main：測試／建置／push 後，通過 IAM 候選檢查才自動發布；不改 IAM。
 serviceAccount: projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com
-timeout: 1200s
+# 最多等鎖 15 分鐘；另外保留 30 分鐘供 React build、候選驗證與必要回滾。
+timeout: 2700s
 options:
   logging: CLOUD_LOGGING_ONLY
 

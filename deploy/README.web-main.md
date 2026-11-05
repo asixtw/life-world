@@ -4,13 +4,27 @@
 
 `cloudbuild.web.yaml` 保留 React tests／build／明確 image push，最後呼叫 `release.py`。以 digest、`--no-traffic` 與每個 Build ID 的唯一 tag 建候選；以 Build SA 的 IAM ID token 檢查 `/health` 後，自動將 100% 流量指向該 revision。正式網址檢查失敗會自動恢復先前的完整流量配置。既有容量、網路、runtime SA 與私人 IAM 沿用，不增加每版人工核准。
 
-同一服務以 Cloud Run service annotation＋etag 取得發布鎖；原 build 未結束不搶鎖。失敗／取消留下的發布 journal 由後續 build 先回復。發布前核對 GitHub main 的相關來源及上次成功發布時間，防止舊 commit／同 commit 的較舊 build 覆蓋新版；後續只改 API 的 main commit 不阻擋 Web。所有等待都有上限，來源或控制平面無法確認即停止。
+同一服務以 Cloud Run service annotation＋etag 取得發布鎖；原 build 未結束不搶鎖。等鎖最多 900 秒、每 5 秒核對一次；到期仍有執行中的 build 就失敗，不因等待時間接管。Web Cloud Build 總上限 2700 秒：15 分鐘等鎖，另保留 30 分鐘供前置 build、候選部署／健康檢查及必要回滾；這是同一總預算，不是每階段各自重設。API 原有總上限 1800 秒保持不變。失敗／取消留下的發布 journal 由後續 build 先回復。發布前核對 GitHub main 的相關來源及上次成功發布時間，防止舊 commit／同 commit 的較舊 build 覆蓋新版；後續只改 API 的 main commit 不阻擋 Web。所有等待都有上限，來源或控制平面無法確認即停止。
 
 Trigger `711e7258-2725-4007-a555-0f0100b77dbc` 的 `includedFiles` 已於本輪更新並讀回為 `release.py` 的 `WEB_FILES`：依 ui-kit Docker context 白名單列 9 個根檔、7 個來源目錄，再加 Web YAML、共用發布器及其安全測試。排除 UI 說明文件與 API 無關改動。只修改此欄，既有 Trigger／連線／`^main$`／Build SA 不重建，未因此啟動建置。
 
 一次性啟用條件：Build SA 除既有部署權限外，須能 `cloudbuild.builds.get`（讀取本次與遺留鎖 build 狀態）及對自己執行 `iam.serviceAccounts.getOpenIdToken`（IAM 健康檢查）。可分別使用專案 `roles/cloudbuild.builds.viewer`、Build SA 自身資源上的 `roles/iam.serviceAccountOpenIdTokenCreator`，不需要廣泛 Token Creator 或匿名存取。本批不修改 IAM；合入 main 前須完成一次性權限核對。日常 Push 後不需要人工進 GCP。
 
+2026-11-05 最終準備核對：Web／API 唯讀 preflight 均通過。Build SA 的專案直接授權僅 Logging Writer／Cloud Run Developer，已查角色定義不含上述兩項權限；Build SA 自身 IAM policy 為空。Policy Troubleshooter API 未啟用，組織繼承 IAM 查詢遭 403，因此不能把「直接授權未見」當成「有效權限確定不存在」。本輪不啟用 API 或補 IAM；須由可見組織繼承的人員確認，若未繼承才補上前述兩個指定範圍的 binding。現有 Run Developer／Runtime SA User 不重複授權。
+
 本機必要檢查：`python -m unittest discover -s deploy/tests -p 'test_*.py' -q`（依 `deploy/tests/requirements.txt` 安裝測試依賴）。無 GCP 副作用的 `python deploy/release.py --component web --preflight` 僅核對現有流量。正式發布入口只接受既有 main trigger 的來源，沒有 Push／Merge 授權前不送入 main。
+
+### 異常發布鎖復原（只在事故時使用）
+
+正常 Push 仍全自動。先從 Cloud Run v2 `GET https://run.googleapis.com/v2/projects/life-world-513506/locations/asia-east1/services/<SERVICE>` 保存 `etag`、`reconciling`、`traffic`、`trafficStatuses` 及 `annotations`；只保存路由／發布資訊，不輸出 template、Secret 或權杖。`SERVICE` 僅為 `lw-web-main` 或 `lw-api-main`。
+
+1. `lifeworld.dev/release-build` 是鎖的 Build ID；以 `gcloud builds describe <BUILD_ID> --project=life-world-513506 --region=asia-east1 --format="yaml(id,status,buildTriggerId,substitutions.COMMIT_SHA,substitutions.BRANCH_NAME)"` 核對來源為本服務既有 main Trigger。ID 不明、查詢 403／404 或來源不符，一律停止調查，不直接刪鎖。`QUEUED`／`WORKING`／未知狀態不是遺留鎖；不得接管，亦不以鎖的年齡判定。
+2. 只有 Build 已為 `SUCCESS`／`FAILURE`／`INTERNAL_ERROR`／`TIMEOUT`／`CANCELLED`／`EXPIRED`，且服務 `reconciling=false`、`trafficStatuses` 已完整解析為具名 revision／100% 配額，才繼續。API 同時核對 `hostfix` 仍是 `lw-api-main-00004-yiv`。保存 `lifeworld.dev/release-pending` journal 的 candidate／traffic，對照目前正式配額與 Build 日誌；candidate 應為 `<SERVICE>-c-<移除連字號的 BUILD_ID>`。
+3. 無 pending journal，或目前配額仍是 journal candidate 100%／journal 原配額時，優先讓後續正常 main Build 自動復原及取得鎖；不要自行改流量。若 journal 格式不明、ETag 衝突或目前配額已被其他操作者更改，發布器會停止，不覆蓋對方流量。
+4. 若確有事故需要人工解除：先確認該 Build 終止、Cloud Run 收斂、目前所有配額及 Tag 正是要保留的設定，並保存 journal 與流量快照。重新 GET 服務，以**該次最新 etag 及完整 annotations** 發出 `PATCH <上述服務 URL>?updateMask=annotations`；本文僅含 `name`、`etag`、`annotations`。無 pending 時只移除已辨識的 `lifeworld.dev/release-build`。有 pending 且決定保留其他操作者目前流量時，確認其發布紀錄後才移除該鎖及 `lifeworld.dev/release-pending`；若 release-commit／release-created 不能證明對應目前正式版本，也一併移除這兩個過期指紋。其他 annotations 保留，**不傳 traffic／template，不刪或重指派任何 Tag**。遇到 409／412 立即停止、重新查明變動，不重送舊本文。
+5. 等 PATCH operation 完成後讀回：鎖已解除、journal／指紋符合上述處置，且原配額、所有 Tag（含 hostfix）未變。若無法確認任一條件，不解除鎖、不改正式流量；交由具備可見權限的人員查明。處理完成後由下一次正常 Build 自動發布，不增設逐次人工核准。
+
+本輪只撰寫此程序，沒有解除任何鎖或修改流量。
 
 以下為先前交接／歷史驗證，人工逐版部署步驟已由上述流程取代。
 

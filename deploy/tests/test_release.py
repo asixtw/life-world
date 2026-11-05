@@ -183,6 +183,33 @@ def positive(traffic):
 
 
 class ReleaseExecution(unittest.TestCase):
+    def test_lock_accepts_a_previous_build_finishing_after_four_minutes(self):
+        publisher = FakePublisher()
+        owner = '22222222-2222-4222-8222-222222222222'
+        publisher.state['annotations'][release.OWNER] = owner
+        clock = [0.0]
+        publisher.build = lambda bid: {'status': 'WORKING' if clock[0] < 240 else 'SUCCESS'}
+        # 以虛擬時間跨過舊 180 秒界線；不實際等待，也不接管執行中的 build。
+        with patch.object(release.time, 'monotonic', side_effect=lambda: clock[0]), patch.object(
+                release.time, 'sleep', side_effect=lambda seconds: clock.__setitem__(0, clock[0] + seconds)):
+            current = publisher.acquire()
+        self.assertGreaterEqual(clock[0], 240)
+        self.assertEqual(current['annotations'][release.OWNER], publisher.build_id)
+
+    def test_lock_stops_after_fifteen_minutes_without_stealing_a_live_build(self):
+        publisher = FakePublisher()
+        owner = '22222222-2222-4222-8222-222222222222'
+        publisher.state['annotations'][release.OWNER] = owner
+        publisher.build = lambda bid: {'status': 'WORKING'}
+        clock = [0.0]
+        with patch.object(release.time, 'monotonic', side_effect=lambda: clock[0]), patch.object(
+                release.time, 'sleep', side_effect=lambda seconds: clock.__setitem__(0, clock[0] + seconds)):
+            with self.assertRaisesRegex(release.ReleaseError, 'bounded lock wait expired'):
+                publisher.acquire()
+        self.assertEqual(clock[0], 900)
+        self.assertEqual(publisher.state['annotations'][release.OWNER], owner)
+        self.assertFalse(publisher.acquired)
+
     def execute(self, publisher):
         with tempfile.TemporaryDirectory() as directory, chdir(directory), patch.object(release.time, 'sleep'), redirect_stdout(io.StringIO()):
             publisher.run()

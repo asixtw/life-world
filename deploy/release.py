@@ -35,6 +35,8 @@ RUNTIME_FIELDS = ('serviceAccount', 'vpcAccess', 'volumes', 'executionEnvironmen
                   'healthCheckDisabled', 'nodeSelector', 'serviceMesh', 'gpuZonalRedundancyDisabled')
 ORIGIN = 'LIFEWORLD_EXTERNAL_ORIGIN'
 HOSTS = 'LIFEWORLD_TRUSTED_HOSTS'
+LOCK_WAIT_SECONDS = 900
+LOCK_POLL_SECONDS = 5
 
 
 def snapshot_traffic(service):
@@ -247,8 +249,9 @@ class Publisher:
 
     def acquire(self):
         """同一服務以 etag 原子取得鎖；不以租約逾時搶走仍執行中的發布。"""
-        deadline = time.monotonic() + 180
-        for _ in range(90):
+        # 涵蓋前一版候選部署／驗證；同時保留時間與次數上限，不形成無限輪詢。
+        deadline = time.monotonic() + LOCK_WAIT_SECONDS
+        for _ in range(LOCK_WAIT_SECONDS // LOCK_POLL_SECONDS + 1):
             service = self.get()
             owner = service.get('annotations', {}).get(OWNER)
             busy = service.get('reconciling', False)
@@ -274,9 +277,10 @@ class Publisher:
                     return self.owned()
                 except Conflict:
                     pass
-            if time.monotonic() >= deadline:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
                 break
-            time.sleep(2)
+            time.sleep(min(LOCK_POLL_SECONDS, remaining))
         raise ReleaseError('Another release is active; bounded lock wait expired')
 
     def restore(self, service, journal):
