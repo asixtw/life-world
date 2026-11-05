@@ -24,7 +24,7 @@
 ## 雲端啟用前精確待決項目（本輪未執行）
 
 1. **API 呼叫身分**：本輪讀到 API service 與 project IAM 都沒有 Web runtime 的明確 binding，未查無權／不相關的組織政策。若沒有等效繼承授權，需要在 **`asia-east1/lw-api-main` 服務資源** 授予 `serviceAccount:lw-web-runtime@life-world-513506.iam.gserviceaccount.com` **`roles/run.invoker`**。不授在 project、不加匿名成員、不替 Web 加 DB／Secret 權限。此 IAM 角色允許調用服務；HTTP 唯讀限制由 gateway 執行，App Session／CSRF 仍是另一道權限。
-2. **目前 API 配置差異**：100% 正式 revision `lw-api-main-c-94975cd3a6854941b1705c5634c777b3` 的 `LIFEWORLD_ENABLE_BUSINESS_API=true`；本輪先觀察到 `prestable` 的 `lw-api-main-00007-4b5` 為 false，收尾時其他工作線新增 `e2e` 的 `lw-api-main-00008-kgk`，成為最新模板，業務開關仍為 false。兩次 `api_config` 都實際回報 `API runtime differs from production; automatic release is blocked`。需 Owner 確認下一版應沿用哪個政策，再核准相應配置處置；本輪不改 true／false、不移除任何 Tag、不放寬發布器比對。
+2. **API 發布護欄修正與其他阻礙**：100% 正式 revision `lw-api-main-c-94975cd3a6854941b1705c5634c777b3` 的 business 為 true，latest/e2e `lw-api-main-00008-kgk` 為 false。本 PR 已依指示準備唯一的 false→正式 true 例外，只調整比較複本，並對新候選明確設定 true；正式政策非明確 true、其他 Runtime 差異或候選變回 false 仍拒絕。實際唯讀檢驗發現 latest 還指向 `life_world_e2e`／`lw_e2e_app` 及不同 DB Secret 參照，正式則為 `life_world_dev`／`lw_app`；因此修正後仍 fail-closed。這些 DB／Secret 差異不在核准例外內，不能擅自忽略或覆寫。e2e 維持 false、hostfix 綁定與所有 Tag 未變。是否及如何恢復正式模板基準，須另列精確處置取得授權。
 3. **正式業務入口／登入**：目前只準備唯讀 `/app/`，維持現有 Web／API IAM。是否讓一般瀏覽器直接進入、受邀帳號如何取得 Session、何時啟用登入，均須沿用核准的存取政策。本輪沒有加 `allUsers`、公開註冊或新的權限。讀取來源保留原 Origin，API Trusted Hosts 不需因 server-to-server 轉送而加 Web hostname。
 4. **資料庫寫入**：`lw_app` 的實際雲端 DML 本輪未核對；不新增 GRANT。登入前至少須確認 users SELECT、sessions SELECT／INSERT／DELETE 的有效權限及限制；其他業務另依實際 SQL／配額表核對。後續寫入也必須核准 API 的 Web Origin，不能改寫瀏覽器 Origin 假裝同來源。`/ready` 的 SELECT 成功不能替代上述驗證。
 

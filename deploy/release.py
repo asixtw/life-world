@@ -35,6 +35,7 @@ RUNTIME_FIELDS = ('serviceAccount', 'vpcAccess', 'volumes', 'executionEnvironmen
                   'healthCheckDisabled', 'nodeSelector', 'serviceMesh', 'gpuZonalRedundancyDisabled')
 ORIGIN = 'LIFEWORLD_EXTERNAL_ORIGIN'
 HOSTS = 'LIFEWORLD_TRUSTED_HOSTS'
+BUSINESS = 'LIFEWORLD_ENABLE_BUSINESS_API'
 LOCK_WAIT_SECONDS = 900
 LOCK_POLL_SECONDS = 5
 
@@ -92,12 +93,21 @@ def runtime_config(template):
 
 def api_overrides(service, production, tag):
     """正式流量 revision 才是 API 設定來源；latest 可能是 localhost hostfix。"""
-    current = service['template']
-    if len(production.get('containers', [])) != 1 or runtime_config(current) != runtime_config(production):
+    current = copy.deepcopy(service['template'])
+    if len(production.get('containers', [])) != 1 or len(current.get('containers', [])) != 1:
         raise ValueError('API runtime differs from production; automatic release is blocked')
     env = {x['name']: x for x in production['containers'][0].get('env', [])}
     if len(env) != len(production['containers'][0].get('env', [])):
         raise ValueError('Duplicate API environment names')
+    # 僅核准 e2e 的 false 與正式 true 差異；正式政策必須明確為 true，不能猜預設值。
+    if env.get(BUSINESS, {}).get('value') != 'true' or env[BUSINESS].get('valueSource'):
+        raise ValueError('API production business policy must be explicitly true')
+    flags = [x for x in current['containers'][0].get('env', []) if x['name'] == BUSINESS]
+    if len(flags) != 1 or flags[0].get('value') not in ('true', 'false') or flags[0].get('valueSource'):
+        raise ValueError('Unexpected API template business policy')
+    flags[0]['value'] = 'true'  # 只調整比較複本；不修改 e2e revision、template 或 Tag。
+    if runtime_config(current) != runtime_config(production):
+        raise ValueError('API runtime differs from production; automatic release is blocked')
     values = {k: v.get('value') for k, v in env.items()}
     origin = values.get(ORIGIN, '')
     parsed = urlsplit(origin)
@@ -124,7 +134,7 @@ def api_overrides(service, production, tag):
         raise ValueError('Unexpected Cloud Run canonical URL')
     # 只移除本發布器的舊候選 Host，避免每次發布累積環境變數；不碰 hostfix revision。
     hosts = [h for h in formal_hosts if not re.fullmatch(r'c-[0-9a-f]{32}---' + re.escape(host), h)]
-    return {ORIGIN: origin, HOSTS: ','.join(dict.fromkeys(hosts + [host, tag + '---' + host]))}
+    return {ORIGIN: origin, HOSTS: ','.join(dict.fromkeys(hosts + [host, tag + '---' + host])), BUSINESS: 'true'}
 
 
 def rollback_owned(service, build_id, revision):
@@ -396,7 +406,7 @@ class Publisher:
                     raise ReleaseError('Candidate changed API runtime configuration')
                 env = {x['name']: x.get('value') for x in candidate['containers'][0]['env']}
                 if any(env.get(k) != v for k, v in overrides.items()):
-                    raise ReleaseError('Candidate did not receive the formal API Origin/Hosts')
+                    raise ReleaseError('Candidate did not receive the formal API Origin/Hosts/business policy')
             service = self.owned()
             if any(tag_map(service).get(k) != v for k, v in previous_tags.items()):
                 raise ReleaseError('An existing tag changed; refusing traffic publication')
