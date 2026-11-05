@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 import os
 import re
+import ipaddress
 from urllib.parse import urlsplit
 
 
@@ -34,7 +35,28 @@ class RuntimeSettings:
     cloud_run: bool = False
     business_enabled: bool = True
 
+    access_mode: str = 'legacy'
+    auth_rate_enabled: bool = False
+    auth_rate_secret: str = field(default='', repr=False)
+    auth_source_mode: str = 'unconfigured'
+    auth_trusted_proxies: tuple = ()
+    alpha_worlds_total: int = 30
+    alpha_worlds_daily: int = 20
+    alpha_owner_writes: int = 100
+    alpha_global_writes: int = 3000
+    alpha_writes_enabled: bool = True
+
     def __post_init__(self):
+        if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy'):
+            raise ValueError('Invalid access/source mode')
+        if self.cloud_run and (self.auth_rate_enabled or self.access_mode=='public_alpha') and self.auth_source_mode=='direct':
+            raise ValueError('Cloud Run requires verified proxy source policy')
+        for n in self.auth_trusted_proxies:
+            if ipaddress.ip_network(n).prefixlen==0:raise ValueError('Wildcard proxies are forbidden')
+        for value in (self.alpha_worlds_total,self.alpha_worlds_daily,self.alpha_owner_writes,self.alpha_global_writes):
+            if not isinstance(value,int) or isinstance(value,bool) or not 1<=value<=1000000:raise ValueError('Invalid Alpha quota')
+        if self.access_mode=='public_alpha' and self.backend=='postgresql' and (self.db_name!='life_world_alpha' or self.db_user!='lw_alpha_app'):
+            raise ValueError('Public Alpha must use isolated database and runtime role')
         # 直接注入設定與環境變數同樣驗證，避免測試／其他入口繞過邊界。
         if self.backend not in ('sqlite', 'postgresql'):
             raise ValueError('Unknown database backend')
@@ -96,4 +118,14 @@ class RuntimeSettings:
                    db_user=os.environ.get('LIFEWORLD_DB_USER', 'lw_app'), db_password=password,
                    instance_connection_name=instance, pool_size=size,
                    trusted_hosts=hosts, secure_cookies=secure, external_origin=origin,
+                   access_mode=os.environ.get('LIFEWORLD_ACCESS_MODE','legacy'),
+                   auth_rate_enabled=flag('LIFEWORLD_AUTH_RATE_ENABLED',False),
+                   auth_rate_secret=os.environ.get('LIFEWORLD_AUTH_RATE_SECRET',''),
+                   auth_source_mode=os.environ.get('LIFEWORLD_AUTH_SOURCE_MODE','unconfigured'),
+                   auth_trusted_proxies=tuple(x.strip() for x in os.environ.get('LIFEWORLD_AUTH_TRUSTED_PROXIES','').split(',') if x.strip()),
+                   alpha_worlds_total=int(os.environ.get('LIFEWORLD_ALPHA_WORLDS_TOTAL','30')),
+                   alpha_worlds_daily=int(os.environ.get('LIFEWORLD_ALPHA_WORLDS_DAILY','20')),
+                   alpha_owner_writes=int(os.environ.get('LIFEWORLD_ALPHA_OWNER_WRITES','100')),
+                   alpha_global_writes=int(os.environ.get('LIFEWORLD_ALPHA_GLOBAL_WRITES','3000')),
+                   alpha_writes_enabled=flag('LIFEWORLD_ALPHA_WRITES_ENABLED',True),
                    cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud))

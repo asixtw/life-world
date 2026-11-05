@@ -37,14 +37,14 @@ def test_catalog_types_constraints_ownership_and_no_theater(app, tmp_path):
     assert not list(tmp_path.glob('*.sqlite*'))
     with bootstrap.admin_connection() as raw, closing(raw.cursor()) as c:
         c.execute("SELECT count(*) FROM pg_tables WHERE schemaname='lw_core_draft'")
-        assert c.fetchone()[0] == 31
+        assert c.fetchone()[0] == 32
         c.execute("SELECT count(*), bool_and(convalidated) FROM pg_constraint WHERE connamespace='lw_core_draft'::regnamespace AND contype='f'")
         assert c.fetchone() == [60, True]
         c.execute("SELECT count(*) FROM information_schema.columns WHERE table_schema='lw_core_draft'")
-        assert c.fetchone()[0] == 203
+        assert c.fetchone()[0] == 207
         c.execute("SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='lw_core_draft'")
         types = {(t, n): d for t, n, d in c.fetchall()}
-        # 31表逐欄與既有 SQLite migration 的全新合成參照比對，不能只驗六個樣本。
+        # 32表逐欄與既有 SQLite migration 的全新合成參照比對，不能只驗六個樣本。
         numeric = {('actions','target'),('actions','per_occurrence'),('contributions','quantity'),
                    ('habit_quantity_versions','quantity'),('pending_contributions','quantity'),
                    ('pending_contributions','accepted_quantity')}
@@ -60,7 +60,7 @@ def test_catalog_types_constraints_ownership_and_no_theater(app, tmp_path):
         expected_types, expected_not_null, expected_fk = {},set(),set()
         with Database(tmp_path / 'explicit-sqlite-schema-reference').connect() as reference:
             tables = [r[0] for r in reference.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
-            assert len(tables) == 31
+            assert len(tables) == 32
             for table in tables:
                 for col in reference.execute('PRAGMA table_info("' + table + '")'):
                     key = (table,col['name'])
@@ -99,7 +99,7 @@ def test_catalog_types_constraints_ownership_and_no_theater(app, tmp_path):
         c.execute("SELECT bool_and(relowner='lw_migration_role'::regrole) FROM pg_class WHERE relnamespace='lw_core_draft'::regnamespace AND relkind IN ('r','S')")
         assert c.fetchone()[0] is True
         c.execute("SELECT count(*) FROM pg_index i JOIN pg_class t ON t.oid=i.indrelid LEFT JOIN pg_constraint c ON c.conindid=i.indexrelid WHERE t.relnamespace='lw_core_draft'::regnamespace AND c.oid IS NULL")
-        assert c.fetchone()[0] == 10
+        assert c.fetchone()[0] == 11
         c.execute("SELECT rolsuper,rolcreatedb,rolcreaterole,rolbypassrls FROM pg_roles WHERE rolname='lw_app'")
         assert c.fetchone() == [False] * 4
         c.execute("SELECT pg_has_role('lw_app','lw_migration_role','MEMBER')")

@@ -23,6 +23,7 @@ from .errors import DomainError  # 共用領域錯誤與條件檢查
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
 from . import media
+from .auth_rate_limit import AuthRateLimiter, AlphaDatabase, AlphaBodyLimit, protection_unavailable
 
 logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的紀錄器
 
@@ -37,6 +38,9 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         from .postgres import PostgresDatabase
         database = PostgresDatabase(settings)
     service = LifeWorld(database or Database(data_dir), policy, clock)
+    limiter=AuthRateLimiter(settings,service.now)
+    limiter.backend=service.db.backend
+    if settings.access_mode=='public_alpha':service.db=AlphaDatabase(service.db,limiter)
     lifespan_lock, active_lifespans = Lock(), 0
 
     @asynccontextmanager
@@ -57,11 +61,12 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
     app.add_middleware(media.MediaBodyLimit, max_bytes=policy.max_upload_bytes + 65536)
+    if settings.access_mode=='public_alpha':app.add_middleware(AlphaBodyLimit)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts))
 
     @app.exception_handler(DomainError)  # 註冊此 HTTP 路由、例外處理器或中介層
     async def domain_error(request, exc):  # 將領域錯誤轉成一致的 HTTP 回應
-        return JSONResponse({'error': {'code': exc.code, 'message': exc.message}}, status_code=exc.status)  # 回傳將領域錯誤轉成一致的 HTTP 回應的結果
+        return JSONResponse({'error': {'code': exc.code, 'message': exc.message}}, status_code=exc.status,headers=getattr(exc,'headers',None))  # 回傳將領域錯誤轉成一致的 HTTP 回應的結果
 
     @app.exception_handler(RequestValidationError)  # 註冊此 HTTP 路由、例外處理器或中介層
     async def validation_error(request, exc):  # 回報欄位格式錯誤，避免回傳密碼與原文
@@ -76,6 +81,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
+        if settings.access_mode=='public_alpha' and request.method not in ('GET','HEAD','OPTIONS'):
+            blocked=request.url.path in ('/api/auth/login','/api/auth/claim','/api/media/recognize') or '/evidence' in request.url.path
+            if blocked:
+                return JSONResponse({'error':{'code':'alpha_feature_unavailable','message':'本輪Alpha僅開放訪客文字體驗；此功能尚未開放。'}},status_code=403,headers={'Cache-Control':'no-store'})
         # 未核准的 Cloud Run revision 只供健康／連線驗證，不接業務讀寫。
         if not settings.business_enabled and request.url.path not in ('/health', '/ready', '/api/health'):
             return JSONResponse({'error': {'code': 'business_api_disabled', 'message': '此服務尚未開放業務操作。'}}, status_code=503)
@@ -145,14 +154,27 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def readiness():
         try:
             service.db.check_ready()
+            limiter.ready(service.db)
         except Exception as exc:
             logger.warning('Readiness failed (%s)', type(exc).__name__)
             return JSONResponse({'status': 'unavailable'}, status_code=503, headers={'Cache-Control': 'no-store'})
         return JSONResponse({'status': 'ready'}, headers={'Cache-Control': 'no-store'})
 
+    @app.get('/api/capabilities',tags=['Identity'])
+    def capabilities():
+        """公開模式說明不含憑證／內部資料；UI與後端共用範圍。"""
+        alpha=settings.access_mode=='public_alpha'
+        return {'access_mode':settings.access_mode,'accounts_available':not alpha,
+                'media_available':False if alpha else app.state.media_provider is not None,
+                'ai_available':False,'writes_available':settings.alpha_writes_enabled if alpha else True,
+                'points':'accumulation_only','redemption_available':False}
+
     @app.post('/api/auth/guest', tags=['Identity'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def guest(request: Request, response: Response):  # 取得既有訪客身分或建立新的訪客世界
-        result, token, created = service.guest(request.cookies.get('lw_session'))  # 取得既有訪客身分或建立新的訪客世界
+        try:
+            result, token, created = service.guest(request.cookies.get('lw_session'),admission=lambda c:limiter.guest_admission(c,request))  # 取得既有訪客身分或建立新的訪客世界
+        except DomainError:raise
+        except Exception:raise protection_unavailable() from None
         response.status_code = 201 if created else 200  # 保存「response.status_code」供後續驗證或回傳使用
         if token:  # 依目前條件選擇下一步處理分支
             cookie(response, token)  # 設定不可由 JavaScript 讀取的工作階段 Cookie
@@ -181,7 +203,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             except DomainError as exc:  # 處理此類預期例外並保留明確失敗結果
                 if exc.status != 401:  # 依目前條件選擇下一步處理分支
                     raise  # 中止目前操作並向呼叫端傳遞錯誤
-        result, token = service.login(data, request.cookies.get('lw_session'))  # 核對密碼並建立工作階段，不合併訪客資料
+        try:
+            result, token = service.login(data, request.cookies.get('lw_session'),limiter=limiter,request=request)  # 核對密碼並建立工作階段，不合併訪客資料
+        except DomainError:raise
+        except Exception:raise protection_unavailable() from None
         cookie(response, token)  # 設定不可由 JavaScript 讀取的工作階段 Cookie
         return result  # 回傳核對密碼並建立工作階段，不合併訪客資料的結果
 

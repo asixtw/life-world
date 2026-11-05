@@ -59,7 +59,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             result['csrf_token'] = csrf  # 保存「result['csrf_token']」供後續驗證或回傳使用
         return result  # 回傳只回傳介面需要的公開帳號欄位的結果
 
-    def guest(self, token):  # 取得既有訪客身分或建立新的訪客世界
+    def guest(self, token, admission=None):  # 取得既有訪客身分或建立新的訪客世界
         if token:  # 依目前條件選擇下一步處理分支
             try:  # 保護可能失敗的操作，交由下方例外分支處理
                 user, csrf = self.session(token)  # 核對登入期限，寫入操作另檢查 CSRF
@@ -68,6 +68,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
                 if exc.status != 401:  # 依目前條件選擇下一步處理分支
                     raise  # 中止目前操作並向呼叫端傳遞錯誤
         with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
+            if admission is not None: admission(c)  # 配額及身分新增必須同交易提交。
             owner = uid()  # 準備目前資料所屬帳號識別碼
             c.execute("INSERT INTO users (id,status,created_at) VALUES (?,'guest',?)", (owner, self.now().isoformat()))  # 新增帳號與個人介紹；值以參數傳入
             token, csrf = new_session(c, owner, self.now(), self.policy)  # 產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊
@@ -93,20 +94,28 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             token, csrf = new_session(c, user['id'], self.now(), self.policy)  # 產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊
             return self.public_user(self._owned_user(c, user['id']), csrf), token  # 回傳將原訪客世界升級為本機帳號並輪換工作階段的結果
 
-    def login(self, data, existing_token=None):  # 核對密碼並建立工作階段，不合併訪客資料
-        with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
-            user = c.execute('SELECT * FROM users WHERE username=?', (data.username.lower(),)).fetchone()  # 執行目前交易中的參數化查詢
-            valid = PASSWORDS.verify(data.password, user['password_hash'] if user else DUMMY_HASH)  # 核對雜湊密碼；未知帳號仍使用替代雜湊
-            require(user is not None and valid, 401, 'invalid_credentials', '帳號或密碼不正確。')  # 驗證限制：帳號或密碼不正確。
-            if existing_token:  # 依目前條件選擇下一步處理分支
-                old = c.execute('SELECT s.*,u.status FROM sessions s JOIN users u ON u.id=s.owner_id WHERE token_hash=?',
-                                (digest(existing_token),)).fetchone()  # 查詢登入工作階段；值以參數傳入
-                if old and datetime.fromisoformat(old['expires_at']) > self.now() and old['owner_id'] != user['id'] and old['status'] == 'guest':  # 依目前條件選擇下一步處理分支
-                    require(data.discard_guest, 409, 'guest_conflict',
-                            '此裝置有訪客世界。登入不會合併資料；若離開訪客身分，可能無法再次取回。')  # 驗證限制：此裝置有訪客世界。登入不會合併資料；若離開訪客身分，可能無法再次取回。
-                c.execute('DELETE FROM sessions WHERE token_hash=?', (digest(existing_token),))  # 刪除登入工作階段；值以參數傳入
-            token, csrf = new_session(c, user['id'], self.now(), self.policy)  # 產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊
-            return self.public_user(user, csrf), token  # 回傳核對密碼並建立工作階段，不合併訪客資料的結果
+    def login(self, data, existing_token=None, limiter=None, request=None):
+        """來源先限流、帳號採軟桶；失敗計數提交後才回HTTP錯誤。"""
+        outcome=None
+        with self.db.connect(write=True) as c:
+            outcome=limiter.login_admission(c,request) if limiter else None
+            if outcome is None:
+                user=c.execute('SELECT * FROM users WHERE username=?',(data.username.lower(),)).fetchone()
+                valid=PASSWORDS.verify(data.password,user['password_hash'] if user else DUMMY_HASH)
+                if user is None or not valid:
+                    outcome=(limiter.failure(c,data.username) if limiter else None) or DomainError(401,'invalid_credentials','帳號或密碼不正確。')
+                else:
+                    if existing_token:
+                        old=c.execute('SELECT s.*,u.status FROM sessions s JOIN users u ON u.id=s.owner_id WHERE token_hash=?',(digest(existing_token),)).fetchone()
+                        if old and datetime.fromisoformat(old['expires_at'])>self.now() and old['owner_id']!=user['id'] and old['status']=='guest' and not data.discard_guest:
+                            outcome=DomainError(409,'guest_conflict','此裝置有訪客世界。登入不會合併資料；若離開訪客身分，可能無法再次取回。')
+                    if outcome is None:
+                        if existing_token:c.execute('DELETE FROM sessions WHERE token_hash=?',(digest(existing_token),))
+                        token,csrf=new_session(c,user['id'],self.now(),self.policy)
+                        if limiter and limiter.enabled:limiter.reset_account(c,data.username)
+                        result=self.public_user(user,csrf),token
+        if outcome is not None:raise outcome
+        return result
 
     def logout(self, token):  # 撤銷目前工作階段
         with self.db.connect(write=True) as c:  # 開啟可回滾的寫入交易，相關修改一起提交

@@ -40,7 +40,8 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
   try { response = await fetch('/api' + path, {...options, headers, credentials:'same-origin', cache:'no-store'}); } // 以同來源 Cookie 送出請求，停用 API 快取
   catch { throw new Error('目前無法連線。請保留內容，連線恢復後再送出；尚未確認保存成功。'); } // 顯示失敗原因，讓使用者保留內容並重試
   const body = response.status === 204 ? null : await response.json(); // 無內容回應不解析 JSON，其他回應讀取本文
-  if (!response.ok) { // 依目前選項或狀態進入對應處理分支
+  if (!response.ok) {
+    if(response.status===429){const seconds=Number(response.headers.get('Retry-After'));if(Number.isFinite(seconds)&&seconds>0&&body?.error)body.error.message+=` 約 ${Math.ceil(seconds/60)} 分鐘後再試。`;} // 依目前選項或狀態進入對應處理分支
     const error = new Error(body?.error?.message || '操作未完成，請重試。'); // 建立包含代碼、狀態與欄位資訊的錯誤
     error.code = body?.error?.code; error.status = response.status; error.fields = body?.error?.fields; // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
     if (response.status === 401 && !path.startsWith('/auth/')) { // 依目前選項或狀態進入對應處理分支
@@ -51,7 +52,8 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
   } // 結束目前回呼、區塊或模組定義
   return body; // 回傳此步驟組合完成的結果
 } // 結束目前回呼、區塊或模組定義
-async function refresh() { // 重新讀取身分與世界資料
+async function refresh() {
+  if(!state.capabilities)state.capabilities=await api('/capabilities'); // 重新讀取身分與世界資料
   state.me = await api('/auth/me'); state.csrf = state.me.csrf_token; // 等待伺服器完成讀取或保存，再進入下一步
   state.world = state.me.lumi_hatched ? await api('/state') : null; // 等待伺服器完成讀取或保存，再進入下一步
 } // 結束目前回呼、區塊或模組定義
@@ -104,7 +106,8 @@ function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#page-label').textContent = names[route] || (route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
   $('#account-button').textContent = state.me?.name?.slice(0,1) || '○'; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
-function welcomeView() { // 產生訪客開始與本機帳號登入入口
+function welcomeView() {
+  if(state.capabilities?.access_mode==='public_alpha')return `<div class="welcome"><h1>Life World Public Alpha</h1><p>用一個獨立測試世界，記下今天的一小步。請勿輸入真實客戶或敏感資料。</p><p>本輪提供目標、文字記錄、人工確認與積分累積；積分尚無兌換用途。AI、語音／圖片辨識與帳號恢復未開放。清除Cookie或登出後，訪客世界無法自行恢復。</p>${button('guest','建立我的測試世界 →')}<p>新增世界與寫入皆有本輪配額；額滿會暫停新增，已保存內容仍可查看。</p></div>`; // 產生訪客開始與本機帳號登入入口
   return `<div class="welcome">${heading('把每一步，種成自己的世界。','不需要一次走很遠。先給想做的事，一個小小的開始。')}<section class="hero"><div class="hero-copy"><div class="eyebrow">A WORLD THAT GROWS WITH YOU</div><h2>從一顆目標蛋，<br>開始你的故事。</h2><p>記下真實的努力，收集成長的痕跡。建立第一個目標後，新的陪伴也將誕生。</p><div class="button-row">${button('guest','不用註冊，先開始 →')}${button('login-dialog','登入我的世界','text-button')}</div></div><div class="hero-art"><span class="egg">⌁</span><span class="spark">✧</span></div></section><p class="small muted">資料保存在此電腦的 Python 服務。訪客尚無帳號恢復保障；請用虛構內容測試。</p></div>`; // 組合「產生訪客開始與本機帳號登入入口」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function profileView() { // 產生個人介紹與時區表單
@@ -210,6 +213,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
 } // 結束目前回呼、區塊或模組定義
 function dialog(content) { $('#account-content').innerHTML = content + '<p id="dialog-error" class="small" role="alert"></p>'; if (!$('#account-dialog').open) $('#account-dialog').showModal(); } // 更新共用對話框並開啟模態視窗
 function accountView(mode = 'account') { // 顯示帳號、升級或登入表單
+  if(state.capabilities?.access_mode==='public_alpha'){dialog('<h2 id="account-heading">Alpha 訪客世界</h2><p>資料位於隔離Alpha測試服務；本輪未開放帳號升級、恢復及私人劇場。請勿輸入敏感資料。</p>');return;}
   if (mode === 'account' && !state.me) mode = 'login'; // 依目前選項或狀態進入對應處理分支
   if (mode === 'account') { // 依目前選項或狀態進入對應處理分支
     dialog(`<h2 id="account-heading">${esc(state.me.name || '你的世界')}</h2><p class="account-state">${state.me.status === 'guest' ? '目前為訪客 · 尚無帳號恢復保障' : '本機帳號：' + esc(state.me.username)}</p><p class="small muted">資料保存在此電腦的 Python 服務。登出會撤銷這個工作階段，不會刪除已保存資料。${state.dirty ? '請先關閉此視窗，保存尚未送出的內容。' : ''}</p><div class="button-row">${state.me.status === 'guest' ? button('claim-dialog','建立帳號，保存世界') : ''}${button('login-dialog','登入其他帳號','secondary')}${button('logout','登出','danger', state.dirty ? 'disabled' : '')}</div>`); // 執行「顯示帳號、升級或登入表單」的目前處理步驟
@@ -287,7 +291,7 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (action === 'guest') {const me = await api('/auth/guest',{method:'POST'}); state.me = me; state.csrf = me.csrf_token; await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定
     if (action === 'claim-dialog') accountView('claim'); // 開啟升級帳號表單
-    if (action === 'login-dialog') accountView('login'); // 開啟登入表單
+    if (action === 'login-dialog') {if(state.capabilities?.access_mode==='public_alpha')throw new Error('Alpha未開放帳號登入／恢復。');accountView('login');} // 開啟登入表單
     if (action === 'close-account') $('#account-dialog').close(); // 關閉對話框
     if (action === 'stay-on-form') {state.pendingRoute = null; $('#account-dialog').close();} // 保留輸入並繼續編輯
     if (action === 'discard-and-leave') {await MediaUI.discard(); const route = state.pendingRoute; state.pendingRoute = null; ConnectionsUI.clearReview(state.draft?.id); $('#account-dialog').close(); navigate(route);} // 明確捨棄時不在下次核對偷偷還原修改

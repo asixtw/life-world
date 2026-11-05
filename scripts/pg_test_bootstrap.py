@@ -73,12 +73,45 @@ def bootstrap():
         with closing(migrator.cursor()) as c:
             c.execute('SET ROLE lw_migration_role')
             c.execute((ROOT / 'docs/database/schema-2026-11-02/POSTGRESQL_CORE_DRAFT.sql').read_text(encoding='utf-8'))
+            c.execute((ROOT / 'deploy/postgres/auth_rate_limit.review.sql').read_text(encoding='utf-8'))
             c.execute((ROOT / 'deploy/postgres/app_dml_grants.review.sql').read_text(encoding='utf-8'))
     with admin_connection() as raw, closing(raw.cursor()) as c:
         c.execute("COMMENT ON DATABASE life_world_dev IS 'STEP10_LOCAL_SYNTHETIC_ONLY'")
         c.execute("SELECT count(*) FROM information_schema.tables WHERE table_schema='lw_core_draft'")
-        assert c.fetchone()[0] == 31
-    print('Local PG18 initialized: 31 core tables; no theater schema; no cloud operations')
+        assert c.fetchone()[0] == 32
+    bootstrap_alpha()
+    print('Local PG18 initialized: dev and isolated Alpha synthetic fixtures; no cloud operations')
+
+
+def bootstrap_alpha():
+    """專用本機cluster建立Alpha合成fixture；既有庫必須有marker，不覆寫資料。"""
+    with admin_connection('postgres') as raw, closing(raw.cursor()) as c:
+        c.execute("SELECT shobj_description(oid,'pg_database') FROM pg_database WHERE datname='life_world_alpha'")
+        existing=c.fetchone()
+        if existing is not None:
+            if existing[0]!='STEP10_LOCAL_SYNTHETIC_ONLY':
+                raise ValueError('Refusing existing unmarked Alpha database')
+            return
+        for role in ('lw_alpha_owner','lw_alpha_migrator','lw_alpha_app_role','lw_alpha_app'):
+            c.execute('SELECT 1 FROM pg_roles WHERE rolname=?',(role,))
+            if c.fetchone() is not None:
+                raise ValueError('Refusing pre-existing Alpha roles without marked database')
+        c.execute('CREATE DATABASE life_world_alpha')
+    with admin_connection('life_world_alpha') as raw, closing(raw.cursor()) as c:
+        c.execute((ROOT/'deploy/postgres/alpha_roles_database.review.sql').read_text(encoding='utf-8'))
+        for role in ('lw_alpha_migrator','lw_alpha_app'):
+            c.execute("SELECT format('ALTER ROLE %I PASSWORD %L', ?::text, ?::text)",(role,test_config()['password']))
+            c.execute(c.fetchone()[0])
+    with driver.connect(user='lw_alpha_migrator', database='life_world_alpha', **test_config()) as raw:
+        raw.autocommit=True
+        with closing(raw.cursor()) as c:
+            c.execute('SET ROLE lw_alpha_owner')
+            for name in ('docs/database/schema-2026-11-02/POSTGRESQL_CORE_DRAFT.sql',
+                         'deploy/postgres/alpha_auth_rate_limit.review.sql',
+                         'deploy/postgres/alpha_app_grants.review.sql'):
+                c.execute((ROOT/name).read_text(encoding='utf-8'))
+    with admin_connection('life_world_alpha') as raw, closing(raw.cursor()) as c:
+        c.execute("COMMENT ON DATABASE life_world_alpha IS 'STEP10_LOCAL_SYNTHETIC_ONLY'")
 
 
 if __name__ == '__main__':
