@@ -1,4 +1,4 @@
-"""建置安全邊界：測試先於 API 產物、不可加入部署或沿用 web image。"""
+"""建置安全邊界：驗證 API 產物後，只能經由既有安全發布器部署。"""
 from pathlib import Path
 import os
 import re
@@ -9,20 +9,34 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_api_build_is_test_then_build_push_only():
+def test_api_build_releases_only_after_test_build_verify_and_push():
     config = yaml.safe_load((ROOT / 'deploy/cloudbuild.api.yaml').read_text(encoding='utf-8'))
     assert config['serviceAccount'] == 'projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com'
     steps = config['steps']
     ids = [step['id'] for step in steps]
     assert ids.index('sqlite-and-real-pg18-tests') < ids.index('api-image-build') < ids.index('api-container-verification') < ids.index('api-image-push')
     image = 'asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api:${COMMIT_SHA}-${BUILD_ID}'
-    assert config['images'] == [image]
+    # 明確 Push 必須先於發布；不得讓 images 在切流量後重複上傳。
+    assert 'images' not in config
+    assert ids[-2:] == ['api-image-push', 'deploy-main']
+    release = steps[-1]
+    assert release['name'] == 'gcr.io/google.com/cloudsdktool/google-cloud-cli:slim'
+    assert release['entrypoint'] == '/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python3'
+    assert release['args'] == ['deploy/release.py', '--component', 'api',
+                               '--commit', '$COMMIT_SHA', '--build-id', '$BUILD_ID',
+                               '--branch', '$BRANCH_NAME']
     build = steps[ids.index('api-image-build')]['args']
     assert image in build and 'VCS_REF=${COMMIT_SHA}' in build and 'deploy/Dockerfile.api' in build
     assert steps[ids.index('api-image-push')]['args'] == ['push', image]
     commands = '\n'.join('\n'.join(s.get('args',[])) for s in steps)
     assert 'gcloud ' not in commands and 'lw-web' not in commands
     assert 'run deploy' not in commands and 'triggers' not in commands
+    # YAML 不得繞過發布器，另加公開存取、IAM、Cloud SQL 或 hostfix 改動。
+    for forbidden in ('--allow-unauthenticated', '--no-invoker-iam-check', 'allUsers',
+                      'allAuthenticatedUsers', 'set-iam-policy', 'add-iam-policy-binding',
+                      'sql instances', 'sql databases', 'sql users', '--clear-tags',
+                      '--remove-tags=hostfix', '--tag=hostfix'):
+        assert forbidden not in commands
     assert 'staging' not in commands and 'lw-build-stg' not in config['serviceAccount']
     tests = steps[ids.index('sqlite-and-real-pg18-tests')]['args'][-1]
     assert tests.count('pytest tests') == 2

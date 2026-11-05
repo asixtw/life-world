@@ -1,5 +1,13 @@
 # TDD 與實際驗收紀錄
 
+## 首次自動部署已知失敗修復（2026-11-05，合併前檢查）
+
+基準 `1cd3458`：Web 在發布步驟找不到 PATH 上的 python3，API 舊契約讀取已移除的 images。API 單檔先重現 1 failed／2 passed；新增發布容器契約亦先重現舊映像不符，修正後 `.venv\Scripts\python.exe -X utf8 -m pytest --noconftest tests/test_api_build_config.py -q --tb=short -p no:cacheprovider`：3 passed、0 failed、0 skipped。兩份 YAML 解析及發布入口契約通過，`release.py` 與基準逐位元內容（統一換行後）一致，候選／回滾邏輯未修改；未重跑完整 API 測試。
+
+Windows／既有 WSL 無 Docker CLI，本機容器檢查未執行成功；經使用者明確同意，僅提交一次無原始碼、無部署的 Cloud Build `8eab4a4f-ef32-4dd4-8812-f24e854945e9`，結果 SUCCESS。官方 google-cloud-cli:slim（digest `sha256:8a50079dfc4b164aa5e83926bef5f9b305b93e80f82d40fabd836da4830dd08e`）實際 PATH 無 python3，但映像自帶 `/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python3` 可匯入發布器所需標準庫並呼叫 gcloud 592.0.0，日誌為 RELEASE_RUNTIME_CHECK=PASS。兩份 YAML 改用該官方映像與已驗證絕對入口，不另安裝套件。
+
+Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，commit e9f9661；00005-qtk 於 2026-11-05 17:18 建立，commit 4ece786，creator 為 lw-build-main，digest 與既有 Web Trigger 的成功 Build `da542cb1-7aea-4083-a617-13e9c3186266` 結果完全一致，早於本次 CI/CD 啟用失敗。未因此修改流量。本節僅記合併前驗證，不代表修復後的正式發布已通過。
+
 ## 自動 CI/CD 最終準備（2026-11-05，續 e368379）
 
 先以虛擬時間新增兩個鎖等待案例，舊版實際 2 failed（180 秒提前結束，無法等到第 240 秒／不足 900 秒），修正後僅重跑直接相關檢查：`.venv\Scripts\python.exe -X utf8 -m pytest deploy/tests/test_release.py -q --tb=short -p no:cacheprovider -k 'lock or cancelled or rollback_cannot or older_rebuild'`：9 passed、15 deselected、0 skipped；Python AST／Web timeout 基本檢查通過。第一次相關檢查為 6 passed、3 failed，三項均因沙箱 TEMP 的 WinError 5 無法 chdir，改以正常 TEMP 執行後上述 9 項通過，未修改案例放寬斷言。Web／API `--preflight` 本輪各通過，未出現 Traffic has no resolved revision。未重跑整套測試、未部署／改流量。IAM 專案直接政策僅 Logging Writer／Run Developer，自身 policy 為空，角色定義不含兩項待查權限；有效權限因 Troubleshooter API 未啟用、組織政策查詢 403 而未能完整確認，不標為通過或確定缺少，也未修改 IAM。安全解除遺留鎖僅有文件程序，未實際執行。

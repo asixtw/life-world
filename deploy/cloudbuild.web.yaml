@@ -69,8 +69,9 @@ steps:
       - asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web:${COMMIT_SHA}-${BUILD_ID}
 
   - id: deploy-main
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
-    entrypoint: python3
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    # 直接使用映像自帶的 Python，不依賴系統 PATH 有 python3。
+    entrypoint: /usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python3
     args:
       - deploy/release.py
       - --component

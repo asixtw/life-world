@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-05 首次 CI/CD 失敗最小修復
+
+Web／API 發布步驟改用官方 google-cloud-cli:slim 與映像自帶 Python 的絕對路徑；一次獨立容器檢查已證實兩者可執行。API 建置契約改驗證 Test→Build→Container Verification→明確 Push→release.py，禁止恢復 images 後置推送，保留公開存取／SQL／hostfix 安全限制。僅 API 契約 3 項及 YAML 基本檢查，發布器主要邏輯、IAM、資料庫、流量不改；正式重新部署須經本次 PR Merge 授權。
+
 ## 2026-11-05 CI/CD 等鎖與事故復原補充（續 e368379）
 
 等鎖由 180 秒延長為 900 秒、輪詢 5 秒，保留 etag、新舊版本護欄及執行中 Build 不可接管；Web 總 timeout 改為 2700 秒。補入以 Build 終止狀態、Cloud Run 收斂、journal／實際流量及新 etag 為前提的最小事故復原程序，禁止覆蓋其他操作者流量。9 項相關檢查及本輪雙 preflight 通過；兩項 IAM 有效權限受組織可見權限限制尚未完整確認，不補 IAM、不改正式流量、不 Push／Merge。
