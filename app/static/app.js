@@ -32,6 +32,10 @@ function showError(error) { // 在頁面與對話框顯示可閱讀的錯誤
   if ($('#source-dialog')?.open) $('#source-error').textContent=error.message+fields; // 來源儲存失敗保持表單並顯示退路
 } // 結束目前回呼、區塊或模組定義
 async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與連線失敗處理
+  if(state.capabilities?.read_only && !['GET','HEAD'].includes((options.method || 'GET').toUpperCase())) {
+    const error = new Error('目前僅開放資料回讀，登入與資料寫入尚未啟用。');
+    error.status=403; error.code='read_only'; throw error; // UI 與 gateway 都拒絕寫入，不只隱藏按鈕。
+  }
   const headers = {'X-CSRF-Token':state.csrf, ...options.headers}; // 為寫入請求帶上目前工作階段的 CSRF 代碼
   if (options.body && !(options.body instanceof FormData)) { // 依目前選項或狀態進入對應處理分支
     headers['Content-Type'] = 'application/json'; options.body = JSON.stringify(options.body); // 序列化提交內容供 API 或請求指紋使用
@@ -54,6 +58,8 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
 } // 結束目前回呼、區塊或模組定義
 async function refresh() {
   if(!state.capabilities)state.capabilities=await api('/capabilities');
+  const readOnlyNotice=$('#read-only-notice');
+  if(readOnlyNotice)readOnlyNotice.hidden=!state.capabilities.read_only;
   // 同時保留Alpha入口能力與Dashboard跨帳號快照隔離，避免合併遺失任一安全規則。
   const previousOwner=state.me?.owner_id;
   state.me=await api('/auth/me');
@@ -113,6 +119,7 @@ function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').textContent = state.me?.name?.slice(0,1) || '○'; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function welcomeView() {
+  if(state.capabilities?.read_only)return `<div class="welcome"><h1>Life World</h1><p>目前僅開放資料回讀。</p><p>有效工作階段可查看既有世界、目標與紀錄；登入、建立世界及資料寫入尚未啟用。</p></div>`;
   if(state.capabilities?.access_mode==='public_alpha')return `<div class="welcome"><h1>Life World Public Alpha</h1><p>用一個獨立測試世界，記下今天的一小步。請勿輸入真實客戶或敏感資料。</p><p>本輪提供目標、文字記錄、人工確認與積分累積；積分尚無兌換用途。AI、語音／圖片辨識與公開註冊未開放。清除Cookie或登出後，匿名訪客世界無法自行恢復；預建帳號可登入同一世界。</p><div class="button-row">${button('guest','建立我的測試世界 →')}${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}</div><p>新增世界與寫入皆有本輪配額；額滿會暫停新增，已保存內容仍可查看。</p></div>`; // 產生訪客開始與本機帳號登入入口
   return `<div class="welcome">${heading('把每一步，種成自己的世界。','不需要一次走很遠。先給想做的事，一個小小的開始。')}<section class="hero"><div class="hero-copy"><div class="eyebrow">A WORLD THAT GROWS WITH YOU</div><h2>從一顆目標蛋，<br>開始你的故事。</h2><p>記下真實的努力，收集成長的痕跡。建立第一個目標後，新的陪伴也將誕生。</p><div class="button-row">${button('guest','不用註冊，先開始 →')}${button('login-dialog','登入我的世界','text-button')}</div></div><div class="hero-art"><span class="egg">⌁</span><span class="spark">✧</span></div></section><p class="small muted">資料保存在此電腦的 Python 服務。訪客尚無帳號恢復保障；請用虛構內容測試。</p></div>`; // 組合「產生訪客開始與本機帳號登入入口」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義

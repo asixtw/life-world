@@ -1,5 +1,17 @@
 # TDD 與實際驗收紀錄
 
+## PR #14 正式模板恢復方案（2026-11-06，未執行變更）
+
+僅查指定API：現有兩個main Trigger沒有E2E部署項；歷史E2E指引仍指向main，Audit確認使用者身分於台北03:01執行gcloud.run.deploy並建立00008-kgk，不能宣稱已停止再部署。完整比對正式Revision可寫模板與latest，差異為DB／DB user／Secret參照／business／Trusted Hosts；所有非env模板欄位、容量／Probe一致。根據live v2 schema構造完整正式template與具名traffic，以最新etag送validateOnly=true，請求已接受；前後etag／generation／latestCreatedRevision／template／trafficStatuses完全相同，沒有實際建立Revision。真實恢復、恢復後Preflight、IAM授權、Merge、Cloud Build、Cloud SQL業務Session讀取均未執行。PR的Gateway Origin已依實際Service URI設定，audience一致；YAML解析／Origin靜態核對通過，發布器與gateway程式相對0bb4c9d未改。完整方案與停止／回復條件見[恢復提案](../deploy/README.api-template-recovery.md)。
+
+## PR #14 雲端唯讀入口準備（2026-11-06，未授權啟用／Merge）
+
+既有檔新增正式 business true／e2e false 邊界，先重現3 failed／3 passed；最終 `python -X utf8 -m pytest --noconftest deploy/tests/test_release.py -q --tb=short -p no:cacheprovider -k api`：6 passed／22 deselected，無擴充測試專案。只放行指定業務開關差異，DB名稱／使用者、Secret名稱／版本、VPC與Runtime SA差異仍拒絕；候選完整比較仍檢查business。Cloud Run v2實際Service URI與Gateway固定Origin／audience一致。修正後真實唯讀preflight仍BLOCKED，原因另有 `life_world_dev/lw_app` 對 `life_world_e2e/lw_e2e_app` 及不同Secret參照；沒有放寬或套用修正來掩蓋它。只讀IAM未見Web runtime在API服務／project的直接binding；沒有授權或查組織政策。Gateway Origin仍空、PR保持Draft，Cloud Build／候選發布／真實Cloud SQL業務讀取均未執行；e2e false、hostfix與正式流量保持原狀。
+
+## Web → FastAPI 唯讀串接（2026-11-06，未部署）
+
+`python -X utf8 -m unittest discover -s collaboration/ui-kit/tools -p test_web_server.py -q`：14 passed。`python -X utf8 -m pytest tests/test_web_gateway.py tests/test_api_build_config.py deploy/tests/test_web_main.py -q --tb=short -p no:cacheprovider`：14 passed、0 skipped，合計28 passed。先重現11個未實作錯誤、真正UI唯讀缺失1 failed／1 passed；沒有以環境失敗充當紅燈。Edge實際執行既有app/static，網路攔截至ASGI，讀取隔離SQLite既有Session／目標；讀取期間禁止write transaction、跨owner維持拒絕，不呼叫Cloud SQL。依賴只安裝到獨立TEMP，14項server安全測試涵蓋metadata快取／錯audience、Session隔離、Origin／SSRF、Google token不外洩、寫入拒絕及失敗健康檢查。Docker／新Cloud Build／雲端業務DML未執行；只唯讀發現Web runtime未見API明確Invoker授權，以及API prestable與正式business開關差異導致現有發布護欄阻擋。現有Caddy、hostfix、prestable、正式流量、IAM、DB不改；細節與精確核准範圍見[串接候選](../deploy/README.web-gateway.md)。
+
 ## 首次自動部署已知失敗修復（2026-11-05，合併前檢查）
 
 基準 `1cd3458`：Web 在發布步驟找不到 PATH 上的 python3，API 舊契約讀取已移除的 images。API 單檔先重現 1 failed／2 passed；新增發布容器契約亦先重現舊映像不符，修正後 `.venv\Scripts\python.exe -X utf8 -m pytest --noconftest tests/test_api_build_config.py -q --tb=short -p no:cacheprovider`：3 passed、0 failed、0 skipped。兩份 YAML 解析及發布入口契約通過，`release.py` 與基準逐位元內容（統一換行後）一致，候選／回滾邏輯未修改；未重跑完整 API 測試。

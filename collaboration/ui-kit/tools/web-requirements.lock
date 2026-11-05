@@ -1,0 +1,18 @@
+# 僅 Web gateway 所需套件；版本沿用既有 requirements.lock，不含 DB driver 或 Google key SDK。
+annotated-doc==0.0.5
+annotated-types==0.7.0
+anyio==4.12.1
+certifi==2026.10.23
+click==8.1.8
+colorama==0.4.6; sys_platform == 'win32'
+fastapi==0.128.8
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.20
+pydantic==2.13.5
+pydantic-core==2.46.5
+starlette==0.49.3
+typing-extensions==4.16.0
+typing-inspection==0.4.2
+uvicorn==0.39.0

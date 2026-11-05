@@ -26,6 +26,7 @@ def service():
                              {'name': 'LIFEWORLD_DB_NAME', 'value': 'life_world_dev'},
                              {'name': 'LIFEWORLD_INSTANCE_CONNECTION_NAME', 'value': 'life-world-513506:asia-east1:lw-pg-staging-trial'},
                              {'name': 'LIFEWORLD_DB_PASSWORD', 'valueSource': {'secretKeyRef': {'secret': 'existing-secret', 'version': '1'}}},
+                             {'name': 'LIFEWORLD_ENABLE_BUSINESS_API', 'value': 'true'},
                              {'name': 'LIFEWORLD_EXTERNAL_ORIGIN', 'value': 'https://api-example.a.run.app'},
                              {'name': 'LIFEWORLD_TRUSTED_HOSTS', 'value': 'api-example.a.run.app'},
                              {'name': 'LIFEWORLD_SECURE_COOKIES', 'value': 'true'}]}]}}
@@ -79,7 +80,59 @@ class ReleaseSafety(unittest.TestCase):
         result = release.api_overrides(current, production, 'c-test')
         self.assertEqual(result['LIFEWORLD_EXTERNAL_ORIGIN'], 'https://api-example.a.run.app')
         self.assertIn('c-test---api-example.a.run.app', result['LIFEWORLD_TRUSTED_HOSTS'].split(','))
-        self.assertEqual(set(result), {'LIFEWORLD_EXTERNAL_ORIGIN', 'LIFEWORLD_TRUSTED_HOSTS'})
+        self.assertEqual(result['LIFEWORLD_ENABLE_BUSINESS_API'], 'true')
+        self.assertEqual(set(result), {'LIFEWORLD_EXTERNAL_ORIGIN', 'LIFEWORLD_TRUSTED_HOSTS', 'LIFEWORLD_ENABLE_BUSINESS_API'})
+
+    def test_api_false_e2e_template_uses_true_formal_policy_without_mutating_tags(self):
+        current = service()
+        production = copy.deepcopy(current['template'])
+        current['template']['containers'][0]['env'][5]['value'] = 'false'
+        current['trafficStatuses'].append({'revision': 'e2e-fixed', 'tag': 'e2e'})
+        before = copy.deepcopy(current)
+        result = release.api_overrides(current, production, 'c-test')
+        self.assertEqual(result['LIFEWORLD_ENABLE_BUSINESS_API'], 'true')
+        self.assertEqual(current, before)
+        routes = release.promoted_traffic(current, 'candidate')
+        self.assertEqual({x['tag']: x['revision'] for x in routes if x.get('tag')},
+                         {'hostfix': 'fixed', 'e2e': 'e2e-fixed'})
+
+    def test_api_requires_explicit_true_formal_policy(self):
+        for value in ('false', 'TRUE', None):
+            current = service()
+            production = copy.deepcopy(current['template'])
+            for template in (current['template'], production):
+                if value is None:
+                    template['containers'][0]['env'].pop(5)
+                else:
+                    template['containers'][0]['env'][5]['value'] = value
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                release.api_overrides(current, production, 'c-test')
+
+    def test_api_business_exception_does_not_mask_any_other_runtime_drift(self):
+        for field in ('serviceAccount', 'vpcAccess', 'database', 'database_user', 'secret', 'secret_name'):
+            current = service()
+            production = copy.deepcopy(current['template'])
+            current['template']['containers'][0]['env'][5]['value'] = 'false'
+            if field == 'serviceAccount':
+                current['template']['serviceAccount'] = 'different-runtime'
+            elif field == 'vpcAccess':
+                current['template']['vpcAccess']['egress'] = 'ALL_TRAFFIC'
+            elif field == 'database':
+                current['template']['containers'][0]['env'][2]['value'] = 'different-database'
+            elif field == 'database_user':
+                current['template']['containers'][0]['env'].append({'name': 'LIFEWORLD_DB_USER', 'value': 'lw_e2e_app'})
+            elif field == 'secret_name':
+                current['template']['containers'][0]['env'][4]['valueSource']['secretKeyRef']['secret'] = 'different-reference'
+            else:
+                current['template']['containers'][0]['env'][4]['valueSource']['secretKeyRef']['version'] = '2'
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                release.api_overrides(current, production, 'c-test')
+
+    def test_api_candidate_comparison_still_rejects_false_business_policy(self):
+        production = service()['template']
+        candidate = copy.deepcopy(production)
+        candidate['containers'][0]['env'][5]['value'] = 'false'
+        self.assertNotEqual(release.runtime_config(candidate), release.runtime_config(production))
 
     def test_api_network_or_secret_drift_blocks_release(self):
         for field in ('vpcAccess', 'containers'):

@@ -4,7 +4,7 @@
 
 `cloudbuild.api.yaml` 保留 SQLite／PG18.6 合成測試、容器驗證與明確 image push，最後使用共用 `release.py` 發布候選；不連 Cloud SQL 執行 migration、SQL 管理或合成資料寫入。候選 `/health`、`/ready` 使用 IAM ID token；通過後自動發布到明確 revision，正式網址檢查失敗自動回復。程序健康不能取代 `/ready`，也不把 readiness 當作業務 DML 授權證明。
 
-API 正式設定從當時 100% 正式流量的 revision 取得，不使用 latest hostfix 的 localhost Origin。只有當 latest 與正式 revision 的 VPC、Cloud SQL／Secret 參照、容量及其他執行設定完全相符，才覆寫兩個必要變數：正式 `LIFEWORLD_EXTERNAL_ORIGIN`、正式 `LIFEWORLD_TRUSTED_HOSTS` 加該候選精確 hostname。其他設定保持不變。任何差異或不明配置皆禁止自動發布。
+API 正式設定從當時 100% 正式流量的 revision 取得，不使用 latest hostfix 的 localhost Origin。正式 `LIFEWORLD_ENABLE_BUSINESS_API` 必須明確為 `true`；只允許 latest/e2e 在此欄為 `false` 的已指定差異，其他 VPC、Cloud SQL／Secret 參照、容量、Runtime SA 等仍須完全相符。新候選明確設定正式 `LIFEWORLD_EXTERNAL_ORIGIN`、正式 `LIFEWORLD_TRUSTED_HOSTS` 加該候選精確 hostname，以及 `LIFEWORLD_ENABLE_BUSINESS_API=true`。候選完成後仍作完整 Runtime 比對，沒有把 business 欄全域排除；既有 e2e／hostfix revision 與 Tag 不修改。任何其他差異或不明配置皆禁止自動發布。
 
 `hostfix` 必須持續指向 `lw-api-main-00004-yiv`，既有 URL 不改。發布器只新增／清理自己的 `c-<Build ID>` tag，不刪除或重指派 hostfix。讀取當下完整流量作為回復來源，不能硬編碼一個舊 revision。
 
