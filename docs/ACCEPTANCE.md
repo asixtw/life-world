@@ -1,5 +1,9 @@
 # TDD 與實際驗收紀錄
 
+## 自動 CI/CD 發布護欄（2026-11-05）
+
+本輪 `python -X utf8 -m unittest discover -s deploy/tests -p 'test_*.py' -q`：31 passed、0 failed、0 skipped。只測 YAML／Bash、合成發布控制平面及關鍵來源／CAS／回滾邊界；沒有執行 Cloud Build、Artifact Push 或正式流量發布。新增函式先重現 10 項未實作失敗；發布回應遺失先重現錯誤流量保留，再補上回滾與取消後恢復 journal。API 唯讀 `--preflight`、兩服務的 Cloud Run `validateOnly` 請求格式檢查成功，沒有讀 Secret 值或 Cloud SQL 資料。兩個既有 Trigger 只修改 includedFiles 並讀回 Web 19／API 12 項，來源與 SA 未變；首個 PATCH 缺必要 query 欄位遭 400 拒絕，補齊後成功，未啟動建置或修改 IAM／流量。既有 React、SQLite／PG 與容器驗證步驟原樣保留，並未以本輪結果冒充重跑。完整機制、一次性權限及啟用界線見 `deploy/README.web-main.md`、`deploy/README.api-main.md`。
+
 ## v0.4.0 單一目標與三個習慣（2026-10-28～29）
 
 本輪實測 **137 項後端、19 項 Chromium 全數通過，0 失敗、0 跳過**。涵蓋分步建立、月／週日期、返回草稿、到期回顧、逐筆採計、歷史與原有完整回歸；27 個既有資料表原欄位遷移前後一致。完整命令、有效紅燈、手機／桌面圖與限制見[單一目標驗收](GOAL_FLOW_ACCEPTANCE.md)。下方數字是各舊版本當時結果。2026-10-29 發布準備另行重跑的命令與結果見[v0.4 發布檢查](GITHUB_PUBLISH_V0_4.md)，不覆寫初次 TDD 證據。

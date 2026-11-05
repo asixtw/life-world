@@ -36,7 +36,7 @@ def shell(script, *, syntax=False, env=None):
 class WebMainDeployment(unittest.TestCase):
     def test_build_identity_and_step_order(self):
         self.assertEqual(CONFIG['serviceAccount'],'projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com')
-        self.assertEqual(list(STEPS),['validate-source','react-tests','react-build','image-build','image-push','deploy-main'])
+        self.assertEqual(list(STEPS),['validate-source','release-safety-tests','react-tests','react-build','image-build','image-push','deploy-main'])
         self.assertEqual(CONFIG['options']['logging'],'CLOUD_LOGGING_ONLY')
 
     def test_unique_image_tag_is_consistent(self):
@@ -44,20 +44,20 @@ class WebMainDeployment(unittest.TestCase):
         build=STEPS['image-build']['args']
         self.assertEqual(build[build.index('-t')+1],tag)
         self.assertEqual(STEPS['image-push']['args'],['push',tag])
-        self.assertEqual(CONFIG['images'],[tag])
-        self.assertIn('$${IMAGE}:${COMMIT_SHA}-${BUILD_ID}',STEPS['deploy-main']['args'][-1])
+        self.assertNotIn('images',CONFIG)  # 正式發布之後不可再有隱藏的映像上傳步驟。
+        self.assertEqual(STEPS['deploy-main']['args'], ['deploy/release.py','--component','web',
+                         '--commit','$COMMIT_SHA','--build-id','$BUILD_ID','--branch','$BRANCH_NAME'])
         self.assertNotEqual(substitute(tag,build_id=BUILD_IDS[0]),substitute(tag,build_id=BUILD_IDS[1]))
 
     def test_runtime_resources_and_digest(self):
-        script=STEPS['deploy-main']['args'][-1]
-        self.assertIn('gcloud run deploy lw-web-main ',script)
-        self.assertIn('--image="$${IMAGE}@$${DIGEST}"',script)
-        for flag in ('--region=asia-east1','--port=8080','--memory=256Mi','--cpu=1',
-                     '--min-instances=0','--max-instances=2','--concurrency=80','--timeout=60',
-                     '--service-account=lw-web-runtime@life-world-513506.iam.gserviceaccount.com',
-                     'environment=main','commit-sha=$COMMIT_SHA'):
-            self.assertIn(flag,script)
-        self.assertNotIn('staging',script)
+        script=(ROOT/'deploy/release.py').read_text(encoding='utf-8')
+        self.assertIn("'--image=' + image + '@' + digest",script)
+        self.assertIn("'--no-traffic'",script)
+        self.assertIn("'--revision-suffix=' + self.tag",script)
+        self.assertIn("'--service-account=' + runtime_sa",script)
+        # 未傳入容量／網路／Secret 設定：沿用服務現況，API 另核對正式 revision。
+        for flag in ('--clear-env-vars','--clear-secrets','--clear-vpc-connector','--remove-cloudsql-instances'):
+            self.assertNotIn(flag,script)
 
     def test_private_access_policy_is_preserved(self):
         source=(ROOT/'deploy/cloudbuild.web.yaml').read_text(encoding='utf-8')
@@ -85,7 +85,7 @@ class WebMainDeployment(unittest.TestCase):
             self.assertIn(expected,source)
 
     def test_shell_syntax_after_substitution(self):
-        for name in ('validate-source','deploy-main'):
+        for name in ('validate-source',):
             for build_id in BUILD_IDS:
                 with self.subTest(step=name,build_id=build_id):
                     result=shell(substitute(STEPS[name]['args'][-1],build_id=build_id),syntax=True)
@@ -99,45 +99,14 @@ class WebMainDeployment(unittest.TestCase):
             with self.subTest(sha=sha,project=project):
                 self.assertEqual(shell(substitute(script,sha=sha,project=project)).returncode==0,valid)
 
-    def test_deploy_mock_uses_exact_digest_and_propagates_errors(self):
-        # 模擬器不會呼叫外部 gcloud；未預期參數直接失敗。
-        mock=r'''
-gcloud() {
-  if [ "$1 $2 $3 $4" = 'artifacts docker images describe' ]; then
-    printf '%s\n' "$5" > "$MOCK_QUERY"
-    [ "$MOCK_LOOKUP_FAIL" = 'false' ] || return 42
-    printf '%s\n' "$MOCK_DIGEST"
-  elif [ "$1 $2" = 'run deploy' ]; then
-    printf '%s\n' "$@" > "$MOCK_DEPLOY"
-    [ "$MOCK_DEPLOY_FAIL" = 'false' ] || return 43
-  else return 99; fi
-}
-'''
-        cases=[('valid1',BUILD_IDS[0],'sha256:'+'a'*64,False,False),
-               ('valid2',BUILD_IDS[1],'sha256:'+'b'*64,False,False),
-               ('empty',BUILD_IDS[0],'',False,False),('short',BUILD_IDS[0],'sha256:abc',False,False),
-               ('badhex',BUILD_IDS[0],'sha256:'+'g'*64,False,False),
-               ('lookup',BUILD_IDS[0],'sha256:'+'a'*64,True,False),
-               ('deploy',BUILD_IDS[0],'sha256:'+'a'*64,False,True)]
-        with tempfile.TemporaryDirectory() as temporary:
-            for name,bid,digest,lookup_fail,deploy_fail in cases:
-                with self.subTest(case=name):
-                    query,capture=Path(temporary)/('query-'+name),Path(temporary)/('deploy-'+name)
-                    env=dict(os.environ,MOCK_QUERY=query.as_posix(),MOCK_DEPLOY=capture.as_posix(),
-                        MOCK_DIGEST=digest,MOCK_LOOKUP_FAIL=str(lookup_fail).lower(),MOCK_DEPLOY_FAIL=str(deploy_fail).lower())
-                    result=shell(mock+'\n'+substitute(STEPS['deploy-main']['args'][-1],build_id=bid),env=env)
-                    self.assertEqual(query.read_text().strip(),IMAGE+':'+SHA+'-'+bid)
-                    if name.startswith('valid'):
-                        self.assertEqual(result.returncode,0,result.stderr)
-                        arguments=capture.read_text().splitlines()
-                        self.assertEqual(arguments[:3],['run','deploy','lw-web-main'])
-                        self.assertIn('--image='+IMAGE+'@'+digest,arguments)
-                    elif deploy_fail:
-                        self.assertNotEqual(result.returncode,0)
-                        self.assertTrue(capture.exists())
-                    else:
-                        self.assertNotEqual(result.returncode,0)
-                        self.assertFalse(capture.exists())
+    def test_both_pipelines_end_with_the_same_guarded_publisher(self):
+        api=yaml.safe_load((ROOT/'deploy/cloudbuild.api.yaml').read_text(encoding='utf-8'))
+        self.assertEqual(api['steps'][-1]['args'][0],'deploy/release.py')
+        self.assertEqual(api['steps'][-1]['args'][2],'api')
+        self.assertEqual(api['steps'][-2]['id'],'api-image-push')
+        self.assertNotIn('images',api)
+        self.assertTrue(any(x['id']=='sqlite-and-real-pg18-tests' for x in api['steps']))
+        self.assertTrue(any(x['id']=='api-container-verification' for x in api['steps']))
 
 
 if __name__=='__main__':

@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-05 自動 CI/CD（工程交付，未推送 main）
+
+Web／API 共用 `deploy/release.py`：固定 digest 的 0% 候選、IAM 健康檢查、指定 revision 發布、etag 發布鎖、防舊建置覆蓋與失敗回滾；保留 API 正式設定／hostfix 隔離及既有合成測試。不修改 App／DB schema，不執行資料庫 migration；本機 31 項部署檢查與唯讀 API 設定預檢通過，不代表已完成雲端發布。詳見兩份現行部署 README。
+
 建立／最後更新：2026-11-03（Asia/Taipei）。維護原則見[共同研發指引](PRODUCT_GUIDE.md)。這是功能演進的完整紀錄入口；[ROADMAP](ROADMAP.md)保存後續工作，驗收證據仍保留於原文件。
 
 ## 版本與證據如何閱讀

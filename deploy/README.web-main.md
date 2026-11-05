@@ -1,5 +1,19 @@
 # React Web main 部署交接
 
+## 2026-11-05 自動發布（現行實作）
+
+`cloudbuild.web.yaml` 保留 React tests／build／明確 image push，最後呼叫 `release.py`。以 digest、`--no-traffic` 與每個 Build ID 的唯一 tag 建候選；以 Build SA 的 IAM ID token 檢查 `/health` 後，自動將 100% 流量指向該 revision。正式網址檢查失敗會自動恢復先前的完整流量配置。既有容量、網路、runtime SA 與私人 IAM 沿用，不增加每版人工核准。
+
+同一服務以 Cloud Run service annotation＋etag 取得發布鎖；原 build 未結束不搶鎖。失敗／取消留下的發布 journal 由後續 build 先回復。發布前核對 GitHub main 的相關來源及上次成功發布時間，防止舊 commit／同 commit 的較舊 build 覆蓋新版；後續只改 API 的 main commit 不阻擋 Web。所有等待都有上限，來源或控制平面無法確認即停止。
+
+Trigger `711e7258-2725-4007-a555-0f0100b77dbc` 的 `includedFiles` 已於本輪更新並讀回為 `release.py` 的 `WEB_FILES`：依 ui-kit Docker context 白名單列 9 個根檔、7 個來源目錄，再加 Web YAML、共用發布器及其安全測試。排除 UI 說明文件與 API 無關改動。只修改此欄，既有 Trigger／連線／`^main$`／Build SA 不重建，未因此啟動建置。
+
+一次性啟用條件：Build SA 除既有部署權限外，須能 `cloudbuild.builds.get`（讀取本次與遺留鎖 build 狀態）及對自己執行 `iam.serviceAccounts.getOpenIdToken`（IAM 健康檢查）。可分別使用專案 `roles/cloudbuild.builds.viewer`、Build SA 自身資源上的 `roles/iam.serviceAccountOpenIdTokenCreator`，不需要廣泛 Token Creator 或匿名存取。本批不修改 IAM；合入 main 前須完成一次性權限核對。日常 Push 後不需要人工進 GCP。
+
+本機必要檢查：`python -m unittest discover -s deploy/tests -p 'test_*.py' -q`（依 `deploy/tests/requirements.txt` 安裝測試依賴）。無 GCP 副作用的 `python deploy/release.py --component web --preflight` 僅核對現有流量。正式發布入口只接受既有 main trigger 的來源，沒有 Push／Merge 授權前不送入 main。
+
+以下為先前交接／歷史驗證，人工逐版部署步驟已由上述流程取代。
+
 更新：2026-11-03。現行部署來源統一為 `main`，Build SA為 `lw-build-main`，Cloud Run目標為 `lw-web-main`。本輪只在隔離工作樹修改、測試及本機commit，沒有Push、PR合併、Cloud Build或GCP部署。舊Cloud Run服務與GitHub staging分支均未刪除。
 
 這是 `collaboration/ui-kit` 的React／Vite候選展示站，尚未接入完整FastAPI／PostgreSQL、真實登入或辨識API。POC、Staging與Production共用main中已驗證來源，不複製不同程式碼；目前此YAML只處理指定Web展示服務。
