@@ -85,6 +85,44 @@
         }
       }
     },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Process Health",
+        "operationId": "process_health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Readiness",
+        "operationId": "readiness_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/guest": {
       "post": {
         "tags": [
@@ -319,6 +357,47 @@
         ],
         "summary": "Get Goal",
         "operationId": "get_goal_api_goals__goal_id__get",
+        "parameters": [
+          {
+            "name": "goal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Goal Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/goals/{goal_id}/dashboard": {
+      "get": {
+        "tags": [
+          "Goals"
+        ],
+        "summary": "Goal Dashboard",
+        "description": "只讀 owner 的目標儀表板，不更新進度或帳本。",
+        "operationId": "goal_dashboard_api_goals__goal_id__dashboard_get",
         "parameters": [
           {
             "name": "goal_id",

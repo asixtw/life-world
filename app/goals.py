@@ -70,6 +70,35 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
         goal['allowed_actions'] = ['record', 'complete', 'end', 'schedule'] if goal['status'] == 'active' else ['record', 'complete', 'extend', 'end'] if goal['status'] == 'awaiting_review' else ['setup', 'complete', 'end'] if goal['status'] == 'needs_setup' else []  # 前後端使用同一行為來源。
         return goal  # 不因讀取而改狀態或資料。
 
+    def goal_dashboard(self, owner, goal_id):
+        """同一唯讀快照彙整目標；正式貢獻才算投入，草稿與待採計分開。"""
+        with self.db.connect() as c:
+            user = self._owned_user(c, owner)
+            goal = self._goal(c, goal_id, owner)
+            today = date.fromisoformat(goal['today'])
+            zone = ZoneInfo(goal['schedule_timezone'] or user['timezone'])
+            days = { (today - timedelta(days=i)).isoformat(): {} for i in range(6, -1, -1) }
+            confirmed_today = set()
+            first = datetime.combine(today-timedelta(days=6), datetime.min.time(), zone).isoformat()
+            last = datetime.combine(today+timedelta(days=1), datetime.min.time(), zone).isoformat()
+            # 以 experience_id 去重，不把一段經歷的多個習慣貢獻算成多段故事。
+            # PG 欄位是 timestamptz／boolean，不能沿用 SQLite 的 julianday 或整數比較。
+            period_sql = 'e.occurred_at>=CAST(? AS timestamptz) AND e.occurred_at<CAST(? AS timestamptz)' if self.db.backend == 'postgresql' else 'julianday(e.occurred_at)>=julianday(?) AND julianday(e.occurred_at)<julianday(?)'
+            for row in c.execute('SELECT e.id,e.summary,e.raw_text,e.occurred_at,k.action_id FROM experiences e JOIN contributions k ON k.experience_id=e.id AND k.owner_id=e.owner_id JOIN actions a ON a.id=k.action_id AND a.owner_id=e.owner_id WHERE e.owner_id=? AND e.goal_id=? AND a.goal_id=? AND ' + period_sql, (owner, goal_id, goal_id, first, last)):
+                day = datetime.fromisoformat(row['occurred_at']).astimezone(zone).date().isoformat()
+                if day in days:
+                    days[day][row['id']] = {key: row[key] for key in ('id','summary','raw_text','occurred_at')}
+                if day == goal['today']:
+                    confirmed_today.add(row['action_id'])
+            in_period = bool(goal['start_date'] and goal['deadline'] and goal['start_date'] <= goal['today'] <= goal['deadline'])
+            habits = []
+            for action in goal['actions']:
+                planned = in_period and (goal['today'] in action['dates'] if action['dates'] is not None else today.weekday() in action['weekdays'])
+                habits.append({'actionId':action['id'], 'title':action['title'], 'unit':action['unit'], 'progress':action['progress'], 'target':action['target'], 'plannedToday':planned, 'plannedQuantityToday':planned_quantity(action['quantity_versions'], goal['today']) if planned else None, 'confirmedToday':action['id'] in confirmed_today, 'scheduledDayCount':len(action['dates']) if action['dates'] is not None else None, 'nextScheduledDate':next((day for day in sorted(action['dates'] or []) if day>=goal['today']),None) if goal['status']=='active' else None, 'scheduleDates':action['dates'], 'quantityVersions':action['quantity_versions']})
+            tasks = [dict(r) for r in c.execute('SELECT t.* FROM tasks t JOIN experiences e ON e.id=t.experience_id AND e.owner_id=t.owner_id WHERE t.owner_id=? AND e.goal_id=? AND NOT t.done ORDER BY t.id', (owner, goal_id))]
+            drafts = [dict(r) for r in c.execute("SELECT id,raw_text,updated_at FROM drafts WHERE owner_id=? AND goal_id=? AND status='draft' ORDER BY updated_at DESC,id", (owner, goal_id))]
+            return {'goal':{k:goal[k] for k in ('id','title','outcome','status','start_date','deadline','revision')}, 'goalId':goal_id, 'today':goal['today'], 'timezone':str(zone), 'updatedAt':self.now().isoformat(), 'habits':habits, 'openTasks':tasks, 'drafts':drafts, 'unconfirmedDraftCount':len(drafts), 'pendingContributions':[p for p in goal['pending_contributions'] if p['status']=='pending'], 'trend':{'status':'available','days':[{'date':day,'confirmedExperienceCount':len(rows),'experiences':sorted(rows.values(),key=lambda r:(r['occurred_at'],r['id']))} for day,rows in days.items()]}}
+
     def calendar(self, owner, goal_id, start=None, end=None):  # 用實際日期取代固定 28 日。
         with self.db.connect() as c:  # 使用同一讀取快照。
             user = self._onboarded(c, owner)  # 首目標限制保持。

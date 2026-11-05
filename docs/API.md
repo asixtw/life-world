@@ -129,3 +129,11 @@ Cookie `lw_session` 為 HttpOnly。先呼叫 guest 或 login，再以回傳 `csr
 經歷 Confirm 增加 interaction_type（預設 unknown）、interaction_event_id（關聯同一次互動）、person_updates（只有 selected=true 才更新的四維度候選）。人物資訊、互動、經歷與積分共用交易及 owner 驗證；舊請求的預設欄位不改動原去重指紋。
 
 私人筆記增加 source_experience_ids；來源由後端檢查。筆記、模擬與訊息草稿不呼叫真實經歷確認與記帳。
+
+## Goal Dashboard（2026-11-03）
+
+新增唯讀 `GET /api/goals/{goal_id}/dashboard`，同一owner快照彙整三習慣、目標時區今日安排、關聯任務／草稿／待採計與七日正式採計經歷。事件按發生日去重，不修改任何帳本。[欄位與口徑](GOAL_DASHBOARD.md)。
+
+Goal Detail v0.2：`habits`新增 `scheduledDayCount`（舊日期未知為null）、`nextScheduledDate`（active目標今天起最近安排，無則null）、`scheduleDates`及`quantityVersions`。其餘既有去重、時區、權限與唯讀口徑不變。
+
+HabitScheduleDisclosure v0.3沿用calendar端點，每次明確請求當月與目標期間的交集；`planned_quantities[actionId]` 是單日期望量，不是完成量。前端新增日期與必填時間欄位，但寫入仍只提交既有`occurred_at`，不新增公開API欄位。[驗收](HABIT_SCHEDULE_ACCEPTANCE.md)。

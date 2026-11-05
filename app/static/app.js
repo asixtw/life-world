@@ -44,8 +44,8 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
     if(response.status===429){const seconds=Number(response.headers.get('Retry-After'));if(Number.isFinite(seconds)&&seconds>0&&body?.error)body.error.message+=` 約 ${Math.ceil(seconds/60)} 分鐘後再試。`;} // 依目前選項或狀態進入對應處理分支
     const error = new Error(body?.error?.message || '操作未完成，請重試。'); // 建立包含代碼、狀態與欄位資訊的錯誤
     error.code = body?.error?.code; error.status = response.status; error.fields = body?.error?.fields; // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
-    if (response.status === 401 && !path.startsWith('/auth/')) { // 依目前選項或狀態進入對應處理分支
-      state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.dirty = false; // 成功保存或明確導覽後清除未保存旗標
+    if (response.status === 401 && (!path.startsWith('/auth/') || path === '/auth/me')) { // 依目前選項或狀態進入對應處理分支
+      DashboardUI.clear(); state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.dirty = false; // 成功保存或明確導覽後清除未保存旗標
       $('#account-dialog').close(); await render(); // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
     } // 結束目前回呼、區塊或模組定義
     throw error; // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
@@ -53,9 +53,15 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
   return body; // 回傳此步驟組合完成的結果
 } // 結束目前回呼、區塊或模組定義
 async function refresh() {
-  if(!state.capabilities)state.capabilities=await api('/capabilities'); // 重新讀取身分與世界資料
-  state.me = await api('/auth/me'); state.csrf = state.me.csrf_token; // 等待伺服器完成讀取或保存，再進入下一步
-  state.world = state.me.lumi_hatched ? await api('/state') : null; // 等待伺服器完成讀取或保存，再進入下一步
+  if(!state.capabilities)state.capabilities=await api('/capabilities');
+  // 同時保留Alpha入口能力與Dashboard跨帳號快照隔離，避免合併遺失任一安全規則。
+  const previousOwner=state.me?.owner_id;
+  state.me=await api('/auth/me');
+  if(previousOwner!==state.me.owner_id){state.world=null;DashboardUI.clear();}
+  state.csrf=state.me.csrf_token;
+  state.world=state.me.lumi_hatched?await api('/state'):null;
+  state.worldReadError=false;
+
 } // 結束目前回呼、區塊或模組定義
 function requestId(scope, body) { // 相同內容沿用提交代碼，避免重送造成重複入帳
   const fingerprint = JSON.stringify(body); // 序列化提交內容供 API 或請求指紋使用
@@ -73,22 +79,22 @@ function button(action, label, style = 'primary', attributes = '') { return `<bu
 function heading(title, subtitle, action = '') { return `<div class="heading"><div><div class="eyebrow">YOUR LITTLE UNIVERSE</div><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div>${action}</div>`; } // 產生頁面標題與說明
 function lumi() { return '<div class="hero-art" aria-label="目標蛋建立後誕生的 Lumi"><div class="ground"></div><div class="lumi"><i class="leaf"></i><i class="eyes"></i><i class="beak"></i><i class="wing"></i></div><span class="spark" aria-hidden="true">✧</span></div>'; } // 以 HTML 與 CSS 組合 Lumi 外觀
 function empty(message, action = '') { return `<div class="empty"><span class="empty-icon">✳</span>${esc(message)}${action ? '<div class="space-top">' + action + '</div>' : ''}</div>`; } // 產生空資料提示與下一步入口
-function localInput(iso = new Date().toISOString()) { // 依帳號時區轉成表單需要的當地時間
-  const parts = new Intl.DateTimeFormat('sv-SE', {timeZone:state.me?.timezone || 'Asia/Taipei', year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)); // 依帳號時區拆出日期與時間欄位
+function localInput(iso = new Date().toISOString(), zone = state.me?.timezone || 'Asia/Taipei') { // 依帳號時區轉成表單需要的當地時間
+  const parts = new Intl.DateTimeFormat('sv-SE', {timeZone:zone, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)); // 依帳號時區拆出日期與時間欄位
   const p = Object.fromEntries(parts.map(x => [x.type,x.value])); // 取得目前人物或日期欄位資料
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; // 組合「依帳號時區轉成表單需要的當地時間」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
-function inputISO(value) { // 將當地時間換算 UTC，並拒絕不存在的當地時間
+function inputISO(value, zone = state.me?.timezone || 'Asia/Taipei') { // 將當地時間換算 UTC，並拒絕不存在的當地時間
   const components = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/); // 檢查當地日期時間輸入格式並拆出數字
   if (!components) throw new Error('請填寫實際發生時間。'); // 依目前選項或狀態進入對應處理分支
   const desired = Date.UTC(...components.slice(1).map((v,i) => Number(v) - (i === 1 ? 1 : 0))); // 將輸入欄位組成待換算的日期數值
   let instant = desired; // 逐次校正當地時區對應的 UTC 時刻
   for (let i = 0; i < 3; i++) { // 執行「將當地時間換算 UTC，並拒絕不存在的當地時間」的目前處理步驟
-    const rendered = localInput(new Date(instant).toISOString()); // 以帳號時區回算目前 UTC 候選時間
+    const rendered = localInput(new Date(instant).toISOString(), zone); // 以帳號時區回算目前 UTC 候選時間
     const p = rendered.match(/\d+/g).map(Number); p[1]--; // 取得目前人物或日期欄位資料
     instant += desired - Date.UTC(...p); // 執行「將當地時間換算 UTC，並拒絕不存在的當地時間」的目前處理步驟
   } // 結束目前回呼、區塊或模組定義
-  if (localInput(new Date(instant).toISOString()) !== value) throw new Error('此當地時間不存在，請重新選擇。'); // 依目前選項或狀態進入對應處理分支
+  if (localInput(new Date(instant).toISOString(), zone) !== value) throw new Error('此當地時間不存在，請重新選擇。'); // 依目前選項或狀態進入對應處理分支
   return new Date(instant).toISOString(); // 回傳此步驟組合完成的結果
 } // 結束目前回呼、區塊或模組定義
 function time(iso) { return new Intl.DateTimeFormat('zh-TW', {timeZone:state.me?.timezone || 'Asia/Taipei',dateStyle:'medium',timeStyle:'short'}).format(new Date(iso)); } // 以帳號時區顯示日期與時間
@@ -114,12 +120,22 @@ function profileView() { // 產生個人介紹與時區表單
   return `<div class="narrow">${heading('先認識一下你。','這個世界，從你的名字與一點點自我介紹開始。')}<form id="profile-form" class="card"><div class="step-label"><span class="step-dot">1</span>認識你 → 建立目標 → 新的陪伴</div><div class="field"><label for="profile-name">希望怎麼稱呼你？</label><input id="profile-name" name="name" maxlength="80" required value="${esc(state.me.name)}" placeholder="你的名字或暱稱"></div><div class="field"><label for="bio">一點點關於你</label><textarea id="bio" name="bio" maxlength="2000" required placeholder="現在的你，在意什麼、想靠近什麼？">${esc(state.me.bio)}</textarea></div><div class="field"><label for="timezone">你的時區</label><input id="timezone" name="timezone" value="${esc(state.me.timezone)}" required></div><button class="primary">接著，建立第一個目標 →</button></form></div>`; // 組合「產生個人介紹與時區表單」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function goalForm() { return GoalsUI.form(); } // 分步設定三個習慣與日期。
-function worldView() { // 產生 Lumi、目標、今日行動與待辦首頁
-  const w = state.world, active = w.goals.filter(GoalsUI.open); // 讀取目前帳號的世界資料
-  const weekday = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].indexOf(new Intl.DateTimeFormat('en-US',{timeZone:state.me.timezone,weekday:'short'}).format(new Date())); // 依帳號時區取得當天星期索引
-  const today = active.filter(g=>g.status==='active').flatMap(g=>g.actions.filter(a=>a.dates?.includes(GoalsUI.today())).map(a=>({...a,goal:g.title}))); // 今日行動依實際日期判定。
-  return `${heading(`${state.me.name}，歡迎回來。`,'你的每一點努力，都讓這個世界更靠近你。',link('record','＋ 記下一次經歷','primary'))}<section class="hero"><div class="hero-copy"><span class="tag">一點一點，慢慢長大</span><h2 class="space-top">今天也一起，<br>照顧心裡的那顆種子。</h2><p>我是 Lumi。無論你走到哪裡，這個世界都會為你留一個位置。</p><div class="button-row">${link('record','記錄今天的一小步 →','primary')}${link('goals','看看我的目標','text-button')}</div></div>${lumi()}</section><div class="stats"><div class="stat"><span class="stat-icon">♧</span><div><b>${active.length}</b><small>正在成長的目標</small></div></div><div class="stat"><span class="stat-icon">▤</span><div><b>${w.experiences.length}</b><small>已確認的真實經歷</small></div></div><div class="stat"><span class="stat-icon">✧</span><div><b>${w.rewards.total}</b><small>累積積分 · 開發規則</small></div></div></div><div class="grid"><section><div class="section-title"><h2>我的目標花園</h2>${link('goals','查看全部 →','text-button')}</div><div class="stack">${active.length ? active.slice(0,2).map(goalCard).join('') : empty('這一段已經完成，也可以種下新的方向。',link('goal-new','建立新目標','primary'))}</div></section><section><div class="section-title"><h2>今天，可以做的一小步</h2><span class="tag">依你的排程</span></div><div class="card">${today.length ? today.map(a => `<div class="list-item"><div class="list-start"><span class="circle-icon">↗</span><div class="item-main"><h3>${esc(a.title)}</h3><p>${esc(a.goal)} · Lv${a.level}</p></div></div>${link('record','記錄','text-button')}</div>`).join('') : empty('今天沒有排定行動，依照自己的節奏就好。')}</div><div class="section-title space-top"><h2>待辦與下一步</h2></div><div class="card">${w.tasks.length ? w.tasks.map(t => `<label class="check-line"><input type="checkbox" data-task="${esc(t.id)}" ${t.done ? 'checked' : ''}>${esc(t.title)}</label>`).join('') : empty('確認經歷時，可以留下想做的下一步。')}</div></section></div>${w.drafts.length ? `<div class="callout space-top">有 ${w.drafts.length} 份已保存、未確認的草稿。 ${link('history','繼續上次的記錄 →','text-button')}</div>` : ''}`; // 組合「產生 Lumi、目標、今日行動與待辦首頁」所需的畫面或提交資料
-} // 結束目前回呼、區塊或模組定義
+// 依目標生命週期選擇操作；資料不完整只降級呈現，不推斷正式狀態。
+function homeGoalPanel(w,failed=false) {
+  if(failed)return '<section class="card home-goal"><h2>目前挑戰</h2><p role="alert">暫時無法讀取最新資料，請重試。</p><button type="button" class="primary" data-home-retry>重新讀取</button></section>';
+  const goals=w.goals.filter(GoalsUI.open);
+  if(goals.length>1)return `<section class="card home-goal"><h2>請先整理目前挑戰</h2><p>有多個尚未結束的目標，請逐一檢視。</p>${link('goals','整理目標','primary')}</section>`;
+  const g=goals[0];
+  if(!g)return `<section class="card home-goal"><h2>讓故事有個起點</h2><p>先選一個方向，再設定三個重要習慣。</p>${link('goal-new','建立新目標','primary')}${link('goals','目標旅程','text-button')}</section>`;
+  const vm=mapHomeHabitOverview(g),review=g.status==='awaiting_review',setup=g.status==='needs_setup';
+  return `<section class="card home-goal"><span class="tag">${esc(GoalsUI.labels[g.status]||g.status)}</span><h2>${esc(g.title)}</h2><p>${esc(g.outcome||'')}</p><h3>我的三個習慣</h3>${vm.items.length?renderHomeHabitRows(vm,(id,body)=>`<a class="home-habit-row" href="#goal/${esc(g.id)}">${body}</a>`):'<p>三個習慣資料尚未完整，請進入目標補設定。</p>'}<p class="muted">排程代表打算做；投入以確認的經歷為準。</p><div class="button-row">${review||setup?link('goal/'+g.id,review?'查看並回顧':'補齊目標設定','primary'):link('record?goal='+g.id,'記錄新經歷','primary')}${review?link('record?goal='+g.id,'記錄新經歷','text-button'):''}${link('goal/'+g.id,'查看目前挑戰','text-button')}</div></section>`;
+}
+async function worldView() {
+  // 首頁直接使用同次 /state 快照，不為摘要額外載入完整 Dashboard。
+  const failed=!!state.worldReadError,w=failed?null:state.world;
+  return heading(`${state.me.name}，歡迎回來。`,'每一段投入，都值得被留下。')+`<div class="home-overview"><section class="hero home-lumi"><div class="hero-copy"><h2>Lumi</h2><p>照自己的步調，慢慢前進。</p></div>${lumi()}</section>${homeGoalPanel(w,failed)}</div>`+(w?ConnectionsUI.worldMini()+`<section class="card space-top"><h2>待辦與下一步</h2>${w.tasks.length?w.tasks.map(t=>`<label class="check-line"><input type="checkbox" data-task="${esc(t.id)}" ${t.done?'checked':''}>${esc(t.title)}</label>`).join(''):empty('確認經歷時，可以留下想做的下一步。')}${w.drafts.length?`<p>有 ${w.drafts.length} 份未確認草稿。${link('history','繼續上次的記錄','text-button')}</p>`:''}${link('people?view=cards','人物劇場','text-button')}<p class="muted">選擇人物後進入私人小劇場。</p></section>`:'');
+}
+
 function personField(selected = null) { // 產生選填人物欄位與訪客升級入口
   return `<div class="field"><label for="person-id">關聯人物（選填）</label><select id="person-id" name="person_id"><option value="">不關聯人物</option>${options(state.world.people, selected, 'name')}${state.me.status === 'guest' ? '<option value="__upgrade">建立帳號，再新增／關聯人物…</option>' : ''}</select>${button('new-person','＋ 新增人物','text-button')}</div>`; // 組合「產生選填人物欄位與訪客升級入口」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
@@ -132,8 +148,11 @@ function recordView() { // 產生原始經歷表單並帶入人物與目標上�
   const params = new URLSearchParams(location.hash.split('?')[1] || ''); // 解析目前路由的查詢參數
   const goalId = d ? d.goal_id : params.has('goal') ? params.get('goal') : params.has('person') ? null : active[0]?.id; // 保留目前選定目標的識別碼
   const goal = state.world.goals.find(g => g.id === goalId); // 讀取目前選定目標及其行動資料
+  const actionContext=!d&&goal?.actions.find(a=>a.id===params.get('action'));
+  const requestedDate=params.get('date');
+  const calendarDate=!d&&actionContext&&/^\d{4}-\d{2}-\d{2}$/.test(requestedDate||'')&&requestedDate>=goal.start_date&&requestedDate<=goal.deadline&&requestedDate<=goal.today?requestedDate:null;
   const personId = d ? d.person_id : params.get('person'); // 保留來源人物的識別碼
-  return `<div class="narrow">${heading('把這一刻，記下來。','今天的小事、昨天的努力，都值得有一個位置。')}<form id="record-form" class="card"><div class="step-label"><span class="step-dot">1</span>原始紀錄 → 人工核對 → 正式保存</div><div class="field"><label for="raw-text">發生了什麼？</label><textarea id="raw-text" name="raw_text" maxlength="20000" required placeholder="用自己的話記下真實經過…">${esc(d?.raw_text || '')}</textarea></div><div id="media-panel"></div><div class="field"><label for="occurred-at">實際發生時間 · ${esc(state.me.timezone)}</label><input id="occurred-at" name="occurred_at" type="datetime-local" required value="${esc(localInput(d?.occurred_at))}"><span class="small muted">可以補記過去的經歷。發生時間與現在的提交時間會分別保存。</span></div><div class="field"><label for="goal-id">關聯目標（選填）</label><select id="goal-id" name="goal_id"><option value="">不關聯目標</option>${options(state.world.goals, goalId)}</select></div>${personField(personId)}${ConnectionsUI.editor(d?.story,'record')}<div id="contribution-fields">${contributionFields(goal, d?.contributions)}</div><div class="callout">人物是選填的。若選擇人物操作，訪客需要先建立帳號；升級時保留這份內容。確認前不累計、不發放積分。</div><div class="button-row"><button class="primary" name="intent" value="review">保存草稿並進入核對 →</button><button class="secondary" name="intent" value="save">先存草稿</button></div></form></div>`; // 組合「產生原始經歷表單並帶入人物與目標上下文」所需的畫面或提交資料
+  return `<div class="narrow">${heading('把這一刻，記下來。','今天的小事、昨天的努力，都值得有一個位置。')}<form id="record-form" class="card" ${calendarDate?'data-calendar-zone="'+esc(goal.schedule_timezone)+'"':''}><div class="step-label"><span class="step-dot">1</span>原始紀錄 → 人工核對 → 正式保存</div><div class="field"><label for="raw-text">發生了什麼？</label><textarea id="raw-text" name="raw_text" maxlength="20000" required placeholder="用自己的話記下真實經過…">${esc(d?.raw_text || '')}</textarea></div><div id="media-panel"></div>${calendarDate?`<div class="field"><label for="calendar-date">實際發生日期 · ${esc(goal.schedule_timezone)}</label><input id="calendar-date" name="calendar_date" type="date" required value="${esc(calendarDate)}"><label for="calendar-time">實際發生時間（請確認並填寫）</label><input id="calendar-time" name="calendar_time" type="time" required><input id="occurred-at" name="occurred_at" type="hidden" value=""><p>這是從月曆帶入的日期，請自行確認實際時間；沒有預填實際投入量。</p></div>`:`<div class="field"><label for="occurred-at">實際發生時間 · ${esc(state.me.timezone)}</label><input id="occurred-at" name="occurred_at" type="datetime-local" required value="${esc(localInput(d?.occurred_at))}"><span class="small muted">可以補記過去的經歷。發生時間與現在的提交時間會分別保存。</span></div>` }<div class="field"><label for="goal-id">關聯目標（選填）</label><select id="goal-id" name="goal_id"><option value="">不關聯目標</option>${options(state.world.goals, goalId)}</select></div>${personField(personId)}${ConnectionsUI.editor(d?.story,'record')}<div id="contribution-fields">${actionContext?'<p class="callout">本次記錄：'+esc(actionContext.title)+'；請自行填寫實際投入量。</p>':''}${contributionFields(goal, d?.contributions)}</div><div class="callout">人物是選填的。若選擇人物操作，訪客需要先建立帳號；升級時保留這份內容。確認前不累計、不發放積分。</div><div class="button-row"><button class="primary" name="intent" value="review">保存草稿並進入核對 →</button><button class="secondary" name="intent" value="save">先存草稿</button></div></form></div>`; // 組合「產生原始經歷表單並帶入人物與目標上下文」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function reviewView(d) { // 產生人工核對頁，分開保存經歷與勾選人物更新
   const goal = state.world.goals.find(g => g.id === d.goal_id); // 讀取目前選定目標及其行動資料
@@ -154,9 +173,10 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   state.renderGeneration = sequence; // 用本次渲染序號拒絕較舊非同步回應覆蓋畫面
   lockRenderControls(); // 切頁開始前鎖住舊表單，避免非同步載入時遺失輸入
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
+  ScheduleUI.leave();
   MediaUI.leave(); // 切頁前保存裝置草稿並停止麥克風，取消舊辨識回應。
   let route = location.hash.slice(1) || 'world'; // 取得目前 hash 指定的目的頁面
-  if(!options.localGoalEdit && state.me && /^(world|goals|goal-new|goal\/)/.test(route)) {await refresh();if(sequence!==renderSequence)return;} // 跨日與另一視窗更新後，重新核對目標狀態。
+  if(!options.localGoalEdit && state.me && /^(world|goals|goal-new|goal\/)/.test(route)) {try{await refresh();}catch(error){if(route==='world'&&state.me&&![401,403].includes(error.status)){state.worldReadError=true;}else if(!(route==='goals'||route.startsWith('goal/'))||!state.me||!state.world||[401,403].includes(error.status))throw error;}if(sequence!==renderSequence)return;} // 跨日與另一視窗更新後，重新核對目標狀態。
   let params = new URLSearchParams(route.split('?')[1] || ''); // 解析目前路由的查詢參數
   if (route.startsWith('history?') && params.get('person')) { // 依目前選項或狀態進入對應處理分支
     route = 'person/' + params.get('person') + '?tab=history'; history.replaceState(null, '', '#' + route); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
@@ -175,8 +195,8 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   else if (path === 'profile') html = profileView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'goal-new') html = goalForm(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'birth') html = `<div class="narrow"><section class="hero"><div class="hero-copy"><div class="eyebrow">A NEW BEGINNING</div><h1>目標蛋誕生了。<br>你好，我是 Lumi。</h1><p>你的方向，讓這個世界有了第一顆種子。從現在起，我們一起慢慢走。</p>${link('world','進入我的世界 →','primary')}</div>${lumi()}</section></div>`; // 依目前選項或狀態進入對應處理分支
-  else if (path === 'world') html = worldView().replace('<div class="grid">', ConnectionsUI.worldMini()+'<div class="grid space-top">'); // 依目前選項或狀態進入對應處理分支
-  else if (path === 'goals') html = GoalsUI.list(); // 目前挑戰與歷史分區顯示。
+  else if (path === 'world') html = await worldView(); // 依目前選項或狀態進入對應處理分支
+  else if (path === 'goals') html = await GoalsUI.list(); // 目前挑戰與歷史分區顯示。
   else if (path.startsWith('goal/')) html = await goalView(path.split('/')[1],options.localGoalEdit); // 依目前選項或狀態進入對應處理分支
   else if (path === 'record') {state.returnTo=params.get('return')||null; html=recordView();} // 依目前選項或狀態進入對應處理分支
   else if (path.startsWith('review/')) { // 依目前選項或狀態進入對應處理分支
@@ -193,10 +213,11 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   else if (path.startsWith('media-sources/')) html = `<div class="narrow">${heading('此裝置的原始素材','素材未同步至其他裝置，這裡的編輯不會改動正式經歷。')}${link('history','返回經歷收藏','secondary')}<div id="media-panel"></div></div>`;
   else if (path === 'history') html = '<div id="media-local-drafts"></div>'+historyView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'private-notes') html = notesView(); // 依目前選項或狀態進入對應處理分支
-  else html = worldView(); // 處理前述條件不成立時的替代流程
+  else html = await worldView(); // 處理前述條件不成立時的替代流程
   if ((path === 'record' || path.startsWith('review/')) && state.returnTo) html=link(state.returnTo,'返回人物頁','text-button')+html; // 依目前選項或狀態進入對應處理分支
   if (sequence === renderSequence) {
-    $('#app').innerHTML = html; state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);
+    $('#app').innerHTML = html; ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);
+    const section=params.get('section');if(['gd-today','gd-week','gd-records'].includes(section)){document.getElementById(section)?.focus();document.getElementById(section)?.scrollIntoView({block:'start'});}
     if (state.me && path==='history') await MediaUI.renderDrafts(state.me.owner_id);
     if (state.me && $('#media-panel')) {
       const scope = path.startsWith('review/') || path.startsWith('media-sources/') ? 'draft:'+path.split('/')[1] : state.editingDraft && state.draft ? 'draft:'+state.draft.id : 'new:'+route;
@@ -251,7 +272,7 @@ function contributions(form) { // 只送出非空且非零的人工行動貢獻
   return [...new FormData(form)].filter(([key,value]) => key.startsWith('quantity-') && value !== '' && Number(value) !== 0).map(([key,value]) => ({action_id:key.slice(9),quantity:value})); // 讀取使用者目前表單值，不直接推論人物資訊
 } // 結束目前回呼、區塊或模組定義
 async function saveDraft(form, review, destination = 'history') { // 新增或依版本修改草稿，成功後接續核對或返回
-  const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.get('occurred_at')),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
+  const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.has('calendar_time')?f.get('calendar_date')+'T'+f.get('calendar_time'):f.get('occurred_at'),form.dataset.calendarZone||state.me.timezone),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
   body.story=ConnectionsUI.collectEditor(form); // 草稿只保存候選，不建立正式人物連結
   if (body.person_id === '__upgrade') throw new Error('請先建立帳號後再選擇人物。'); // 依目前選項或狀態進入對應處理分支
   let result; // 保存伺服器已確認的操作結果
@@ -284,7 +305,7 @@ document.addEventListener('change', async event => { // 監聽欄位變更
     if (event.target.name === 'person_id' && event.target.value === '__upgrade') {event.target.value = ''; accountView('claim');} // 依目前選項或狀態進入對應處理分支
     if (event.target.dataset.task) { // 依目前選項或狀態進入對應處理分支
       const result = await api('/tasks/' + event.target.dataset.task, {method:'PATCH',body:{done:event.target.checked}}); // 等待伺服器完成讀取或保存，再進入下一步
-      const task = state.world.tasks.find(t => t.id === result.id); task.done = result.done; toast('待辦狀態已保存；不會重複增加行動進度。'); // 保存「task」供此流程接續使用
+      const task = state.world.tasks.find(t => t.id === result.id); task.done = result.done; if(state.route==='goals'||state.route.startsWith('goal/'))await render(); toast('待辦狀態已保存；不會重複增加行動進度。'); // 保存「task」供此流程接續使用
     } // 結束目前回呼、區塊或模組定義
   } catch (error) {showError(error); if (event.target.dataset.task) event.target.checked = !event.target.checked;} // 顯示失敗原因，讓使用者保留內容並重試
 }); // 結束目前回呼、區塊或模組定義
@@ -303,7 +324,7 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (action === 'keep-local-and-leave') {await MediaUI.keepLocal(); const route=state.pendingRoute; state.pendingRoute=null; $('#account-dialog').close(); navigate(route);}
     if (action === 'save-and-leave') {await saveDraft($('#record-form'), false, state.pendingRoute); state.pendingRoute = null; $('#account-dialog').close();} // 先保存草稿再前往目的地
     if (action === 'logout') { // 撤銷登入並清除目前帳號快取
-      await api('/auth/logout',{method:'POST'}); $('#account-dialog').close(); state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.candidate = null; state.requests.clear(); navigate('welcome'); // 等待伺服器完成讀取或保存，再進入下一步
+      await api('/auth/logout',{method:'POST'}); $('#account-dialog').close(); DashboardUI.clear(); state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.candidate = null; state.requests.clear(); navigate('welcome'); // 等待伺服器完成讀取或保存，再進入下一步
     } // 結束目前回呼、區塊或模組定義
     if (action === 'new-person') { // 依訪客狀態升級或新增人物
       if (state.me.status === 'guest') accountView('claim'); // 依目前選項或狀態進入對應處理分支
@@ -380,3 +401,6 @@ ConnectionsUI.initialize({state,api,esc,link,button,heading,empty,time,options,t
 document.addEventListener('click',async event=>{const target=event.target.closest('[data-cx]'); if(!target) return; target.disabled=true; try { await ConnectionsUI.click(target); } catch(error) { showError(error); } finally { if(target.isConnected) target.disabled=false; }}); // 防止來源／配對重複點擊並保留失敗內容
 document.addEventListener('keydown', event => {if(event.target.matches('[data-person]') && ['Enter',' '].includes(event.key)) {event.preventDefault(); event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}); // 監聽鍵盤操作，讓星點支援 Enter 與空白鍵
 start().catch(showError); // 啟動 App，未處理錯誤交由共用提示呈現
+
+// 使用委派事件以符合既有 CSP，不允許內嵌腳本。
+document.addEventListener("click",event=>{if(event.target.closest("[data-home-retry]"))render().catch(showError);});
