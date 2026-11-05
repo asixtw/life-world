@@ -1,5 +1,7 @@
 # Life World · Python 本機 App
 
+> **2026-11-05 工程整合：**先讀[Public Alpha共同交付與未完成事項](docs/RELEASE_PUBLIC_ALPHA_20261105.md)。包含Alpha限流／預建登入與Dashboard；本機驗證通過，Docker及雲端公開驗收未完成，合併main不代表已上線。
+
 > **2026-11-03 Step 18：** [API 雲端 e2e 準備與本機證據](docs/STEP18_API_E2E_ACCEPTANCE.md)、[Console／驗收／清理操作](deploy/README.api-e2e.md)。使用既有 lw-api-main 的 0% Tagged Revision 與獨立合成 DB；本輪只做工具及本機驗證，沒有 GCP 操作。
 
 > **2026-11-03 Step 11：** [API main 整合與重新驗證](docs/STEP11_API_MAIN_INTEGRATION.md)、[API main 建置／Console 交接](deploy/README.api-main.md)。保留 SQLite 與 PG18；API YAML 只 Build／Test／Push，沒有自動部署，雲端 lw_app 寫入仍待 DML 審核。
