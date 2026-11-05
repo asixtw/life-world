@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import importlib.util
 
 import yaml
 
@@ -73,16 +74,24 @@ class WebMainDeployment(unittest.TestCase):
         self.assertIn('FROM verify AS build',docker)
         self.assertIn('RUN pnpm test',docker)
         self.assertIn('RUN pnpm run build',docker)
-        self.assertIn('RUN nginx -t',docker)
-        self.assertIn('Life World UI candidate main',docker)
+        self.assertIn('RUN python -m unittest -q test_web_server',docker)
+        self.assertIn('COPY --from=server-verify',docker)
+        self.assertIn('Life World Web main',docker)
         self.assertNotIn('candidate staging',docker)
 
     def test_health_and_web_routing(self):
-        source=(ROOT/'collaboration/ui-kit/cloud-nginx.conf').read_text(encoding='utf-8')
-        for expected in ('location = /health {','return 200 "ok\\n";','listen 8080;',
-                         'location = /api { return 404; }','location ^~ /api/ { return 404; }',
-                         'try_files $uri $uri/ /index.html;'):
-            self.assertIn(expected,source)
+        from fastapi.testclient import TestClient
+        spec=importlib.util.spec_from_file_location('web_server',ROOT/'collaboration/ui-kit/tools/web_server.py')
+        server=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(server)
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory)/'index.html').write_text('<h1>gallery</h1>',encoding='utf-8')
+            with TestClient(server.create_app(api_origin='',gallery_dir=directory),base_url='https://testserver') as client:
+                self.assertEqual(client.get('/health').text,'ok\n')
+                self.assertEqual(client.get('/').status_code,200)
+                self.assertEqual(client.get('/api/state').status_code,503)
+                self.assertEqual(client.get('/missing.js').status_code,404)
+                self.assertEqual(client.get('/.env').status_code,404)
 
     def test_shell_syntax_after_substitution(self):
         for name in ('validate-source',):

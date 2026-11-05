@@ -1,5 +1,9 @@
 # TDD 與實際驗收紀錄
 
+## Web → FastAPI 唯讀串接（2026-11-06，未部署）
+
+`python -X utf8 -m unittest discover -s collaboration/ui-kit/tools -p test_web_server.py -q`：14 passed。`python -X utf8 -m pytest tests/test_web_gateway.py tests/test_api_build_config.py deploy/tests/test_web_main.py -q --tb=short -p no:cacheprovider`：14 passed、0 skipped，合計28 passed。先重現11個未實作錯誤、真正UI唯讀缺失1 failed／1 passed；沒有以環境失敗充當紅燈。Edge實際執行既有app/static，網路攔截至ASGI，讀取隔離SQLite既有Session／目標；讀取期間禁止write transaction、跨owner維持拒絕，不呼叫Cloud SQL。依賴只安裝到獨立TEMP，14項server安全測試涵蓋metadata快取／錯audience、Session隔離、Origin／SSRF、Google token不外洩、寫入拒絕及失敗健康檢查。Docker／新Cloud Build／雲端業務DML未執行；只唯讀發現Web runtime未見API明確Invoker授權，以及API prestable與正式business開關差異導致現有發布護欄阻擋。現有Caddy、hostfix、prestable、正式流量、IAM、DB不改；細節與精確核准範圍見[串接候選](../deploy/README.web-gateway.md)。
+
 ## 首次自動部署已知失敗修復（2026-11-05，合併前檢查）
 
 基準 `1cd3458`：Web 在發布步驟找不到 PATH 上的 python3，API 舊契約讀取已移除的 images。API 單檔先重現 1 failed／2 passed；新增發布容器契約亦先重現舊映像不符，修正後 `.venv\Scripts\python.exe -X utf8 -m pytest --noconftest tests/test_api_build_config.py -q --tb=short -p no:cacheprovider`：3 passed、0 failed、0 skipped。兩份 YAML 解析及發布入口契約通過，`release.py` 與基準逐位元內容（統一換行後）一致，候選／回滾邏輯未修改；未重跑完整 API 測試。

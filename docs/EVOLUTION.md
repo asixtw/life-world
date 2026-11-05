@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-06 Web／API 唯讀串接候選
+
+區分React gallery與真正app/static。既有Web image新增server端metadata IAM gateway，保留gallery根目錄，以/app/與同來源/api回讀；Cookie／CSRF／Origin／CSP及owner驗證保留，不給瀏覽器Google token。所有寫入封鎖，UI明示唯讀；backend origin預設關閉，啟用後健康檢查需驗API可用，沿用既有自動候選發布／回滾。28項直接相關檢查通過，尚未部署或宣稱Cloud SQL業務驗收；IAM、API prestable政策差異與Session/DML仍有明確待決事項，見deploy/README.web-gateway.md。
+
 ## 2026-11-05 首次 CI/CD 失敗最小修復
 
 Web／API 發布步驟改用官方 google-cloud-cli:slim 與映像自帶 Python 的絕對路徑；一次獨立容器檢查已證實兩者可執行。API 建置契約改驗證 Test→Build→Container Verification→明確 Push→release.py，禁止恢復 images 後置推送，保留公開存取／SQL／hostfix 安全限制。僅 API 契約 3 項及 YAML 基本檢查，發布器主要邏輯、IAM、資料庫、流量不改；正式重新部署須經本次 PR Merge 授權。

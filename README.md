@@ -1,5 +1,7 @@
 # Life World · Python 本機 App
 
+> **2026-11-06 Web 串接候選：**[真正業務 UI 與唯讀 gateway](deploy/README.web-gateway.md)已完成本機隔離驗證；React gallery 保留，`/app/`／同來源 `/api` 的雲端啟用仍待指定 IAM 與 API 存取政策確認，不代表 Cloud SQL 業務讀寫已驗收。
+
 > **2026-11-05 工程整合：**先讀[Public Alpha共同交付與未完成事項](docs/RELEASE_PUBLIC_ALPHA_20261105.md)。包含Alpha限流／預建登入與Dashboard；本機驗證通過，Docker及雲端公開驗收未完成，合併main不代表已上線。
 
 > **2026-11-03 Step 18：** [API 雲端 e2e 準備與本機證據](docs/STEP18_API_E2E_ACCEPTANCE.md)、[Console／驗收／清理操作](deploy/README.api-e2e.md)。使用既有 lw-api-main 的 0% Tagged Revision 與獨立合成 DB；本輪只做工具及本機驗證，沒有 GCP 操作。
