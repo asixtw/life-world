@@ -82,9 +82,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
         if settings.access_mode=='public_alpha' and request.method not in ('GET','HEAD','OPTIONS'):
-            blocked=request.url.path in ('/api/auth/login','/api/auth/claim','/api/media/recognize') or '/evidence' in request.url.path
+            blocked=request.url.path in ('/api/auth/claim','/api/media/recognize') or '/evidence' in request.url.path
+            blocked=blocked or (request.url.path=='/api/auth/login' and not settings.alpha_login_enabled)
             if blocked:
-                return JSONResponse({'error':{'code':'alpha_feature_unavailable','message':'本輪Alpha僅開放訪客文字體驗；此功能尚未開放。'}},status_code=403,headers={'Cache-Control':'no-store'})
+                return JSONResponse({'error':{'code':'alpha_feature_unavailable','message':'本輪Alpha尚未開放此功能；帳號登入需由管理者啟用。'}},status_code=403,headers={'Cache-Control':'no-store'})
         # 未核准的 Cloud Run revision 只供健康／連線驗證，不接業務讀寫。
         if not settings.business_enabled and request.url.path not in ('/health', '/ready', '/api/health'):
             return JSONResponse({'error': {'code': 'business_api_disabled', 'message': '此服務尚未開放業務操作。'}}, status_code=503)
@@ -164,7 +165,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def capabilities():
         """公開模式說明不含憑證／內部資料；UI與後端共用範圍。"""
         alpha=settings.access_mode=='public_alpha'
-        return {'access_mode':settings.access_mode,'accounts_available':not alpha,
+        return {'access_mode':settings.access_mode,'accounts_available':not alpha or settings.alpha_login_enabled,
+                'registration_available':not alpha,
                 'media_available':False if alpha else app.state.media_provider is not None,
                 'ai_available':False,'writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
@@ -204,7 +206,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 if exc.status != 401:  # 依目前條件選擇下一步處理分支
                     raise  # 中止目前操作並向呼叫端傳遞錯誤
         try:
-            result, token = service.login(data, request.cookies.get('lw_session'),limiter=limiter,request=request)  # 核對密碼並建立工作階段，不合併訪客資料
+            result, token = service.login(data, request.cookies.get('lw_session'),limiter=limiter,request=request,registered_only=settings.access_mode=='public_alpha')  # 核對密碼並建立工作階段，不合併訪客資料
         except DomainError:raise
         except Exception:raise protection_unavailable() from None
         cookie(response, token)  # 設定不可由 JavaScript 讀取的工作階段 Cookie

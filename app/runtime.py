@@ -45,6 +45,7 @@ class RuntimeSettings:
     alpha_owner_writes: int = 100
     alpha_global_writes: int = 3000
     alpha_writes_enabled: bool = True
+    alpha_login_enabled: bool = False
 
     def __post_init__(self):
         if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy'):
@@ -128,4 +129,5 @@ class RuntimeSettings:
                    alpha_owner_writes=int(os.environ.get('LIFEWORLD_ALPHA_OWNER_WRITES','100')),
                    alpha_global_writes=int(os.environ.get('LIFEWORLD_ALPHA_GLOBAL_WRITES','3000')),
                    alpha_writes_enabled=flag('LIFEWORLD_ALPHA_WRITES_ENABLED',True),
+                   alpha_login_enabled=flag('LIFEWORLD_ALPHA_LOGIN_ENABLED',False),
                    cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud))

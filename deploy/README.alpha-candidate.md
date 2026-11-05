@@ -24,6 +24,7 @@ SQL為review-only、顯式交易。不用IF NOT EXISTS吞錯；重跑CREATE表�
 |LIFEWORLD_DB_NAME / DB_USER / DB_SCHEMA|life_world_alpha / lw_alpha_app / lw_core_draft|
 |LIFEWORLD_SECURE_COOKIES / ENABLE_BUSINESS_API|true / true|
 |LIFEWORLD_AUTH_RATE_ENABLED / AUTH_SOURCE_MODE|true / proxy|
+|LIFEWORLD_ALPHA_LOGIN_ENABLED|預設false；Owner另批部署時可true，只允許預建registered登入，claim永遠封鎖|
 |LIFEWORLD_AUTH_TRUSTED_PROXIES|NOT_READY：需PRIVATE Alpha來源證據，不猜CIDR|
 |LIFEWORLD_TRUSTED_HOSTS|NOT_READY：實際唯一Alpha hostname|
 |LIFEWORLD_EXTERNAL_ORIGIN|NOT_READY：實際完整HTTPS origin|
@@ -42,3 +43,18 @@ app/serve.py在Alpha關閉Uvicorn proxy_headers自動改寫；實際peer與轉�
 本機容器build/smoke需Docker；未執行就BLOCKED。API Dockerfile只COPY app，模型CLI不進runtime。API Cloud Build YAML會push映像，不部署API；Web YAML會部署lw-web-main。Trigger regex實況由Owner查，不Push或合main以免觸發。
 
 候選需鎖29基線及增量SHA256、精確diff、測試結果。Owner另批Commit後才有RC SHA，再另批build取得digest；base e9f966不冒充Alpha SHA。不能先填假digest。NOT_READY欄位未完成前不可部署。
+
+
+## 預建帳號登入最小安全方案
+
+兩條旅程獨立：匿名POST /api/auth/guest依原來源／世界容量；既有registered透過POST /api/auth/login登入，不建立新世界或自動註冊。LIFEWORLD_ALPHA_LOGIN_ENABLED預設false，啟用時保留共用DB來源／全域限流、軟帳號失敗桶、Session輪換、已有Session的CSRF及訪客衝突確認。啟用登入不代表啟用claim、密碼找回、Google OAuth或管理者建帳號API。
+
+預建帳號由Owner／DBA在隔離Alpha庫依核准程序建立，只保存密碼hash；此輪沒有建立雲端帳號、傳送密碼或交付含密碼的名單。帳號數及重設／撤銷流程需Owner確認；不要從main複製私人帳號與密碼。未知帳號回401，不自動建立。
+
+匿名世界30總量／24h20只約束guest建立；DBA預建帳號不經guest配額，不能將兩者合計稱30世界硬上限。預建數量另核准；登入來源30/15m、全域3000/24h仍生效；每owner與全域業務寫入配額維持。正確密碼可越過軟帳號失敗桶，但不能越過來源／全域限流。
+
+零目標registered首登走個人資料→三習慣／目標→Lumi；第二裝置獨立登入回讀同owner資料，登出只撤銷該Session。登入不合併匿名訪客世界；若目前有訪客，需CSRF與明確捨棄訪客確認。原訪客資料不移轉、不宣稱可恢復。
+
+本機已驗不等於HTTPS雲端驗收：Owner須對確切新Commit／image digest、固定Host／Origin、Secure Cookie、PRIVATE入口及預建合成帳號測試另批准；舊候選SHA不含本輪登入差異，不可直接宣稱已支援。
+
+業務停寫不等於完全不寫DB：啟用預建登入時仍需更新限流桶與Session以支援回讀；撤除所有存取需Owner另處理Alpha入口。
