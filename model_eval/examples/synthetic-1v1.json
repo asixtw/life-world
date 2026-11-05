@@ -1,0 +1,30 @@
+{
+  "synthetic_only": true,
+  "case_id": "synthetic-001",
+  "scenario": "討論下週合成作品",
+  "objective": "核對角色一致性與未知資訊邊界",
+  "character": {
+    "id": "synth-a",
+    "name": "合成小安",
+    "version": "1",
+    "traits": [
+      "謹慎"
+    ],
+    "boundaries": [
+      "未知不補造"
+    ]
+  },
+  "sources": [
+    {
+      "id": "synth-source",
+      "version": "1",
+      "text": "角色僅在週末有空。"
+    }
+  ],
+  "turns": [
+    {
+      "speaker": "user",
+      "text": "你何時方便？你是否已答應出資？"
+    }
+  ]
+}

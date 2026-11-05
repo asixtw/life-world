@@ -179,7 +179,7 @@ def test_migration_backfills_old_actions_without_altering_original_columns(tmp_p
     with sqlite3.connect(db_path) as c:
         for name, in c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'habit_%'").fetchall():
             c.execute('DROP TABLE ' + name)
-        c.execute("DELETE FROM schema_migrations WHERE version >= '005'")
+        c.execute("DELETE FROM schema_migrations WHERE version = '005_habit_versions.sql'")
         tables = [r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'schema_migrations'")]
         before = {t: c.execute('SELECT * FROM ' + t).fetchall() for t in tables}
     db = Database(old_dir)
