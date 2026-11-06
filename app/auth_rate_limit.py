@@ -40,6 +40,10 @@ class AuthRateLimiter:
     def source(self,request):
         """僅原始peer直連或已明確信任的代理鏈；不接受任意最左XFF。"""
         self._check_config()
+        if self.settings.auth_source_mode=='iap':
+            subject=getattr(request.state,'lw_iap_subject',None)
+            if not isinstance(subject,str) or not subject.startswith('iap:https://cloud.google.com/iap:'):raise protection_unavailable()
+            return subject
         try:
             peer=ipaddress.ip_address(request.client.host)
             def canonical(ip):return str(ip.ipv4_mapped or ip) if isinstance(ip,ipaddress.IPv6Address) else str(ip)
@@ -108,9 +112,32 @@ class AlphaDatabase:
 
     def __getattr__(self,name):return getattr(self.inner,name)
 
+    def logical_bytes(self,c):
+        # Application row payload budget, not Cloud SQL physical/index/backup quota.
+        import json,re
+        if self.backend=='postgresql':
+            tables=[r['name'] for r in c.execute("SELECT relname AS name FROM pg_class WHERE relnamespace=current_schema()::regnamespace AND relkind='r'").fetchall()]
+        else:tables=[r['name'] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").fetchall()]
+        total=0
+        for table in tables:
+            if table=='schema_migrations':continue # immutable deployment receipts, runtime has no access
+            if not re.fullmatch('[a-z_][a-z0-9_]*',table):raise protection_unavailable()
+            if self.backend=='postgresql':
+                total+=int(c.execute('SELECT COALESCE(sum(octet_length(to_jsonb(budget_row)::text)),0) AS bytes FROM "'+table+'" budget_row').fetchone()['bytes'])
+            else:
+                total+=sum(len(json.dumps(dict(row),ensure_ascii=False,default=str,separators=(',',':')).encode()) for row in c.execute('SELECT * FROM "'+table+'"').fetchall())
+        return total
+
+    def storage_gate(self,c):
+        if self.logical_bytes(c)>self.limiter.settings.alpha_storage_bytes:
+            raise DomainError(409,'storage_capacity_reached','目前保存容量已滿；既有資料仍可讀取，請聯絡測試支援。')
+
     @contextmanager
     def connect(self,write=False,owner=None):
         with self.inner.connect(write=write,owner=owner) as c:
+            if write:
+                if self.backend=='postgresql':c.execute('SELECT pg_advisory_xact_lock(?)',(1420000001,))
+                before_bytes=self.logical_bytes(c)
             if write and owner:
                 self.limiter._check_config()
                 s=self.limiter.settings
@@ -119,6 +146,11 @@ class AlphaDatabase:
                     error=self.limiter.take(c,scope,key,limit,capacity=True)
                     if error:raise error
             yield c
+            if write:
+                after_bytes=self.logical_bytes(c)
+                # Allow revocation/shrinking if an operator lowered the cap below existing usage.
+                if after_bytes>self.limiter.settings.alpha_storage_bytes and after_bytes>=before_bytes:
+                    raise DomainError(409,'storage_capacity_reached','目前保存容量已滿；既有資料仍可讀取，請聯絡測試支援。')
 
 
 class AlphaBodyLimit:

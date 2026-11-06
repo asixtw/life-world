@@ -4,7 +4,7 @@ import wave
 
 import pytest
 from PIL import Image
-from conftest import guest, onboard
+from conftest import guest, onboard, register
 
 
 def image_bytes():
@@ -43,7 +43,7 @@ def send(client, kind='image', mime='image/png', content=None, name='sample.png'
 
 
 def test_capabilities_do_not_claim_available_provider(client):
-    onboard(client)
+    onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     response = client.get('/api/media/capabilities')
     assert response.status_code == 200
     assert response.json()['recognition_available'] is False
@@ -52,7 +52,7 @@ def test_capabilities_do_not_claim_available_provider(client):
 
 
 def test_unconfigured_provider_is_an_explicit_failure(client):
-    onboard(client)
+    onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     response = send(client)
     assert response.status_code == 503
     assert response.json()['error']['code'] == 'media_provider_unavailable'
@@ -65,7 +65,7 @@ def test_unconfigured_provider_is_an_explicit_failure(client):
     ('audio', 'audio/wav', audio_bytes(), 'voice.wav'),
 ])
 def test_recognition_never_changes_domain_data(app, client, kind, mime, content, name):
-    onboard(client)
+    onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     before = client.get('/api/state').json()
     app.state.media_provider = Provider()
     response = send(client, kind, mime, content, name)
@@ -91,7 +91,7 @@ def test_recognition_never_changes_domain_data(app, client, kind, mime, content,
     ('invalid', 'image/png', image_bytes(), 'image.png', 422),
 ])
 def test_reject_invalid_material_without_calling_provider(app, client, kind, mime, content, name, status):
-    onboard(client)
+    onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     app.state.media_provider = Provider()
     response = send(client, kind, mime, content, name)
     assert response.status_code == status
@@ -101,7 +101,7 @@ def test_reject_invalid_material_without_calling_provider(app, client, kind, mim
 @pytest.mark.parametrize('text,fails', [('', False), ('x' * 20001, False), (None, False), ('', True)],
                          ids=['empty', 'too-long', 'non-text', 'provider-error'])
 def test_provider_failure_is_sanitized_and_has_no_side_effect(app, client, text, fails):
-    onboard(client)
+    onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     before = client.get('/api/state').json()
     app.state.media_provider = Provider(text, fails)
     response = send(client)
@@ -113,15 +113,17 @@ def test_provider_failure_is_sanitized_and_has_no_side_effect(app, client, text,
 def test_media_requires_session_csrf_and_onboarding(app, client):
     assert send(client).status_code == 401
     guest(client)
-    assert send(client).status_code == 409
-    onboard(client)
+    assert send(client).status_code == 403  # Guest先被登入權限拒絕。
+    register(client)
+    assert send(client).status_code == 409  # 已登入仍必須完成onboarding。
+    onboard(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     client.headers.pop('X-CSRF-Token')
     assert send(client).status_code == 403
 
 
 def test_chunked_oversize_request_is_rejected_before_multipart_spooling(client):
     """沒有 Content-Length 也必須限制整個請求，不能先寫滿暫存磁碟才拒絕。"""
-    onboard(client)
+    onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     chunks = iter([b'x' * 70000])
     response = client.post('/api/media/recognize', content=chunks,
                            headers={'Content-Type': 'multipart/form-data; boundary=testing'})

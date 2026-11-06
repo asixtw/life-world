@@ -35,6 +35,7 @@ class RuntimeSettings:
     cloud_run: bool = False
     business_enabled: bool = True
 
+    google_client_id: str = ''  # 明確配置才啟用GIS；既有IAP部署預設不變。
     access_mode: str = 'legacy'
     auth_rate_enabled: bool = False
     auth_rate_secret: str = field(default='', repr=False)
@@ -44,18 +45,25 @@ class RuntimeSettings:
     alpha_worlds_daily: int = 20
     alpha_owner_writes: int = 100
     alpha_global_writes: int = 3000
+    alpha_source_writes: int = 200
+    alpha_storage_bytes: int = 100_000_000
     alpha_writes_enabled: bool = True
     alpha_login_enabled: bool = False
 
     def __post_init__(self):
-        if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy'):
+        if self.google_client_id and not re.fullmatch(r'[A-Za-z0-9._-]+\.apps\.googleusercontent\.com',self.google_client_id):
+            raise ValueError('Explicit Google OAuth client required')
+        if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy','iap'):
             raise ValueError('Invalid access/source mode')
         if self.cloud_run and (self.auth_rate_enabled or self.access_mode=='public_alpha') and self.auth_source_mode=='direct':
             raise ValueError('Cloud Run requires verified proxy source policy')
+        if self.auth_source_mode=='iap' and (not self.auth_rate_enabled or len(self.auth_rate_secret.encode())<32):
+            raise ValueError('IAP staging requires shared rate protection')
         for n in self.auth_trusted_proxies:
             if ipaddress.ip_network(n).prefixlen==0:raise ValueError('Wildcard proxies are forbidden')
-        for value in (self.alpha_worlds_total,self.alpha_worlds_daily,self.alpha_owner_writes,self.alpha_global_writes):
+        for value in (self.alpha_worlds_total,self.alpha_worlds_daily,self.alpha_owner_writes,self.alpha_global_writes,self.alpha_source_writes):
             if not isinstance(value,int) or isinstance(value,bool) or not 1<=value<=1000000:raise ValueError('Invalid Alpha quota')
+        if not isinstance(self.alpha_storage_bytes,int) or isinstance(self.alpha_storage_bytes,bool) or not 1<=self.alpha_storage_bytes<=1_000_000_000:raise ValueError('Invalid storage byte cap')
         if self.access_mode=='public_alpha' and self.backend=='postgresql' and (self.db_name!='life_world_alpha' or self.db_user!='lw_alpha_app'):
             raise ValueError('Public Alpha must use isolated database and runtime role')
         # 直接注入設定與環境變數同樣驗證，避免測試／其他入口繞過邊界。
@@ -79,6 +87,7 @@ class RuntimeSettings:
     def from_env(cls):
         """拒絕未知 backend／不完整 PG 設定，不允許退回 SQLite。"""
         cloud = bool(os.environ.get('K_SERVICE'))
+        # IAP audience 在驗證器依受控 Origin／明確設定核對，不公開固定專案參數。
         hosts = tuple(x.strip() for x in os.environ.get('LIFEWORLD_TRUSTED_HOSTS', '').split(',') if x.strip())
         if not hosts and cloud:
             raise ValueError('Cloud Run requires explicit Trusted Hosts')
@@ -119,6 +128,7 @@ class RuntimeSettings:
                    db_user=os.environ.get('LIFEWORLD_DB_USER', 'lw_app'), db_password=password,
                    instance_connection_name=instance, pool_size=size,
                    trusted_hosts=hosts, secure_cookies=secure, external_origin=origin,
+                   google_client_id=os.environ.get('LIFEWORLD_GOOGLE_CLIENT_ID',''),
                    access_mode=os.environ.get('LIFEWORLD_ACCESS_MODE','legacy'),
                    auth_rate_enabled=flag('LIFEWORLD_AUTH_RATE_ENABLED',False),
                    auth_rate_secret=os.environ.get('LIFEWORLD_AUTH_RATE_SECRET',''),
@@ -128,6 +138,8 @@ class RuntimeSettings:
                    alpha_worlds_daily=int(os.environ.get('LIFEWORLD_ALPHA_WORLDS_DAILY','20')),
                    alpha_owner_writes=int(os.environ.get('LIFEWORLD_ALPHA_OWNER_WRITES','100')),
                    alpha_global_writes=int(os.environ.get('LIFEWORLD_ALPHA_GLOBAL_WRITES','3000')),
+                   alpha_source_writes=int(os.environ.get('LIFEWORLD_ALPHA_SOURCE_WRITES','200')),
+                   alpha_storage_bytes=int(os.environ.get('LIFEWORLD_ALPHA_STORAGE_BYTES','100000000')),
                    alpha_writes_enabled=flag('LIFEWORLD_ALPHA_WRITES_ENABLED',True),
                    alpha_login_enabled=flag('LIFEWORLD_ALPHA_LOGIN_ENABLED',False),
                    cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud))

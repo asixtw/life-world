@@ -1,0 +1,13 @@
+# Product Staging test handoff
+
+Use the HTTPS URL provided privately by the release operator. IAP controls entry; application Guest/Google sessions remain separate. Only approved testers may enter. No Main/Gallery, CI/CD, cloud resources or credentials are changed by this PR.
+
+- Begin as Guest, enter synthetic profile/goal, save a synthetic experience, edit the manual summary, confirm it and its follow-up tasks. Reload and confirm goal progress/Lumi points. Repeated confirmation must not award twice.
+- Google login is available only after the reviewed 007/008 migrations and runtime configuration are applied. Save current Guest with Google: same owner/counts/points, new session/CSRF. Logout then login, including a fresh browser profile, must return the same world. Record PASS/FAIL/NOT RUN, never infer from mock tests.
+- Guest B with content must explicitly choose whether to leave; never merge it into Google owner A. Explicit abandonment revokes all B sessions, marks a 14-day deadline and clears only B's local data. Local cleanup failure is retried on reconnect/reopen or account-menu action. No deployed automatic purge is claimed.
+- Guest person/link/AI APIs must reject direct requests; a second account cannot read another owner's goals/drafts/people. Never test against real users or delete existing records.
+- Test desktop and a mobile viewport, network failure/retry, duplicate submissions, expired session, storage failure and account switching. Report revision, platform, steps, expected/actual behavior and a redacted screenshot. Do not attach HAR, tokens, cookies, CSRF, secrets or personal records.
+
+AI status: no real Provider is connected in this release; manual summary/confirmation is retained. The existing DraftAssistant and MediaProvider interfaces and separate model-evaluation adapters are integration points, not proof of production AI. AI drafts, suggested tasks, media extraction and person simulation require a separate Provider/model/budget review and real API/browser/PostgreSQL evidence. Results stay editable drafts until user confirmation, never inferred person facts or automatic rewards.
+
+Operational rollback: operator retains the exact previous product revision and traffic state, keeps IAP, and may roll back only this product service after approval. Never drop populated identity or abandonment tables to roll back application code. Database receipt/permissions must be verified through the private DBA review packet before enabling Google login. CI main triggers affect other services, so this Draft PR must not merge without separate trigger-impact approval.
