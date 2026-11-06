@@ -30,3 +30,7 @@
 最小首批授權提案：指定一個已核實可用的 Gemini 模型，僅合成內容，最多 5 次全站呼叫、每 Owner 每日 2 次，文字輸入 8KiB、媒體 1MB、輸出 512 tokens；實際費用總上限與每次最壞預留額需 Owner/計費管理者核定後才設定 `LIFEWORLD_AI_BUDGET_MICROUSD`／`LIFEWORLD_AI_RESERVATION_MICROUSD`。目前兩者預設 0，正式呼叫停用。調高額度或傳送真實人物/媒體需獨立核准。
 
 尚需：模型/配額查核、Runtime Secret 版本與存取權核准、費用上限、真實 API 合成 smoke、手機/桌面實際操作、隔離 PostgreSQL API 整合驗收。未讀任何 Secret 值，未呼叫外部付費 API。
+
+## 授權後的 Provider 中繼資料查核
+
+後端已完成既有 Key 的官方 GET /v1beta/models，HTTP 200；清單含 gemini-2.5-flash、gemini-2.5-flash-lite 等可 generateContent 模型。Key 只在後端記憶體中使用，沒有寫入前端、Git 或紀錄。此結果只代表模型清單可存取；內容生成呼叫為 0，免費方案/剩餘配額、各功能真實輸出仍未驗證。實際模型呼叫與 Runtime Secret 掛載仍需個別核准，不將 Key 名稱或 model list 當作免費額度證據。
