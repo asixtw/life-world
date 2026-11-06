@@ -230,6 +230,21 @@ const MediaUI = (() => {
     try {await storage(nextKey,{items:session.items,fields:session.fields,serverRevision}); await storage(oldKey,undefined,true); sessions.delete(oldKey); session.key=nextKey; session.serverRevision=serverRevision; sessions.set(nextKey,session);}
     catch {throw new Error('文字草稿已到伺服器，但本機素材未完成連結。請保留此頁，勿重複建立草稿。');}
   }
+  async function clearOwner(owner) { // 僅在使用者勾選後清本owner本機素材，不刪伺服器或其他owner。
+    if(active?.owner===owner){stopRecording(true);cancelRequests(active);}
+    await pending;
+    const db=await dbPromise();
+    try {
+      await new Promise((resolve,reject)=>{
+        const tx=db.transaction('workspaces','readwrite'),store=tx.objectStore('workspaces');
+        const cursor=store.openCursor();
+        cursor.onsuccess=()=>{const row=cursor.result;if(!row)return;if(String(row.key).startsWith(owner+':'))row.delete();row.continue();};
+        tx.oncomplete=resolve;tx.onerror=()=>reject(new Error('本機媒體草稿清除失敗，尚未登出。'));tx.onabort=tx.onerror;
+      });
+      for(const key of sessions.keys())if(key.startsWith(owner+':'))sessions.delete(key);
+      if(active?.owner===owner){active=null;releaseURLs();}
+    } finally {db.close();}
+  }
   async function discard() {
     if(!active)return;
     const session=active;
@@ -270,7 +285,7 @@ const MediaUI = (() => {
           case 'start': await startRecording(); break;
           case 'stop': stopRecording(); break;
           case 'cancel-recording': stopRecording(true); break;
-          case 'recognize': await recognizeItem(item); break;
+          case 'recognize': if(ctx.state.me?.status==='guest') {ctx.requestLogin();break;} await recognizeItem(item); break;
           case 'cancel-upload': requests.get(item.id)?.abort(); requests.delete(item.id); item.error='已取消等待，素材保留；伺服器已收到的工作不保證撤銷。'; await persist(); draw(); break;
           case 'remove': requests.get(item.id)?.abort(); requests.delete(item.id); active.items=active.items.filter(i=>i!==item); await persist(); draw(); break;
           case 'apply': {
@@ -286,5 +301,5 @@ const MediaUI = (() => {
     window.addEventListener('pagehide',()=>{capture();cancelRequests();if(recorder||recordingSession)stopRecording();});
     window.addEventListener('beforeunload',event=>{if(recorder||recordingSession){event.preventDefault();event.returnValue='';}});
   }
-  return {initialize,mount,capture,leave,bindDraft,discard,renderDrafts,keepLocal};
+  return {initialize,clearOwner,mount,capture,leave,bindDraft,discard,renderDrafts,keepLocal};
 })();

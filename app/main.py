@@ -19,6 +19,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware  # 限制此�
 from .config import DemoPolicy  # 載入本機開發設定
 from .db import Database  # 載入 SQLite 交易與遷移管理器
 from .runtime import RuntimeSettings
+from .security import require_registered
 from .errors import DomainError  # 共用領域錯誤與條件檢查
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
@@ -28,7 +29,7 @@ from .auth_rate_limit import AuthRateLimiter, AlphaDatabase, AlphaBodyLimit, pro
 logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的紀錄器
 
 
-def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None):  # PG factory 不執行 DDL
+def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None, iap_verifier=None, google_verifier=None):  # PG factory 不執行 DDL
     settings = settings or getattr(database, 'settings', None) or RuntimeSettings.from_env()
     policy = policy or DemoPolicy()
     if settings.secure_cookies:
@@ -57,6 +58,14 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                     service.db.close()
 
     app = FastAPI(title='Life World Local API', version='0.4.0', description='本機開發版；開發設定不是正式產品規則。', lifespan=lifespan)
+    if settings.auth_source_mode=='iap':
+        from .iap import IAPVerifier
+        app.state.iap_verifier=iap_verifier or IAPVerifier()
+    app.state.external_auth = None
+    if settings.google_client_id:
+        from .google_identity import GoogleVerifier
+        from .external_auth import ExternalAuth
+        app.state.external_auth = ExternalAuth(service,google_verifier or GoogleVerifier(settings.google_client_id),limiter)
     app.state.settings = settings
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
@@ -81,11 +90,32 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
+        # IAP只保護入口，App仍須原有Session／CSRF；只有GET/HEAD健康探針豁免。
+        if settings.auth_source_mode=='iap' and not (request.method in ('GET','HEAD') and request.url.path in ('/health','/ready')):
+            tokens=request.headers.getlist('x-goog-iap-jwt-assertion')
+            try:
+                from .iap import denied
+                if len(tokens)!=1:raise denied()
+                request.state.lw_iap_subject=await run_in_threadpool(app.state.iap_verifier.verify,tokens[0])
+            except DomainError as exc:
+                return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers={'Cache-Control':'no-store'})
+        if settings.google_client_id and request.url.path in ('/api/auth/claim','/api/auth/login'):
+            return JSONResponse({'error':{'code':'google_only','message':'本輪請使用Google登入，訪客仍可繼續。'}},status_code=403,headers={'Cache-Control':'no-store'})
         if settings.access_mode=='public_alpha' and request.method not in ('GET','HEAD','OPTIONS'):
             blocked=request.url.path in ('/api/auth/claim','/api/media/recognize') or '/evidence' in request.url.path
             blocked=blocked or (request.url.path=='/api/auth/login' and not settings.alpha_login_enabled)
             if blocked:
                 return JSONResponse({'error':{'code':'alpha_feature_unavailable','message':'本輪Alpha尚未開放此功能；帳號登入需由管理者啟用。'}},status_code=403,headers={'Cache-Control':'no-store'})
+        if settings.access_mode=='public_alpha' and request.method in ('POST','PUT','PATCH','DELETE') and request.url.path.startswith('/api/') and request.url.path!='/api/auth/logout':
+            try:
+                source=limiter.source(request)
+                def source_write_gate():
+                    with service.db.connect(write=True) as c:
+                        return limiter.take(c,'alpha_owner_writes','source-write:'+source,settings.alpha_source_writes,3600)
+                error=await run_in_threadpool(source_write_gate)
+                if error:raise error
+            except DomainError as exc:
+                return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers=getattr(exc,'headers',{'Cache-Control':'no-store'}))
         # 未核准的 Cloud Run revision 只供健康／連線驗證，不接業務讀寫。
         if not settings.business_enabled and request.url.path not in ('/health', '/ready', '/api/health'):
             return JSONResponse({'error': {'code': 'business_api_disabled', 'message': '此服務尚未開放業務操作。'}}, status_code=503)
@@ -108,6 +138,11 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         if request.url.path == '/':  # 依目前條件選擇下一步處理分支
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
             response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"  # Blob 音訊只供使用者主動試聽，不自動播放。
+        if request.url.path=='/' and settings.google_client_id:
+            csp=response.headers['Content-Security-Policy']
+            csp=csp.replace("script-src 'self'","script-src 'self' https://accounts.google.com/gsi/client").replace("style-src 'self'","style-src 'self' https://accounts.google.com/gsi/style").replace("connect-src 'self'","connect-src 'self' https://accounts.google.com/gsi/")
+            response.headers['Content-Security-Policy']=csp+"; frame-src https://accounts.google.com/gsi/"
+            response.headers['Cross-Origin-Opener-Policy']='same-origin-allow-popups'
         return response  # 回傳檢查寫入來源並加入安全與快取標頭的結果
 
     def current(request, write=False):  # 驗證目前工作階段，寫入時同時檢查 CSRF
@@ -116,8 +151,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     @app.get('/api/media/capabilities', tags=['Media'])
     def media_capabilities(request: Request):
         """傳回實際可用能力與傳輸護欄，不把本機設定宣稱為正式素材政策。"""
-        current(request)
-        return {'recognition_available': app.state.media_provider is not None,
+        user = current(request)
+        return {'recognition_available': user['status']=='registered' and app.state.media_provider is not None,
                 'max_bytes': policy.max_upload_bytes, 'server_retention': 'none',
                 'image_types': list(media.IMAGE_TYPES), 'audio_types': list(media.AUDIO_TYPES)}
 
@@ -127,6 +162,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         """僅接受明確上傳；回應是候選文字，不建立人物、經歷、貢獻或獎勵。"""
         try:
             user = current(request, True)
+            # 辨識屬登入功能；在provider呼叫前由後端拒絕Guest。
+            require_registered(user)
             with service.db.connect() as connection:
                 service._onboarded(connection, user['id'])
             content = await file.read(policy.max_upload_bytes + 1)
@@ -143,6 +180,26 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         response.set_cookie('lw_session', token, httponly=True, secure=policy.secure_cookies,
                             samesite='strict', path='/', max_age=policy.session_hours * 3600)  # 執行此模組的共用工具操作
 
+    def external(request):
+        # 入口必須由明確啟用的公開OAuth契約配置，沒有client即fail-closed。
+        if app.state.external_auth is None:raise DomainError(503,'google_not_configured','Google登入尚未設定，訪客仍可繼續。')
+        expected=settings.external_origin or str(request.base_url).rstrip('/')
+        if request.headers.get('origin')!=expected:raise DomainError(403,'origin_rejected','請從本站重新開始登入。')
+        try:
+            with service.db.connect() as c:c.execute('SELECT provider,issuer,subject,owner_id,created_at FROM external_identities LIMIT 0')
+        except Exception:raise DomainError(503,'google_schema_not_ready','Google登入尚未完成設定，訪客資料會保留。') from None
+        return app.state.external_auth
+
+    @app.post('/api/auth/external/challenge',tags=['Identity'])
+    def google_challenge(request:Request,data:schemas.GoogleChallenge):
+        return external(request).challenge(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),data.mode,data.discard_guest)
+
+    @app.post('/api/auth/external/exchange',tags=['Identity'])
+    def google_exchange(request:Request,response:Response,data:schemas.GoogleExchange):
+        result,token,replayed=external(request).exchange(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),data.challenge_id,data.credential)
+        if token:cookie(response,token)
+        return {**result,'replayed':replayed}
+
     @app.get('/api/health', tags=['System'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def health():  # 回報本機服務的健康狀態
         return {'status': 'ok', 'mode': 'cloud-preparation' if settings.cloud_run else 'local-development'}
@@ -156,6 +213,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         try:
             service.db.check_ready()
             limiter.ready(service.db)
+            if settings.google_client_id:
+                with service.db.connect() as c:
+                    c.execute('SELECT provider,issuer,subject,owner_id,created_at FROM external_identities LIMIT 0')
+                    c.execute('SELECT owner_id,abandoned_at,purge_after,status,attempts,last_error_code,completed_at,media_state,media_attempts FROM guest_abandonments LIMIT 0')
         except Exception as exc:
             logger.warning('Readiness failed (%s)', type(exc).__name__)
             return JSONResponse({'status': 'unavailable'}, status_code=503, headers={'Cache-Control': 'no-store'})
@@ -168,7 +229,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         return {'access_mode':settings.access_mode,'accounts_available':not alpha or settings.alpha_login_enabled,
                 'registration_available':not alpha,
                 'media_available':False if alpha else app.state.media_provider is not None,
-                'ai_available':False,'writes_available':settings.alpha_writes_enabled if alpha else True,
+                'google_login_available':bool(settings.google_client_id),'ai_available':False,'writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
 
     @app.post('/api/auth/guest', tags=['Identity'])  # 註冊此 HTTP 路由、例外處理器或中介層

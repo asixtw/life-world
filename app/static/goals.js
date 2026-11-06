@@ -101,6 +101,7 @@ const GoalsUI = (() => { // 將建立草稿與回顧編輯狀態集中管理。
       const body={request_id:d.request_id,title:d.title,outcome:d.outcome,deadline:d.deadline,actions:d.actions.map(({title,unit,per_occurrence,dates,weekdays,cycle})=>({title,unit,per_occurrence,dates:[...dates].sort(),weekdays,cycle}))}; // 不把游標或畫面狀態送進 API。
       const hatched=state.me.lumi_hatched,goal=await api('/goals',{method:'POST',body}); // 相同草稿重試沿用 ID。
       try {localStorage.removeItem(key());} catch {} // 正式成功後才清草稿。
+      state.guestSaveNoticePending=true; // 只有server成功保存後，在下一畫面提醒Guest保存期限。
       draft=null;edit=null;await refresh();navigate(hatched?'goal/'+goal.id:'birth');return true; // 只有首次顯示 Lumi 誕生。
     } // 其他表單使用回顧流程。
     if(!['goal-review-form','goal-end-form'].includes(form.id)&&!form.matches('.pending-accept-form')) return false; // 不攔截經歷或人物表單。
