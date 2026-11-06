@@ -160,3 +160,7 @@ Plan 改為保留匯出時的來源批次／時間／SHA256，不能用建立時
 E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STOP；權限核對補齊 PUBLIC／欄位級／DDL 路徑並改以 OID 支援非 superuser 管理者；00 不再接管既有 DB。預檢另要求測試修訂只有唯一 e2e 路由、單一容器及僅含已審查欄位的 Direct VPC interface；本機 harness 改以非 superuser 管理者執行交付 SQL。API、核心 DDL 與授權矩陣不變，見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md)。
 
 定點修正：權限核對由各權限總數改為逐表白名單；00 拆成建角色、建 DB、標記三階段，前段失敗時 session 維持唯讀，不再建立或改寫同名 DB。
+
+## GCP-143 AI 隔離候選｜2026-11-07
+
+將既有 Gemini 傳輸 Adapter 抽為 app/model_eval 共用，不改 Docker／CI 或核心 schema。新增預設停用的後端 AI 候選組裝與持久化呼叫額度、經歷整理、確認後任務建議／人工冪等建立、只用有效 confirmed 來源的人物模擬，以及既有媒體契約接線；回應不直接寫人物事實或獎勵。首批合成契約測試通過，不代表真實 Provider 整合或線上完成；詳見 [AI 候選](ai/GCP143_AI_CANDIDATE.md)。
