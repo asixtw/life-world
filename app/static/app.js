@@ -337,7 +337,11 @@ function contributions(form) { // 只送出非空且非零的人工行動貢獻
 function guestSaveNotice() { // 只在成功保存後提醒；登入者不顯示訪客限制。
   if (state.me?.status !== 'guest' || state.guestSaveNoticeShown) return;
   state.guestSaveNoticeShown=true;
-  $('#notice').textContent='已保存至目前服務。此瀏覽器的訪客工作階段有效期間內可繼續；清除Cookie或工作階段到期後可能無法取回。登入功能可協助保存帳號資料。';
+  // 只宣告目前已啟用的保存方式；伺服器保存與裝置媒體草稿不同。
+  const accountHelp=state.capabilities?.google_login_available
+    ? '可使用 Google 帳號保存世界；帳號衝突時不會自動合併。'
+    : '目前未開放 Google 保存世界，請保留此瀏覽器的工作階段。';
+  $('#notice').textContent='已保存至目前服務。此瀏覽器的訪客工作階段有效期間內可繼續；清除Cookie或工作階段到期後可能無法取回。'+accountHelp;
 }
 async function saveDraft(form, review, destination = 'history') { // 新增或依版本修改草稿，成功後接續核對或返回
   const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.has('calendar_time')?f.get('calendar_date')+'T'+f.get('calendar_time'):f.get('occurred_at'),form.dataset.calendarZone||state.me.timezone),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
