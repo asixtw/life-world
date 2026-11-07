@@ -4,7 +4,7 @@
 
 | 類別 | 現有來源與用途 | 狀態／缺口與 fallback |
 |---|---|---|
-| Lumi 角色及狀態 | `collaboration/ui-kit/assets/lumi-poses-candidate-20261029/`：idle、listening、confirmed、quiet 等候選，來源1254平方RGBA；`derived-v1_1/poses/` 有128／256／512／1254衍生輸出 | 人體審查與角色組裝 anchor 仍待核准。App 沿用既有 CSS Lumi，不冒稱已整合圖片 |
+| Lumi 角色及狀態 | `collaboration/ui-kit/assets/lumi-poses-candidate-20261029/`：idle、listening、confirmed、quiet 等候選，來源1254平方RGBA；`derived-v1_1/poses/` 有128／256／512／1254衍生輸出 | 人工審查與角色組裝 anchor 仍待核准。App 沿用既有 CSS Lumi，不冒稱已整合圖片 |
 | 世界房間背景 | `world-candidates-20261029/originals/room-day-base.png`、`room-quiet-base.png`，1448×1086；plant／cabinet／contact shadow 分層 | 原包標示 independent-candidate-not-accepted，1920原生規格不符；世界頁先保留既有版面背景 |
 | 目標／任務圖示 | `shared-art/lifeworld-fullkit-shared-art/` 的 egg-rest／app-icon，以及 App 現有導覽符號 | 沒有獨立已核准的 task icon 完整套件；先用原有文字與圖示，不將 app-icon 當任務圖示 |
 | 經歷視覺素材 | `collaboration/flow-wireframe/assets/confirmed@256.png`、`listening@256.png`；`derived-v1_1/poses/confirmed@*.png` | 原型／候選，非正式經歷狀態替代；保留文字確認與可讀成功回饋 |
