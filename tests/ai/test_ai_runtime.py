@@ -125,7 +125,7 @@ def test_usage_receipt_records_only_bounded_metadata(prepared):
     receipt=json.loads(row['response'])
     assert receipt['input_tokens']==3 and receipt['output_tokens']==4
     assert receipt['cost_microusd'] is None
-    assert set(receipt)=={'created_at','status','cost_microusd','input_tokens','output_tokens'}
+    assert set(receipt)=={'created_at','status','provider','model','provider_request_id','cost_microusd','input_tokens','output_tokens'}
     assert '不應留存' not in row['response'] and '合成整理' not in row['response']
 
 

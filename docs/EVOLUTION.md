@@ -176,3 +176,11 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ## 2026-11-08｜GCP-144 RC v3（候選，未部署）
 
 修復交付包版本／Patch基準混用，37檔完整Patch與Parent增量各自重建Tree並綁精確Commit。兩次真實Gemini 3.5 Flash-Lite HTTP200（360 input／121 output tokens、費用null），Browser完成編輯／確認／重送／刷新，僅既有合成SQLite；Call2空任務，不將人工任務當AI輸出。完整API424 passed／28 skipped，精確Commit及各類原始日誌以v3 Manifest為準。Owner最新目標為受IAP保護Staging POC，不自行公開或部署。詳見[RC v3驗收](testing/GCP144_RC_ACCEPTANCE.md)。
+
+## 2026-11-08｜完整公開版核心候選（本機、未提交）
+
+保留RC v3，新增規則式雙端來源情境、有限Behavior JSON、既有模型劇場端點的可操作UI與短期多輪；模擬筆記不回寫真實事實。新增模型收據metadata與獨立聲音開關、核准白名單及成功回執去重。新增範圍5項API／3項Chromium通過，未追加真模型呼叫，未重跑RC v3完整測試。素材逐項呈現待Owner核准；公開Gate尚未通過，見[功能矩陣](testing/PUBLIC_RELEASE_MATRIX.md)。
+
+### Owner委任採用／補製與映像檔推進
+
+已直接整合10張既有PNG／5個既有音效、新增3段可重製的原創程序BGM；所有新產出與沿用檔案分開記錄。原RC v3與PR19保留，新增候選在獨立分支固定來源後建置；未因素材委任自行執行Migration／GRANT或解除IAP。

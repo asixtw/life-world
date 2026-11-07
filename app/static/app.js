@@ -73,6 +73,8 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
     } // 結束目前回呼、區塊或模組定義
     throw error; // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
   } // 結束目前回呼、區塊或模組定義
+  // 只有已成功的回應才觸發音效，重送以回執去重；素材／播放失敗不影響交易。
+  window.WorldAudio?.feedback(path,options.method,body,state.me?.owner_id);
   return body; // 回傳此步驟組合完成的結果
 } // 結束目前回呼、區塊或模組定義
 async function refresh() {
@@ -100,7 +102,7 @@ function navigate(route) { // 切換 hash 路由並先鎖住舊畫面
 function link(route, label, style = 'secondary') { return `<a class="${style}" href="#${esc(route)}">${label}</a>`; } // 產生導覽連結並處理可存取名稱
 function button(action, label, style = 'primary', attributes = '') { return `<button type="button" class="${style}" data-action="${action}" ${attributes}>${label}</button>`; } // 產生帶事件代碼的操作按鈕
 function heading(title, subtitle, action = '') { return `<div class="heading"><div><div class="eyebrow">YOUR LITTLE UNIVERSE</div><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div>${action}</div>`; } // 產生頁面標題與說明
-function lumi() { return '<div class="hero-art" aria-label="目標蛋建立後誕生的 Lumi"><div class="ground"></div><div class="lumi"><i class="leaf"></i><i class="eyes"></i><i class="beak"></i><i class="wing"></i></div><span class="spark" aria-hidden="true">✧</span></div>'; } // 以 HTML 與 CSS 組合 Lumi 外觀
+function lumi(pose='idle') { return `<div class="hero-art lumi-art" aria-label="目標蛋建立後誕生的 Lumi"><img class="lumi-asset" data-lumi-art src="/static/art/lumi-${pose==='welcome'?'welcome':'idle'}.png" width="300" height="300" alt="Lumi 溫暖地陪伴你"><div data-lumi-fallback hidden><div class="ground"></div><div class="lumi"><i class="leaf"></i><i class="eyes"></i><i class="beak"></i><i class="wing"></i></div></div></div>`; } // 既有原始角色圖；載入失敗由art.js還原CSS角色。
 function empty(message, action = '') { return `<div class="empty"><span class="empty-icon">✳</span>${esc(message)}${action ? '<div class="space-top">' + action + '</div>' : ''}</div>`; } // 產生空資料提示與下一步入口
 function localInput(iso = new Date().toISOString(), zone = state.me?.timezone || 'Asia/Taipei') { // 依帳號時區轉成表單需要的當地時間
   const parts = new Intl.DateTimeFormat('sv-SE', {timeZone:zone, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)); // 依帳號時區拆出日期與時間欄位
@@ -156,7 +158,7 @@ function homeGoalPanel(w,failed=false) {
 async function worldView() {
   // 首頁直接使用同次 /state 快照，不為摘要額外載入完整 Dashboard。
   const failed=!!state.worldReadError,w=failed?null:state.world;
-  return heading(`${state.me.name}，歡迎回來。`,'每一段投入，都值得被留下。')+`<div class="home-overview"><section class="hero home-lumi"><div class="hero-copy"><h2>Lumi</h2><p>照自己的步調，慢慢前進。</p></div>${lumi()}</section>${homeGoalPanel(w,failed)}</div>`+(w?ConnectionsUI.worldMini()+`<section class="card space-top"><h2>待辦與下一步</h2>${w.tasks.length?w.tasks.map(t=>`<label class="check-line"><input type="checkbox" data-task="${esc(t.id)}" ${t.done?'checked':''}>${esc(t.title)}</label>`).join(''):empty('確認經歷時，可以留下想做的下一步。')}${w.drafts.length?`<p>有 ${w.drafts.length} 份未確認草稿。${link('history','繼續上次的記錄','text-button')}</p>`:''}${link('people?view=cards','人物劇場','text-button')}<p class="muted">選擇人物後進入私人小劇場。</p></section>`:'');
+  return heading(`${state.me.name}，歡迎回來。`,'每一段投入，都值得被留下。')+`<div class="home-overview"><section class="hero home-lumi"><div class="hero-copy"><h2>Lumi</h2><p>照自己的步調，慢慢前進。</p></div>${lumi()}<img class="world-cabinet" src="/static/art/cabinet.png" alt="" aria-hidden="true"><img class="world-plant" src="/static/art/plant.png" alt="" aria-hidden="true"></section>${homeGoalPanel(w,failed)}</div>`+(w?ConnectionsUI.worldMini()+`<section class="card space-top"><h2>待辦與下一步</h2>${w.tasks.length?w.tasks.map(t=>`<label class="check-line"><input type="checkbox" data-task="${esc(t.id)}" ${t.done?'checked':''}>${esc(t.title)}</label>`).join(''):empty('確認經歷時，可以留下想做的下一步。')}${w.drafts.length?`<p>有 ${w.drafts.length} 份未確認草稿。${link('history','繼續上次的記錄','text-button')}</p>`:''}${link('people?view=cards','人物劇場','text-button')}<p class="muted">選擇人物後進入私人小劇場。</p></section>`:'');
 }
 
 function personField(selected = null) { // 產生選填人物欄位與訪客升級入口
@@ -212,12 +214,12 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   const path = route.split('?')[0]; params = new URLSearchParams(route.split('?')[1] || ''); // 從路由分離出頁面路徑
   if (path !== 'record') state.editingDraft = false; // 依目前選項或狀態進入對應處理分支
   if (state.route) { PeopleUI.remember(state.route, window.scrollY); ConnectionsUI.remember(state.route, window.scrollY); } // 依目前選項或狀態進入對應處理分支
-  ConnectionsUI.ensureOwner(); state.route = route; navigation(path); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
+  ConnectionsUI.ensureOwner(); state.route = route; navigation(path); window.WorldAudio?.route(path); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
   let html; // 保存目前路由產生的頁面標記
   if (path === 'welcome') html = welcomeView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'profile') html = profileView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'goal-new') html = goalForm(); // 依目前選項或狀態進入對應處理分支
-  else if (path === 'birth') html = BirthUI.view(lumi()); // 三次明確互動後才揭露既有 Lumi 呈現。
+  else if (path === 'birth') html = BirthUI.view(lumi('welcome')); // 三次明確互動後才揭露既有 Lumi 呈現。
   else if (path === 'world') html = await worldView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'goals') html = await GoalsUI.list(); // 目前挑戰與歷史分區顯示。
   else if (path.startsWith('goal/')) html = await goalView(path.split('/')[1],options.localGoalEdit); // 依目前選項或狀態進入對應處理分支

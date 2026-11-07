@@ -137,3 +137,11 @@ Cookie `lw_session` 為 HttpOnly。先呼叫 guest 或 login，再以回傳 `csr
 Goal Detail v0.2：`habits`新增 `scheduledDayCount`（舊日期未知為null）、`nextScheduledDate`（active目標今天起最近安排，無則null）、`scheduleDates`及`quantityVersions`。其餘既有去重、時區、權限與唯讀口徑不變。
 
 HabitScheduleDisclosure v0.3沿用calendar端點，每次明確請求當月與目標期間的交集；`planned_quantities[actionId]` 是單日期望量，不是完成量。前端新增日期與必填時間欄位，但寫入仍只提交既有`occurred_at`，不新增公開API欄位。[驗收](HABIT_SCHEDULE_ACCEPTANCE.md)。
+
+## 公開核心候選｜2026-11-08（未部署）
+
+`POST /api/people/{person_id}/simulation` 仍需registered Owner、Session／CSRF及明確`consent:true`；`fact_ids`為1–10項本人已確認且仍有來源的資訊，`message`1–2000字。新增選填`history`最多6段，每段`{speaker:"user"|"simulation",text:1–1000字}`，不接受system角色。所有歷史皆未查證的模擬內容，不是事實來源；完整請求仍受AI輸入byte上限。
+
+後端每次由有效來源重算User／Person／Relationship／Context提示及有限Behavior；內部雙端標籤不回傳一般人物卡。回應保留utterance／provider／model／request_id／applied=false，另帶`behavior`（action=ask_question|share_context|acknowledge、tone=supportive、reason_codes、simulation=true）、`behavior_source=rules`、`source_experience_ids`、`uncertainty=simulation_not_prediction`。Provider替身notice不得覆蓋成真實AI。未啟用回503、Guest403、來源不存在／撤回422、跨Owner拒絕；不寫人物事實、經歷、進度或獎勵。
+
+`ai_result_v1`私有收據新增Provider／Model／可為null的Provider Request ID；Token用量與未知成本null不變，不存來源／輸出全文。這些候選變更不代表Staging API已部署。

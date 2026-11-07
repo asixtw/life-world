@@ -15,9 +15,16 @@ class ConfirmedInput(BaseModel):
         if value is not True:raise ValueError('請明確同意傳送所選來源給模型')
         return value
 
+class DialogueTurn(BaseModel):
+    """歷史只接受有限對話內容，不能注入system角色或任意技術欄位。"""
+    model_config=ConfigDict(extra='forbid',strict=True)
+    speaker:Literal['user','simulation']
+    text:str=Field(min_length=1,max_length=1000)
+
 class SimulationInput(ConfirmedInput):
     fact_ids:list[str]=Field(min_length=1,max_length=10)
     message:str=Field(min_length=1,max_length=2000)
+    history:list[DialogueTurn]=Field(default_factory=list,max_length=6)
 
 class TasksConfirm(BaseModel):
     model_config=ConfigDict(extra='forbid',strict=True)
@@ -45,7 +52,7 @@ def install(app):
     def experience(who,experience_id):
         app.state.ai_runtime.authorize(who)
         with service.db.connect() as c:
-            row=c.execute('SELECT id,summary FROM experiences WHERE id=? AND owner_id=?',(experience_id,who)).fetchone()
+            row=c.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(experience_id,who)).fetchone()
             require(row is not None,404,'not_found','找不到可存取的經歷。')
             return dict(row)
 
@@ -76,6 +83,13 @@ def install(app):
         overview=service.person_overview(who,person_id)
         available={fact['id']:fact for group in overview['facts'].values() for fact in group if fact['status']=='confirmed' and fact['sources']}
         require(all(f in available for f in data.fact_ids),422,'confirmed_sources_required','只可使用本人已確認且仍有來源的人物資訊。')
-        facts=[{'value':available[f]['value'],'source_experience_ids':[s['id'] for s in available[f]['sources']]} for f in dict.fromkeys(data.fact_ids)]
-        result=app.state.ai_runtime.generate(who,'simulation',{'confirmed_facts':facts,'message':data.message})
-        return {**result,'simulation':True,'notice':'AI 私人模擬，不是對真人反應的預測；不寫入人物事實。'}
+        facts=[{'fact_id':f,'value':available[f]['value'],'source_experience_ids':[s['id'] for s in available[f]['sources']]} for f in dict.fromkeys(data.fact_ids)]
+        from .relationship_engine import build_context
+        source_ids=sorted({ref for fact in facts for ref in fact['source_experience_ids']})
+        # 來源摘要必須再次限定Owner，內部提示每次重算，撤回／刪除即不沿用。
+        with service.db.connect() as db:
+            records=[dict(row) for ref in source_ids for row in db.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(ref,who)).fetchall()]
+        context=build_context(facts,records,data.message,service.now().isoformat())
+        result=app.state.ai_runtime.generate(who,'simulation',{'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message})
+        # 一般人物卡／對話UI不暴露內部雙端標籤；只回可解釋的來源與有限行為。
+        return {**result,'simulation':True,'behavior':context['behavior'],'behavior_source':'rules','source_experience_ids':source_ids,'uncertainty':'simulation_not_prediction','notice':result['notice']+' 私人模擬，不是對真人反應的預測；不寫入人物事實。'}
