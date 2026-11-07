@@ -8,7 +8,7 @@ from app.runtime import RuntimeSettings
 CANON='https://lw-product-staging-162310640466.asia-east1.run.app'
 TAG='https://gcp144-review---lw-product-staging-u5py2jttpa-de.a.run.app'
 
-@pytest.mark.parametrize('base,origin,status',[(TAG,TAG,201),(CANON,CANON,201),(TAG,CANON,403),(TAG,'https://evil.example',403)])
+@pytest.mark.parametrize('base,origin,status',[(TAG,TAG,201),(TAG.replace('https://','http://'),TAG,201),(CANON,CANON,201),(TAG,CANON,403),(TAG,'https://evil.example',403)])
 def test_exact_same_origin_guest(tmp_path,base,origin,status):
     settings=replace(RuntimeSettings(),external_origin=CANON,trusted_hosts=(CANON.split('//')[1],TAG.split('//')[1]),write_origins=(TAG,))
     with TestClient(create_app(data_dir=tmp_path,settings=settings),base_url=base) as client:

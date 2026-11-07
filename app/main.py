@@ -130,9 +130,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             origin = request.headers.get('origin')  # 保存「origin」供後續驗證或回傳使用
             expected = settings.external_origin or str(request.base_url).rstrip('/')
             # Tag額外來源只授權同一個實際請求Host，不能跨允許來源送出寫入；OAuth仍只用external_origin。
-            same_origin = str(request.base_url).rstrip('/')
+            # Cloud Run在TLS終止後使用內部HTTP，不能依內部scheme判斷瀏覽器Origin，也不信任X-Forwarded-*。
+            same_authority = not origin or origin.split('://', 1)[-1] == request.url.netloc
             allowed = (expected,) + settings.write_origins
-            if origin and (origin not in allowed or (settings.write_origins and origin != same_origin)):
+            if origin and (origin not in allowed or (settings.write_origins and not same_authority)):
                 return JSONResponse({'error': {'code': 'origin_rejected', 'message': '不允許跨來源寫入。'}}, status_code=403)  # 回傳檢查寫入來源並加入安全與快取標頭的結果
         response = await call_next(request)  # 保存「response」供後續驗證或回傳使用
         response.headers['X-Content-Type-Options'] = 'nosniff'  # 設定回應的安全或快取標頭
