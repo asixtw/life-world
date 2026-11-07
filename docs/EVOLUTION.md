@@ -160,3 +160,7 @@ Plan 改為保留匯出時的來源批次／時間／SHA256，不能用建立時
 E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STOP；權限核對補齊 PUBLIC／欄位級／DDL 路徑並改以 OID 支援非 superuser 管理者；00 不再接管既有 DB。預檢另要求測試修訂只有唯一 e2e 路由、單一容器及僅含已審查欄位的 Direct VPC interface；本機 harness 改以非 superuser 管理者執行交付 SQL。API、核心 DDL 與授權矩陣不變，見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md)。
 
 定點修正：權限核對由各權限總數改為逐表白名單；00 拆成建角色、建 DB、標記三階段，前段失敗時 session 維持唯讀，不再建立或改寫同名 DB。
+
+### 2026-11-07｜GCP-144 核心介面修正候選（未部署）
+
+修正環境標籤及依 GIS capability 的訪客保存提示；新增跨服務實例讀回、載入成功／失敗與提示瀏覽器測試。API 23 passed、Chromium 4 passed，均為明示隔離測試；線上 PostgreSQL、真實 GIS／AI Gate 仍未通過。見 [本輪驗收](testing/GCP144_CORE_ACCEPTANCE.md)。
