@@ -93,7 +93,7 @@ class AIRuntime:
         except Exception:raise DomainError(502,'ai_invalid_candidate','AI 回應未通過檢查；原資料未變更，可手動處理。') from None
         # 金額未知不是零；最壞情況預留額不因失敗／未知 usage 釋放。
         with self.service.db.connect(write=True,owner=owner) as c:
-            c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_result_v1',request_id,fingerprint,json.dumps({'created_at':self.service.now().isoformat(),'status':'candidate','cost_microusd':result.cost_microusd})))
+            c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_result_v1',request_id,fingerprint,json.dumps({'created_at':self.service.now().isoformat(),'status':'candidate','cost_microusd':result.cost_microusd,'input_tokens':result.input_tokens,'output_tokens':result.output_tokens})))
         return {**candidate,'provider':self.provider.name,'model':self.provider.model,'applied':False,'request_id':request_id,'notice':'真實模型候選，尚未套用；請編輯並人工確認。'}
 
     def recognize(self,owner,kind,mime,content):

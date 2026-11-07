@@ -164,3 +164,7 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ## GCP-143 AI 隔離候選｜2026-11-07
 
 將既有 Gemini 傳輸 Adapter 抽為 app/model_eval 共用，不改 Docker／CI 或核心 schema。新增預設停用的後端 AI 候選組裝與持久化呼叫額度、經歷整理、確認後任務建議／人工冪等建立、只用有效 confirmed 來源的人物模擬，以及既有媒體契約接線；回應不直接寫人物事實或獎勵。首批合成契約測試通過，不代表真實 Provider 整合或線上完成；詳見 [AI 候選](ai/GCP143_AI_CANDIDATE.md)。
+
+## GCP-144 AI 收據與人工退路驗收｜2026-11-07
+
+AI 候選收據補入供應商回報的 input/output tokens，未知費用仍為 null，不保存來源或輸出全文。新增模型失敗後人工確認、冪等重送與持久化讀回測試；33項定點回歸通過。免費 tier 無證據，真實生成仍 BLOCKED／0次；未部署，詳見 [本輪驗收](ai/GCP144_AI_ACCEPTANCE.md)。

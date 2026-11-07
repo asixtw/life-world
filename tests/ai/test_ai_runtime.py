@@ -109,3 +109,37 @@ def test_multimodal_adapter_uses_inline_data_without_key_in_url():
     assert seen[0][1]['contents'][0]['parts'][1]['inlineData']['mimeType']=='image/png'
     assert seen[0][1]['generationConfig']['responseMimeType']=='application/json'
     assert 'synthetic-not-a-real-key' not in seen[0][0]
+
+
+def test_usage_receipt_records_only_bounded_metadata(prepared):
+    """留存供應商回報用量，不把未知費用當零，也不保存來源或輸出。"""
+    app,c,me,g,runtime,p=prepared
+    result=runtime.generate(me['owner_id'],'experience',{'raw_text':'不應留存的合成來源'})
+    with app.state.service.db.connect() as db:
+        row=db.execute("SELECT response FROM requests WHERE operation='ai_result_v1' AND request_id=?",(result['request_id'],)).fetchone()
+    receipt=json.loads(row['response'])
+    assert receipt['input_tokens']==3 and receipt['output_tokens']==4
+    assert receipt['cost_microusd'] is None
+    assert set(receipt)=={'created_at','status','cost_microusd','input_tokens','output_tokens'}
+    assert '不應留存' not in row['response'] and '合成整理' not in row['response']
+
+
+def test_invalid_ai_result_preserves_manual_confirm_and_readback(prepared):
+    """模型失敗後仍能人工確認；候選/失敗本身不改進度或獎勵。"""
+    app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime
+    d=draft(c,g);before=c.get('/api/state').json();p.text='not JSON'
+    failed=c.post('/api/drafts/'+d['id']+'/suggest')
+    assert failed.status_code==502 and failed.json()['error']['code']=='ai_invalid_candidate'
+    assert c.get('/api/state').json()==before and len(p.calls)==1
+    payload=confirm_payload(d,summary='人工核對的合成摘要',tasks=[])
+    first=c.post('/api/drafts/'+d['id']+'/confirm',json=payload)
+    assert first.status_code==201,first.text
+    repeat=c.post('/api/drafts/'+d['id']+'/confirm',json=payload)
+    assert repeat.json()==first.json()
+    after=c.get('/api/state').json()
+    assert len(after['experiences'])==1 and after['experiences'][0]['summary']==payload['summary']
+    assert len(p.calls)==1
+    # 重新組裝服務，從同一持久化測試資料庫讀回，並非前端快照。
+    from app.service import LifeWorld
+    restored=LifeWorld(app.state.service.db,app.state.service.policy,clock=app.state.service.clock)
+    assert restored.state(me['owner_id'])['experiences'][0]['summary']==payload['summary']

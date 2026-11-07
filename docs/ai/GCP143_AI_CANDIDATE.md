@@ -36,3 +36,5 @@
 後端已完成既有 Key 的官方 GET /v1beta/models，HTTP 200；清單含 gemini-2.5-flash、gemini-2.5-flash-lite 等可 generateContent 模型。Key 只在後端記憶體中使用，沒有寫入前端、Git 或紀錄。此結果只代表模型清單可存取；內容生成呼叫為 0，免費方案/剩餘配額、各功能真實輸出仍未驗證。實際模型呼叫與 Runtime Secret 掛載仍需個別核准，不將 Key 名稱或 model list 當作免費額度證據。
 
 隔離 PostgreSQL 18.6 已完成 18 項契約檢查：經歷人工確認、task receipt 冪等與並發去重、Owner/Guest/CSRF 拒絕、ledger 不變及最小 DML 權限。使用全新 Unix socket 測試庫及合成資料，Provider 是明示測試替身；2 次替身呼叫、0 次真實生成。測試庫已停止，未連正式 Cloud SQL。這不取代真實模型或 Browser 驗收。
+
+本輪後續：[GCP-144 定點驗收與真實生成阻塞](GCP144_AI_ACCEPTANCE.md)。
