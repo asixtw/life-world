@@ -45,6 +45,8 @@ def test_wizard_single_goal_end_and_history(page, viewport):  # 從建立走到�
     artifacts.mkdir(parents=True, exist_ok=True)  # 建立虛構截圖目錄。
     page.screenshot(path=str(artifacts / ('summary-' + str(viewport['width']) + '.png')), full_page=True)  # 保存資訊層級。
     page.get_by_role('button', name='確認設定，建立目標蛋').click()  # 明確開始挑戰。
+    for _ in range(3):  # 每次動畫結束後才可進入下一階段。
+        page.locator('[data-birth-egg]').click()
     page.get_by_role('link', name='進入我的世界').click()  # Lumi 首次出現後進世界。
     page.locator('#nav').get_by_role('link', name='目標', exact=True).click()  # 查看目前挑戰。
     expect(page.get_by_role('heading', name='目前挑戰')).to_be_visible()  # 聚焦唯一目標。
@@ -102,6 +104,8 @@ def test_create_failure_keeps_summary_and_retries_once(page):  # 網路失敗不
     page.reload()  # 跨刷新仍可重試同份草稿。
     expect(page.get_by_role('heading', name='檢查這次挑戰')).to_be_visible()  # 保留最後步驟。
     page.get_by_role('button', name='確認設定，建立目標蛋').click()  # 重試建立。
+    for _ in range(3):  # 每次動畫結束後才可進入下一階段。
+        page.locator('[data-birth-egg]').click()
     page.get_by_role('link', name='進入我的世界').click()  # 只有成功才出現 Lumi。
     goals = page.request.get(BASE + '/api/state').json()['goals']  # 核對真正伺服器狀態。
     assert len(goals) == 1 and goals[0]['title'] == '可以重試的挑戰'  # 恰好一個正式挑戰。
