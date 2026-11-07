@@ -32,6 +32,7 @@ class RuntimeSettings:
     trusted_hosts: tuple = ('127.0.0.1', 'localhost', 'testserver', '[::1]')
     secure_cookies: bool = False
     external_origin: str = ''
+    write_origins: tuple = ()  # 額外受保護Tag僅允許自己的同源寫入，不改OAuth來源。
     cloud_run: bool = False
     business_enabled: bool = True
 
@@ -51,6 +52,12 @@ class RuntimeSettings:
     alpha_login_enabled: bool = False
 
     def __post_init__(self):
+        for origin in self.write_origins:
+            parsed = urlsplit(origin)
+            if (parsed.scheme != 'https' or not parsed.netloc or parsed.hostname not in self.trusted_hosts
+                    or parsed.path or parsed.query or parsed.fragment or parsed.username or parsed.password
+                    or parsed.port not in (None, 443) or origin != 'https://' + parsed.netloc):
+                raise ValueError('Write origins must be exact HTTPS Trusted Hosts')
         if self.google_client_id and not re.fullmatch(r'[A-Za-z0-9._-]+\.apps\.googleusercontent\.com',self.google_client_id):
             raise ValueError('Explicit Google OAuth client required')
         if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy','iap'):
@@ -136,6 +143,7 @@ class RuntimeSettings:
                    db_user=os.environ.get('LIFEWORLD_DB_USER', 'lw_app'), db_password=password,
                    instance_connection_name=instance, pool_size=size,
                    trusted_hosts=hosts, secure_cookies=secure, external_origin=origin,
+                   write_origins=tuple(x.strip() for x in os.environ.get('LIFEWORLD_WRITE_ORIGINS','').split(',') if x.strip()),
                    google_client_id=os.environ.get('LIFEWORLD_GOOGLE_CLIENT_ID',''),
                    access_mode=os.environ.get('LIFEWORLD_ACCESS_MODE','legacy'),
                    auth_rate_enabled=flag('LIFEWORLD_AUTH_RATE_ENABLED',False),

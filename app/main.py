@@ -129,7 +129,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):  # 依目前條件選擇下一步處理分支
             origin = request.headers.get('origin')  # 保存「origin」供後續驗證或回傳使用
             expected = settings.external_origin or str(request.base_url).rstrip('/')
-            if origin and origin != expected:  # 依目前條件選擇下一步處理分支
+            # Tag額外來源只授權同一個實際請求Host，不能跨允許來源送出寫入；OAuth仍只用external_origin。
+            same_origin = str(request.base_url).rstrip('/')
+            allowed = (expected,) + settings.write_origins
+            if origin and (origin not in allowed or (settings.write_origins and origin != same_origin)):
                 return JSONResponse({'error': {'code': 'origin_rejected', 'message': '不允許跨來源寫入。'}}, status_code=403)  # 回傳檢查寫入來源並加入安全與快取標頭的結果
         response = await call_next(request)  # 保存「response」供後續驗證或回傳使用
         response.headers['X-Content-Type-Options'] = 'nosniff'  # 設定回應的安全或快取標頭

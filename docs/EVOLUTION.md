@@ -184,3 +184,8 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ### Owner委任採用／補製與映像檔推進
 
 已直接整合10張既有PNG／5個既有音效、新增3段可重製的原創程序BGM；所有新產出與沿用檔案分開記錄。原RC v3與PR19保留，新增候選在獨立分支固定來源後建置；未因素材委任自行執行Migration／GRANT或解除IAP。
+
+
+### 2026-11-08：受保護Tag同源寫入修復
+
+新增明確 LIFEWORLD_WRITE_ORIGINS，僅允許精確HTTPS Trusted Host的同源業務寫入；正式OAuth Origin及IAP audience推導不變。Tag Origin與正式Origin不同導致訪客POST403，並非業務旗標關閉（實際為true）。本輪針對Origin／CSRF／身分／Runtime測試38 passed，正式瀏覽器及Product PG閉環待驗收，不把本機測試當部署E2E。
