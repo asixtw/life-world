@@ -14,8 +14,7 @@ PROMPT_VERSION = 'theater-eval-v1'
 SCORE_FIELDS = ('character_consistency', 'source_fidelity', 'hallucination_control', 'role_boundaries', 'dialogue_quality')
 
 
-class EvalError(ValueError):
-    """可安全回報的固定錯誤，不回顯提供者例外或秘密。"""
+from app.ai_provider_base import EvalError, ModelResult
 
 
 def encoded(value):
@@ -52,13 +51,6 @@ def build_prompt(case):
     }
 
 
-@dataclass(frozen=True)
-class ModelResult:
-    text: str
-    input_tokens: Optional[int] = None
-    output_tokens: Optional[int] = None
-    cost_microusd: Optional[int] = None
-    provider_request_id: Optional[str] = None
 
 
 class Provider(Protocol):

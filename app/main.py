@@ -20,7 +20,7 @@ from .config import DemoPolicy  # 載入本機開發設定
 from .db import Database  # 載入 SQLite 交易與遷移管理器
 from .runtime import RuntimeSettings
 from .security import require_registered
-from .errors import DomainError  # 共用領域錯誤與條件檢查
+from .errors import DomainError, require  # 共用領域錯誤與條件檢查
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
 from . import media
@@ -69,6 +69,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     app.state.settings = settings
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
+    from .ai_routes import install as install_ai_routes
+    install_ai_routes(app)  # 保留既有GIS/IAP邊界；僅組裝預設停用的AI候選。
     app.add_middleware(media.MediaBodyLimit, max_bytes=policy.max_upload_bytes + 65536)
     if settings.access_mode=='public_alpha':app.add_middleware(AlphaBodyLimit)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts))
@@ -152,7 +154,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def media_capabilities(request: Request):
         """傳回實際可用能力與傳輸護欄，不把本機設定宣稱為正式素材政策。"""
         user = current(request)
-        return {'recognition_available': user['status']=='registered' and app.state.media_provider is not None,
+        return {'recognition_available': user['status']=='registered' and (app.state.ai_runtime.enabled or app.state.media_provider is not None),
                 'max_bytes': policy.max_upload_bytes, 'server_retention': 'none',
                 'image_types': list(media.IMAGE_TYPES), 'audio_types': list(media.AUDIO_TYPES)}
 
@@ -169,6 +171,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             content = await file.read(policy.max_upload_bytes + 1)
             mime = media.validate_media(kind, file.filename, file.content_type, content, policy.max_upload_bytes)
             try:
+                if app.state.ai_runtime.enabled:
+                    return await asyncio.wait_for(run_in_threadpool(app.state.ai_runtime.recognize,user['id'],kind,mime,content),timeout=30)
                 return await asyncio.wait_for(run_in_threadpool(
                     media.recognize, app.state.media_provider, kind, mime, content), timeout=30)
             except asyncio.TimeoutError:
@@ -228,8 +232,9 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         alpha=settings.access_mode=='public_alpha'
         return {'access_mode':settings.access_mode,'accounts_available':not alpha or settings.alpha_login_enabled,
                 'registration_available':not alpha,
-                'media_available':False if alpha else app.state.media_provider is not None,
-                'google_login_available':bool(settings.google_client_id),'ai_available':False,'writes_available':settings.alpha_writes_enabled if alpha else True,
+                'media_available':False if alpha else app.state.ai_runtime.enabled or app.state.media_provider is not None,
+                'google_login_available':bool(settings.google_client_id),'ai_available':app.state.ai_runtime.enabled,
+                'ai_status':'configured_not_verified' if app.state.ai_runtime.enabled else 'not_configured','writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
 
     @app.post('/api/auth/guest', tags=['Identity'])  # 註冊此 HTTP 路由、例外處理器或中介層
@@ -324,7 +329,13 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.post('/api/drafts/{draft_id}/suggest', tags=['Experiences'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def suggest(draft_id: str, request: Request):  # 建立可手動審閱的整理候選，不寫入正式事實
-        return service.suggest(current(request, True)['id'], draft_id)  # 回傳建立可手動審閱的整理候選，不寫入正式事實的結果
+        who=current(request,True)['id']
+        if app.state.ai_runtime.enabled:
+            app.state.ai_runtime.authorize(who)
+            source=service.draft(who,draft_id)
+            require(source['status']=='draft',409,'already_confirmed','這份草稿已經確認。')
+            return app.state.ai_runtime.generate(who,'experience',{'raw_text':source['raw_text']})
+        return service.suggest(who,draft_id)  # 未啟用模型時仍明示原文候選。
 
     @app.post('/api/drafts/{draft_id}/confirm', status_code=201, tags=['Experiences'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def confirm(draft_id: str, request: Request, data: schemas.Confirm):  # 以單一交易保存經歷、貢獻、人物更新與一次積分

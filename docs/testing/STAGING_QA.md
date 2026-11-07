@@ -11,3 +11,7 @@ Use the HTTPS URL provided privately by the release operator. IAP controls entry
 AI status: no real Provider is connected in this release; manual summary/confirmation is retained. The existing DraftAssistant and MediaProvider interfaces and separate model-evaluation adapters are integration points, not proof of production AI. AI drafts, suggested tasks, media extraction and person simulation require a separate Provider/model/budget review and real API/browser/PostgreSQL evidence. Results stay editable drafts until user confirmation, never inferred person facts or automatic rewards.
 
 Operational rollback: operator retains the exact previous product revision and traffic state, keeps IAP, and may roll back only this product service after approval. Never drop populated identity or abandonment tables to roll back application code. Database receipt/permissions must be verified through the private DBA review packet before enabling Google login. CI main triggers affect other services, so this Draft PR must not merge without separate trigger-impact approval.
+
+GCP-144 介面候選與當輪證據見 [CORE_ACCEPTANCE](GCP144_CORE_ACCEPTANCE.md)；不代表候選已部署。
+
+GCP-144 單一整合候選、當輪fixture E2E及剩餘正式Gate見 [RC_ACCEPTANCE](GCP144_RC_ACCEPTANCE.md)，未部署。
