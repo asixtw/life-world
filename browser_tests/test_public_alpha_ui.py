@@ -51,7 +51,9 @@ def test_alpha_real_browser_goal_record_refresh_and_quota(alpha_url,width,tmp_pa
                 page.get_by_role('button',name='平日',exact=True).click()
                 page.get_by_role('button',name='下一步').click()
             page.get_by_role('button',name='確認設定，').click()
-            expect(page.get_by_role('heading',name='目標蛋誕生了。 你好，我是 Lumi。')).to_be_visible()
+            expect(page.get_by_role('heading',name='目標蛋誕生了。')).to_be_visible()
+            for _ in range(3):  # 每次動畫結束後才可進入下一階段。
+                page.locator('[data-birth-egg]').click()
             page.get_by_role('link',name='進入我的世界').click()
             expect(page.get_by_text('完成Alpha作品',exact=True).first).to_be_visible()
             page.reload()
@@ -113,6 +115,8 @@ def test_alpha_prebuilt_login_second_browser_onboarding_and_readback(alpha_url,w
                 page.get_by_role('button',name='平日',exact=True).click()
                 page.get_by_role('button',name='下一步').click()
             page.get_by_role('button',name='確認設定，').click()
+            for _ in range(3):  # 每次動畫結束後才可進入下一階段。
+                page.locator('[data-birth-egg]').click()
             page.get_by_role('link',name='進入我的世界').click()
             expect(page.get_by_text('跨裝置的作品',exact=True).first).to_be_visible()
             second=browser.new_context(viewport={'width':width,'height':844})

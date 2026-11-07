@@ -35,7 +35,7 @@ def test_loading_finishes_on_success_and_failure(fail):
         page.evaluate('''() => {window.$=s=>document.querySelector(s);
           window.state={me:{lumi_hatched:true},route:'world'};
           window.renderSequence=0;window.renderControls=new Map();window.loadingTimer=null;
-          window.navigation=()=>{};window.refresh=async()=>{};window.MediaUI={leave:()=>{}};window.ScheduleUI={mount:()=>{},leave:()=>{}};
+          window.BirthUI={mount:()=>{}};window.navigation=()=>{};window.refresh=async()=>{};window.MediaUI={leave:()=>{}};window.ScheduleUI={mount:()=>{},leave:()=>{}};
           window.PeopleUI={restore:()=>{},remember:()=>{}};window.ConnectionsUI={restore:()=>{},remember:()=>{},ensureOwner:()=>{}};
           window.worldView=async()=>{await new Promise(r=>setTimeout(r,600));
           '''+('throw new Error("synthetic query failure");' if fail else 'return "<p>載入完成</p>";')+'};'+lock+render+';window.render=render;}')

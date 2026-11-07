@@ -1,5 +1,9 @@
 # TDD 與實際驗收紀錄
 
+## 2026-11-07 GCP-144 孵化互動
+
+隔離Chromium `browser_tests/test_birth_interaction.py -q --tb=short`：4 passed（桌面／觸控，各含reduced motion）。驗證三次點擊、動畫鎖及第三階段揭露。完整後端旅程未重跑；線上與DB驗收不在此證據範圍。詳見[盤點與限制](art/README.md)。
+
 ## 首次自動部署已知失敗修復（2026-11-05，合併前檢查）
 
 基準 `1cd3458`：Web 在發布步驟找不到 PATH 上的 python3，API 舊契約讀取已移除的 images。API 單檔先重現 1 failed／2 passed；新增發布容器契約亦先重現舊映像不符，修正後 `.venv\Scripts\python.exe -X utf8 -m pytest --noconftest tests/test_api_build_config.py -q --tb=short -p no:cacheprovider`：3 passed、0 failed、0 skipped。兩份 YAML 解析及發布入口契約通過，`release.py` 與基準逐位元內容（統一換行後）一致，候選／回滾邏輯未修改；未重跑完整 API 測試。
@@ -122,3 +126,11 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 修正 SQL PASS 誤印、非 superuser DBA 無法執行 dev 探測、權限核對缺口、退休殘留路由、Direct VPC 未知欄位／多容器及 00 接管既有 DB。紅燈 9 failed／65 passed 與 PG18.6 情境紀錄後修正；工具 74 passed、完整回歸 305 passed／14 skipped、PG18.6 模式全套 319 passed、PG18.6＋HTTPS 49 項及退休 9 項、SQL 負向情境、Web 契約 9 tests 通過，未操作 GCP。dev 的 PUBLIC CONNECT／TEMP 是否撤銷待使用者決定。見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md#pr-11-獨立複審修正2026-11-03)。
 
 定點修正：03 改為逐表白名單（總數相同的權限互換實測會誤判 PASS），00 分段並以 session 唯讀預設擋住 guard 失敗後的 CREATE DATABASE／標記（實測曾改寫既有未標記 DB）。紅燈 2 failed／74 passed 與 harness 兩處失敗後修正；工具 76 passed、PG18.6＋HTTPS 49 項、退休 9 項、SQL 負向情境通過。
+
+## GCP-143 AI 隔離候選｜2026-11-07
+
+`tests/ai/test_ai_runtime.py` 與既有 `test_model_eval*.py`：30 passed（0.40s）。新案例覆蓋預設停用、registered/CSRF、持久化額度、無效模型 JSON、候選編輯/人工確認、任務重送不重複或發獎勵、來源人物模擬與多模態傳輸契約。使用全新 SQLite＋傳輸替身，真實模型 API／Browser／PostgreSQL 均未驗收；Secret metadata 不等於 key 可用或免費額度。見 [AI 候選與授權條件](ai/GCP143_AI_CANDIDATE.md)。未部署、未修改雲端。
+
+## 2026-11-08｜GCP-144 RC v3（候選，未部署）
+
+修復交付包版本／Patch基準混用，37檔完整Patch與Parent增量各自重建Tree並綁精確Commit。兩次真實Gemini 3.5 Flash-Lite HTTP200（360 input／121 output tokens、費用null），Browser完成編輯／確認／重送／刷新，僅既有合成SQLite；Call2空任務，不將人工任務當AI輸出。完整API424 passed／28 skipped，精確Commit及各類原始日誌以v3 Manifest為準。Owner最新目標為受IAP保護Staging POC，不自行公開或部署。詳見[RC v3驗收](testing/GCP144_RC_ACCEPTANCE.md)。

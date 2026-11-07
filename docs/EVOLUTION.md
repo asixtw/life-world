@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-07 GCP-144 三階段孵化候選
+
+加入三次明確輸入、防連點及reduced-motion的前端孵化呈現，沿用既有CSS Lumi；25筆候選PNG inventory保留來源與alpha/SHA。4項隔離Chromium測試通過；未部署，未替換正式角色。詳見[美術接入候選](art/README.md)。
+
 ## 2026-11-05 首次 CI/CD 失敗最小修復
 
 Web／API 發布步驟改用官方 google-cloud-cli:slim 與映像自帶 Python 的絕對路徑；一次獨立容器檢查已證實兩者可執行。API 建置契約改驗證 Test→Build→Container Verification→明確 Push→release.py，禁止恢復 images 後置推送，保留公開存取／SQL／hostfix 安全限制。僅 API 契約 3 項及 YAML 基本檢查，發布器主要邏輯、IAM、資料庫、流量不改；正式重新部署須經本次 PR Merge 授權。
@@ -164,3 +168,11 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ### 2026-11-07｜GCP-144 核心介面修正候選（未部署）
 
 修正環境標籤及依 GIS capability 的訪客保存提示；新增跨服務實例讀回、載入成功／失敗與提示瀏覽器測試。API 23 passed、Chromium 4 passed，均為明示隔離測試；線上 PostgreSQL、真實 GIS／AI Gate 仍未通過。見 [本輪驗收](testing/GCP144_CORE_ACCEPTANCE.md)。
+
+### 2026-11-07｜GCP-144 今日整合候選（未部署）
+
+局部整合Google／IAP安全基底、AI草稿、測試版提示與三次孵化；補Guest AI顯示、Fixture標示與既有Guest容量邊界。真實Staging DB/GIS仍待證據，不以本機fixture冒充上線。見[整合驗收](testing/GCP144_RC_ACCEPTANCE.md)。
+
+## 2026-11-08｜GCP-144 RC v3（候選，未部署）
+
+修復交付包版本／Patch基準混用，37檔完整Patch與Parent增量各自重建Tree並綁精確Commit。兩次真實Gemini 3.5 Flash-Lite HTTP200（360 input／121 output tokens、費用null），Browser完成編輯／確認／重送／刷新，僅既有合成SQLite；Call2空任務，不將人工任務當AI輸出。完整API424 passed／28 skipped，精確Commit及各類原始日誌以v3 Manifest為準。Owner最新目標為受IAP保護Staging POC，不自行公開或部署。詳見[RC v3驗收](testing/GCP144_RC_ACCEPTANCE.md)。

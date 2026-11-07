@@ -97,6 +97,10 @@ class AuthRateLimiter:
         source=self.source(request)
         if self.settings.access_mode=='public_alpha':
             if not self.settings.alpha_writes_enabled:raise DomainError(503,'alpha_paused','Alpha 暫停新增，已保存內容仍可查看。')
+            # 公開切換前已存在的Guest也計入硬上限；外層AlphaDatabase寫入鎖防競爭。
+            guests=c.execute("SELECT count(*) AS n FROM users WHERE status='guest'").fetchone()['n']
+            if guests>=self.settings.alpha_worlds_total:
+                raise DomainError(409,'guest_capacity_reached','目前訪客世界數量已滿；已保存內容仍可查看。')
             for scope,limit,seconds in [('alpha_worlds_total',self.settings.alpha_worlds_total,None),('alpha_worlds_daily',self.settings.alpha_worlds_daily,86400)]:
                 error=self.take(c,scope,'all',limit,seconds,capacity=seconds is None)
                 if error:raise error

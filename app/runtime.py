@@ -64,8 +64,16 @@ class RuntimeSettings:
         for value in (self.alpha_worlds_total,self.alpha_worlds_daily,self.alpha_owner_writes,self.alpha_global_writes,self.alpha_source_writes):
             if not isinstance(value,int) or isinstance(value,bool) or not 1<=value<=1000000:raise ValueError('Invalid Alpha quota')
         if not isinstance(self.alpha_storage_bytes,int) or isinstance(self.alpha_storage_bytes,bool) or not 1<=self.alpha_storage_bytes<=1_000_000_000:raise ValueError('Invalid storage byte cap')
-        if self.access_mode=='public_alpha' and self.backend=='postgresql' and (self.db_name!='life_world_alpha' or self.db_user!='lw_alpha_app'):
-            raise ValueError('Public Alpha must use isolated database and runtime role')
+        if self.access_mode=='public_alpha' and self.backend=='postgresql':
+            isolated=self.db_name=='life_world_alpha' and self.db_user=='lw_alpha_app'
+            # Product公開候選沿用現有DB，只有明確Google-only與來源/容量護欄才可配置。
+            product=(self.db_name=='life_world_product_staging' and self.db_user=='lw_product_staging_app'
+                     and bool(self.google_client_id) and self.secure_cookies
+                     and self.external_origin.startswith('https://') and self.auth_rate_enabled
+                     and len(self.auth_rate_secret.encode())>=32
+                     and (self.auth_source_mode=='iap' or (self.auth_source_mode=='proxy' and bool(self.auth_trusted_proxies))))
+            if not (isolated or product):
+                raise ValueError('Public Alpha must use isolated database or guarded Product Staging profile')
         # 直接注入設定與環境變數同樣驗證，避免測試／其他入口繞過邊界。
         if self.backend not in ('sqlite', 'postgresql'):
             raise ValueError('Unknown database backend')

@@ -53,7 +53,9 @@ def onboarding(page):  # 以真實瀏覽器完成首次旅程並檢查 Lumi 出�
     expect(page.locator('#goal-form')).to_be_visible()  # 等待並核對目前畫面狀態
     expect(page.locator('.lumi')).to_have_count(0)  # 等待並核對目前畫面狀態
     create_goal(page, '第一個作品')  # 在同一交易建立目標、行動並孵化 Lumi
-    expect(page.get_by_role('heading', name='目標蛋誕生了。 你好，我是 Lumi。')).to_be_visible()  # 等待並核對目前畫面狀態
+    expect(page.get_by_role('heading', name='目標蛋誕生了。')).to_be_visible()  # 等待並核對目前畫面狀態
+    for _ in range(3):  # 每次動畫結束後才可進入下一階段。
+        page.locator('[data-birth-egg]').click()
     page.get_by_role('link', name='進入我的世界').click()  # 依使用者動線點擊畫面入口
     expect(page.get_by_role('heading', name='測試小光，歡迎回來。')).to_be_visible()  # 等待並核對目前畫面狀態
 

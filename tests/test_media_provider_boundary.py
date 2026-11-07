@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from fastapi.testclient import TestClient
 
 from app.main import create_app
-from conftest import onboard
+from conftest import onboard, register
 from test_media import Provider, send
 
 
@@ -18,6 +18,12 @@ def test_injected_media_provider_does_not_leak_into_another_app(tmp_path):
     with TestClient(configured) as first, TestClient(unconfigured) as second:
         onboard(first)
         onboard(second)
+        # Guest在provider之前被拒絕；註冊後才驗證跨App注入隔離。
+        assert first.get('/api/media/capabilities').json()['recognition_available'] is False
+        assert send(first).status_code == 403
+        assert provider.calls == []
+        register(first, 'synthetic_media_first')
+        register(second, 'synthetic_media_second')
         first_before = first.get('/api/state').json()
         second_before = second.get('/api/state').json()
         assert first.get('/api/media/capabilities').json()['recognition_available'] is True

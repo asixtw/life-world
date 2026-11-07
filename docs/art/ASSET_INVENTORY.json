@@ -1,0 +1,343 @@
+{
+  "status": "candidate_inventory_not_approval",
+  "assets": [
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-celebrate-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "941665d17e5b9312401928a1be9ed0c537924a31fa0913326d5ecfb5d610da76",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-confirmed-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "76c37b3b6183c2f6984a9a9225f312341b2435ef23770b574bdc5cf4ade962de",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-idle-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-listening-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "e05fce759e8f41323644253f8f1a64b9fa3c64446b9dc19bf4d828dc9ff21198",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-quiet-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-welcome-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-shell-left-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "f3f76f704d34f28ccb236ecbfff1f08ce226f80a5b757c641712af6e2d60b6b1",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-shell-right-candidate-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "26709f2e5da4ea509688e42c2ed5a9ce5c302578c982346b287b682867ec5ff4",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "獎勵／經歷視覺",
+      "path": "collaboration/ui-kit/assets/shared-art/additions-20261029/originals/lw-effects-nourishment-v2.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        253
+      ],
+      "sha256": "43a82833a107544ad42a3706c38c427b21c3889d3687feb4050724f6cea00e2e",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/shared-art/additions-20261029/originals/lw-egg-shellsplit-v2.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/shared-art/additions-20261029/originals/lw-lumi-completion-v2.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "b04aaaf36ad2226f5645e3e7b8d8fd0a4572e35ad9c263d1b297318bd5ccd04a",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "獎勵／經歷視覺",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-app-icon-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGB",
+      "alpha_range": null,
+      "sha256": "e5beb459afe15afdbbafc522f6bcdfc5788318914086583854e9512566df8563",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-deepcrack-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "87585e05a376269141b31d83243d9bca7e1c22e04a5e4c5681407043b4b63f5c",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-initialcrack-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "f7682e3e0a433f857cbaba01b52a804d4d1cb02c5ff882796ecf2307cf3ce1f6",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-rest-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "6bb5e377dbaf40367ff8726394e944dc7489b47bd21d36561fd9ff1cb4eb09a3",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "孵化蛋",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-softglow-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "523001d03b80f9eda1864072ef544af1cd0e3a8f845809b4bd81d681bf07ff87",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-lumi-companion-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-lumi-quiet-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "baae4fdd3dbed091ac85a127b777da7a31ef74c194193b983cc7041af458c27f",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "獎勵／經歷視覺",
+      "path": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-share-illustration-v1.png",
+      "width": 1731,
+      "height": 909,
+      "format": "PNG",
+      "mode": "RGB",
+      "alpha_range": null,
+      "sha256": "d0af20b745920cb04e6f8b780f92229d2339750271351944d24ea182f4c9aa5b",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "房間／裝飾",
+      "path": "collaboration/ui-kit/assets/world-candidates-20261029/layers/foreground-plant.png",
+      "width": 1299,
+      "height": 1211,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "f5bfce9b4d0105542424be953e6d8bbe397eb4ba7f866d74afd16ecfef1e7824",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "房間／裝飾",
+      "path": "collaboration/ui-kit/assets/world-candidates-20261029/layers/furniture-cabinet.png",
+      "width": 1448,
+      "height": 1086,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "207cb4692b198a7b97e7c9d82f9a16b4d89cfc66a41974bec032837d97a13d36",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/world-candidates-20261029/layers/lumi-contact-shadow.png",
+      "width": 1774,
+      "height": 887,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        97
+      ],
+      "sha256": "72f0ae9e3df88f205b28d395cb47725facca6a7909cb4374f788bd6f07d76a8c",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "Lumi 狀態",
+      "path": "collaboration/ui-kit/assets/world-candidates-20261029/layers/reference-lumi-completion.png",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "b04aaaf36ad2226f5645e3e7b8d8fd0a4572e35ad9c263d1b297318bd5ccd04a",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "房間／裝飾",
+      "path": "collaboration/ui-kit/assets/world-candidates-20261029/originals/room-day-base.png",
+      "width": 1448,
+      "height": 1086,
+      "format": "PNG",
+      "mode": "RGB",
+      "alpha_range": null,
+      "sha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3",
+      "status": "existing_candidate_not_newly_approved"
+    },
+    {
+      "category": "房間／裝飾",
+      "path": "collaboration/ui-kit/assets/world-candidates-20261029/originals/room-quiet-base.png",
+      "width": 1448,
+      "height": 1086,
+      "format": "PNG",
+      "mode": "RGB",
+      "alpha_range": null,
+      "sha256": "dc6803404bc77f46d939de662aa058d00ee1d762e97667393bab72c8033cbf03",
+      "status": "existing_candidate_not_newly_approved"
+    }
+  ]
+}
