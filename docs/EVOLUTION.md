@@ -189,3 +189,8 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ### 2026-11-08：受保護Tag同源寫入修復
 
 新增明確 LIFEWORLD_WRITE_ORIGINS，僅允許精確HTTPS Trusted Host的同源業務寫入；正式OAuth Origin及IAP audience推導不變。Tag Origin與正式Origin不同導致訪客POST403，並非業務旗標關閉（實際為true）。本輪針對Origin／CSRF／身分／Runtime測試38 passed，正式瀏覽器及Product PG閉環待驗收，不把本機測試當部署E2E。
+
+
+### 2026-11-08：Google challenge精確Tag來源
+
+Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能只修一般POST而留下Google第二層canonical-only Gate。26項針對性測試通過；未將工程SQLite／替身驗證器當真GIS或Product PG驗收。Client設定啟用仍須007/008與備份Gate，維持IAP。

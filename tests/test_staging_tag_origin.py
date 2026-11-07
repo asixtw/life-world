@@ -33,3 +33,17 @@ def test_tag_origin_does_not_bypass_csrf_or_enable_google(tmp_path):
         assert cap['google_login_available'] is False
         assert cap['writes_available'] is True
         assert settings.external_origin==CANON
+
+@pytest.mark.parametrize('origin,expected',[(TAG,200),(CANON,403),('https://evil.example',403)])
+def test_google_challenge_on_exact_tag(tmp_path,origin,expected):
+    """僅驗證OAuth來源Gate；不冒充真實Google驗簽或正式PG。"""
+    settings=replace(RuntimeSettings(),external_origin=CANON,trusted_hosts=(CANON.split('//')[1],TAG.split('//')[1]),write_origins=(TAG,),google_client_id='123-synthetic.apps.googleusercontent.com')
+    app=create_app(data_dir=tmp_path,settings=settings)
+    # 僅在本測試可丟棄SQLite建立Google表；不連Product、不執行正式Migration。
+    with app.state.service.db.connect(write=True) as c:
+        c.execute('CREATE TABLE external_identities(provider TEXT,issuer TEXT,subject TEXT,owner_id TEXT,created_at TEXT)')
+    with TestClient(app,base_url=TAG) as client:
+        guest=client.post('/api/auth/guest',headers={'Origin':TAG}).json()
+        result=client.post('/api/auth/external/challenge',json={'mode':'upgrade'},headers={'Origin':origin,'X-CSRF-Token':guest['csrf_token']})
+        assert result.status_code==expected,result.text
+        if expected==200:assert result.json()['client_id']==settings.google_client_id

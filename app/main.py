@@ -192,7 +192,11 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         # 入口必須由明確啟用的公開OAuth契約配置，沒有client即fail-closed。
         if app.state.external_auth is None:raise DomainError(503,'google_not_configured','Google登入尚未設定，訪客仍可繼續。')
         expected=settings.external_origin or str(request.base_url).rstrip('/')
-        if request.headers.get('origin')!=expected:raise DomainError(403,'origin_rejected','請從本站重新開始登入。')
+        # GIS與一般寫入使用同一精確Tag白名單；仍必須有Origin，不變更Google audience或IAP audience。
+        origin=request.headers.get('origin')
+        same_authority=bool(origin) and origin.split('://',1)[-1]==request.url.netloc
+        if origin not in ((expected,)+settings.write_origins) or (settings.write_origins and not same_authority):
+            raise DomainError(403,'origin_rejected','請從本站重新開始登入。')
         try:
             with service.db.connect() as c:c.execute('SELECT provider,issuer,subject,owner_id,created_at FROM external_identities LIMIT 0')
         except Exception:raise DomainError(503,'google_schema_not_ready','Google登入尚未完成設定，訪客資料會保留。') from None
