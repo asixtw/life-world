@@ -217,7 +217,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   if (path === 'welcome') html = welcomeView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'profile') html = profileView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'goal-new') html = goalForm(); // 依目前選項或狀態進入對應處理分支
-  else if (path === 'birth') html = `<div class="narrow"><section class="hero"><div class="hero-copy"><div class="eyebrow">A NEW BEGINNING</div><h1>目標蛋誕生了。<br>你好，我是 Lumi。</h1><p>你的方向，讓這個世界有了第一顆種子。從現在起，我們一起慢慢走。</p>${link('world','進入我的世界 →','primary')}</div>${lumi()}</section></div>`; // 依目前選項或狀態進入對應處理分支
+  else if (path === 'birth') html = BirthUI.view(lumi()); // 三次明確互動後才揭露既有 Lumi 呈現。
   else if (path === 'world') html = await worldView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'goals') html = await GoalsUI.list(); // 目前挑戰與歷史分區顯示。
   else if (path.startsWith('goal/')) html = await goalView(path.split('/')[1],options.localGoalEdit); // 依目前選項或狀態進入對應處理分支
@@ -240,6 +240,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   if ((path === 'record' || path.startsWith('review/')) && state.returnTo) html=link(state.returnTo,'返回人物頁','text-button')+html; // 依目前選項或狀態進入對應處理分支
   if (sequence === renderSequence) {
     $('#app').innerHTML = html;
+    BirthUI.mount(); // 只為孵化頁綁定互動，不改寫伺服器的目標狀態。
     if(state.guestSaveNoticePending){guestSaveNotice();state.guestSaveNoticePending=false;}
     ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);
     const section=params.get('section');if(['gd-today','gd-week','gd-records'].includes(section)){document.getElementById(section)?.focus();document.getElementById(section)?.scrollIntoView({block:'start'});}

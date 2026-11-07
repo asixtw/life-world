@@ -1,5 +1,9 @@
 # TDD 與實際驗收紀錄
 
+## 2026-11-07 GCP-144 孵化互動
+
+隔離Chromium `browser_tests/test_birth_interaction.py -q --tb=short`：4 passed（桌面／觸控，各含reduced motion）。驗證三次點擊、動畫鎖及第三階段揭露。完整後端旅程未重跑；線上與DB驗收不在此證據範圍。詳見[盤點與限制](art/README.md)。
+
 ## 首次自動部署已知失敗修復（2026-11-05，合併前檢查）
 
 基準 `1cd3458`：Web 在發布步驟找不到 PATH 上的 python3，API 舊契約讀取已移除的 images。API 單檔先重現 1 failed／2 passed；新增發布容器契約亦先重現舊映像不符，修正後 `.venv\Scripts\python.exe -X utf8 -m pytest --noconftest tests/test_api_build_config.py -q --tb=short -p no:cacheprovider`：3 passed、0 failed、0 skipped。兩份 YAML 解析及發布入口契約通過，`release.py` 與基準逐位元內容（統一換行後）一致，候選／回滾邏輯未修改；未重跑完整 API 測試。
