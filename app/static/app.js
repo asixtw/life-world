@@ -428,14 +428,32 @@ async function finishLogout(){
     finally{clearTimeout(timeout);}
   }
 }
+// 同一頁面首次尚無Cookie時，共用進行中的Guest請求，避免雙擊建立兩個世界。
+let guestStartPending=null;
+function startGuest() {
+  if(guestStartPending)return guestStartPending;
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
+  guestStartPending=(async()=>{
+    try {
+      const me=await api('/auth/guest',{method:'POST',signal:controller.signal});
+      state.me=me;state.csrf=me.csrf_token;return me;
+    } catch(error) {
+      if(error.name==='AbortError')throw new Error('服務回應逾時，尚未確認世界是否建立。請重試；若瀏覽器已收到Session，會恢復同一個世界。');
+      throw error;
+    } finally {clearTimeout(timer);}
+  })().finally(()=>{guestStartPending=null;});
+  return guestStartPending;
+}
+// Guest入口控制結束
 document.addEventListener('click', async event => { // 監聽點擊
   const target = event.target.closest('[data-action],g[data-person],button[data-person]'); if (!target) return; // 取得本次操作的控制項或合併主要事件
+  if(target.disabled)return; // 防止重複派送仍在處理的操作。
   const action = target.dataset.action; target.disabled = true; // 讀取按鈕明確指定的操作代碼
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
     if(action==='entry-retry'){await retryPublicEntry();return;}
     if(action?.startsWith('entry-')){publicEntryView(action.slice(6));return;}
     if (await PeopleUI.handleClick(target)) return; // 依目前選項或狀態進入對應處理分支
-    if (action === 'guest') {const me = await api('/auth/guest',{method:'POST'}); state.me = me; state.csrf = me.csrf_token; await refresh(); navigate('profile');} // 開始訪客旅程
+    if (action === 'guest') {await startGuest(); await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定
     if(action==='test-login-dialog')accountView('test-login');
     if (action === 'claim-dialog') accountView('claim'); // 開啟升級帳號表單
