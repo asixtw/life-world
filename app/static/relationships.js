@@ -153,7 +153,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     if(action==='connection-new') { const people=c.state.world.people.filter(p=>p.id!==profile.person.id); c.dialog(`<h2 id="account-heading">建立明確的共同關係</h2><form id="connection-form"><div class="field"><label for="other-person">另一位人物</label><select id="other-person" name="other_person_id" required>${c.options(people,null,'name')}</select></div><div class="field"><label for="connection-label">共同關係／場合</label><input id="connection-label" name="label" required maxlength="300"></div><h3>可附相關經歷來源</h3>${sourceChecks(profile)}<button class="primary">保存共同關係</button></form>`); return true; } // 建立人物間明確共同關係
     if(action==='theater-clear') { dialogue=[]; document.querySelector('#simulation-output').replaceChildren(); return true; }
     if(action==='theater-generate') {
-      if(target.disabled) return true;
+      // 共用派送已完成去重並鎖定按鈕，不能把本次合法派送誤判成重送。
       const message=document.querySelector('#simulation-message').value.trim();
       const ids=[...document.querySelectorAll('[name="simulation_facts"]:checked')].map(x=>x.value);
       if(!message||!ids.length) throw new Error('請輸入想練習的話，並勾選已確認的人物資訊。');
