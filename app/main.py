@@ -168,8 +168,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
             response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"  # Blob 音訊只供使用者主動試聽，不自動播放。
         if request.url.path=='/' and settings.google_client_id:
+            # GIS需跨來源Origin Referer；只送Origin，不送私人路徑或查詢字串。
+            response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
             csp=response.headers['Content-Security-Policy']
-            csp=csp.replace("script-src 'self'","script-src 'self' https://accounts.google.com/gsi/client").replace("style-src 'self'","style-src 'self' https://accounts.google.com/gsi/style").replace("connect-src 'self'","connect-src 'self' https://accounts.google.com/gsi/")
+            csp=csp.replace("script-src 'self'","script-src 'self' https://accounts.google.com/gsi/client").replace("style-src 'self'","style-src 'self' 'sha256-RU4sU0AaS8IBGZx8XrGt/pa9A5SLA3dQszGeqT5L3Kw=' https://accounts.google.com/gsi/style").replace("connect-src 'self'","connect-src 'self' https://accounts.google.com/gsi/")
             response.headers['Content-Security-Policy']=csp+"; frame-src https://accounts.google.com/gsi/"
             response.headers['Cross-Origin-Opener-Policy']='same-origin-allow-popups'
         return response  # 回傳檢查寫入來源並加入安全與快取標頭的結果

@@ -8,7 +8,7 @@ from ai.test_ai_runtime import Provider
 
 def enable(app):
     provider=Provider(json.dumps({'summary':'合成摘要','tasks':['明天閱讀15分鐘']}))
-    app.state.ai_runtime=AIRuntime(app.state.service,AISettings(provider='gemini',model='gemini-synthetic',approved=True,reservation_microusd=1,max_budget_microusd=10),provider)
+    app.state.ai_runtime=AIRuntime(app.state.service,AISettings(provider='gemini',model='gemini-synthetic',approved=True,max_total_budget_microusd=10000,reservation_microusd=1,max_budget_microusd=10),provider)
     return provider
 
 

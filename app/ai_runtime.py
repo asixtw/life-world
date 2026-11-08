@@ -19,9 +19,11 @@ class AISettings:
     max_global_calls:int=5  # 與預留預算均採滾動24小時，不是服務生命週期總額。
     reservation_microusd:int=0
     max_budget_microusd:int=0
+    historical_reservation_microusd:int=0
     max_total_budget_microusd:int=0  # 測試期總上限，不因日額度輪替重置；0只供未配置環境。
 
     def __post_init__(self):
+        if self.historical_reservation_microusd<0 or (self.approved and not 0<self.max_total_budget_microusd<=20_000_000-self.historical_reservation_microusd):raise ValueError('Approved AI requires cumulative US$20 hard ceiling')
         if self.max_total_budget_microusd<0 or (self.max_total_budget_microusd and self.max_total_budget_microusd<self.reservation_microusd):raise ValueError('Invalid total test budget')
         if self.provider not in ('','gemini'):raise ValueError('Explicit supported provider required')
         if self.approved and (self.provider!='gemini' or not re.fullmatch(r'gemini-[a-z0-9][a-z0-9.\-]{0,100}',self.model) or self.reservation_microusd<=0 or self.max_budget_microusd<self.reservation_microusd):raise ValueError('Provider/model/worst-case reservation approval required')
@@ -29,7 +31,7 @@ class AISettings:
 
     @classmethod
     def from_env(cls):
-        return cls(max_total_budget_microusd=int(os.environ.get('LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD','0')),provider=os.environ.get('LIFEWORLD_AI_PROVIDER',''),model=os.environ.get('LIFEWORLD_AI_MODEL',''),approved=os.environ.get('LIFEWORLD_AI_CALLS_APPROVED','false')=='true',
+        return cls(historical_reservation_microusd=int(os.environ.get('LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD','0')),max_total_budget_microusd=int(os.environ.get('LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD','0')),provider=os.environ.get('LIFEWORLD_AI_PROVIDER',''),model=os.environ.get('LIFEWORLD_AI_MODEL',''),approved=os.environ.get('LIFEWORLD_AI_CALLS_APPROVED','false')=='true',
             max_input_bytes=int(os.environ.get('LIFEWORLD_AI_MAX_INPUT_BYTES','8192')),max_media_bytes=int(os.environ.get('LIFEWORLD_AI_MAX_MEDIA_BYTES','1000000')),max_output_tokens=int(os.environ.get('LIFEWORLD_AI_MAX_OUTPUT_TOKENS','512')),
             max_owner_daily_calls=int(os.environ.get('LIFEWORLD_AI_OWNER_DAILY_CALLS','2')),max_global_calls=int(os.environ.get('LIFEWORLD_AI_GLOBAL_DAILY_CALLS',os.environ.get('LIFEWORLD_AI_GLOBAL_CALLS','5'))),reservation_microusd=int(os.environ.get('LIFEWORLD_AI_RESERVATION_MICROUSD','0')),max_budget_microusd=int(os.environ.get('LIFEWORLD_AI_DAILY_BUDGET_MICROUSD',os.environ.get('LIFEWORLD_AI_BUDGET_MICROUSD','0'))))
 
@@ -60,6 +62,16 @@ class AIRuntime:
 
     def authorize(self,owner):
         with self.service.db.connect() as c:require_registered(self.service._onboarded(c,owner))
+
+    def usage(self,owner):
+        """只公開有界成本metadata，不含來源文字、憑證、其他Owner識別碼。"""
+        self.authorize(owner)
+        with self.service.db.connect() as c:
+            value="(response::jsonb->>'reservation_microusd')::bigint" if self.service.db.backend=='postgresql' else "json_extract(response,'$.reservation_microusd')"
+            used=int(c.execute(f"SELECT COALESCE(sum({value}),0) AS used FROM requests WHERE operation='ai_attempt_v1'").fetchone()['used'])
+            own=c.execute("SELECT response FROM requests WHERE owner_id=? AND operation='ai_result_v1' ORDER BY request_id LIMIT 100",(owner,)).fetchall()
+        receipts=[json.loads(r['response']) for r in own]
+        return {'total_budget_microusd':self.settings.max_total_budget_microusd,'historical_reserved_microusd':self.settings.historical_reservation_microusd,'global_reserved_microusd':used,'remaining_microusd':max(0,self.settings.max_total_budget_microusd-used),'per_call_reservation_microusd':self.settings.reservation_microusd,'actual_invoice_cost_microusd':None,'receipts':receipts,'notice':'預留不是實際帳單；失敗或未知用量不釋放預留。'}
 
     def reserve(self,owner,operation,fingerprint):
         now=self.service.now();s=self.settings

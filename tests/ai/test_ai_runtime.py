@@ -27,7 +27,7 @@ def prepared(tmp_path):
         app.state.service.clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc)
         me,g=onboard(client);register(client)
         provider=Provider(json.dumps({'summary':'合成整理','tasks':['合成後續']}))
-        settings=AISettings(provider='gemini',model='gemini-synthetic',approved=True,max_owner_daily_calls=2,max_global_calls=3,reservation_microusd=100,max_budget_microusd=300)
+        settings=AISettings(provider='gemini',model='gemini-synthetic',approved=True,max_total_budget_microusd=10000,max_owner_daily_calls=2,max_global_calls=3,reservation_microusd=100,max_budget_microusd=300)
         runtime=AIRuntime(app.state.service,settings,provider=provider)
         yield app,client,me,g,runtime,provider
 

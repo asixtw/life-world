@@ -44,3 +44,20 @@ def test_pg_aggregate_text_budget_is_normalized(prepared,monkeypatch):
         with original(*args,**kwargs) as c:yield Proxy(c)
     monkeypatch.setattr(runtime.service.db,'connect',connect)
     runtime.reserve(me['owner_id'],'experience','pg-text-aggregate')
+
+
+def test_approved_requires_hard_cap_and_loads_env(monkeypatch):
+    from app.ai_runtime import AISettings
+    base={'provider':'gemini','model':'gemini-synthetic','approved':True,'reservation_microusd':100,'max_budget_microusd':1000}
+    with pytest.raises(ValueError):AISettings(**base)
+    with pytest.raises(ValueError):AISettings(**base,max_total_budget_microusd=20_000_001)
+    for key,value in {'LIFEWORLD_AI_PROVIDER':'gemini','LIFEWORLD_AI_MODEL':'gemini-synthetic','LIFEWORLD_AI_CALLS_APPROVED':'true','LIFEWORLD_AI_RESERVATION_MICROUSD':'100','LIFEWORLD_AI_DAILY_BUDGET_MICROUSD':'1000','LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD':'19000000','LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD':'1000000'}.items():monkeypatch.setenv(key,value)
+    settings=AISettings.from_env();assert settings.max_total_budget_microusd==19_000_000 and settings.historical_reservation_microusd==1_000_000
+
+
+def test_usage_reports_reserved_not_unknown_invoice_cost(prepared):
+    app,c,me,g,runtime,provider=prepared
+    runtime.reserve(me['owner_id'],'experience','usage-report')
+    result=runtime.usage(me['owner_id'])
+    assert result['global_reserved_microusd']==100 and result['remaining_microusd']==9900
+    assert result['actual_invoice_cost_microusd'] is None and result['receipts']==[]

@@ -56,6 +56,11 @@ def install(app):
             require(row is not None,404,'not_found','找不到可存取的經歷。')
             return dict(row)
 
+    @app.get('/api/ai/usage',tags=['AI drafts'])
+    def ai_usage(request:Request):
+        who=service.session(request.cookies.get('lw_session'))[0]['id']
+        return app.state.ai_runtime.usage(who)
+
     @app.post('/api/experiences/{experience_id}/task-suggestions',tags=['AI drafts'])
     def task_suggestions(experience_id:str,request:Request,data:ConfirmedInput):
         who=owner(request);source=experience(who,experience_id)
