@@ -37,6 +37,9 @@ class RuntimeSettings:
     business_enabled: bool = True
 
     google_client_id: str = ''  # 明確配置才啟用GIS；既有IAP部署預設不變。
+    test_login_usernames: tuple = ()  # 既有授權測試帳密白名單，與Google共用Owner能力。
+    registration_enabled: bool = True
+    password_login_enabled: bool = True
     access_mode: str = 'legacy'
     auth_rate_enabled: bool = False
     auth_rate_secret: str = field(default='', repr=False)
@@ -51,7 +54,14 @@ class RuntimeSettings:
     alpha_writes_enabled: bool = True
     alpha_login_enabled: bool = False
 
+    @property
+    def password_login_available(self):
+        """登入管道開放由政策決定；不由Google Client設定決定。"""
+        return bool(self.test_login_usernames) or (self.alpha_login_enabled if self.access_mode=='public_alpha' else self.password_login_enabled)
+
     def __post_init__(self):
+        if any(not re.fullmatch(r"[a-z0-9_]{3,30}",x) for x in self.test_login_usernames):
+            raise ValueError("Explicit test usernames required")
         for origin in self.write_origins:
             parsed = urlsplit(origin)
             if (parsed.scheme != 'https' or not parsed.netloc or parsed.hostname not in self.trusted_hosts
@@ -60,8 +70,10 @@ class RuntimeSettings:
                 raise ValueError('Write origins must be exact HTTPS Trusted Hosts')
         if self.google_client_id and not re.fullmatch(r'[A-Za-z0-9._-]+\.apps\.googleusercontent\.com',self.google_client_id):
             raise ValueError('Explicit Google OAuth client required')
-        if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy','iap'):
+        if self.access_mode not in ('legacy','public_alpha') or self.auth_source_mode not in ('unconfigured','direct','proxy','iap','shared'):
             raise ValueError('Invalid access/source mode')
+        if self.auth_source_mode=='shared' and (self.access_mode!='public_alpha' or self.registration_enabled or not self.auth_rate_enabled or len(self.auth_rate_secret.encode())<32):
+            raise ValueError('Shared public source requires closed registration and enforced global quotas')
         if self.cloud_run and (self.auth_rate_enabled or self.access_mode=='public_alpha') and self.auth_source_mode=='direct':
             raise ValueError('Cloud Run requires verified proxy source policy')
         if self.auth_source_mode=='iap' and (not self.auth_rate_enabled or len(self.auth_rate_secret.encode())<32):
@@ -75,10 +87,10 @@ class RuntimeSettings:
             isolated=self.db_name=='life_world_alpha' and self.db_user=='lw_alpha_app'
             # Product公開候選沿用現有DB，只有明確Google-only與來源/容量護欄才可配置。
             product=(self.db_name=='life_world_product_staging' and self.db_user=='lw_product_staging_app'
-                     and bool(self.google_client_id) and self.secure_cookies
+                     and (bool(self.google_client_id) or bool(self.test_login_usernames) or (self.auth_source_mode=='shared' and not self.registration_enabled)) and self.secure_cookies
                      and self.external_origin.startswith('https://') and self.auth_rate_enabled
                      and len(self.auth_rate_secret.encode())>=32
-                     and (self.auth_source_mode=='iap' or (self.auth_source_mode=='proxy' and bool(self.auth_trusted_proxies))))
+                     and (self.auth_source_mode in ('iap','shared') or (self.auth_source_mode=='proxy' and bool(self.auth_trusted_proxies))))
             if not (isolated or product):
                 raise ValueError('Public Alpha must use isolated database or guarded Product Staging profile')
         # 直接注入設定與環境變數同樣驗證，避免測試／其他入口繞過邊界。
@@ -145,6 +157,9 @@ class RuntimeSettings:
                    trusted_hosts=hosts, secure_cookies=secure, external_origin=origin,
                    write_origins=tuple(x.strip() for x in os.environ.get('LIFEWORLD_WRITE_ORIGINS','').split(',') if x.strip()),
                    google_client_id=os.environ.get('LIFEWORLD_GOOGLE_CLIENT_ID',''),
+                   test_login_usernames=tuple(x.strip().lower() for x in os.environ.get('LIFEWORLD_TEST_LOGIN_USERNAMES','').split(',') if x.strip()),
+                   registration_enabled=flag('LIFEWORLD_REGISTRATION_ENABLED',not cloud and not bool(os.environ.get('LIFEWORLD_GOOGLE_CLIENT_ID'))),
+                   password_login_enabled=flag('LIFEWORLD_PASSWORD_LOGIN_ENABLED',not cloud),
                    access_mode=os.environ.get('LIFEWORLD_ACCESS_MODE','legacy'),
                    auth_rate_enabled=flag('LIFEWORLD_AUTH_RATE_ENABLED',False),
                    auth_rate_secret=os.environ.get('LIFEWORLD_AUTH_RATE_SECRET',''),

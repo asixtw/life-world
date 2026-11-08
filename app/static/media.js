@@ -230,16 +230,19 @@ const MediaUI = (() => {
     try {await storage(nextKey,{items:session.items,fields:session.fields,serverRevision}); await storage(oldKey,undefined,true); sessions.delete(oldKey); session.key=nextKey; session.serverRevision=serverRevision; sessions.set(nextKey,session);}
     catch {throw new Error('文字草稿已到伺服器，但本機素材未完成連結。請保留此頁，勿重複建立草稿。');}
   }
-  async function clearOwner(owner) { // 僅在使用者勾選後清本owner本機素材，不刪伺服器或其他owner。
+  async function clearOwner(owner,{signal}={}) { // 僅在使用者勾選後清本owner本機素材，不刪伺服器或其他owner。
     if(active?.owner===owner){stopRecording(true);cancelRequests(active);}
     await pending;
+    if(signal?.aborted)throw new Error('本機清理已取消');
     const db=await dbPromise();
     try {
+      if(signal?.aborted)throw new Error('本機清理已取消');
       await new Promise((resolve,reject)=>{
         const tx=db.transaction('workspaces','readwrite'),store=tx.objectStore('workspaces');
         const cursor=store.openCursor();
         cursor.onsuccess=()=>{const row=cursor.result;if(!row)return;if(String(row.key).startsWith(owner+':'))row.delete();row.continue();};
-        tx.oncomplete=resolve;tx.onerror=()=>reject(new Error('本機媒體草稿清除失敗，尚未登出。'));tx.onabort=tx.onerror;
+        const abort=()=>{try{tx.abort();}catch{}};signal?.addEventListener('abort',abort,{once:true});
+        tx.oncomplete=()=>{signal?.removeEventListener('abort',abort);resolve();};tx.onerror=()=>{signal?.removeEventListener('abort',abort);reject(new Error('本機媒體草稿尚未清除；不影響已完成的登出。'));};tx.onabort=tx.onerror;
       });
       for(const key of sessions.keys())if(key.startsWith(owner+':'))sessions.delete(key);
       if(active?.owner===owner){active=null;releaseURLs();}

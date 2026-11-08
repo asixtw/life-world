@@ -44,6 +44,9 @@ class AuthRateLimiter:
             subject=getattr(request.state,'lw_iap_subject',None)
             if not isinstance(subject,str) or not subject.startswith('iap:https://cloud.google.com/iap:'):raise protection_unavailable()
             return subject
+        # 初期公開共用嚴格來源桶：不用XFF／IP猜測，攻擊者不能偽造標頭取得新額度。
+        # 犧牲尖峰可用性換取保守總額保護；Owner與全域寫入／AI額度仍各自執行。
+        if self.settings.auth_source_mode=='shared':return 'public-shared-source'
         try:
             peer=ipaddress.ip_address(request.client.host)
             def canonical(ip):return str(ip.ipv4_mapped or ip) if isinstance(ip,ipaddress.IPv6Address) else str(ip)

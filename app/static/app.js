@@ -138,7 +138,7 @@ function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').textContent = state.me?.status==='guest' ? '訪客模式' : (state.me?.name?.slice(0,1) || '○'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function welcomeView() {
-  if(state.capabilities?.access_mode==='public_alpha' && !state.capabilities?.google_login_available)return `<div class="welcome"><h1>Life World Public Alpha</h1><p>用一個獨立測試世界，記下今天的一小步。請勿輸入真實客戶或敏感資料。</p><p>本輪提供目標、文字記錄、人工確認與積分累積；積分尚無兌換用途。AI、語音／圖片辨識與公開註冊未開放。清除Cookie或登出後，匿名訪客世界無法自行恢復；預建帳號可登入同一世界。</p><div class="button-row">${button('guest','建立我的測試世界 →')}${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}</div><p>新增世界與寫入皆有本輪配額；額滿會暫停新增，已保存內容仍可查看。</p></div>`; // 產生訪客開始與本機帳號登入入口
+  if(state.capabilities?.access_mode==='public_alpha' && !state.capabilities?.google_login_available)return `<div class="welcome"><h1>Life World Public Alpha</h1><p>用一個獨立測試世界，記下今天的一小步。請勿輸入真實客戶或敏感資料。</p><p>本輪提供目標、文字記錄、人工確認與積分累積；積分尚無兌換用途。${state.capabilities?.ai_available?'AI需登入後使用，候選仍需人工確認。':'AI尚未設定，可先手動整理。'}公開註冊未開放。清除Cookie或登出後，匿名訪客世界無法自行恢復；預建帳號可登入同一世界。</p><div class="button-row">${button('guest','建立我的測試世界 →')}${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}</div><p>新增世界與寫入皆有本輪配額；額滿會暫停新增，已保存內容仍可查看。</p></div>`; // 產生訪客開始與本機帳號登入入口
   return `<div class="welcome">${heading('把每一步，種成自己的世界。','不需要一次走很遠。先給想做的事，一個小小的開始。')}<section class="hero"><div class="hero-copy"><div class="eyebrow">A WORLD THAT GROWS WITH YOU</div><h2>從一顆目標蛋，<br>開始你的故事。</h2><p>記下真實的努力，收集成長的痕跡。建立第一個目標後，新的陪伴也將誕生。</p><div class="button-row">${button('guest','不用註冊，先開始 →')}${button('login-dialog','登入我的世界','text-button')}</div></div><div class="hero-art"><span class="egg">⌁</span><span class="spark">✧</span></div></section>${!state.capabilities?.google_login_available?'<p class="callout" role="status">Google 登入尚未啟用。可先以訪客操作；既有帳號入口供授權測試帳號使用，尚未完成跨裝置 Google 恢復驗收。</p>':''}<p class="small muted">資料儲存於目前連線的服務。訪客尚無帳號恢復保障；請用虛構內容測試。</p></div>`; // 組合「產生訪客開始與本機帳號登入入口」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function profileView() { // 產生個人介紹與時區表單
@@ -262,23 +262,24 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
 } // 結束目前回呼、區塊或模組定義
 function dialog(content) { $('#account-content').innerHTML = content + '<p id="dialog-error" class="small" role="alert"></p>'; if (!$('#account-dialog').open) $('#account-dialog').showModal(); } // 更新共用對話框並開啟模態視窗
 function accountView(mode = 'account') { // 顯示帳號、升級或登入表單
-  if (state.capabilities?.google_login_available) {
+  if (state.capabilities?.google_login_available && mode!=='test-login') {
     const upgrade=state.me?.status==='guest' && mode!=='login';
-    dialog(`<h2 id="account-heading">${upgrade?'使用Google帳號保存我的世界':'Google登入'}</h2><p>${upgrade?'會保留目前目標、經歷與積分；已屬於其他世界的Google帳號不會自動合併。':'登入已有世界；不同帳號資料不會自動合併。'}</p>${!upgrade&&state.me?.status==='guest'?'<label><input id="google-discard" type="checkbox">我了解登入其他帳號不會合併目前訪客資料</label>':''}<button type="button" class="primary" data-action="google-start" data-mode="${upgrade?'upgrade':'login'}">${upgrade?'使用 Google 帳號保存我的世界':'繼續使用 Google 登入'}</button><div id="google-button"></div>${button("retry-guest-cleanup","重試清除已離開的訪客草稿","text-button")}${upgrade?button("google-login-existing","登入既有世界","secondary"):""}${state.me?'<label><input id="clear-local-media" type="checkbox">登出時清除此瀏覽器目前世界的媒體草稿</label><p class="small muted">未勾選會留在此裝置；不代表雲端備份。清除網站資料也會移除。</p>'+button('logout','登出','secondary'):''}`);
+    dialog(`<h2 id="account-heading">${upgrade?'使用Google帳號保存我的世界':'Google登入'}</h2><p>${upgrade?'會保留目前目標、經歷與積分；已屬於其他世界的Google帳號不會自動合併。':'登入已有世界；不同帳號資料不會自動合併。'}</p>${!upgrade&&state.me?.status==='guest'?'<label><input id="google-discard" type="checkbox">我了解登入其他帳號不會合併目前訪客資料</label>':''}<button type="button" class="primary" data-action="google-start" data-mode="${upgrade?'upgrade':'login'}">${upgrade?'使用 Google 帳號保存我的世界':'繼續使用 Google 登入'}</button><div id="google-button"></div>${state.capabilities?.password_login_available?button('test-login-dialog','測試帳號登入','secondary'):''}${button("retry-guest-cleanup","重試清除已離開的訪客草稿","text-button")}${upgrade?button("google-login-existing","登入既有世界","secondary"):""}${state.me?'<label><input id="clear-local-media" type="checkbox">登出後清除此瀏覽器目前世界的媒體草稿（不刪除伺服器資料）</label><p class="small muted">未勾選會留在此裝置；不代表雲端備份。清除網站資料也會移除。</p>'+button('logout','登出','secondary'):''}`);
     return;
   }
+  if(mode==='test-login'){if(!state.capabilities?.password_login_available)throw new Error('測試帳號登入尚未啟用。');mode='login';}
   const alpha=state.capabilities?.access_mode==='public_alpha';
   if(alpha && mode==='claim')throw new Error('Alpha不開放公開註冊或訪客升級。');
   if(alpha && mode==='login' && !state.capabilities.accounts_available)throw new Error('Alpha預建帳號登入尚未啟用。');
   if(alpha && mode==='account'){
-    dialog(`<h2 id="account-heading">${state.me?.status==='registered'?'Alpha 預建帳號':'Alpha 訪客世界'}</h2><p>${state.me?.status==='registered'?'可在其他裝置以相同預建帳號登入，資料不會與其他帳號合併。':'匿名訪客登出或清除Cookie後無法自行恢復；不提供公開註冊或升級。'}</p><div class="button-row">${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}${state.me?button('logout','登出','danger',state.dirty?'disabled':''):''}</div>`);return;
+    dialog(`<h2 id="account-heading">${state.me?.status==='registered'?'Alpha 預建帳號':'Alpha 訪客世界'}</h2><p>${state.me?.status==='registered'?'可在其他裝置以相同預建帳號登入，資料不會與其他帳號合併。':'匿名訪客登出或清除Cookie後無法自行恢復；不提供公開註冊或升級。'}</p><div class="button-row">${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}${state.me?button('logout','登出','danger',''):''}</div>`);return;
   }
   if (mode === 'account' && !state.me) mode = 'login'; // 依目前選項或狀態進入對應處理分支
   if (mode === 'account') { // 依目前選項或狀態進入對應處理分支
-    dialog(`<h2 id="account-heading">${esc(state.me.name || '你的世界')}</h2><p class="account-state">${state.me.status === 'guest' ? '訪客模式 · 此瀏覽器工作階段保存' : '本機帳號：' + esc(state.me.username)}</p><p class="small muted">資料儲存於目前連線的服務。登出會撤銷這個工作階段，不會刪除已保存資料。${state.dirty ? '請先關閉此視窗，保存尚未送出的內容。' : ''}</p><div class="button-row">${state.me.status === 'guest' ? button('claim-dialog','建立帳號，保存世界') : ''}${button('login-dialog','登入其他帳號','secondary')}<label><input id="clear-local-media" type="checkbox">登出時清除此瀏覽器目前世界的媒體草稿</label>${button('logout','登出','danger', state.dirty ? 'disabled' : '')}</div>`); // 執行「顯示帳號、升級或登入表單」的目前處理步驟
+    dialog(`<h2 id="account-heading">${esc(state.me.name || '你的世界')}</h2><p class="account-state">${state.me.status === 'guest' ? '訪客模式 · 此瀏覽器工作階段保存' : 'Life World 帳號：' + esc(state.me.username)}</p><p class="small muted">資料儲存於目前連線的服務。登出會撤銷這個工作階段，不會刪除已保存資料。${state.dirty ? '登出時可選擇保存草稿、捨棄未保存修改或繼續編輯。' : ''}</p><div class="button-row">${state.me.status === 'guest' && state.capabilities?.registration_available ? button('claim-dialog','建立帳號，保存世界') : ''}${button('login-dialog','登入其他帳號','secondary')}<label><input id="clear-local-media" type="checkbox">登出後清除此瀏覽器目前世界的媒體草稿（不刪除伺服器資料）</label>${button('logout','登出','danger', '')}</div>`); // 執行「顯示帳號、升級或登入表單」的目前處理步驟
   } else { // 處理前述條件不成立時的替代流程
     const claim = mode === 'claim'; // 判斷目前顯示建立帳號或登入表單
-    dialog(`<h2 id="account-heading">${claim ? '為你的世界，建立帳號。' : '歡迎回到你的世界。'}</h2><p class="small muted">${claim ? '目標、經歷與草稿仍屬於原本的你；升級後可使用人物功能。' : (alpha?'使用管理者提供的預建帳號；不會自動建立新帳號。':'登入目前服務已建立的帳號。')}</p><form id="${claim ? 'claim' : 'login'}-form"><div class="field"><label for="username">${alpha?'預建帳號名稱':'本機帳號名稱'}</label><input id="username" name="username" autocomplete="username" required pattern="[a-zA-Z0-9_]{3,30}" placeholder="3–30 字英數或底線"></div><div class="field"><label for="password">密碼</label><input id="password" name="password" type="password" minlength="${claim ? 10 : 1}" maxlength="128" autocomplete="${claim ? 'new-password' : 'current-password'}" required placeholder="${claim ? '至少 10 個字元' : '你的密碼'}"></div><div id="guest-conflict"></div><button class="primary">${claim ? '建立帳號，繼續原本的操作' : '登入我的世界'}</button></form><div class="callout">${alpha?'僅預建帳號可跨裝置回讀；忘記密碼請聯絡管理者，沒有自助註冊或密碼找回。':'目前沒有驗證信或自助密碼找回服務；需要協助時請聯絡管理者。'}</div>`); // 執行「顯示帳號、升級或登入表單」的目前處理步驟
+    dialog(`<h2 id="account-heading">${claim ? '為你的世界，建立帳號。' : '歡迎回到你的世界。'}</h2><p class="small muted">${claim ? '目標、經歷與草稿仍屬於原本的你；升級後可使用人物功能。' : (alpha?'使用管理者提供的預建帳號；不會自動建立新帳號。':'登入目前服務已建立的帳號。')}</p><form id="${claim ? 'claim' : 'login'}-form"><div class="field"><label for="username">${alpha?'預建帳號名稱':'Life World 帳號名稱'}</label><input id="username" name="username" autocomplete="username" required pattern="[a-zA-Z0-9_]{3,30}" placeholder="3–30 字英數或底線"></div><div class="field"><label for="password">密碼</label><input id="password" name="password" type="password" minlength="${claim ? 10 : 1}" maxlength="128" autocomplete="${claim ? 'new-password' : 'current-password'}" required placeholder="${claim ? '至少 10 個字元' : '你的密碼'}"></div><div id="guest-conflict"></div><button class="primary">${claim ? '建立帳號，繼續原本的操作' : '登入我的世界'}</button></form><div class="callout">${alpha?'僅預建帳號可跨裝置回讀；忘記密碼請聯絡管理者，沒有自助註冊或密碼找回。':'目前沒有驗證信或自助密碼找回服務；需要協助時請聯絡管理者。'}</div>`); // 執行「顯示帳號、升級或登入表單」的目前處理步驟
   } // 結束目前回呼、區塊或模組定義
 } // 結束目前回呼、區塊或模組定義
 let googleSdkPromise;
@@ -385,6 +386,22 @@ document.addEventListener('change', async event => { // 監聽欄位變更
     } // 結束目前回呼、區塊或模組定義
   } catch (error) {showError(error); if (event.target.dataset.task) event.target.checked = !event.target.checked;} // 顯示失敗原因，讓使用者保留內容並重試
 }); // 結束目前回呼、區塊或模組定義
+// 先撤銷伺服器Session，再做可取消的本機清理；IndexedDB故障不得保留已登入狀態。
+async function finishLogout(){
+  const owner=state.me?.owner_id,clear=state.logoutClearMedia;
+  const revoke=new AbortController(),timer=setTimeout(()=>revoke.abort(),8000);
+  try {await api('/auth/logout',{method:'POST',signal:revoke.signal});}
+  catch(error){if(error.status!==401)throw error;} finally{clearTimeout(timer);}
+  state.googleAttempt=null;state.dirty=false;state.pendingRoute=null;
+  $('#account-dialog').close();DashboardUI.clear();state.me=null;state.world=null;state.csrf='';state.draft=null;state.candidate=null;state.requests.clear();
+  navigate('welcome');
+  if(clear&&owner){
+    const controller=new AbortController();let timeout;
+    try {await Promise.race([MediaUI.clearOwner(owner,{signal:controller.signal}),new Promise((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('cleanup_timeout'));},2500);})]);}
+    catch {$('#notice').innerHTML='<div class="callout" role="status">已登出；本機媒體草稿尚未清除。可使用瀏覽器網站資料設定清理本機內容；不會刪除伺服器資料。</div>';}
+    finally{clearTimeout(timeout);}
+  }
+}
 document.addEventListener('click', async event => { // 監聽點擊
   const target = event.target.closest('[data-action],g[data-person],button[data-person]'); if (!target) return; // 取得本次操作的控制項或合併主要事件
   const action = target.dataset.action; target.disabled = true; // 讀取按鈕明確指定的操作代碼
@@ -392,6 +409,7 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (await PeopleUI.handleClick(target)) return; // 依目前選項或狀態進入對應處理分支
     if (action === 'guest') {const me = await api('/auth/guest',{method:'POST'}); state.me = me; state.csrf = me.csrf_token; await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定
+    if(action==='test-login-dialog')accountView('test-login');
     if (action === 'claim-dialog') accountView('claim'); // 開啟升級帳號表單
     if (action === 'login-dialog') {if(state.capabilities?.access_mode==='public_alpha'&&!state.capabilities.accounts_available)throw new Error('Alpha預建帳號登入尚未啟用。');accountView('login');} // 開啟登入表單
     if (action === 'close-account') $('#account-dialog').close(); // 關閉對話框
@@ -400,10 +418,13 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (action === 'keep-local-and-leave') {await MediaUI.keepLocal(); const route=state.pendingRoute; state.pendingRoute=null; $('#account-dialog').close(); navigate(route);}
     if (action === 'save-and-leave') {await saveDraft($('#record-form'), false, state.pendingRoute); state.pendingRoute = null; $('#account-dialog').close();} // 先保存草稿再前往目的地
     if (action === 'logout') {
-      state.googleAttempt=null;
-      if($('#clear-local-media')?.checked)await MediaUI.clearOwner(state.me.owner_id); // 撤銷登入並清除目前帳號快取
-      await api('/auth/logout',{method:'POST'}); $('#account-dialog').close(); DashboardUI.clear(); state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.candidate = null; state.requests.clear(); navigate('welcome'); // 等待伺服器完成讀取或保存，再進入下一步
-    } // 結束目前回呼、區塊或模組定義
+      state.logoutClearMedia=!!$('#clear-local-media')?.checked;
+      if(state.dirty){
+        dialog(`<h2 id="account-heading">登出前，處理尚未保存的修改</h2><p>登出不刪除伺服器已保存資料。可繼續編輯，或明確捨棄本次未保存修改。</p><div class="button-row">${button('stay-on-form','繼續編輯','secondary')}${$('#record-form')?button('logout-save','保存草稿後登出','secondary'):''}${button('logout-discard','捨棄未保存修改並登出','danger')}</div>`);
+      } else await finishLogout();
+    }
+    if(action==='logout-save'){await saveDraft($('#record-form'),false);await finishLogout();}
+    if(action==='logout-discard'){await finishLogout();}
     if (action === 'new-person') { // 依訪客狀態升級或新增人物
       if (state.me.status === 'guest') accountView('claim'); // 依目前選項或狀態進入對應處理分支
       else PeopleUI.openPersonEditor(); // 處理前述條件不成立時的替代流程

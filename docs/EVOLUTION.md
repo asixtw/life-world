@@ -199,3 +199,8 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-08：Release A 日期操作與核心閉環
 
 有效原生日期可正式提交（HTTP201），先前本機畫面工具未能輸入日期，未重現後端提交Bug。新增使用Owner伺服器當地日期的「一週後／30天後」明確快捷，保留日期必填與人工最後提交；Google未配置時顯示狀態及訪客替代路徑。隔離SQLite＋無頭Chromium兩項閉環通過（含三習慣、三次孵化、人工確認、任務、進度、重送不重複獎勵與刷新）；35項Origin／Session／限流回歸通過。這些不是Product PG、真GIS或真模型驗收。
+
+
+### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
+
+修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。

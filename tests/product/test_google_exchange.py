@@ -25,7 +25,7 @@ class Verifier:
 @pytest.fixture
 def setup(tmp_path):
     verifier=Verifier()
-    app=create_app(data_dir=tmp_path/'isolated-google',settings=RuntimeSettings(google_client_id=CLIENT_ID),google_verifier=verifier,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
+    app=create_app(data_dir=tmp_path/'isolated-google',settings=RuntimeSettings(google_client_id=CLIENT_ID,password_login_enabled=False,registration_enabled=False),google_verifier=verifier,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
     # 只在本fixture新建且可丟棄的DB初始化新表；未寫入app/migrations。
     with app.state.service.db.connect(write=True) as c:
         c.execute("CREATE TABLE external_identities(provider TEXT NOT NULL,issuer TEXT NOT NULL,subject TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL,PRIMARY KEY(provider,issuer,subject))")
