@@ -194,3 +194,13 @@ def test_concurrent_reservations_do_not_overrun_global_daily_cap(prepared):
     assert len(p.calls)==3
     with app.state.service.db.connect() as db:
         assert db.execute("SELECT count(*) AS n FROM requests WHERE operation='ai_attempt_v1'").fetchone()['n']==3
+
+
+def test_theater_prompt_requires_character_voice_instead_of_narrator(prepared):
+    """真實評測曾回解說口吻；契約要求角色直接回話，替身不證明生成品質。"""
+    app,c,me,g,runtime,p=prepared
+    p.text=json.dumps({'utterance':'可以先給我一份簡短議程嗎？'})
+    result=runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':[],'message':'合成邀請練習'})
+    assert result['applied'] is False
+    assert '第一人稱' in p.calls[0]['system']
+    assert '不要替使用者詢問是否合適' in p.calls[0]['system']
