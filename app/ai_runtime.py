@@ -19,15 +19,17 @@ class AISettings:
     max_global_calls:int=5  # 與預留預算均採滾動24小時，不是服務生命週期總額。
     reservation_microusd:int=0
     max_budget_microusd:int=0
+    max_total_budget_microusd:int=0  # 測試期總上限，不因日額度輪替重置；0只供未配置環境。
 
     def __post_init__(self):
+        if self.max_total_budget_microusd<0 or (self.max_total_budget_microusd and self.max_total_budget_microusd<self.reservation_microusd):raise ValueError('Invalid total test budget')
         if self.provider not in ('','gemini'):raise ValueError('Explicit supported provider required')
         if self.approved and (self.provider!='gemini' or not re.fullmatch(r'gemini-[a-z0-9][a-z0-9.\-]{0,100}',self.model) or self.reservation_microusd<=0 or self.max_budget_microusd<self.reservation_microusd):raise ValueError('Provider/model/worst-case reservation approval required')
         if not 1<=self.max_output_tokens<=2000 or not 1<=self.max_input_bytes<=24000 or not 1<=self.max_media_bytes<=2_000_000 or not 1<=self.max_owner_daily_calls<=100 or not 1<=self.max_global_calls<=1000:raise ValueError('Bounded AI quota required')
 
     @classmethod
     def from_env(cls):
-        return cls(provider=os.environ.get('LIFEWORLD_AI_PROVIDER',''),model=os.environ.get('LIFEWORLD_AI_MODEL',''),approved=os.environ.get('LIFEWORLD_AI_CALLS_APPROVED','false')=='true',
+        return cls(max_total_budget_microusd=int(os.environ.get('LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD','0')),provider=os.environ.get('LIFEWORLD_AI_PROVIDER',''),model=os.environ.get('LIFEWORLD_AI_MODEL',''),approved=os.environ.get('LIFEWORLD_AI_CALLS_APPROVED','false')=='true',
             max_input_bytes=int(os.environ.get('LIFEWORLD_AI_MAX_INPUT_BYTES','8192')),max_media_bytes=int(os.environ.get('LIFEWORLD_AI_MAX_MEDIA_BYTES','1000000')),max_output_tokens=int(os.environ.get('LIFEWORLD_AI_MAX_OUTPUT_TOKENS','512')),
             max_owner_daily_calls=int(os.environ.get('LIFEWORLD_AI_OWNER_DAILY_CALLS','2')),max_global_calls=int(os.environ.get('LIFEWORLD_AI_GLOBAL_DAILY_CALLS',os.environ.get('LIFEWORLD_AI_GLOBAL_CALLS','5'))),reservation_microusd=int(os.environ.get('LIFEWORLD_AI_RESERVATION_MICROUSD','0')),max_budget_microusd=int(os.environ.get('LIFEWORLD_AI_DAILY_BUDGET_MICROUSD',os.environ.get('LIFEWORLD_AI_BUDGET_MICROUSD','0'))))
 
@@ -73,6 +75,11 @@ class AIRuntime:
             daily=sum(who==owner for who,_ in receipts)
             used=sum(row['reservation_microusd'] for _,row in receipts)
             require(daily<s.max_owner_daily_calls and len(receipts)<s.max_global_calls and used+s.reservation_microusd<=s.max_budget_microusd,429,'ai_quota_reached','最近24小時 AI 額度已達上限；請稍後再試，原始紀錄仍可手動編輯。')
+            if s.max_total_budget_microusd:
+                # 僅加總成本預留metadata，包含失敗/費用未知；與滾動24h次數額度分開。
+                value="(response::jsonb->>'reservation_microusd')::bigint" if self.service.db.backend=='postgresql' else "json_extract(response,'$.reservation_microusd')"
+                total=c.execute(f"SELECT COALESCE(sum({value}),0) AS used FROM requests WHERE operation='ai_attempt_v1'").fetchone()['used']
+                require(total+s.reservation_microusd<=s.max_total_budget_microusd,429,'ai_total_budget_reached','測試期 AI 總預算已達上限，請聯絡管理者；原始紀錄仍可手動編輯。')
             request_id=str(uuid4());receipt={'operation':operation,'created_at':now.isoformat(),'reservation_microusd':s.reservation_microusd}
             c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_attempt_v1',request_id,fingerprint,json.dumps(receipt)))
         return request_id

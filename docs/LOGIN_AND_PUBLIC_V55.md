@@ -11,3 +11,5 @@ LIFEWORLD_TEST_ACCOUNT_SEED只從固定版本Secret取得指定Owner/username/Ar
 登出先撤銷Session（8秒逾時可重試），dirty先選保存草稿/捨棄/繼續；本機清理最多2.5秒、AbortSignal阻止延後清理新資料。清理失敗明示已登出但本機草稿尚留，不刪伺服器資料。
 
 55 API定點通過、1 PG環境跳過；3登出瀏覽器案例與2核心閉環通過。真模型、真PG、外部雲端HTTP各自以本輪實測更新，不能互代。公開切換先保留IAM限制實測API，失敗恢復IAP與原Revision；再依Owner授權開匿名首頁。Google仍受007/008及備份Gate限制。
+
+AI新增測試期累計預留總額（LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD），與滾動24小時額度分開。跨日不重置總額，失敗及費用未知仍占最壞預留，不把預留當實際帳單。
