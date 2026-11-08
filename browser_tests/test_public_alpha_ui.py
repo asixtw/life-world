@@ -37,7 +37,7 @@ def test_alpha_real_browser_goal_record_refresh_and_quota(alpha_url,width,tmp_pa
             page.goto(alpha_url)
             expect(page.get_by_role('heading',name='Life World Public Alpha')).to_be_visible()
             expect(page.get_by_role('button',name='登入我的世界',exact=True)).to_have_count(0)
-            page.get_by_role('button',name='建立我的測試世界 →').click()
+            page.get_by_role('button',name='不用註冊，先開始 →').click()
             page.locator('#profile-name').fill('Alpha合成測試')
             page.locator('#bio').fill('只使用合成資料')
             page.get_by_role('button',name='接著，建立第一個目標').click()
@@ -80,7 +80,7 @@ def test_alpha_real_browser_goal_record_refresh_and_quota(alpha_url,width,tmp_pa
             context.clear_cookies();page.goto(alpha_url)
             for _ in range(9):
                 page.request.post(alpha_url+'/api/auth/guest');context.clear_cookies()
-            page.get_by_role('button',name='建立我的測試世界 →').click()
+            page.get_by_role('button',name='不用註冊，先開始 →').click()
             expect(page.locator('#notice')).to_contain_text('操作過於頻繁')
             expect(page.locator('#notice')).to_contain_text('分鐘後再試')
             assert not errors
@@ -135,3 +135,11 @@ def test_alpha_prebuilt_login_second_browser_onboarding_and_readback(alpha_url,w
             assert second.request.get(alpha_url+'/api/auth/me').status==401
             assert first.request.get(alpha_url+'/api/auth/me').status==200
         finally:browser.close()
+
+
+def test_alpha_guest_primary_entry_needs_no_registration(alpha_url):
+    """公開Alpha也沿用Guest First入口，不能只在關閉Gate時顯示。"""
+    with sync_playwright() as pw:
+        browser=pw.chromium.launch();page=browser.new_page();page.goto(alpha_url)
+        expect(page.get_by_role('button',name='不用註冊，先開始 →',exact=True)).to_be_visible()
+        browser.close()
