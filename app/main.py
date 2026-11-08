@@ -131,12 +131,18 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             blocked=blocked or (request.url.path=='/api/auth/login' and not (settings.alpha_login_enabled or settings.test_login_usernames))
             if blocked:
                 return JSONResponse({'error':{'code':'alpha_feature_unavailable','message':'本輪Alpha尚未開放此功能；帳號登入需由管理者啟用。'}},status_code=403,headers={'Cache-Control':'no-store'})
-        if settings.access_mode=='public_alpha' and request.method in ('POST','PUT','PATCH','DELETE') and request.url.path.startswith('/api/') and request.url.path!='/api/auth/logout':
+        if request.url.path=='/api/media/recognize' and request.method=='POST':
+            try:
+                media_user,_=service.session(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),True)
+                require_registered(media_user)
+            except DomainError as exc:
+                return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers={'Cache-Control':'no-store'})
+        if settings.access_mode=='public_alpha' and request.method in ('POST','PUT','PATCH','DELETE') and request.url.path.startswith('/api/') and not request.url.path.startswith('/api/auth/'):
             try:
                 source=limiter.source(request)
                 def source_write_gate():
                     with service.db.connect(write=True) as c:
-                        return limiter.take(c,'alpha_owner_writes','source-write:'+source,settings.alpha_source_writes,3600)
+                        return limiter.take(c,'alpha_owner_writes',('v2:global-write' if settings.auth_source_mode=='shared' else 'source-write:'+source),max(settings.alpha_source_writes,settings.alpha_global_writes) if settings.auth_source_mode=='shared' else settings.alpha_source_writes,3600)
                 error=await run_in_threadpool(source_write_gate)
                 if error:raise error
             except DomainError as exc:

@@ -16,6 +16,11 @@ class ExternalAuth:
     def __init__(self,service,verifier,limiter):
         self.service=service;self.db=service.db;self.verifier=verifier;self.limiter=limiter
 
+    def _write(self,owner=None):
+        # 身分交換不消耗業務寫入容量；仍保留來源、Session、帳號與全域登入保護。
+        if hasattr(self.db,'authentication_connect'):return self.db.authentication_connect(owner)
+        return self.db.connect(write=True,owner=owner)
+
     def _session(self,c,token,csrf):
         r=c.execute('SELECT * FROM sessions WHERE token_hash=?',(digest(token or ''),)).fetchone()
         require(r is not None and datetime.fromisoformat(r['expires_at'])>self.service.now(),401,'session_expired','工作階段已失效，請重新開始。')
@@ -34,7 +39,7 @@ class ExternalAuth:
         require(mode in ('login','upgrade'),422,'invalid_login_mode','請選擇登入方式。')
         require(mode!='upgrade' or user['status']=='guest',409,'already_registered','目前已是帳號；不自動連結其他Google身分。')
         nonce=secrets.token_urlsafe(32);identifier=str(uuid4())
-        with self.db.connect(write=True,owner=user['id']) as c:
+        with self._write(user['id']) as c:
             user,_=self._session(c,token,csrf);self._limit(c,user)
             c.execute('SELECT provider FROM external_identities LIMIT 0') # 未批准初始化時fail-closed，不自動建表。
             cutoff=self.service.now()-timedelta(days=1)
@@ -47,14 +52,14 @@ class ExternalAuth:
     def exchange(self,token,csrf,identifier,credential):
         user,_=self.service.session(token,csrf,True)
         # 憑證無論正誤均先消耗既有共享嘗試額度；不以email作來源。
-        with self.db.connect(write=True,owner=user['id']) as c:self._limit(c,user)
+        with self._write(user['id']) as c:self._limit(c,user)
         with self.db.connect() as c:
             row=c.execute('SELECT * FROM requests WHERE operation=? AND request_id=?',(CHALLENGE,identifier)).fetchone()
         require(row is not None,401,'challenge_required','請重新開始Google登入。')
         details=json.loads(row['response'])
         require(datetime.fromisoformat(details['expires_at'])>self.service.now(),401,'challenge_expired','登入請求已過期，請重新開始。')
         issuer,subject=self.verifier.verify(credential,row['fingerprint'])
-        with self.db.connect(write=True,owner=user['id']) as c:
+        with self._write(user['id']) as c:
             user,_=self._session(c,token,csrf)
             if self.db.backend=='postgresql':
                 # 跨owner爭同一Google身分也序列化；SQLite BEGIN IMMEDIATE已序列化所有寫入。

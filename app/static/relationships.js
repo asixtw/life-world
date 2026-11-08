@@ -132,7 +132,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
   function reviewPayload(form) { // 只將明確勾選的人物候選加入提交內容
     const f=new FormData(form); // 讀取使用者目前表單值，不直接推論人物資訊
     return {interaction_type:f.get('interaction_type')||'unknown',interaction_event_id:f.get('interaction_event_id')||null, // 組合「只將明確勾選的人物候選加入提交內容」所需的畫面或提交資料
-      person_updates:Object.keys(dims).filter(d=>f.has('fact_selected_'+d)).map(d=>({dimension:d,value:f.get('fact_value_'+d),description:'由使用者核對本次原始經歷後確認。',evidence_type:f.get('fact_type_'+d),selected:true}))}; // 執行「只將明確勾選的人物候選加入提交內容」的目前處理步驟
+      person_updates:Object.keys(dims).filter(d=>f.has('fact_selected_'+d)).map(d=>({dimension:d,value:f.get('fact_value_'+d),description:document.querySelector('[name="fact_value_'+d+'"]')?.dataset.aiSource?'由使用者核對原始經歷引文：'+document.querySelector('[name="fact_value_'+d+'"]').dataset.aiSource:'由使用者核對本次原始經歷後確認。',evidence_type:f.get('fact_type_'+d),selected:true}))}; // 執行「只將明確勾選的人物候選加入提交內容」的目前處理步驟
   } // 結束目前回呼、區塊或模組定義
   async function handleClick(target) { // 處理人物選取、關注、來源與明確關係操作
     ensureOwner(); // 先清除跨帳號快取，再處理目前人物頁操作

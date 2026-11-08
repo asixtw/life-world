@@ -76,7 +76,7 @@ class AuthRateLimiter:
         if used>=limit:
             if capacity:return DomainError(409,'alpha_capacity_reached','本輪 Alpha 測試額度已滿；已保存內容仍可查看，請留意後續開放。')
             error=DomainError(429,'rate_limited','操作過於頻繁，請稍後再試。')
-            error.headers={'Retry-After':str(max(1,int(seconds-(now-started).total_seconds()+.999))), 'Cache-Control':'no-store'}
+            error.headers={'X-RateLimit-Scope':scope,'Retry-After':str(max(1,int(seconds-(now-started).total_seconds()+.999))), 'Cache-Control':'no-store'}
             return error
         c.execute('UPDATE auth_rate_buckets SET window_started_at=?,attempts=? WHERE scope=? AND key_hash=?',(started.isoformat(),used+1,scope,key))
         return None
@@ -88,6 +88,17 @@ class AuthRateLimiter:
     def login_admission(self,c,request):
         if not self.enabled:return None
         source=self.source(request)
+        if self.settings.auth_source_mode=='shared':
+            # 無法證實代理來源時不採信XFF；共用桶只能是粗全域，不能假裝單一使用者。
+            error=self.take(c,'login_global_attempt','v2:all',3000,86400) or self.take(c,'login_source_attempt','v2:unverified-global',1000,3600)
+            if error:return error
+            from .security import digest
+            token=request.cookies.get('lw_session')
+            if token:
+                row=c.execute('SELECT token_hash,expires_at FROM sessions WHERE token_hash=?',(digest(token),)).fetchone()
+                if row and datetime.fromisoformat(row['expires_at'])>self.clock():
+                    return self.take(c,'login_source_attempt','v2:session:'+row['token_hash'],30,900)
+            return None
         return (self.take(c,'login_global_attempt','all',3000,86400)
                 or self.take(c,'login_source_attempt',source,30,900))
 
@@ -107,7 +118,7 @@ class AuthRateLimiter:
             for scope,limit,seconds in [('alpha_worlds_total',self.settings.alpha_worlds_total,None),('alpha_worlds_daily',self.settings.alpha_worlds_daily,86400)]:
                 error=self.take(c,scope,'all',limit,seconds,capacity=seconds is None)
                 if error:raise error
-        error=self.take(c,'guest_source_create',source,10,3600)
+        error=self.take(c,'guest_source_create','v2:unverified-global' if self.settings.auth_source_mode=='shared' else source,1000 if self.settings.auth_source_mode=='shared' else 10,3600)
         if error:raise error
 
 
@@ -139,13 +150,16 @@ class AlphaDatabase:
         if self.logical_bytes(c)>self.limiter.settings.alpha_storage_bytes:
             raise DomainError(409,'storage_capacity_reached','目前保存容量已滿；既有資料仍可讀取，請聯絡測試支援。')
 
+    def authentication_connect(self,owner=None):
+        return self.connect(write=True,owner=owner,authentication=True)
+
     @contextmanager
-    def connect(self,write=False,owner=None):
+    def connect(self,write=False,owner=None,authentication=False):
         with self.inner.connect(write=write,owner=owner) as c:
             if write:
                 if self.backend=='postgresql':c.execute('SELECT pg_advisory_xact_lock(?)',(1420000001,))
                 before_bytes=self.logical_bytes(c)
-            if write and owner:
+            if write and owner and not authentication:
                 self.limiter._check_config()
                 s=self.limiter.settings
                 if not s.alpha_writes_enabled:raise DomainError(503,'alpha_paused','Alpha 暫停寫入，已保存內容仍可查看。')

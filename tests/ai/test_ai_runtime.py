@@ -216,3 +216,14 @@ def test_simulation_contract_keeps_conflicts_and_unknowns_explicit(prepared):
     assert prompt['case']['confirmed_facts']==facts
     assert '來源互相矛盾' in prompt['system'] and '承認不知道' in prompt['system']
     assert c.get('/api/state').json()==before
+
+
+def test_fragment_person_hints_require_exact_original_evidence(prepared):
+    app,c,me,g,runtime,p=prepared
+    raw='嗯，今天去拜訪小林，小林說不吃辣。下週再傳菜單，時間還沒訂。'
+    p.text=json.dumps({'summary':'拜訪小林，得知他不吃辣；下週傳菜單的時間待確認。','tasks':['確認下週傳菜單時間'],'people':[{'person_name':'小林','dimension':'food','value':'不吃辣','evidence_type':'stated_by_person','source_quote':'小林說不吃辣'},{'person_name':'小林','dimension':'habits','value':'外向','evidence_type':'observed_by_user','source_quote':'小林說不吃辣'},{'person_name':'不存在的人','dimension':'food','value':'吃辣','evidence_type':'stated_by_person','source_quote':'他喜歡吃辣'}]})
+    before=c.get('/api/state').json()
+    result=runtime.generate(me['owner_id'],'experience',{'raw_text':raw})
+    assert len(result['people'])==1 and result['people'][0]['value']=='不吃辣'
+    assert c.get('/api/state').json()==before
+    with app.state.service.db.connect() as db:assert db.execute('SELECT count(*) AS n FROM person_facts').fetchone()['n']==0

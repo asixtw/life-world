@@ -4,6 +4,7 @@ const MediaUI = (() => {
   let ctx, active = null, recorder = null, recordingSession = null, stream = null;
   let permissionToken = 0, timer = null, elapsed = 0, recorderMessage = '', pending = Promise.resolve();
   let maxBytes = 5 * 1024 * 1024, available = false;
+  const photoJobs = new Set();
   const sessions = new Map(), urls = new Set(), requests = new Map();
   const dbPromise = () => new Promise((resolve, reject) => {
     const request = indexedDB.open('lifeworld-media-local', 1);
@@ -67,7 +68,7 @@ const MediaUI = (() => {
   function releaseURLs() { for (const url of urls) URL.revokeObjectURL(url); urls.clear(); }
   function fileURL(blob) { const url = URL.createObjectURL(blob); urls.add(url); return url; }
   function controls() {
-    return `<div class="media-inputs" role="group" aria-label="新增紀錄素材">${[['image','圖片'],['screenshot','截圖'],['camera','拍照'],['card','名片'],['audio','音檔']].map(([kind,label]) => `<label class="secondary media-file">${label}<input type="file" data-media-file="${kind}" accept="${kind==='audio'?'audio/wav,audio/x-wav,audio/webm,audio/ogg,audio/mp4,audio/mpeg':'image/png,image/jpeg'}" ${kind==='camera'?'capture="environment"':''} aria-label="${label}"></label>`).join('')}</div>`;
+    return `<div class="media-inputs" role="group" aria-label="新增紀錄素材">${[['image','圖片'],['screenshot','截圖'],['camera','拍照'],['card','名片'],['audio','音檔']].map(([kind,label]) => `<label class="secondary media-file">${label}<input type="file" data-media-file="${kind}" accept="${kind==='audio'?'audio/wav,audio/x-wav,audio/webm,audio/ogg,audio/mp4,audio/mpeg':'image/*'}" ${kind==='camera'?'capture="environment"':''} aria-label="${label}"></label>`).join('')}</div>`;
   }
   function itemView(item) {
     const e = ctx.esc, busy = requests.has(item.id), isCard = item.kind === 'card';
@@ -79,11 +80,12 @@ const MediaUI = (() => {
     const root = document.querySelector('#media-panel');
     if (!root || !active) return;
     releaseURLs();
-    root.innerHTML = `<section class="media-panel" aria-label="紀錄素材"><h2>從不同方式留下經歷</h2><p class="small muted">選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。</p><p id="media-storage" role="status">${ctx.esc(active.storageMessage || '僅保存在此裝置，尚未同步。')}</p>${active.readOnly?'':controls()+`<details class="media-recorder" ${active.recorderOpen?'open':''}><summary>語音轉文字</summary><p>錄完後再決定是否上傳。試聽可選，不必先播放。</p><p id="recorder-status" role="status">${ctx.esc(recorderMessage || '尚未開始錄音')}</p><div class="button-row"><button type="button" class="secondary" data-media="start" ${recorder||stream||recordingSession?'disabled':''}>開始錄音</button><button type="button" class="secondary" data-media="stop" ${recorder?.state==='recording'?'':'disabled'}>停止錄音</button><button type="button" class="text-button" data-media="cancel-recording" ${recorder||stream||recordingSession?'':'disabled'}>取消錄音</button></div></details>`}<p class="small muted">${available?'辨識服務已設定；送出後仍需人工校對。':'尚未設定辨識服務，可先保留素材並手動輸入。'}圖片傳輸容量 ${(maxBytes/1024/1024).toFixed(1)} MiB；音訊 ${(audioMaxBytes/1024/1024).toFixed(1)} MiB。長音訊逐段辨識，額度不足時原素材仍保留。</p><div class="media-items">${active.items.length?active.items.map(itemView).join(''):'<p class="small muted">此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。</p>'}</div>`;
+    root.innerHTML = `<section class="media-panel" aria-label="紀錄素材"><h2>從不同方式留下經歷</h2><p class="small muted">選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。</p><p id="media-storage" role="status">${ctx.esc(active.storageMessage || '僅保存在此裝置，尚未同步。')}</p>${active.readOnly?'':controls()+`<details class="media-recorder" ${active.recorderOpen?'open':''}><summary>語音轉文字</summary><p>錄完後再決定是否上傳。試聽可選，不必先播放。</p><p id="recorder-status" role="status">${ctx.esc(recorderMessage || '尚未開始錄音')}</p><div class="button-row"><button type="button" class="secondary" data-media="start" ${recorder||stream||recordingSession?'disabled':''}>開始錄音</button><button type="button" class="secondary" data-media="stop" ${recorder?.state==='recording'?'':'disabled'}>停止錄音</button><button type="button" class="text-button" data-media="cancel-recording" ${recorder||stream||recordingSession?'':'disabled'}>取消錄音</button></div></details>`}<p class="small muted">${available?'辨識服務已設定；送出後仍需人工校對。':'尚未設定辨識服務，可先保留素材並手動輸入。'}相片原檔可至64 MiB，會先在裝置縮圖至 ${(maxBytes/1024/1024).toFixed(1)} MiB 內再傳送；伺服器不留原圖。音訊 ${(audioMaxBytes/1024/1024).toFixed(1)} MiB。長音訊逐段辨識，額度不足時原素材仍保留。</p><div class="media-items">${active.items.length?active.items.map(itemView).join(''):'<p class="small muted">此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。</p>'}</div>`;
   }
   async function mount({owner, scope, readOnly = false, revision = null}) {
     const key = owner + ':' + scope;
-    const session = sessions.get(key) || {key, items: [], fields: [], readOnly};
+    const session = sessions.get(key) || {key, owner, items: [], fields: [], readOnly};
+    session.owner=owner; session.invalidated=false;
     active = session;
     session.readOnly = readOnly;
     sessions.set(key, session);
@@ -124,14 +126,48 @@ const MediaUI = (() => {
     finally {db?.close();}
   }
   let audioMaxBytes=5*1024*1024;
+  async function preparePhoto(file) {
+    // 手機原圖可較大；只在裝置縮圖，伺服器收到的是有界JPEG，不保存原圖。
+    if(file.type && !/^image\/(jpeg|png|webp|heic|heif|avif)$/.test(file.type.split(';')[0]))throw new Error('不支援此格式，請選擇手機相片或PNG、JPEG、WebP、HEIC、AVIF圖片。');
+    if(!file.size)throw new Error('沒有取得有效照片，請重拍或從相簿選取。');
+    if(file.size>64*1024*1024)throw new Error('照片超過裝置處理容量64 MiB，請使用一般拍照模式或另存較小副本。');
+    const url=URL.createObjectURL(file),image=new Image();
+    try {
+      image.src=url;
+      try {await image.decode();} catch {throw new Error('此瀏覽器無法解碼相片，請從相簿另存JPEG或使用相機相容格式；尚未上傳。');}
+      const w=image.naturalWidth,h=image.naturalHeight;
+      if(!w||!h||w*h>100000000)throw new Error('相片尺寸超過裝置處理容量，請使用一般拍照模式。');
+      let edge=Math.min(2400,Math.max(w,h));
+      for(let scale=0;scale<4;scale++,edge=Math.round(edge*.75)) {
+        const ratio=Math.min(1,edge/Math.max(w,h)),canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round(w*ratio));canvas.height=Math.max(1,Math.round(h*ratio));
+        const context=canvas.getContext('2d');if(!context)throw new Error('裝置圖片處理資源不足，請稍後重試或另存較小副本。');context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);
+        for(const quality of [.88,.72,.56]) {
+          const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
+          if(blob?.size && blob.size<=maxBytes) {
+            const result=new File([blob],(file.name||'手機相片').replace(/\.[^.]*$/,'')+'.jpg',{type:'image/jpeg'});
+            canvas.width=canvas.height=1;return result;
+          }
+        }
+        canvas.width=canvas.height=1;
+      }
+      throw new Error('相片無法在安全容量內整理，請另存較小副本；尚未上傳。');
+    } finally {URL.revokeObjectURL(url);}
+  }
   async function addFile(file, kind, session = active) {
     if (!session || !file) return;
+    const originalName=file.name,originalBytes=file.size;
+    if(kind!=='audio') {
+      const task=preparePhoto(file);photoJobs.add(task);
+      try {file=await task;} finally {photoJobs.delete(task);}
+      if(session.invalidated || ctx.state.me?.owner_id!==session.owner)return;
+    }
     const mime = file.type.split(';')[0];
     if (file.size === 0 || (file.size > (kind==='audio'?audioMaxBytes:maxBytes) && !file.name?.startsWith('錄音-'))) throw new Error('素材為空或超過目前本機單檔傳輸上限。');
     const types = kind==='audio' ? ['audio/wav','audio/x-wav','audio/webm','audio/ogg','audio/mp4','audio/mpeg'] : ['image/png','image/jpeg'];
     if (!types.includes(mime)) throw new Error('目前不支援這個檔案格式；請選擇 PNG／JPEG 圖片或支援的音檔。');
-    // IndexedDB 保存原始 Blob；object URL 僅供目前畫面，不拿來當永久來源。
-    session.items.push({id:crypto.randomUUID(), kind:kind==='camera'?'image':kind, name:file.name || '錄音', mime, blob:file, originalText:'',editedText:'',checked:false});
+    // IndexedDB 保存音訊或整理後的圖片 Blob；object URL 僅供目前畫面，不拿來當永久來源。
+    session.items.push({id:crypto.randomUUID(), kind:kind==='camera'?'image':kind, name:originalName || file.name || '錄音', uploadName:file.name, originalBytes, mime, blob:file, originalText:'',editedText:'',checked:false});
     if (active===session) draw();
     await persist(session);
   }
@@ -191,7 +227,7 @@ const MediaUI = (() => {
     if(requests.has(item.id)) return;
     requests.set(item.id,controller); item.error=''; draw();
     try {
-      const body=new FormData(); body.append('kind',item.kind); body.append('file',item.blob,item.name);
+      const body=new FormData(); body.append('kind',item.kind); body.append('file',item.blob,item.uploadName||item.name);
       const response=await fetch('/api/media/recognize',{method:'POST',headers:{'X-CSRF-Token':ctx.state.csrf},body,signal:controller.signal,credentials:'same-origin'});
       const data=await response.json();
       if(!response.ok) throw new Error(data.error?.message||'辨識未完成，請保留素材並重試。');
@@ -232,6 +268,7 @@ const MediaUI = (() => {
     catch {throw new Error('文字草稿已到伺服器，但本機素材未完成連結。請保留此頁，勿重複建立草稿。');}
   }
   async function clearOwner(owner,{signal}={}) { // 僅在使用者勾選後清本owner本機素材，不刪伺服器或其他owner。
+    for(const session of sessions.values())if(session.owner===owner)session.invalidated=true;
     if(active?.owner===owner){stopRecording(true);cancelRequests(active);}
     await pending;
     if(signal?.aborted)throw new Error('本機清理已取消');
@@ -256,7 +293,7 @@ const MediaUI = (() => {
     try {await storage(session.key,undefined,true);} catch {throw new Error('本機草稿移除失敗，請重試。');}
     sessions.delete(session.key); active=null; releaseURLs();
   }
-  async function keepLocal() {
+  async function keepLocal() {await awaitReady();
     const session=active;
     capture(); await pending;
     if(!session || session.storedRevision!==session.saveRevision) throw new Error('本機保存尚未成功，請保持此頁或另行保留內容。');
@@ -305,5 +342,6 @@ const MediaUI = (() => {
     window.addEventListener('pagehide',()=>{capture();cancelRequests();if(recorder||recordingSession)stopRecording();});
     window.addEventListener('beforeunload',event=>{if(recorder||recordingSession){event.preventDefault();event.returnValue='';}});
   }
-  return {initialize,clearOwner,mount,capture,leave,bindDraft,discard,renderDrafts,keepLocal};
+  async function awaitReady(){await Promise.all([...photoJobs]);}
+  return {awaitReady,initialize,clearOwner,mount,capture,leave,bindDraft,discard,renderDrafts,keepLocal};
 })();
