@@ -194,3 +194,8 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ### 2026-11-08：Google challenge精確Tag來源
 
 Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能只修一般POST而留下Google第二層canonical-only Gate。26項針對性測試通過；未將工程SQLite／替身驗證器當真GIS或Product PG驗收。Client設定啟用仍須007/008與備份Gate，維持IAP。
+
+
+### 2026-11-08：Release A 日期操作與核心閉環
+
+有效原生日期可正式提交（HTTP201），先前本機畫面工具未能輸入日期，未重現後端提交Bug。新增使用Owner伺服器當地日期的「一週後／30天後」明確快捷，保留日期必填與人工最後提交；Google未配置時顯示狀態及訪客替代路徑。隔離SQLite＋無頭Chromium兩項閉環通過（含三習慣、三次孵化、人工確認、任務、進度、重送不重複獎勵與刷新）；35項Origin／Session／限流回歸通過。這些不是Product PG、真GIS或真模型驗收。
