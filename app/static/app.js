@@ -131,7 +131,7 @@ function goalCard(goal) { // 產生目標摘要卡與詳情入口
   return `<div class="card"><div class="goal-top"><span class="egg ${goal.status==='completed'?'completed':''}">${goal.status==='completed'?'✿':'⌁'}</span><div><h3>${esc(goal.title)}</h3><p>${goal.deadline?'截止日：'+esc(goal.deadline)+' · '+esc(goal.schedule_timezone):(GoalsUI.open(goal)?'請補齊舊目標期限':'舊版歷史，未設定截止日')}</p></div></div>${goalProgress(goal)}<div class="button-row space-top">${link('goal/'+goal.id,goal.status==='awaiting_review'?'查看目標並回顧 →':'查看目標 →','text-button')}<span class="tag">${GoalsUI.labels[goal.status]}${goal.end_reason?' · '+(goal.end_reason==='expired'?'到期未完成':'提前結束'):''}</span></div></div>`; // 生命週期與截止日使用同一後端來源。
 } // 結束目前回呼、區塊或模組定義
 function navigation(route) { // 產生四主分頁並更新頁面標題
-  $('#account-button').hidden=Boolean(state.capabilities?.public_gate_closed);
+  $('#account-button').hidden=false; // 資料服務未開放也保留入口，明示降級而不是整個隱藏。
   $('.sidebar').classList.toggle('before-world',!state.me?.lumi_hatched); // 手機首次引導不顯示空白底部導覽。
   const active = /^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
   $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],['people','◌','關係']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
@@ -139,7 +139,7 @@ function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').textContent = state.me?.status==='guest' ? '訪客模式' : (state.me?.name?.slice(0,1) || '○'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function welcomeView() {
-  if(state.capabilities?.public_gate_closed)return `<section class="hero"><div class="hero-copy"><h1>Life World</h1><p>讓真實的一小步，成為你的世界。</p><p>記下經歷、整理想法，讓目標與重要的人逐漸連起來。</p><p role="status">完整產品候選已抵達；私人世界、登入與AI正在完成資料保存及安全驗收，目前不接受個人資料。</p><p>目標與三個習慣 · 經歷與人工確認 · 人物小劇場 · Lumi陪伴</p></div>${lumi('welcome')}</section>`;
+  if(state.capabilities?.public_gate_closed)return `<section class="hero"><div class="hero-copy"><h1>Life World</h1><p>讓真實的一小步，成為你的世界。</p><p>記下經歷、整理想法，讓目標與重要的人逐漸連起來。</p><div class="button-row">${button('entry-guest','不用註冊，先開始')}${button('entry-google','Google 登入','secondary')}${button('entry-email','Email 註冊／登入','secondary')}${button('entry-test','專用測試帳密登入','text-button')}</div><p class="callout" role="status">資料保存服務準備中，目前不接受個人資料。你可以查看入口流程；尚未建立帳號、登入或保存世界。</p><p>目標與三個習慣 · 經歷與人工確認 · 人物小劇場 · Lumi陪伴</p></div>${lumi('welcome')}</section>`;
   if(state.capabilities?.access_mode==='public_alpha' && !state.capabilities?.google_login_available)return `<div class="welcome"><h1>Life World Public Alpha</h1><p>用一個獨立測試世界，記下今天的一小步。請勿輸入真實客戶或敏感資料。</p><p>本輪提供目標、文字記錄、人工確認與積分累積；積分尚無兌換用途。${state.capabilities?.ai_available?'AI需登入後使用，候選仍需人工確認。':'AI尚未設定，可先手動整理。'}公開註冊未開放。清除Cookie或登出後，匿名訪客世界無法自行恢復；預建帳號可登入同一世界。</p><div class="button-row">${button('guest','建立我的測試世界 →')}${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}</div><p>新增世界與寫入皆有本輪配額；額滿會暫停新增，已保存內容仍可查看。</p></div>`; // 產生訪客開始與本機帳號登入入口
   return `<div class="welcome">${heading('把每一步，種成自己的世界。','不需要一次走很遠。先給想做的事，一個小小的開始。')}<section class="hero"><div class="hero-copy"><div class="eyebrow">A WORLD THAT GROWS WITH YOU</div><h2>從一顆目標蛋，<br>開始你的故事。</h2><p>記下真實的努力，收集成長的痕跡。建立第一個目標後，新的陪伴也將誕生。</p><div class="button-row">${button('guest','不用註冊，先開始 →')}${button('login-dialog','登入我的世界','text-button')}</div></div><div class="hero-art"><span class="egg">⌁</span><span class="spark">✧</span></div></section>${!state.capabilities?.google_login_available?'<p class="callout" role="status">Google 登入尚未啟用。可先以訪客操作；既有帳號入口供授權測試帳號使用，尚未完成跨裝置 Google 恢復驗收。</p>':''}<p class="small muted">資料儲存於目前連線的服務。訪客尚無帳號恢復保障；請用虛構內容測試。</p></div>`; // 組合「產生訪客開始與本機帳號登入入口」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
@@ -263,7 +263,31 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   } // 結束目前回呼、區塊或模組定義
 } // 結束目前回呼、區塊或模組定義
 function dialog(content) { $('#account-content').innerHTML = content + '<p id="dialog-error" class="small" role="alert"></p>'; if (!$('#account-dialog').open) $('#account-dialog').showModal(); } // 更新共用對話框並開啟模態視窗
+// 公開入口只呈現真實可用狀態；資料Gate關閉時不收集密碼、不送出登入或建世界請求。
+function publicEntryView(mode='choose') {
+  const intro='<p class="callout" id="entry-state" role="status">資料保存服務尚未開放，目前不會登入、建立帳號或保存資料。</p>';
+  let content='';
+  if(mode==='guest')content='<h2 id="account-heading">訪客體驗</h2><p>開始後會依序介紹自己、建立目標及三個習慣，再記錄經歷。</p><p>訪客世界須連線到保存服務；清除Cookie或登出後無法自行恢復。升級正式帳號後才能跨裝置回訪，既有世界不會只憑相同Email自動合併。</p><button class="primary" disabled>開始建立訪客世界</button>';
+  else if(mode==='google')content='<h2 id="account-heading">Google 登入</h2><p>用Google帳號建立或回到自己的世界；也可在訪客體驗後明確選擇升級，保留原世界。</p><p>資料服務就緒後才開始Google驗證，目前不會開啟Google視窗或傳送登入資料。</p><button class="primary" disabled>繼續使用 Google 登入</button>';
+  else if(mode==='email')content='<h2 id="account-heading">Email 註冊／登入</h2><p>一般Email帳密註冊與登入尚未開放。將在Email驗證、密碼重設與帳號恢復流程完成後提供；所有正式登入方式使用相同核心功能。</p><label>Email<input type="email" disabled autocomplete="off" placeholder="尚未開放，請勿輸入個人資料"></label><button disabled>建立或登入Email帳號</button>';
+  else if(mode==='test')content='<h2 id="account-heading">專用測試帳密登入</h2><p>使用管理者提供的專用帳密。資料服務就緒後可操作同一套目標、AI與人物劇場；不會公開測試世界。</p><label>測試帳號<input id="entry-username" disabled autocomplete="off" placeholder="資料服務尚未開放"></label><label>密碼<input id="entry-password" type="password" disabled autocomplete="off" placeholder="目前不收集密碼"></label><button disabled>登入我的世界</button>';
+  else content=`<h2 id="account-heading">進入你的世界</h2><div class="button-row">${button('entry-guest','不用註冊，先開始')}${button('entry-google','Google 登入','secondary')}${button('entry-email','Email 註冊／登入','secondary')}${button('entry-test','專用測試帳密登入','text-button')}</div>`;
+  dialog(content+intro+`<div class="button-row">${button('entry-retry','重試服務連線','secondary')}${button('close-account','關閉入口','text-button')}</div>`);
+}
+async function retryPublicEntry() {
+  const status=$('#entry-state');if(status){status.textContent='正在連線，請稍候…';status.setAttribute('aria-busy','true');}
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
+  try {
+    const response=await fetch('/ready',{credentials:'same-origin',cache:'no-store',signal:controller.signal});
+    if(!response.ok)throw new Error('not_ready');
+    const capabilities=await api('/capabilities',{signal:controller.signal});
+    if(capabilities.public_gate_closed)throw new Error('not_open');
+    state.capabilities=capabilities;$('#account-dialog').close();await render();toast('服務已可連線，請重新選擇登入方式。');
+  } catch {if(status)status.textContent='服務尚未開放或暫時無法連線。沒有建立帳號、訪客世界或保存任何資料，可稍後重試。';}
+  finally {clearTimeout(timer);status?.setAttribute('aria-busy','false');}
+}
 function accountView(mode = 'account') { // 顯示帳號、升級或登入表單
+  if(state.capabilities?.public_gate_closed){publicEntryView();return;}
   if (state.capabilities?.google_login_available && mode!=='test-login') {
     const upgrade=state.me?.status==='guest' && mode!=='login';
     dialog(`<h2 id="account-heading">${upgrade?'使用Google帳號保存我的世界':'Google登入'}</h2><p>${upgrade?'會保留目前目標、經歷與積分；已屬於其他世界的Google帳號不會自動合併。':'登入已有世界；不同帳號資料不會自動合併。'}</p>${!upgrade&&state.me?.status==='guest'?'<label><input id="google-discard" type="checkbox">我了解登入其他帳號不會合併目前訪客資料</label>':''}<button type="button" class="primary" data-action="google-start" data-mode="${upgrade?'upgrade':'login'}">${upgrade?'使用 Google 帳號保存我的世界':'繼續使用 Google 登入'}</button><div id="google-button"></div>${state.capabilities?.password_login_available?button('test-login-dialog','測試帳號登入','secondary'):''}${button("retry-guest-cleanup","重試清除已離開的訪客草稿","text-button")}${upgrade?button("google-login-existing","登入既有世界","secondary"):""}${state.me?'<label><input id="clear-local-media" type="checkbox">登出後清除此瀏覽器目前世界的媒體草稿（不刪除伺服器資料）</label><p class="small muted">未勾選會留在此裝置；不代表雲端備份。清除網站資料也會移除。</p>'+button('logout','登出','secondary'):''}`);
@@ -408,6 +432,8 @@ document.addEventListener('click', async event => { // 監聽點擊
   const target = event.target.closest('[data-action],g[data-person],button[data-person]'); if (!target) return; // 取得本次操作的控制項或合併主要事件
   const action = target.dataset.action; target.disabled = true; // 讀取按鈕明確指定的操作代碼
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
+    if(action==='entry-retry'){await retryPublicEntry();return;}
+    if(action?.startsWith('entry-')){publicEntryView(action.slice(6));return;}
     if (await PeopleUI.handleClick(target)) return; // 依目前選項或狀態進入對應處理分支
     if (action === 'guest') {const me = await api('/auth/guest',{method:'POST'}); state.me = me; state.csrf = me.csrf_token; await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定

@@ -9,7 +9,7 @@
 |公開OAuth Origin|PASS（Owner已儲存）|不重做、不改IAP Client；真實Google登入未驗收|
 |02探針／ROLLBACK／正式COMMIT|NOT RUN|[單一交易執行包](database/alpha-02-rehearsal-2026-11-08/02_EXECUTION_GUIDE.md)；只能Owner在原Studio操作|
 |Alpha 03–12|BLOCKED|02正式結果確認後，按既有實際SQL逐檔推進，勿混用Product Migration|
-|公開登入／訪客入口|PARTIAL|現有封閉入口須補可見方法選擇、安全降級及重試，不假稱資料保存|
+|公開登入／訪客入口|PARTIAL|已補可見Google/訪客/Email/測試方法選擇與安全降級重試；3項Chromium通過，正式登入/Email註冊未驗收或未開放|
 |Provider獨立產品能力|PASS（工程測試）|註冊狀態Owner共用AI/劇場/額度；線上PG仍待接通|
 |公開Runtime／真PG E2E|BLOCKED|私有Gate仍關閉，無DB/AI Secret；不可用容器SQLite代替保存|
 |AI／劇場|PARTIAL|真Adapter歷史測試、最新提示與Fixture契約；本輪不得新增真模型呼叫，網站E2E未完成|

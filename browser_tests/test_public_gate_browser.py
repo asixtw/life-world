@@ -26,8 +26,34 @@ def test_closed_public_page_is_honest_and_operable(closed_base,width):
         expect(page.get_by_role('heading',name='Life World',exact=True)).to_be_visible()
         expect(page.locator('#app')).to_contain_text('目前不接受個人資料')
         expect(page.locator('[data-lumi-art]')).to_be_visible();assert page.locator('[data-lumi-art]').evaluate('(img)=>img.complete&&img.naturalWidth>0')
-        expect(page.get_by_role('button',name='帳號設定')).not_to_be_visible()
+        expect(page.get_by_role('button',name='帳號設定')).to_be_visible()
         assert page.request.get(closed_base+'/api/state').status==401
         assert page.request.get(closed_base+'/ready').status==503
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         page.screenshot(path=f'/private/tmp/GCP144_v58/public-{width}.png',full_page=True);browser.close()
+
+
+def test_closed_gate_shows_entry_choices_and_safe_retry(closed_base):
+    """入口可操作，但DB未接通前不送帳密／訪客寫入，也不假裝已登入。"""
+    with sync_playwright() as p:
+        browser=p.chromium.launch();page=browser.new_page();mutations=[]
+        page.on('request',lambda req:mutations.append(req.url) if req.method in ('POST','PUT','DELETE','PATCH') else None)
+        page.goto(closed_base)
+        page.get_by_role('button',name='Google 登入',exact=True).click()
+        expect(page.get_by_role('heading',name='Google 登入',exact=True)).to_be_visible()
+        expect(page.get_by_role('button',name='繼續使用 Google 登入',exact=True)).to_be_disabled()
+        page.get_by_role('button',name='重試服務連線',exact=True).click()
+        expect(page.locator('#entry-state')).to_contain_text('尚未開放')
+        expect(page.get_by_role('button',name='重試服務連線',exact=True)).to_be_enabled()
+        page.get_by_role('button',name='關閉入口',exact=True).click()
+        page.get_by_role('button',name='不用註冊，先開始',exact=True).click()
+        expect(page.get_by_role('heading',name='訪客體驗',exact=True)).to_be_visible()
+        expect(page.locator('#account-content')).to_contain_text('跨裝置')
+        page.get_by_role('button',name='關閉入口',exact=True).click()
+        page.get_by_role('button',name='Email 註冊／登入',exact=True).click()
+        expect(page.locator('#account-content')).to_contain_text('尚未開放')
+        page.get_by_role('button',name='關閉入口',exact=True).click()
+        page.get_by_role('button',name='專用測試帳密登入',exact=True).click()
+        expect(page.locator('#entry-username')).to_be_disabled();expect(page.locator('#entry-password')).to_be_disabled()
+        assert mutations==[]
+        browser.close()
