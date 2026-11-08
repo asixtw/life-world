@@ -1,19 +1,13 @@
-# 公開候選統一進度
+# Guest＋測試帳號真Alpha執行結果
 
-更新：2026-11-08。一般工程持續進行；不把未完成真實PostgreSQL E2E的候選稱為完整Beta。
-
-|工作|狀態|證據／下一步|
+|項目|狀態|證據|
 |---|---|---|
-|Product邏輯備份實際還原|PASS|Build 6d320f67-a5cb-4022-91b1-642c3500f516；32表/2收據/筆數一致，臨時IAM撤銷|
-|Alpha 01/01B／空庫|PASS（Owner回傳）|非superuser但CREATEROLE/CREATEDB與有效授權通過；核心Schema/角色不存在、表0、counts={}，不重跑|
-|公開OAuth Origin|PASS（Owner已儲存）|不重做、不改IAP Client；真實Google登入未驗收|
-|02探針／ROLLBACK／正式COMMIT|NOT RUN|[單一交易執行包](database/alpha-02-rehearsal-2026-11-08/02_EXECUTION_GUIDE.md)；只能Owner在原Studio操作|
-|Alpha 03–12|BLOCKED|02正式結果確認後，按既有實際SQL逐檔推進，勿混用Product Migration|
-|公開登入／訪客入口|PARTIAL|已補可見Google/訪客/Email/測試方法選擇與安全降級重試；3項Chromium通過，正式登入/Email註冊未驗收或未開放|
-|Provider獨立產品能力|PASS（工程測試）|註冊狀態Owner共用AI/劇場/額度；線上PG仍待接通|
-|公開Runtime／真PG E2E|BLOCKED|私有Gate仍關閉，無DB/AI Secret；不可用容器SQLite代替保存|
-|AI／劇場|PARTIAL|真Adapter歷史測試、最新提示與Fixture契約；本輪不得新增真模型呼叫，網站E2E未完成|
-|Lumi／房間／音效|PARTIAL|素材與程式已接入；公開畫面與獨立開關可測，登入世界內旅程待DB|
-|PR／正式Release|PARTIAL|PR20維持Draft／未Merge；以精確Commit/Build/Digest/Revision逐次保存，未宣告完整Beta|
+|Alpha 12A/09/12G/10B|PASS|Owner Studio執行：帳號registered、Argon2、Runtime LOGIN、mismatch0；不重跑|
+|Cloud Run→Alpha|PASS|既有VPC/私人IP、lw_alpha_app、限定IAM/專用Secret，真ready與資料讀寫|
+|Guest/帳密核心真HTTP與瀏覽器|PASS|Cookie、目標三習慣、經歷確認、任務進度獎勵、刷新/重開/重登、跨Owner拒絕|
+|人物基本CRUD/來源拒絕|PASS|真人物卡讀寫、無確認來源422、Guest403；未生成AI台詞|
+|真Gemini/人物劇場生成|NOT RUN|本輪0新呼叫，AI未配置；不冒充完整產品|
+|Google/Email|NOT RUN|不阻塞本輪Guest與受限帳密|
+|公開主流量切換|NOT RUN|新lw-public-alpha-dc471d2為0%，舊entry-6fd3725仍100%；Staging不變|
 
-Owner只需使用同一Studio進行新02包，不重跑Product Restore、Alpha01/01B、空庫檢查或OAuth設定。若出現回滾殘留或非預期public物件，停止實際變更並回報，不擅改原始02。
+[實際版本與驗收收據](GUEST_ALPHA_LIVE_ACCEPTANCE.md)。Source Commit dc471d2fd02d2686576fd19b7971fc8a3e5b1c6f，Image sha256:4235181863fe65f0fa99c9a9bac94a583171d1a4290f7ed438d800a055e86396。

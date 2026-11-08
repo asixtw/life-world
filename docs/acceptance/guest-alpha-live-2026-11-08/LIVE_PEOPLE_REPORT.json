@@ -1,0 +1,35 @@
+{
+  "status": "PASS_PEOPLE_BASIC_AND_SOURCE_GUARDS",
+  "scope": "actual candidate/Alpha registered username account",
+  "person_id": "59bb1827-7e2f-43cd-a2bc-c128bbaf92ac",
+  "checks": [
+    {
+      "name": "account:GET /api/auth/me",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "account:POST /api/people",
+      "status": "PASS",
+      "http": 201
+    },
+    {
+      "name": "account:GET /api/people/59bb1827-7e2f-43cd-a2bc-c128bbaf92ac/overview",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "account:POST /api/people/59bb1827-7e2f-43cd-a2bc-c128bbaf92ac/simulation",
+      "status": "PASS",
+      "http": 422
+    },
+    {
+      "name": "guest_a:GET /api/people/59bb1827-7e2f-43cd-a2bc-c128bbaf92ac/overview",
+      "status": "PASS",
+      "http": 403
+    }
+  ],
+  "real_relationship_inference": "NOT RUN",
+  "real_theater_generation": "NOT RUN",
+  "gemini_calls": 0
+}

@@ -1,0 +1,17 @@
+{
+  "source": "Owner actual Cloud SQL Studio result this turn",
+  "database": "life_world_alpha",
+  "owner": "lw_alpha_owner",
+  "marker": "LIFEWORLD_PUBLIC_ALPHA_GCP144_V1",
+  "tables": 34,
+  "receipts_007_008_present": true,
+  "runtime_login": true,
+  "runtime_superuser_createdb_createrole": false,
+  "schema_usage": true,
+  "schema_create": false,
+  "permission_mismatch_rows": 0,
+  "account_username": "lw_synthetic_test",
+  "account_status": "registered",
+  "argon2_present": true,
+  "migrations_or_account_creation_repeated_by_agent": false
+}

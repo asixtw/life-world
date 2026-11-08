@@ -1,0 +1,45 @@
+{
+  "source_commit": "dc471d2fd02d2686576fd19b7971fc8a3e5b1c6f",
+  "prior_guest_test_commit": "d5fca3bee3cdcdb0db081575c288f9f1bca1f6b8",
+  "image_digest": "sha256:4235181863fe65f0fa99c9a9bac94a583171d1a4290f7ed438d800a055e86396",
+  "build_id": "d1481e66-c018-4112-873a-3a31b6faec58",
+  "revision": "lw-public-alpha-dc471d2",
+  "candidate_url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app",
+  "candidate_traffic_percent": 0,
+  "active_traffic": [
+    {
+      "percent": 100,
+      "revisionName": "lw-public-entry-6fd3725"
+    }
+  ],
+  "runtime_sa": "lw-public-runtime@life-world-513506.iam.gserviceaccount.com",
+  "database": "life_world_alpha",
+  "schema": "lw_core_draft",
+  "database_user": "lw_alpha_app",
+  "network": "lw-vpc-staging",
+  "subnet": "lw-subnet-staging",
+  "egress": "private-ranges-only",
+  "secret_versions": {
+    "LIFEWORLD_DB_PASSWORD": "lw-public-alpha-db-password:1",
+    "LIFEWORLD_AUTH_RATE_SECRET": "lw-public-auth-rate-secret:1"
+  },
+  "iam_added": {
+    "role": "roles/cloudsql.client",
+    "principal": "lw-public-runtime@life-world-513506.iam.gserviceaccount.com",
+    "instance_condition": "resource.name == 'projects/life-world-513506/instances/lw-pg-staging-trial' && resource.type == 'sqladmin.googleapis.com/Instance'"
+  },
+  "secret_accessor_added_only_to_runtime_sa": true,
+  "staging_spec_unchanged": true,
+  "gemini_new_calls": 0,
+  "gemini_real_generation": "NOT RUN",
+  "real_theater_generation": "NOT RUN",
+  "actual_cloud_cost_usd": null,
+  "test_account": {
+    "username": "lw_synthetic_test",
+    "created": true,
+    "http_login_logout_relogin": true,
+    "browser_ui_login": true,
+    "password_delivery": "Owner-approved direct conversation; excluded from package/Git/logs"
+  },
+  "merge_or_public_traffic_switch": false
+}

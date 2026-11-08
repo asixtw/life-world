@@ -1,0 +1,15 @@
+{
+  "scope": "real tagged candidate + Alpha, independent headless Chromium",
+  "model_calls": 0,
+  "status": "PASS",
+  "guest_goal_id": "39d1a871-c096-4c73-842f-4128f12f2060",
+  "guest_owner_id": "eb2af06a-0c7f-40cc-956a-84f63c5e7a3a",
+  "guest_mobile_core": true,
+  "three_deliberate_hatch_inputs": true,
+  "guest_page_refresh": true,
+  "browser_process_restart": true,
+  "desktop_readback": true,
+  "account_real_ui_login": true,
+  "ai_generation": "NOT RUN",
+  "theater_real_generation": "NOT RUN"
+}
