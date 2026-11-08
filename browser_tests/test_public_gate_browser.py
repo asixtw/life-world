@@ -27,7 +27,7 @@ def test_closed_public_page_is_honest_and_operable(closed_base,width):
         expect(page.locator('#app')).to_contain_text('目前不接受個人資料')
         expect(page.locator('[data-lumi-art]')).to_be_visible();assert page.locator('[data-lumi-art]').evaluate('(img)=>img.complete&&img.naturalWidth>0')
         expect(page.get_by_role('button',name='帳號設定')).not_to_be_visible()
-        assert page.request.get(closed_base+'/api/state').status==503
+        assert page.request.get(closed_base+'/api/state').status==401
         assert page.request.get(closed_base+'/ready').status==503
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         page.screenshot(path=f'/private/tmp/GCP144_v58/public-{width}.png',full_page=True);browser.close()

@@ -105,7 +105,9 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             if request.url.path=='/api/auth/me' and request.method=='GET':
                 return JSONResponse({'error':{'code':'unauthenticated','message':'尚未登入。'}},status_code=401,headers={'Cache-Control':'no-store'})
             if not safe:
-                return JSONResponse({'error':{'code':'release_gate_closed','message':'私人世界尚待資料保存與登入驗收，暫不接受資料或AI操作。'}},status_code=503,headers={'Cache-Control':'no-store'})
+                # 尚未登入的私人API回401；登入建立入口則明示環境Gate尚未完成。
+                private_api=request.url.path.startswith('/api/') and not request.url.path.startswith('/api/auth/')
+                return JSONResponse({'error':{'code':'unauthenticated' if private_api else 'release_gate_closed','message':'私人世界尚待資料保存與登入驗收，暫不接受資料或AI操作。'}},status_code=401 if private_api else 503,headers={'Cache-Control':'no-store'})
         # IAP只保護入口，App仍須原有Session／CSRF；只有GET/HEAD健康探針豁免。
         if settings.auth_source_mode=='iap' and not (request.method in ('GET','HEAD') and request.url.path in ('/health','/ready')):
             tokens=request.headers.getlist('x-goog-iap-jwt-assertion')

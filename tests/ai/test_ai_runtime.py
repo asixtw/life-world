@@ -204,3 +204,15 @@ def test_theater_prompt_requires_character_voice_instead_of_narrator(prepared):
     assert result['applied'] is False
     assert '第一人稱' in p.calls[0]['system']
     assert '不要替使用者詢問是否合適' in p.calls[0]['system']
+
+
+def test_simulation_contract_keeps_conflicts_and_unknowns_explicit(prepared):
+    """只驗證提示契約與不自動保存；不把預設替身台詞當成模型品質通過。"""
+    app,c,me,g,runtime,p=prepared
+    facts=[{'fact_id':'f1','value':'合成人物喜歡電話','source_experience_ids':['s1']},{'fact_id':'f2','value':'合成人物不喜歡電話','source_experience_ids':['s2']}]
+    p.text=json.dumps({'utterance':'這部分我還不確定，可以再確認嗎？'})
+    before=c.get('/api/state').json();runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':facts,'message':'合成未知情境'})
+    prompt=p.calls[-1]
+    assert prompt['case']['confirmed_facts']==facts
+    assert '來源互相矛盾' in prompt['system'] and '承認不知道' in prompt['system']
+    assert c.get('/api/state').json()==before

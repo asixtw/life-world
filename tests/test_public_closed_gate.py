@@ -20,11 +20,23 @@ def test_closed_gate_serves_assets_but_never_connects_database(tmp_path):
         assert c.get('/ready').status_code==503
         assert c.get('/api/auth/me').status_code==401
         for path,body in [('/api/auth/guest',{}),('/api/auth/login',{'username':'fake','password':'synthetic'}),('/api/experiences/x/task-suggestions',{'consent':True})]:
-            r=c.post(path,json=body);assert r.status_code==503 and r.json()['error']['code']=='release_gate_closed'
-        assert c.get('/api/state').status_code==503
+            r=c.post(path,json=body);private=not path.startswith('/api/auth/');assert r.status_code==(401 if private else 503) and r.json()['error']['code']==('unauthenticated' if private else 'release_gate_closed')
+        assert c.get('/api/state').status_code==401
         assert c.get('/docs').status_code==503
 
 
 def test_closed_gate_cannot_accidentally_enable_business_or_google():
     with pytest.raises(ValueError):RuntimeSettings(public_gate_closed=True,business_enabled=True)
     with pytest.raises(ValueError):RuntimeSettings(public_gate_closed=True,business_enabled=False,google_client_id='fake.apps.googleusercontent.com')
+
+
+def test_anonymous_private_api_uses_401_without_database_access(tmp_path):
+    """公開安全Gate未解鎖時仍維持未登入私人API的HTTP契約。"""
+    app=create_app(tmp_path,settings=RuntimeSettings(public_gate_closed=True,business_enabled=False))
+    def forbidden(*a,**k):raise AssertionError('must not connect database')
+    app.state.service.db.connect=forbidden
+    with TestClient(app) as client:
+        assert client.get('/api/state').status_code==401
+        assert client.get('/api/people').status_code==401
+        assert client.post('/api/people/unowned/simulation',json={'consent':True,'fact_ids':['x'],'message':'合成'}).status_code==401
+        assert client.post('/api/auth/login',json={'username':'fake','password':'synthetic'}).status_code==503
