@@ -31,6 +31,9 @@ logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的�
 
 def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None, iap_verifier=None, google_verifier=None):  # PG factory 不執行 DDL
     settings = settings or getattr(database, 'settings', None) or RuntimeSettings.from_env()
+    # 尚未通過資料Gate的公開候選不掛載或啟動任何AI／建帳流程。
+    if settings.public_gate_closed and (os.environ.get('LIFEWORLD_AI_CALLS_APPROVED')=='true' or os.environ.get('LIFEWORLD_AI_API_KEY') or os.environ.get('LIFEWORLD_TEST_ACCOUNT_SEED')):
+        raise ValueError('Closed public gate must not mount private AI/account credentials')
     policy = policy or DemoPolicy()
     if settings.secure_cookies:
         policy = replace(policy, secure_cookies=True)
@@ -96,6 +99,13 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
+        if settings.public_gate_closed:
+            # 在限流、身分或業務處理之前封閉，確保公開請求不會連接DB。
+            safe=request.method in ('GET','HEAD') and (request.url.path in ('/','/health','/ready','/api/health','/api/capabilities') or request.url.path.startswith('/static/'))
+            if request.url.path=='/api/auth/me' and request.method=='GET':
+                return JSONResponse({'error':{'code':'unauthenticated','message':'尚未登入。'}},status_code=401,headers={'Cache-Control':'no-store'})
+            if not safe:
+                return JSONResponse({'error':{'code':'release_gate_closed','message':'私人世界尚待資料保存與登入驗收，暫不接受資料或AI操作。'}},status_code=503,headers={'Cache-Control':'no-store'})
         # IAP只保護入口，App仍須原有Session／CSRF；只有GET/HEAD健康探針豁免。
         if settings.auth_source_mode=='iap' and not (request.method in ('GET','HEAD') and request.url.path in ('/health','/ready')):
             tokens=request.headers.getlist('x-goog-iap-jwt-assertion')
@@ -126,7 +136,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             except DomainError as exc:
                 return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers=getattr(exc,'headers',{'Cache-Control':'no-store'}))
         # 未核准的 Cloud Run revision 只供健康／連線驗證，不接業務讀寫。
-        if not settings.business_enabled and request.url.path not in ('/health', '/ready', '/api/health'):
+        if not settings.business_enabled and not settings.public_gate_closed and request.url.path not in ('/health', '/ready', '/api/health'):
             return JSONResponse({'error': {'code': 'business_api_disabled', 'message': '此服務尚未開放業務操作。'}}, status_code=503)
         if request.url.path == '/api/media/recognize':
             # 在 multipart 解析前限制一般已知長度請求，路由內另有串流讀取上限。
@@ -229,6 +239,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.get('/ready', tags=['System'])
     def readiness():
+        if settings.public_gate_closed:
+            return JSONResponse({'status':'unavailable','reason':'release_gates_pending'},status_code=503,headers={'Cache-Control':'no-store'})
         try:
             service.db.check_ready()
             limiter.ready(service.db)
@@ -243,6 +255,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.get('/api/capabilities',tags=['Identity'])
     def capabilities():
+        if settings.public_gate_closed:
+            return {'access_mode':settings.access_mode,'public_gate_closed':True,'accounts_available':False,'password_login_available':False,'registration_available':False,'media_available':False,'google_login_available':False,'ai_available':False,'ai_status':'release_gates_pending','writes_available':False,'points':'accumulation_only','redemption_available':False}
         """公開模式說明不含憑證／內部資料；UI與後端共用範圍。"""
         alpha=settings.access_mode=='public_alpha'
         return {'access_mode':settings.access_mode,'accounts_available':settings.password_login_available,

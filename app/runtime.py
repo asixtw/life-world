@@ -35,6 +35,7 @@ class RuntimeSettings:
     write_origins: tuple = ()  # 額外受保護Tag僅允許自己的同源寫入，不改OAuth來源。
     cloud_run: bool = False
     business_enabled: bool = True
+    public_gate_closed: bool = False  # 公開候選尚缺DB／登入Gate時，只開放非敏感頁面。
 
     google_client_id: str = ''  # 明確配置才啟用GIS；既有IAP部署預設不變。
     test_login_usernames: tuple = ()  # 既有授權測試帳密白名單，與Google共用Owner能力。
@@ -60,6 +61,8 @@ class RuntimeSettings:
         return bool(self.test_login_usernames) or (self.alpha_login_enabled if self.access_mode=='public_alpha' else self.password_login_enabled)
 
     def __post_init__(self):
+        if self.public_gate_closed and (self.business_enabled or self.google_client_id or self.test_login_usernames):
+            raise ValueError('Closed public gate cannot enable business or authentication')
         if any(not re.fullmatch(r"[a-z0-9_]{3,30}",x) for x in self.test_login_usernames):
             raise ValueError("Explicit test usernames required")
         for origin in self.write_origins:
@@ -83,7 +86,7 @@ class RuntimeSettings:
         for value in (self.alpha_worlds_total,self.alpha_worlds_daily,self.alpha_owner_writes,self.alpha_global_writes,self.alpha_source_writes):
             if not isinstance(value,int) or isinstance(value,bool) or not 1<=value<=1000000:raise ValueError('Invalid Alpha quota')
         if not isinstance(self.alpha_storage_bytes,int) or isinstance(self.alpha_storage_bytes,bool) or not 1<=self.alpha_storage_bytes<=1_000_000_000:raise ValueError('Invalid storage byte cap')
-        if self.access_mode=='public_alpha' and self.backend=='postgresql':
+        if self.access_mode=='public_alpha' and self.backend=='postgresql' and not self.public_gate_closed:
             isolated=self.db_name=='life_world_alpha' and self.db_user=='lw_alpha_app'
             # Product公開候選沿用現有DB，只有明確Google-only與來源/容量護欄才可配置。
             product=(self.db_name=='life_world_product_staging' and self.db_user=='lw_product_staging_app'
@@ -106,7 +109,7 @@ class RuntimeSettings:
             raise ValueError('TLS cannot be disabled for remote PostgreSQL')
         if not self.trusted_hosts or any('*' in h or '/' in h for h in self.trusted_hosts):
             raise ValueError('Trusted Hosts must be explicit hostnames')
-        if self.backend == 'postgresql' and (self.connection_mode not in ('tcp','cloud_sql') or not self.db_password
+        if self.backend == 'postgresql' and not self.public_gate_closed and (self.connection_mode not in ('tcp','cloud_sql') or not self.db_password
                 or (self.connection_mode == 'cloud_sql' and not self.instance_connection_name)):
             raise ValueError('Incomplete PostgreSQL configuration')
 
@@ -135,7 +138,8 @@ class RuntimeSettings:
         schema = os.environ.get('LIFEWORLD_DB_SCHEMA', 'lw_core_draft')
         if not re.fullmatch(r'[a-z_][a-z0-9_]{0,62}', schema):
             raise ValueError('Invalid PostgreSQL schema identifier')
-        if backend == 'postgresql' and (mode not in ('tcp', 'cloud_sql') or not password or (mode == 'cloud_sql' and not instance)):
+        closed = flag('LIFEWORLD_PUBLIC_GATE_CLOSED',False)
+        if backend == 'postgresql' and not closed and (mode not in ('tcp', 'cloud_sql') or not password or (mode == 'cloud_sql' and not instance)):
             raise ValueError('Incomplete PostgreSQL configuration')
         origin = os.environ.get('LIFEWORLD_EXTERNAL_ORIGIN', '').rstrip('/')
         if origin:
@@ -173,4 +177,4 @@ class RuntimeSettings:
                    alpha_storage_bytes=int(os.environ.get('LIFEWORLD_ALPHA_STORAGE_BYTES','100000000')),
                    alpha_writes_enabled=flag('LIFEWORLD_ALPHA_WRITES_ENABLED',True),
                    alpha_login_enabled=flag('LIFEWORLD_ALPHA_LOGIN_ENABLED',False),
-                   cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud))
+                   cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud),public_gate_closed=closed)
