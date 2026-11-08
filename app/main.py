@@ -78,7 +78,9 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
     from .ai_routes import install as install_ai_routes
     install_ai_routes(app)  # 保留既有GIS/IAP邊界；僅組裝預設停用的AI候選。
-    app.add_middleware(media.MediaBodyLimit, max_bytes=policy.max_upload_bytes + 65536)
+    audio_max_bytes=int(os.environ.get('LIFEWORLD_AUDIO_MAX_BYTES',str(policy.max_upload_bytes)))
+    if not 1<=audio_max_bytes<=64*1024*1024:raise ValueError('Audio capacity must be bounded to 64MiB')
+    app.add_middleware(media.MediaBodyLimit, max_bytes=max(policy.max_upload_bytes,audio_max_bytes) + 65536)
     if settings.access_mode=='public_alpha':app.add_middleware(AlphaBodyLimit)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts))
 
@@ -143,7 +145,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         if request.url.path == '/api/media/recognize':
             # 在 multipart 解析前限制一般已知長度請求，路由內另有串流讀取上限。
             length = request.headers.get('content-length', '')
-            if length.isdigit() and int(length) > policy.max_upload_bytes + 65536:
+            if length.isdigit() and int(length) > max(policy.max_upload_bytes,audio_max_bytes) + 65536:
                 return JSONResponse({'error': {'code': 'upload_too_large', 'message': '素材超過目前本機傳輸上限。'}}, status_code=413)
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):  # 依目前條件選擇下一步處理分支
             origin = request.headers.get('origin')  # 保存「origin」供後續驗證或回傳使用
@@ -178,7 +180,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         """傳回實際可用能力與傳輸護欄，不把本機設定宣稱為正式素材政策。"""
         user = current(request)
         return {'recognition_available': user['status']=='registered' and (app.state.ai_runtime.enabled or app.state.media_provider is not None),
-                'max_bytes': policy.max_upload_bytes, 'server_retention': 'none',
+                'max_bytes': min(policy.max_upload_bytes,app.state.ai_runtime.settings.max_media_bytes) if app.state.ai_runtime.enabled else policy.max_upload_bytes, 'audio_max_bytes': audio_max_bytes, 'server_retention': 'none',
                 'image_types': list(media.IMAGE_TYPES), 'audio_types': list(media.AUDIO_TYPES)}
 
     @app.post('/api/media/recognize', tags=['Media'])
@@ -191,8 +193,25 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             require_registered(user)
             with service.db.connect() as connection:
                 service._onboarded(connection, user['id'])
-            content = await file.read(policy.max_upload_bytes + 1)
-            mime = media.validate_media(kind, file.filename, file.content_type, content, policy.max_upload_bytes)
+            if kind=='audio' and app.state.ai_runtime.enabled:
+                mime=(file.content_type or '').split(';')[0].lower()
+                require(mime in media.AUDIO_TYPES,415,'unsupported_media','請選取支援的音訊格式。')
+                require(file.size is not None and 0<file.size<=audio_max_bytes,413,'upload_too_large','音訊超過傳輸容量；素材仍保留。')
+                from .audio_transcription import transcribe
+                from threading import Event
+                cancelled=Event()
+                async def watch_disconnect():
+                    while True:
+                        if await request.is_disconnected():cancelled.set();return
+                        await asyncio.sleep(.25)
+                watcher=asyncio.create_task(watch_disconnect())
+                try:
+                    return await run_in_threadpool(transcribe,app.state.ai_runtime,user['id'],file.file,mime,audio_max_bytes,cancelled)
+                finally:
+                    cancelled.set();watcher.cancel()
+            image_limit=min(policy.max_upload_bytes,app.state.ai_runtime.settings.max_media_bytes) if app.state.ai_runtime.enabled else policy.max_upload_bytes
+            content = await file.read(image_limit + 1)
+            mime = media.validate_media(kind, file.filename, file.content_type, content, image_limit)
             try:
                 if app.state.ai_runtime.enabled:
                     return await asyncio.wait_for(run_in_threadpool(app.state.ai_runtime.recognize,user['id'],kind,mime,content),timeout=30)

@@ -79,7 +79,7 @@ const MediaUI = (() => {
     const root = document.querySelector('#media-panel');
     if (!root || !active) return;
     releaseURLs();
-    root.innerHTML = `<section class="media-panel" aria-label="紀錄素材"><h2>從不同方式留下經歷</h2><p class="small muted">選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。</p><p id="media-storage" role="status">${ctx.esc(active.storageMessage || '僅保存在此裝置，尚未同步。')}</p>${active.readOnly?'':controls()+`<details class="media-recorder" ${active.recorderOpen?'open':''}><summary>語音轉文字</summary><p>錄完後再決定是否上傳。試聽可選，不必先播放。</p><p id="recorder-status" role="status">${ctx.esc(recorderMessage || '尚未開始錄音')}</p><div class="button-row"><button type="button" class="secondary" data-media="start" ${recorder||stream||recordingSession?'disabled':''}>開始錄音</button><button type="button" class="secondary" data-media="stop" ${recorder?.state==='recording'?'':'disabled'}>停止錄音</button><button type="button" class="text-button" data-media="cancel-recording" ${recorder||stream||recordingSession?'':'disabled'}>取消錄音</button></div></details>`}<p class="small muted">${available?'辨識服務已設定；送出後仍需人工校對。':'尚未設定辨識服務，可先保留素材並手動輸入。'}目前本機單檔傳輸上限 ${(maxBytes/1024/1024).toFixed(1)} MiB，非正式產品限制。</p><div class="media-items">${active.items.length?active.items.map(itemView).join(''):'<p class="small muted">此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。</p>'}</div>`;
+    root.innerHTML = `<section class="media-panel" aria-label="紀錄素材"><h2>從不同方式留下經歷</h2><p class="small muted">選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。</p><p id="media-storage" role="status">${ctx.esc(active.storageMessage || '僅保存在此裝置，尚未同步。')}</p>${active.readOnly?'':controls()+`<details class="media-recorder" ${active.recorderOpen?'open':''}><summary>語音轉文字</summary><p>錄完後再決定是否上傳。試聽可選，不必先播放。</p><p id="recorder-status" role="status">${ctx.esc(recorderMessage || '尚未開始錄音')}</p><div class="button-row"><button type="button" class="secondary" data-media="start" ${recorder||stream||recordingSession?'disabled':''}>開始錄音</button><button type="button" class="secondary" data-media="stop" ${recorder?.state==='recording'?'':'disabled'}>停止錄音</button><button type="button" class="text-button" data-media="cancel-recording" ${recorder||stream||recordingSession?'':'disabled'}>取消錄音</button></div></details>`}<p class="small muted">${available?'辨識服務已設定；送出後仍需人工校對。':'尚未設定辨識服務，可先保留素材並手動輸入。'}圖片傳輸容量 ${(maxBytes/1024/1024).toFixed(1)} MiB；音訊 ${(audioMaxBytes/1024/1024).toFixed(1)} MiB。長音訊逐段辨識，額度不足時原素材仍保留。</p><div class="media-items">${active.items.length?active.items.map(itemView).join(''):'<p class="small muted">此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。</p>'}</div>`;
   }
   async function mount({owner, scope, readOnly = false, revision = null}) {
     const key = owner + ':' + scope;
@@ -101,7 +101,7 @@ const MediaUI = (() => {
     if (active !== session) return;
     restoreFields(session);
     draw();
-    try {const caps = await ctx.api('/media/capabilities'); if(active!==session)return; maxBytes=caps.max_bytes; available=caps.recognition_available; draw();}
+    try {const caps = await ctx.api('/media/capabilities'); if(active!==session)return; maxBytes=caps.max_bytes; audioMaxBytes=caps.audio_max_bytes||maxBytes; available=caps.recognition_available; draw();}
     catch {if(active===session) storageStatus(session,'無法取得辨識能力，素材仍保留在此裝置。');}
   }
   async function renderDrafts(owner) {
@@ -123,10 +123,11 @@ const MediaUI = (() => {
     } catch {if(root.isConnected)root.textContent='此裝置草稿暫時無法讀取；已保存的伺服器經歷不受影響。';}
     finally {db?.close();}
   }
+  let audioMaxBytes=5*1024*1024;
   async function addFile(file, kind, session = active) {
     if (!session || !file) return;
     const mime = file.type.split(';')[0];
-    if (file.size === 0 || file.size > maxBytes) throw new Error('素材為空或超過目前本機單檔傳輸上限。');
+    if (file.size === 0 || (file.size > (kind==='audio'?audioMaxBytes:maxBytes) && !file.name?.startsWith('錄音-'))) throw new Error('素材為空或超過目前本機單檔傳輸上限。');
     const types = kind==='audio' ? ['audio/wav','audio/x-wav','audio/webm','audio/ogg','audio/mp4','audio/mpeg'] : ['image/png','image/jpeg'];
     if (!types.includes(mime)) throw new Error('目前不支援這個檔案格式；請選擇 PNG／JPEG 圖片或支援的音檔。');
     // IndexedDB 保存原始 Blob；object URL 僅供目前畫面，不拿來當永久來源。
@@ -160,7 +161,7 @@ const MediaUI = (() => {
       let size=0;
       recorder=current; elapsed=0;
       current.addEventListener('dataavailable', event=>{
-        if(event.data?.size) {chunks.push(event.data); size+=event.data.size; if(size>maxBytes) {recording.cancelled=true; recorderMessage='錄音超過目前傳輸上限，請重新錄製較短片段。'; stopRecording(true);}}
+        if(event.data?.size) {chunks.push(event.data); size+=event.data.size; if(size>audioMaxBytes) {recorderMessage='已達本機傳輸容量，停止錄音並保留素材；可分段整理。'; stopRecording();}}
       });
       current.addEventListener('stop', async()=>{
         // 舊錄音的 stop 可能晚於取消／重錄，不能停止下一段的新麥克風。

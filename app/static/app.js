@@ -296,9 +296,6 @@ function accountView(mode = 'account') { // 顯示帳號、升級或登入表單
   const alpha=state.capabilities?.access_mode==='public_alpha';
   if(alpha && mode==='claim')throw new Error('Alpha不開放公開註冊或訪客升級。');
   if(alpha && mode==='login' && !state.capabilities.accounts_available)throw new Error('Alpha預建帳號登入尚未啟用。');
-  if(alpha && mode==='account'){
-    dialog(`<h2 id="account-heading">${state.me?.status==='registered'?'Alpha 預建帳號':'Alpha 訪客世界'}</h2><p>${state.me?.status==='registered'?'可在其他裝置以相同預建帳號登入，資料不會與其他帳號合併。':'匿名訪客登出或清除Cookie後無法自行恢復；不提供公開註冊或升級。'}</p><div class="button-row">${state.capabilities.accounts_available?button('login-dialog','登入預建帳號','secondary'):''}${state.me?button('logout','登出','danger',''):''}</div>`);return;
-  }
   if (mode === 'account' && !state.me) mode = 'login'; // 依目前選項或狀態進入對應處理分支
   if (mode === 'account') { // 依目前選項或狀態進入對應處理分支
     dialog(`<h2 id="account-heading">${esc(state.me.name || '你的世界')}</h2><p class="account-state">${state.me.status === 'guest' ? '訪客模式 · 此瀏覽器工作階段保存' : 'Life World 帳號：' + esc(state.me.username)}</p><p class="small muted">資料儲存於目前連線的服務。登出會撤銷這個工作階段，不會刪除已保存資料。${state.dirty ? '登出時可選擇保存草稿、捨棄未保存修改或繼續編輯。' : ''}</p><div class="button-row">${state.me.status === 'guest' && state.capabilities?.registration_available ? button('claim-dialog','建立帳號，保存世界') : ''}${button('login-dialog','登入其他帳號','secondary')}<label><input id="clear-local-media" type="checkbox">登出後清除此瀏覽器目前世界的媒體草稿（不刪除伺服器資料）</label>${button('logout','登出','danger', '')}</div>`); // 執行「顯示帳號、升級或登入表單」的目前處理步驟
