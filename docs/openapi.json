@@ -6,6 +6,156 @@
     "version": "0.4.0"
   },
   "paths": {
+    "/api/experiences/{experience_id}/task-suggestions": {
+      "post": {
+        "tags": [
+          "AI drafts"
+        ],
+        "summary": "Task Suggestions",
+        "operationId": "task_suggestions_api_experiences__experience_id__task_suggestions_post",
+        "parameters": [
+          {
+            "name": "experience_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experience Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmedInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiences/{experience_id}/tasks": {
+      "post": {
+        "tags": [
+          "AI drafts"
+        ],
+        "summary": "Confirm Tasks",
+        "operationId": "confirm_tasks_api_experiences__experience_id__tasks_post",
+        "parameters": [
+          {
+            "name": "experience_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experience Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TasksConfirm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/people/{person_id}/simulation": {
+      "post": {
+        "tags": [
+          "AI drafts"
+        ],
+        "summary": "Simulation",
+        "operationId": "simulation_api_people__person_id__simulation_post",
+        "parameters": [
+          {
+            "name": "person_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Person Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/media/capabilities": {
       "get": {
         "tags": [
@@ -39,6 +189,84 @@
             "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/Body_recognize_media_api_media_recognize_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/external/challenge": {
+      "post": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Google Challenge",
+        "operationId": "google_challenge_api_auth_external_challenge_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleChallenge"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/external/exchange": {
+      "post": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Google Exchange",
+        "operationId": "google_exchange_api_auth_external_exchange_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleExchange"
               }
             }
           },
@@ -111,6 +339,26 @@
         ],
         "summary": "Readiness",
         "operationId": "readiness_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/capabilities": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Capabilities",
+        "description": "公開模式說明不含憑證／內部資料；UI與後端共用範圍。",
+        "operationId": "capabilities_api_capabilities_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2342,6 +2590,21 @@
         ],
         "title": "Confirm"
       },
+      "ConfirmedInput": {
+        "properties": {
+          "consent": {
+            "type": "boolean",
+            "const": true,
+            "title": "Consent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "consent"
+        ],
+        "title": "ConfirmedInput"
+      },
       "ConnectionCreate": {
         "properties": {
           "request_id": {
@@ -2423,6 +2686,32 @@
         ],
         "title": "Credentials"
       },
+      "DialogueTurn": {
+        "properties": {
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "user",
+              "simulation"
+            ],
+            "title": "Speaker"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "speaker",
+          "text"
+        ],
+        "title": "DialogueTurn",
+        "description": "歷史只接受有限對話內容，不能注入system角色或任意技術欄位。"
+      },
       "DraftCreate": {
         "properties": {
           "contributions": {
@@ -2432,6 +2721,19 @@
             "type": "array",
             "maxItems": 50,
             "title": "Contributions"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
           },
           "raw_text": {
             "type": "string",
@@ -2496,6 +2798,19 @@
             "type": "array",
             "maxItems": 50,
             "title": "Contributions"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
           },
           "raw_text": {
             "type": "string",
@@ -2781,6 +3096,53 @@
           "confirmed"
         ],
         "title": "GoalReview"
+      },
+      "GoogleChallenge": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "login",
+              "upgrade"
+            ],
+            "title": "Mode"
+          },
+          "discard_guest": {
+            "type": "boolean",
+            "title": "Discard Guest",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "title": "GoogleChallenge",
+        "description": "登入前明確選擇是否保存Guest；未知欄位拒絕。"
+      },
+      "GoogleExchange": {
+        "properties": {
+          "challenge_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f-]{36}$",
+            "title": "Challenge Id"
+          },
+          "credential": {
+            "type": "string",
+            "maxLength": 16384,
+            "minLength": 1,
+            "title": "Credential"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "challenge_id",
+          "credential"
+        ],
+        "title": "GoogleExchange",
+        "description": "ID token僅作交換，不接受前端自報owner/email。"
       },
       "HTTPValidationError": {
         "properties": {
@@ -3376,6 +3738,46 @@
         ],
         "title": "Revision"
       },
+      "SimulationInput": {
+        "properties": {
+          "consent": {
+            "type": "boolean",
+            "const": true,
+            "title": "Consent"
+          },
+          "fact_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Fact Ids"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Message"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/DialogueTurn"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "History"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "consent",
+          "fact_ids",
+          "message"
+        ],
+        "title": "SimulationInput"
+      },
       "SourceRevoke": {
         "properties": {
           "expected_revision": {
@@ -3561,6 +3963,38 @@
           "done"
         ],
         "title": "TaskEdit"
+      },
+      "TasksConfirm": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Tasks"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "tasks",
+          "confirmed"
+        ],
+        "title": "TasksConfirm"
       },
       "ValidationError": {
         "properties": {

@@ -1,6 +1,7 @@
 /* Original W01/W02/Person 360 flows. Shared state, real sources, no AI inference. */
 window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全域命名空間
   let c, currentOwner, listing = null, profile = null, evidence = null, editorPerson = null, returnRoute = 'people'; // 保存主程式工具、目前帳號與人物頁快取
+  let dialogue = []; // 只保留本頁有限模擬對話，離開／換帳號即清除。
   const scroll = new Map(); // 依路由保存返回時的捲動位置
   const expanded = new Map(); // 依人物保存四維度展開狀態
   const dims = {interests:'興趣與嗜好', food:'飲食偏好', skills:'專長與背景', habits:'互動習慣'}; // 定義原規劃的四個人物維度
@@ -19,7 +20,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
   function initialize(context) { c = context; } // 注入主程式共用工具與狀態
   function ensureOwner() { // 帳號切換時清除上一帳號的人物與介面快取
     if (currentOwner !== c.state.me?.owner_id) { // 依目前選項或狀態進入對應處理分支
-      currentOwner=c.state.me?.owner_id; listing=null; profile=null; evidence=null; editorPerson=null; returnRoute='people'; scroll.clear(); expanded.clear(); // 帳號變更時清空人物、來源、編輯資料與介面狀態
+      currentOwner=c.state.me?.owner_id; listing=null; profile=null; evidence=null; editorPerson=null; returnRoute='people'; dialogue=[]; scroll.clear(); expanded.clear(); // 帳號變更時清空人物、來源、編輯資料與介面狀態
     } // 結束目前回呼、區塊或模組定義
   } // 結束目前回呼、區塊或模組定義
   function remember(route,y) { // 記住返回時的捲動位置與維度展開狀態
@@ -96,14 +97,21 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
   } // 結束目前回呼、區塊或模組定義
   function allExperiences(data) { return [...new Map([...data.interactions.flatMap(e=>e.experiences),...(data.stories||[])].map(e=>[e.id,e])).values()]; } // 以識別碼去重可引用的已確認經歷
   function sourceChecks(data) { return allExperiences(data).map(e=>`<label class="check-line"><input name="source_ids" type="checkbox" value="${e.id}"><span>${h(c.time(e.occurred_at))}<br>${h(e.summary)}</span></label>`).join('')||'<p class="small muted">目前沒有已確認的來源；仍可手動練習，但不能捏造人物偏好。</p>'; } // 列出可由使用者明確勾選的來源
+  // 只提供已確認來源的選擇與真正配置的模型入口，不假裝已啟用。
+  function simulationControls(data) {
+    const facts=Object.values(data.facts).flat().filter(f=>f.status==='confirmed'&&f.sources.length);
+    if(c.state.me.status!=='registered'||!c.state.capabilities?.ai_available) return '<p class="callout">真實 AI 尚未開放；可保存手動演練筆記。</p>';
+    if(!facts.length) return '<p class="callout">先從真實經歷確認人物資訊，才能開始 AI 演練。</p>';
+    return `<fieldset><legend>選擇可傳送給模型的人物資訊及來源摘要</legend>${facts.map(f=>`<label class="check-line"><input type="checkbox" name="simulation_facts" value="${h(f.id)}">${h(f.value)}</label>`).join('')}</fieldset><label for="simulation-message">你想練習說的話</label><textarea id="simulation-message" maxlength="1000"></textarea><p>點擊後會將勾選資訊、來源摘要及本頁最近六段文字（每段最多1000字）傳給已設定模型；全部回答是模擬，不是本人發言。</p>${btn('theater-generate','產生 AI 模擬對話','secondary')}${btn('theater-clear','清除本頁對話','text-button')}<div id="simulation-output" role="status" aria-live="polite"></div>`;
+  }
   async function renderTheater(personId,mode='') { // 產生四用途小劇場，區分模擬、私人草稿與真實經歷
     ensureOwner(); const ticket=c.state.renderGeneration, data=await c.api('/people/'+encodeURIComponent(personId)+'/overview'); // 用本次渲染序號拒絕較舊非同步回應覆蓋畫面
     if(ticket!==c.state.renderGeneration) return ''; // 用本次渲染序號拒絕較舊非同步回應覆蓋畫面
-    profile=data; const p=profile.person; // 保存目前帳號最新人物完整頁資料
-    const modes={preparation:['見面前準備','查看來源，留下自己的準備。'],simulation:['情境演練','手動練習；模擬內容，非真人發言。'],message:['傳達心意','保存或複製草稿，尚未送出。'],review:['相遇後回顧','只記錄真正發生的互動。']}; // 定義四種小劇場用途及模擬／未發送說明
+    profile=data; dialogue=[]; const p=profile.person; // 保存目前帳號最新人物完整頁資料
+    const modes={preparation:['見面前準備','查看來源，留下自己的準備。'],simulation:['情境演練','人工筆記與已設定的 AI 演練；非真人發言。'],message:['傳達心意','保存或複製草稿，尚未送出。'],review:['相遇後回顧','只記錄真正發生的互動。']}; // 定義四種小劇場用途及模擬／未發送說明
     const back=query().get('return')||personRoute(p); // 保留返回人物原分頁的路由
     if(mode==='review') return ''; // The mode link routes directly into the shared experience form. // 相遇後回顧入口直接使用共用的真實經歷表單
-    return `<div class="narrow">${link(back,'← 返回人物頁','text-button')}${c.heading('與'+p.name+'的小劇場','先練習，再相遇。真實經歷與私人草稿分開保存。')}<div class="theater-modes">${Object.entries(modes).map(([key,[name,description]])=>link(key==='review'?recordRoute(p,null,back):'theater/'+p.id+'?mode='+key+'&return='+encodeURIComponent(back),`<b>${name}</b><span>${description}</span>`,`card theater-mode ${key===mode?'active':''}`)).join('')}</div>${mode&&modes[mode]?`<form id="theater-note-form" class="card space-top" data-person="${p.id}"><span class="tag gold">${mode==='simulation'?'模擬內容，非真人發言':mode==='message'?'訊息草稿，尚未送出':'私人準備'}</span><input type="hidden" name="kind" value="${mode}"><h3 class="space-top">本次引用的已確認來源（選填）</h3>${sourceChecks(profile)}<div class="field space-top"><label for="theater-title">標題</label><input id="theater-title" name="title" maxlength="160" required></div><div class="field"><label for="theater-content">自己的內容</label><textarea id="theater-content" name="content" maxlength="20000" required></textarea></div><div class="callout">本輪不連接真實 AI；私人內容不更新人物事實、互動次數、進度或積分。</div><div class="button-row"><button class="primary">保存私人筆記</button>${mode==='message'?btn('theater-copy','複製草稿','secondary'):''}</div></form>`:''}<section class="space-top"><h2>私人筆記與草稿</h2><div class="stack">${profile.notes.map(n=>`<article class="card note-card"><span class="tag gold">${n.kind==='simulation'?'模擬內容，非真人發言':n.kind==='message'?'訊息草稿，尚未送出':'私人準備'}</span><h3 class="space-top">${h(n.title)}</h3><p class="record-content">${h(n.content)}</p><p class="small muted">引用 ${n.source_experience_ids.length} 筆來源 · ${h(c.time(n.created_at))}</p></article>`).join('')||c.empty('尚無私人筆記。')}</div></section></div>`; // 組合「產生四用途小劇場，區分模擬、私人草稿與真實經歷」所需的畫面或提交資料
+    return `<div class="narrow">${link(back,'← 返回人物頁','text-button')}${c.heading('與'+p.name+'的小劇場','先練習，再相遇。真實經歷與私人草稿分開保存。')}<div class="theater-modes">${Object.entries(modes).map(([key,[name,description]])=>link(key==='review'?recordRoute(p,null,back):'theater/'+p.id+'?mode='+key+'&return='+encodeURIComponent(back),`<b>${name}</b><span>${description}</span>`,`card theater-mode ${key===mode?'active':''}`)).join('')}</div>${mode&&modes[mode]?`<form id="theater-note-form" class="card space-top" data-person="${p.id}"><span class="tag gold">${mode==='simulation'?'模擬內容，非真人發言':mode==='message'?'訊息草稿，尚未送出':'私人準備'}</span><input type="hidden" name="kind" value="${mode}"><h3 class="space-top">本次引用的已確認來源（選填）</h3>${sourceChecks(profile)}<div class="field space-top"><label for="theater-title">標題</label><input id="theater-title" name="title" maxlength="160" required></div><div class="field"><label for="theater-content">自己的內容</label><textarea id="theater-content" name="content" maxlength="20000" required></textarea></div>${mode==='simulation'?simulationControls(profile):''}<div class="callout">私人筆記與模擬不更新人物事實、互動次數、進度或積分；保存前請自行核對。</div><div class="button-row"><button class="primary">保存私人筆記</button>${mode==='message'?btn('theater-copy','複製草稿','secondary'):''}</div></form>`:''}<section class="space-top"><h2>私人筆記與草稿</h2><div class="stack">${profile.notes.map(n=>`<article class="card note-card"><span class="tag gold">${n.kind==='simulation'?'模擬內容，非真人發言':n.kind==='message'?'訊息草稿，尚未送出':'私人準備'}</span><h3 class="space-top">${h(n.title)}</h3><p class="record-content">${h(n.content)}</p><p class="small muted">引用 ${n.source_experience_ids.length} 筆來源 · ${h(c.time(n.created_at))}</p></article>`).join('')||c.empty('尚無私人筆記。')}</div></section></div>`; // 組合「產生四用途小劇場，區分模擬、私人草稿與真實經歷」所需的畫面或提交資料
   } // 結束目前回呼、區塊或模組定義
   async function renderEvidence(personId,factId) { // 顯示人物資訊的原文、時間、證據類型與撤回入口
     ensureOwner(); const ticket=c.state.renderGeneration, result=await c.api('/people/'+personId+'/facts/'+factId+'/evidence'); // 用本次渲染序號拒絕較舊非同步回應覆蓋畫面
@@ -124,7 +132,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
   function reviewPayload(form) { // 只將明確勾選的人物候選加入提交內容
     const f=new FormData(form); // 讀取使用者目前表單值，不直接推論人物資訊
     return {interaction_type:f.get('interaction_type')||'unknown',interaction_event_id:f.get('interaction_event_id')||null, // 組合「只將明確勾選的人物候選加入提交內容」所需的畫面或提交資料
-      person_updates:Object.keys(dims).filter(d=>f.has('fact_selected_'+d)).map(d=>({dimension:d,value:f.get('fact_value_'+d),description:'由使用者核對本次原始經歷後確認。',evidence_type:f.get('fact_type_'+d),selected:true}))}; // 執行「只將明確勾選的人物候選加入提交內容」的目前處理步驟
+      person_updates:Object.keys(dims).filter(d=>f.has('fact_selected_'+d)).map(d=>({dimension:d,value:f.get('fact_value_'+d),description:document.querySelector('[name="fact_value_'+d+'"]')?.dataset.aiSource?'由使用者核對原始經歷引文：'+document.querySelector('[name="fact_value_'+d+'"]').dataset.aiSource:'由使用者核對本次原始經歷後確認。',evidence_type:f.get('fact_type_'+d),selected:true}))}; // 執行「只將明確勾選的人物候選加入提交內容」的目前處理步驟
   } // 結束目前回呼、區塊或模組定義
   async function handleClick(target) { // 處理人物選取、關注、來源與明確關係操作
     ensureOwner(); // 先清除跨帳號快取，再處理目前人物頁操作
@@ -143,6 +151,27 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     if(action==='fact-revoke') { const f=evidence.fact; await c.api('/people/'+f.person_id+'/facts/'+f.id+'/sources/revoke',json('POST',{expected_revision:f.revision,experience_id:target.dataset.experience})); c.navigate('person/'+f.person_id+'?tab=overview'); c.toast('來源已撤回；沒有有效來源的資訊不再顯示為已知。'); return true; } // 撤回來源且不刪除原始經歷
     if(action==='person-goal-new') { c.dialog(`<h2 id="account-heading">關聯目標與下一步</h2><form id="person-goal-form"><div class="field"><label for="related-goal">目標</label><select id="related-goal" name="goal_id">${c.options(c.state.world.goals,null)}</select></div><div class="field"><label for="goal-label">關聯說明／下一步</label><input id="goal-label" name="label" maxlength="300"></div><button class="primary">保存關聯</button></form>`); return true; } // 明確建立人物目標關聯
     if(action==='connection-new') { const people=c.state.world.people.filter(p=>p.id!==profile.person.id); c.dialog(`<h2 id="account-heading">建立明確的共同關係</h2><form id="connection-form"><div class="field"><label for="other-person">另一位人物</label><select id="other-person" name="other_person_id" required>${c.options(people,null,'name')}</select></div><div class="field"><label for="connection-label">共同關係／場合</label><input id="connection-label" name="label" required maxlength="300"></div><h3>可附相關經歷來源</h3>${sourceChecks(profile)}<button class="primary">保存共同關係</button></form>`); return true; } // 建立人物間明確共同關係
+    if(action==='theater-clear') { dialogue=[]; document.querySelector('#simulation-output').replaceChildren(); return true; }
+    if(action==='theater-generate') {
+      // 共用派送已完成去重並鎖定按鈕，不能把本次合法派送誤判成重送。
+      const message=document.querySelector('#simulation-message').value.trim();
+      const ids=[...document.querySelectorAll('[name="simulation_facts"]:checked')].map(x=>x.value);
+      if(!message||!ids.length) throw new Error('請輸入想練習的話，並勾選已確認的人物資訊。');
+      const ticket=c.state.renderGeneration; target.disabled=true;
+      try {
+        const result=await c.api('/people/'+encodeURIComponent(profile.person.id)+'/simulation',json('POST',{consent:true,fact_ids:ids,message,history:dialogue.slice(-6).map(t=>({...t,text:t.text.slice(0,1000)}))}));
+        if(ticket!==c.state.renderGeneration) return true;
+        dialogue.push({speaker:'user',text:message},{speaker:'simulation',text:result.utterance});dialogue=dialogue.slice(-6);
+        const output=document.querySelector('#simulation-output');
+        output.innerHTML='<p>'+h(result.notice)+'</p>'+dialogue.map(t=>'<p><b>'+(t.speaker==='user'?'你':'AI 模擬')+'</b>：'+h(t.text)+'</p>').join('');
+        const note=document.querySelector('#theater-content');
+        const text='模擬對話，非真人事實\n你：'+message+'\nAI 模擬：'+result.utterance;
+        if((note.value+'\n'+text).length<=20000) note.value=note.value?note.value+'\n\n'+text:text;
+        for(const node of document.querySelectorAll('[name="source_ids"]')) if(result.source_experience_ids.includes(node.value)) node.checked=true;
+        c.state.dirty=true; c.toast('模擬候選已產生；尚未保存，請編輯核對。');
+      } finally { if(ticket===c.state.renderGeneration) target.disabled=false; }
+      return true;
+    }
     if(action==='theater-copy') { const text=document.querySelector('#theater-content').value; if(navigator.clipboard) await navigator.clipboard.writeText(text); else throw new Error('請選取草稿文字，使用系統的複製功能。'); c.toast('已複製草稿，尚未發送。'); return true; } // 複製訊息草稿，不對外發送
     return false; // 此事件不屬於人物模組，交回主程式處理
   } // 結束目前回呼、區塊或模組定義

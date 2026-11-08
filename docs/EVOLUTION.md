@@ -176,3 +176,31 @@ E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STO
 ## 2026-11-08｜GCP-144 RC v3（候選，未部署）
 
 修復交付包版本／Patch基準混用，37檔完整Patch與Parent增量各自重建Tree並綁精確Commit。兩次真實Gemini 3.5 Flash-Lite HTTP200（360 input／121 output tokens、費用null），Browser完成編輯／確認／重送／刷新，僅既有合成SQLite；Call2空任務，不將人工任務當AI輸出。完整API424 passed／28 skipped，精確Commit及各類原始日誌以v3 Manifest為準。Owner最新目標為受IAP保護Staging POC，不自行公開或部署。詳見[RC v3驗收](testing/GCP144_RC_ACCEPTANCE.md)。
+
+## 2026-11-08｜完整公開版核心候選（本機、未提交）
+
+保留RC v3，新增規則式雙端來源情境、有限Behavior JSON、既有模型劇場端點的可操作UI與短期多輪；模擬筆記不回寫真實事實。新增模型收據metadata與獨立聲音開關、核准白名單及成功回執去重。新增範圍5項API／3項Chromium通過，未追加真模型呼叫，未重跑RC v3完整測試。素材逐項呈現待Owner核准；公開Gate尚未通過，見[功能矩陣](testing/PUBLIC_RELEASE_MATRIX.md)。
+
+### Owner委任採用／補製與映像檔推進
+
+已直接整合10張既有PNG／5個既有音效、新增3段可重製的原創程序BGM；所有新產出與沿用檔案分開記錄。原RC v3與PR19保留，新增候選在獨立分支固定來源後建置；未因素材委任自行執行Migration／GRANT或解除IAP。
+
+
+### 2026-11-08：受保護Tag同源寫入修復
+
+新增明確 LIFEWORLD_WRITE_ORIGINS，僅允許精確HTTPS Trusted Host的同源業務寫入；正式OAuth Origin及IAP audience推導不變。Tag Origin與正式Origin不同導致訪客POST403，並非業務旗標關閉（實際為true）。本輪針對Origin／CSRF／身分／Runtime測試38 passed，正式瀏覽器及Product PG閉環待驗收，不把本機測試當部署E2E。
+
+
+### 2026-11-08：Google challenge精確Tag來源
+
+Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能只修一般POST而留下Google第二層canonical-only Gate。26項針對性測試通過；未將工程SQLite／替身驗證器當真GIS或Product PG驗收。Client設定啟用仍須007/008與備份Gate，維持IAP。
+
+
+### 2026-11-08：Release A 日期操作與核心閉環
+
+有效原生日期可正式提交（HTTP201），先前本機畫面工具未能輸入日期，未重現後端提交Bug。新增使用Owner伺服器當地日期的「一週後／30天後」明確快捷，保留日期必填與人工最後提交；Google未配置時顯示狀態及訪客替代路徑。隔離SQLite＋無頭Chromium兩項閉環通過（含三習慣、三次孵化、人工確認、任務、進度、重送不重複獎勵與刷新）；35項Origin／Session／限流回歸通過。這些不是Product PG、真GIS或真模型驗收。
+
+
+### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
+
+修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。

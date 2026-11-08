@@ -28,3 +28,9 @@
 隔離Chromium桌面鍵盤／手機觸控 ×一般／reduced-motion：`browser_tests/test_birth_interaction.py` **4 passed**。涵蓋第三下前不可進入、動畫中重送click不跳階及完成後Lumi可見。首次嘗試因沙箱阻擋Chromium啟動；允許隔離瀏覽器執行後，先重現缺少模組失敗，再實作。第一輪實作的4個測試定位失敗，是accessible name按階段變更而locator仍綁舊名稱；改用穩定data locator並保留初始accessible-name斷言，未放寬三階段規則。
 
 既有journey／goal-flow／public-alpha測試已依新互動加入三次點擊；本輪未重跑這些完整後端旅程，不冒稱全部回歸通過。線上Staging及PostgreSQL未測本互動，未部署。
+
+## 2026-11-08｜Owner委任直接採用／補製
+
+不再逐項等待採用核准：10張既有原始PNG已接入世界／Lumi／家具／四階段蛋／圖示，5個既有SFX各選候選1，未改畫原始角色。另補製登入、設定目標、世界3段16秒原創程序合成BGM，非模型生成、不使用外部旋律或樣本；`scripts/generate_public_bgm.py`可重製完全相同SHA。逐檔來源、既有／新增與聲學數據見[採用紀錄](ADOPTED_ASSETS_20261108.json)。
+
+實際HTTP／Chromium已驗證世界背景與圖像、三次逐步孵化、手機無水平溢位、壞圖CSS fallback；8音檔實際解碼通過。成功回執音效支援草稿、經歷確認、目標完成，第三次孵化後才播孵化音；音樂按登入／目標設定／世界切換，兩開關獨立，不強制自動播放。未宣稱92項素材全齊。

@@ -25,7 +25,7 @@ class Verifier:
 @pytest.fixture
 def setup(tmp_path):
     verifier=Verifier()
-    app=create_app(data_dir=tmp_path/'isolated-google',settings=RuntimeSettings(google_client_id=CLIENT_ID),google_verifier=verifier,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
+    app=create_app(data_dir=tmp_path/'isolated-google',settings=RuntimeSettings(google_client_id=CLIENT_ID,password_login_enabled=False,registration_enabled=False),google_verifier=verifier,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
     # 只在本fixture新建且可丟棄的DB初始化新表；未寫入app/migrations。
     with app.state.service.db.connect(write=True) as c:
         c.execute("CREATE TABLE external_identities(provider TEXT NOT NULL,issuer TEXT NOT NULL,subject TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL,PRIMARY KEY(provider,issuer,subject))")
@@ -183,3 +183,13 @@ def test_upgrade_rolls_back_if_identity_insert_fails(setup):
         with app.state.service.db.connect() as db:
             assert db.execute('SELECT count(*) AS n FROM external_identities').fetchone()['n']==0
             assert db.execute("SELECT count(*) AS n FROM requests WHERE operation='google_exchange_v1'").fetchone()['n']==0
+
+
+def test_gis_headers_preserve_origin_and_allow_only_known_style(setup):
+    """依Google正式整合契約送出Origin Referer，樣式只放行已核對的CSS hash。"""
+    app,_=setup
+    with client_for(app) as c:
+        r=c.get('/');policy=r.headers['content-security-policy']
+        assert r.headers['referrer-policy']=='strict-origin-when-cross-origin'
+        assert "'sha256-RU4sU0AaS8IBGZx8XrGt/pa9A5SLA3dQszGeqT5L3Kw='" in policy
+        assert "'unsafe-inline'" not in policy and "'unsafe-eval'" not in policy

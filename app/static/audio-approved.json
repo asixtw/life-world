@@ -1,0 +1,45 @@
+{
+  "status": "adopted_under_owner_delegation_20261108",
+  "assets": {
+    "ui-tap": {
+      "approved": true,
+      "kind": "sound",
+      "url": "/static/audio/ui-tap.wav"
+    },
+    "draft-saved": {
+      "approved": true,
+      "kind": "sound",
+      "url": "/static/audio/draft-saved.wav"
+    },
+    "experience-confirmed": {
+      "approved": true,
+      "kind": "sound",
+      "url": "/static/audio/experience-confirmed.wav"
+    },
+    "first-hatch": {
+      "approved": true,
+      "kind": "sound",
+      "url": "/static/audio/first-hatch.wav"
+    },
+    "goal-completed": {
+      "approved": true,
+      "kind": "sound",
+      "url": "/static/audio/goal-completed.wav"
+    },
+    "login": {
+      "approved": true,
+      "kind": "music",
+      "url": "/static/audio/login-bgm.wav"
+    },
+    "goals": {
+      "approved": true,
+      "kind": "music",
+      "url": "/static/audio/goals-bgm.wav"
+    },
+    "world": {
+      "approved": true,
+      "kind": "music",
+      "url": "/static/audio/world-bgm.wav"
+    }
+  }
+}

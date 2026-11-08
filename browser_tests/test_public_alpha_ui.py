@@ -35,9 +35,9 @@ def test_alpha_real_browser_goal_record_refresh_and_quota(alpha_url,width,tmp_pa
             context=browser.new_context(viewport={'width':width,'height':844},locale='zh-TW')
             page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
             page.goto(alpha_url)
-            expect(page.get_by_role('heading',name='Life World Public Alpha')).to_be_visible()
-            expect(page.get_by_role('button',name='登入我的世界',exact=True)).to_have_count(0)
-            page.get_by_role('button',name='建立我的測試世界 →').click()
+            expect(page.get_by_role('heading',name='把每一步，種成自己的世界。')).to_be_visible()
+            expect(page.locator('.lumi-art img')).to_be_visible()
+            page.get_by_role('button',name='不用註冊，先開始 →').click()
             page.locator('#profile-name').fill('Alpha合成測試')
             page.locator('#bio').fill('只使用合成資料')
             page.get_by_role('button',name='接著，建立第一個目標').click()
@@ -80,7 +80,7 @@ def test_alpha_real_browser_goal_record_refresh_and_quota(alpha_url,width,tmp_pa
             context.clear_cookies();page.goto(alpha_url)
             for _ in range(9):
                 page.request.post(alpha_url+'/api/auth/guest');context.clear_cookies()
-            page.get_by_role('button',name='建立我的測試世界 →').click()
+            page.get_by_role('button',name='不用註冊，先開始 →').click()
             expect(page.locator('#notice')).to_contain_text('操作過於頻繁')
             expect(page.locator('#notice')).to_contain_text('分鐘後再試')
             assert not errors
@@ -97,10 +97,10 @@ def test_alpha_prebuilt_login_second_browser_onboarding_and_readback(alpha_url,w
         try:
             first=browser.new_context(viewport={'width':width,'height':844})
             page=first.new_page();page.goto(alpha_url)
-            page.get_by_role('button',name='登入預建帳號',exact=True).click()
+            page.get_by_role('button',name='登入我的世界',exact=True).click()
             page.locator('#username').fill('browser_prebuilt')
             page.locator('#password').fill('synthetic-browser-password')
-            page.get_by_role('button',name='登入我的世界',exact=True).click()
+            page.locator('#account-dialog').get_by_role('button',name='登入我的世界',exact=True).click()
             expect(page.locator('#profile-name')).to_be_visible()
             page.locator('#profile-name').fill('受邀合成人')
             page.locator('#bio').fill('合成測試')
@@ -121,17 +121,25 @@ def test_alpha_prebuilt_login_second_browser_onboarding_and_readback(alpha_url,w
             expect(page.get_by_text('跨裝置的作品',exact=True).first).to_be_visible()
             second=browser.new_context(viewport={'width':width,'height':844})
             restored=second.new_page();restored.goto(alpha_url)
-            restored.get_by_role('button',name='登入預建帳號',exact=True).click()
+            restored.get_by_role('button',name='登入我的世界',exact=True).click()
             restored.locator('#username').fill('browser_prebuilt')
             restored.locator('#password').fill('synthetic-browser-password')
-            restored.get_by_role('button',name='登入我的世界',exact=True).click()
+            restored.locator('#account-dialog').get_by_role('button',name='登入我的世界',exact=True).click()
             expect(restored.get_by_text('跨裝置的作品',exact=True).first).to_be_visible()
             restored.reload()
             expect(restored.get_by_text('跨裝置的作品',exact=True).first).to_be_visible()
             restored.locator('#account-button').click()
             expect(restored.get_by_role('button',name='建立帳號，保存世界')).to_have_count(0)
             restored.get_by_role('button',name='登出',exact=True).click()
-            expect(restored.get_by_role('heading',name='Life World Public Alpha')).to_be_visible()
+            expect(restored.get_by_role('heading',name='把每一步，種成自己的世界。')).to_be_visible()
             assert second.request.get(alpha_url+'/api/auth/me').status==401
             assert first.request.get(alpha_url+'/api/auth/me').status==200
         finally:browser.close()
+
+
+def test_alpha_guest_primary_entry_needs_no_registration(alpha_url):
+    """公開Alpha也沿用Guest First入口，不能只在關閉Gate時顯示。"""
+    with sync_playwright() as pw:
+        browser=pw.chromium.launch();page=browser.new_page();page.goto(alpha_url)
+        expect(page.get_by_role('button',name='不用註冊，先開始 →',exact=True)).to_be_visible()
+        browser.close()

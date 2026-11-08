@@ -134,3 +134,11 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 ## 2026-11-08｜GCP-144 RC v3（候選，未部署）
 
 修復交付包版本／Patch基準混用，37檔完整Patch與Parent增量各自重建Tree並綁精確Commit。兩次真實Gemini 3.5 Flash-Lite HTTP200（360 input／121 output tokens、費用null），Browser完成編輯／確認／重送／刷新，僅既有合成SQLite；Call2空任務，不將人工任務當AI輸出。完整API424 passed／28 skipped，精確Commit及各類原始日誌以v3 Manifest為準。Owner最新目標為受IAP保護Staging POC，不自行公開或部署。詳見[RC v3驗收](testing/GCP144_RC_ACCEPTANCE.md)。
+
+## 2026-11-08｜公開核心增量（未提交、未部署）
+
+只驗新增變更：API 5 passed（其中1項因收據metadata變更更新）、新Chromium 3 passed（UI2＋API成功hook1）；詳[公開完成矩陣](testing/PUBLIC_RELEASE_MATRIX.md)。Backend／Browser傳輸均明示測試替身，不代表真實劇場AI驗收。RC v3既有測試不重跑、不冒充本輪；新增Gemini呼叫0次，原核准2次已耗盡。圖片及聲音待Owner逐項核准，正式白名單保持空。
+
+### Owner委任採用後的素材整合驗證
+
+對新增整合再做必要驗證，未重跑原RC v3全套：API5 passed、受影響新Chromium3 passed；實際localhost HTTP畫面與8音檔解碼、手機無溢位、三次蛋圖淡入及壞圖fallback通過。3段原創程序BGM已重製並逐檔SHA相符。修正背景被後載CSS覆蓋、訪客按鈕換行及草稿音效應使用`/experiences/drafts`路徑。沒有新真實模型呼叫。

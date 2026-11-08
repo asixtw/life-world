@@ -94,7 +94,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             token, csrf = new_session(c, user['id'], self.now(), self.policy)  # 產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊
             return self.public_user(self._owned_user(c, user['id']), csrf), token  # 回傳將原訪客世界升級為本機帳號並輪換工作階段的結果
 
-    def login(self, data, existing_token=None, limiter=None, request=None, registered_only=False):
+    def login(self, data, existing_token=None, limiter=None, request=None, registered_only=False, allowed_usernames=None):
         """來源先限流、帳號採軟桶；失敗計數提交後才回HTTP錯誤。"""
         outcome=None
         with self.db.connect(write=True) as c:
@@ -102,7 +102,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             if outcome is None:
                 user=c.execute('SELECT * FROM users WHERE username=?',(data.username.lower(),)).fetchone()
                 # Alpha只接受已預建registered帳號；未知或無效類型仍走替代hash，維持統一失敗語意。
-                eligible=user is not None and (not registered_only or user['status']=='registered')
+                eligible=user is not None and (not registered_only or user['status']=='registered') and (allowed_usernames is None or user['username'] in allowed_usernames)
                 valid=PASSWORDS.verify(data.password,user['password_hash'] if eligible and user['password_hash'] else DUMMY_HASH)
                 if not eligible or not valid:
                     outcome=(limiter.failure(c,data.username) if limiter else None) or DomainError(401,'invalid_credentials','帳號或密碼不正確。')

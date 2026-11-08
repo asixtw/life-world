@@ -3,6 +3,8 @@
 <head> <!-- 建立頁面結構容器 -->
   <meta charset="utf-8"> <!-- 使用 UTF-8 正確顯示中文 -->
   <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 以裝置寬度呈現手機與桌面版面 -->
+  <link rel="icon" type="image/png" href="/static/art/app-icon.png">
+  <script src="/static/art.js" defer></script>
   <meta name="theme-color" content="#edf3e9"> <!-- 設定瀏覽器工具列的品牌背景色 -->
   <title>Life World · 把每一步，種成自己的世界</title> <!-- 設定瀏覽器分頁標題 -->
   <link rel="stylesheet" href="/static/styles.css"> <!-- 載入共用或人物流程樣式 -->
@@ -20,6 +22,8 @@
   <link rel="stylesheet" href="/static/media.css">
   <script src="/static/media.js" defer></script>
   <script src="/static/birth.js" defer></script>
+  <link rel="stylesheet" href="/static/art.css">
+  <script src="/static/audio.js" defer></script>
   <script src="/static/app.js" defer></script> <!-- 先載入各模組再啟動 App。 -->
   <link rel="stylesheet" href="/static/birth.css">
 </head> <!-- 結束此頁面結構區塊 -->
@@ -31,7 +35,7 @@
       <div class="sidebar-bottom"><span class="status-dot"></span> Life World 測試版<span>你的世界，從真實的一小步開始。</span></div> <!-- 顯示不依賴部署位置的測試版標籤 -->
     </aside> <!-- 結束此頁面結構區塊 -->
     <main> <!-- 宣告頁面主要內容區域 -->
-      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
+      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><details id="audio-preferences"></details><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
       <div id="notice" role="status" aria-live="polite"></div> <!-- 以無障礙即時區域顯示錯誤與狀態 -->
       <div id="app-loading" role="status" aria-live="polite" hidden>正在載入，請稍候…</div> <!-- 較慢切頁保留可理解回饋 -->
       <div id="app" class="content"><p>正在打開你的世界…</p></div> <!-- 依目前路由置換的主內容容器 -->

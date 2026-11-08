@@ -1,0 +1,22 @@
+/* 沿用原始PNG，僅以版面與交叉淡入接入，不修改正式角色畫稿。 */
+.lumi-art{position:relative;width:min(100%,300px);height:300px;isolation:isolate;justify-self:center}
+.lumi-asset{position:relative;width:100%;height:100%;object-fit:contain;z-index:2}
+[data-lumi-fallback][hidden],[data-lumi-art][hidden]{display:none!important}
+.home-lumi{position:relative;min-height:430px;overflow:hidden;background:#f2ead7 url('/static/art/world-day.png') center/cover;border-radius:28px;isolation:isolate}
+.home-lumi .hero-copy{position:relative;z-index:3;background:#fffefbdc;border-radius:20px;padding:20px;max-width:330px;backdrop-filter:blur(6px)}
+.home-lumi .lumi-art{z-index:2;align-self:end;margin-bottom:4px}
+.world-cabinet{position:absolute;right:0;bottom:0;width:170px;z-index:0;pointer-events:none}
+.world-plant{position:absolute;left:0;bottom:0;width:105px;z-index:1;pointer-events:none}
+.birth-egg.has-art{border:0;background:transparent;box-shadow:none;overflow:visible;border-radius:0}
+.has-art .birth-crack{display:none}
+.egg-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity 1.4s ease}
+.egg-rest{opacity:1}
+[data-stage="1"] .egg-fine,[data-stage="2"] .egg-fine,[data-stage="3"] .egg-fine{opacity:1}
+[data-stage="2"] .egg-deep,[data-stage="3"] .egg-deep{opacity:1}
+[data-stage="3"] .egg-open{opacity:1}
+@media(max-width:700px){.home-lumi{min-height:500px}.home-lumi .hero-copy{padding:16px;max-width:none}.home-lumi .lumi-art{height:255px;width:255px}.world-cabinet{width:125px}}
+@media(prefers-reduced-motion:reduce){.egg-layer{transition-duration:.4s}}
+
+#audio-preferences summary{cursor:pointer;font-size:14px}#audio-preferences[open]{position:absolute;right:16px;top:12px;z-index:40;background:#fffefb;border:1px solid #ddd;border-radius:14px;padding:14px;max-width:280px;box-shadow:0 8px 28px #33443122}
+
+#account-button{width:auto;min-width:44px;height:40px;padding:0 12px;border-radius:999px;white-space:nowrap;font-size:13px}#audio-preferences summary{white-space:nowrap}

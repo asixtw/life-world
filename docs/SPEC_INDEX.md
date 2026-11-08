@@ -1,5 +1,7 @@
 # 共同規格入口
 
+> 2026-11-08 Owner最新範圍：首次公開版包含核心人物理解／劇場、美術核准接入、聲音v0.2規劃及獨立開關。先讀[公開完成矩陣](testing/PUBLIC_RELEASE_MATRIX.md)，不再沿用先凍結核心劇場的發布範圍。RC v3保留；新程式為本機候選，不能當已公開／已部署。
+
 > **2026-11-05 最新共同基準：**[Public Alpha工程交付](RELEASE_PUBLIC_ALPHA_20261105.md)。預建登入獨立開關、無自由註冊；積分保留但無兌換，優先於下方歷史敘述。工程與雲端交付狀態分開驗收。
 
 > **2026-10-29 封測定稿 v1.0：**先讀[完整流程與驗收基準](team/BETA_FLOW_SPEC.md)。封測不做養分／積分／兌換獎勵；保留完成紀念與未達成旅程摘要，人物及來源不刪。劇場同時提供私人演練與示範情境；真實語音與圖片辨識均為封測門檻。下列長期製作項不全是封測必須整合項。
@@ -65,3 +67,5 @@ App 儲存庫外的原型與完整工作區沒有隨這次提交上傳；共同�
 - [首頁三習慣摘要與驗收](HOME_HABIT_OVERVIEW.md)：首頁單一挑戰、精確用量及下一安排；[來源包](team/home-habits/README.md)。
 
 - [本批發布審查與未驗證事項](RELEASE_HOME_HABITS_20261103.md)。
+
+- [公開候選統一進度](PUBLIC_RELEASE_ROADMAP.md)／[Alpha 02單一交易探針與執行指引](database/alpha-02-rehearsal-2026-11-08/02_EXECUTION_GUIDE.md)（2026-11-08最新Owner決策）：保留原始02，先探針、ROLLBACK與快照驗證，再同一Studio正式COMMIT；不重跑已PASS的01/01B或OAuth Origin。

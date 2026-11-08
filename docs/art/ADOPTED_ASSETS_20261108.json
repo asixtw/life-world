@@ -1,0 +1,155 @@
+{
+  "authorization": "Owner delegated selection/adaptation/creation 2026-11-08",
+  "assets": [
+    {
+      "id": "image-03",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-idle-candidate-v1.png",
+      "target": "app/static/art/lumi-idle.png",
+      "sha256": "0c06a2a7809ccf8321d8fb0efd7da4fcb8d9d8c28af217449ef8a0be3bc07481",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-06",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/lumi-poses-candidate-20261029/originals/lw-lumi-welcome-candidate-v1.png",
+      "target": "app/static/art/lumi-welcome.png",
+      "sha256": "105df8498ba9a508891b3e55a254d085a8cd2ec9caae2e0e449191586d0b1471",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-10",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/shared-art/additions-20261029/originals/lw-egg-shellsplit-v2.png",
+      "target": "app/static/art/egg-open.png",
+      "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-13",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-deepcrack-v1.png",
+      "target": "app/static/art/egg-deep.png",
+      "sha256": "87585e05a376269141b31d83243d9bca7e1c22e04a5e4c5681407043b4b63f5c",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-14",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-initialcrack-v1.png",
+      "target": "app/static/art/egg-fine.png",
+      "sha256": "f7682e3e0a433f857cbaba01b52a804d4d1cb02c5ff882796ecf2307cf3ce1f6",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-15",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-egg-rest-v1.png",
+      "target": "app/static/art/egg-rest.png",
+      "sha256": "6bb5e377dbaf40367ff8726394e944dc7489b47bd21d36561fd9ff1cb4eb09a3",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-12",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/shared-art/lifeworld-fullkit-shared-art/originals/lw-app-icon-v1.png",
+      "target": "app/static/art/app-icon.png",
+      "sha256": "e5beb459afe15afdbbafc522f6bcdfc5788318914086583854e9512566df8563",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-20",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/world-candidates-20261029/layers/foreground-plant.png",
+      "target": "app/static/art/plant.png",
+      "sha256": "f5bfce9b4d0105542424be953e6d8bbe397eb4ba7f866d74afd16ecfef1e7824",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-21",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/world-candidates-20261029/layers/furniture-cabinet.png",
+      "target": "app/static/art/cabinet.png",
+      "sha256": "207cb4692b198a7b97e7c9d82f9a16b4d89cfc66a41974bec032837d97a13d36",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "image-24",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/world-candidates-20261029/originals/room-day-base.png",
+      "target": "app/static/art/world-day.png",
+      "sha256": "efeddddb8587f6a796166670ec2d4e1b1ef215524b3b94412b18e659cbe91ec3",
+      "adopted_by": "Owner delegated selection 2026-11-08"
+    },
+    {
+      "id": "ui-tap-01",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/audio-candidates/wav/ui-tap-01.wav",
+      "target": "app/static/audio/ui-tap.wav",
+      "sha256": "02eea828728dd0a01a2a5390adb37380c69910ffed3cf6747b5ec0fbeca0e476"
+    },
+    {
+      "id": "draft-saved-01",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/audio-candidates/wav/draft-saved-01.wav",
+      "target": "app/static/audio/draft-saved.wav",
+      "sha256": "9b0c8a1c377da8bd35f82c4e75c40d5b9c1d25ed2517ad69e4bfefca6308b057"
+    },
+    {
+      "id": "experience-confirmed-01",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/audio-candidates/wav/experience-confirmed-01.wav",
+      "target": "app/static/audio/experience-confirmed.wav",
+      "sha256": "f0fcb6938cfca0f37bb23e222650337fb1d21e4c6cf5d018a42076704fd6476c"
+    },
+    {
+      "id": "first-hatch-01",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/audio-candidates/wav/first-hatch-01.wav",
+      "target": "app/static/audio/first-hatch.wav",
+      "sha256": "5963b2378b4e1cf41f4c7eca01899b9b3283ba1b240a3a9fb13f5768aecdf5cc"
+    },
+    {
+      "id": "goal-completed-01",
+      "kind": "existing_unchanged",
+      "source": "collaboration/ui-kit/assets/audio-candidates/wav/goal-completed-01.wav",
+      "target": "app/static/audio/goal-completed.wav",
+      "sha256": "ac0b3b5197abe5a1709c95caa4ffa62d7ca5747c3eb400b0ba5a54f1d83efc8a"
+    },
+    {
+      "id": "login-bgm",
+      "kind": "new_procedural_original",
+      "method": "deterministic sine/pad/pluck composition, not AI",
+      "target": "app/static/audio/login-bgm.wav",
+      "sha256": "4a3edf07dfb5a2dfc9500f11bac92c7042774a54bfb9b1ab5e6065b04fa2a85a",
+      "duration_seconds": 16,
+      "sample_rate": 24000,
+      "rms_dbfs": -28.73,
+      "peak_dbfs": -16.64
+    },
+    {
+      "id": "goals-bgm",
+      "kind": "new_procedural_original",
+      "method": "deterministic sine/pad/pluck composition, not AI",
+      "target": "app/static/audio/goals-bgm.wav",
+      "sha256": "1ae116ee90928f2344373656444dd6ff3868953a8cb15646349c5586f16b4d61",
+      "duration_seconds": 16,
+      "sample_rate": 24000,
+      "rms_dbfs": -28.73,
+      "peak_dbfs": -17.33
+    },
+    {
+      "id": "world-bgm",
+      "kind": "new_procedural_original",
+      "method": "deterministic sine/pad/pluck composition, not AI",
+      "target": "app/static/audio/world-bgm.wav",
+      "sha256": "0c851a6a6176bd37261d6582c0853e4f2552924c71467f8df617e067663c0403",
+      "duration_seconds": 16,
+      "sample_rate": 24000,
+      "rms_dbfs": -28.73,
+      "peak_dbfs": -16.66
+    }
+  ],
+  "new_image_generation": false,
+  "new_model_calls": 0
+}

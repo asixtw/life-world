@@ -27,7 +27,7 @@ def prepared(tmp_path):
         app.state.service.clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc)
         me,g=onboard(client);register(client)
         provider=Provider(json.dumps({'summary':'合成整理','tasks':['合成後續']}))
-        settings=AISettings(provider='gemini',model='gemini-synthetic',approved=True,max_owner_daily_calls=2,max_global_calls=3,reservation_microusd=100,max_budget_microusd=300)
+        settings=AISettings(provider='gemini',model='gemini-synthetic',approved=True,max_total_budget_microusd=10000,max_owner_daily_calls=2,max_global_calls=3,reservation_microusd=100,max_budget_microusd=300)
         runtime=AIRuntime(app.state.service,settings,provider=provider)
         yield app,client,me,g,runtime,provider
 
@@ -125,7 +125,7 @@ def test_usage_receipt_records_only_bounded_metadata(prepared):
     receipt=json.loads(row['response'])
     assert receipt['input_tokens']==3 and receipt['output_tokens']==4
     assert receipt['cost_microusd'] is None
-    assert set(receipt)=={'created_at','status','cost_microusd','input_tokens','output_tokens'}
+    assert set(receipt)=={'created_at','status','provider','model','provider_request_id','cost_microusd','input_tokens','output_tokens','http_status'}
     assert '不應留存' not in row['response'] and '合成整理' not in row['response']
 
 
@@ -194,3 +194,36 @@ def test_concurrent_reservations_do_not_overrun_global_daily_cap(prepared):
     assert len(p.calls)==3
     with app.state.service.db.connect() as db:
         assert db.execute("SELECT count(*) AS n FROM requests WHERE operation='ai_attempt_v1'").fetchone()['n']==3
+
+
+def test_theater_prompt_requires_character_voice_instead_of_narrator(prepared):
+    """真實評測曾回解說口吻；契約要求角色直接回話，替身不證明生成品質。"""
+    app,c,me,g,runtime,p=prepared
+    p.text=json.dumps({'utterance':'可以先給我一份簡短議程嗎？'})
+    result=runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':[],'message':'合成邀請練習'})
+    assert result['applied'] is False
+    assert '第一人稱' in p.calls[0]['system']
+    assert '不要替使用者詢問是否合適' in p.calls[0]['system']
+
+
+def test_simulation_contract_keeps_conflicts_and_unknowns_explicit(prepared):
+    """只驗證提示契約與不自動保存；不把預設替身台詞當成模型品質通過。"""
+    app,c,me,g,runtime,p=prepared
+    facts=[{'fact_id':'f1','value':'合成人物喜歡電話','source_experience_ids':['s1']},{'fact_id':'f2','value':'合成人物不喜歡電話','source_experience_ids':['s2']}]
+    p.text=json.dumps({'utterance':'這部分我還不確定，可以再確認嗎？'})
+    before=c.get('/api/state').json();runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':facts,'message':'合成未知情境'})
+    prompt=p.calls[-1]
+    assert prompt['case']['confirmed_facts']==facts
+    assert '來源互相矛盾' in prompt['system'] and '承認不知道' in prompt['system']
+    assert c.get('/api/state').json()==before
+
+
+def test_fragment_person_hints_require_exact_original_evidence(prepared):
+    app,c,me,g,runtime,p=prepared
+    raw='嗯，今天去拜訪小林，小林說不吃辣。下週再傳菜單，時間還沒訂。'
+    p.text=json.dumps({'summary':'拜訪小林，得知他不吃辣；下週傳菜單的時間待確認。','tasks':['確認下週傳菜單時間'],'people':[{'person_name':'小林','dimension':'food','value':'不吃辣','evidence_type':'stated_by_person','source_quote':'小林說不吃辣'},{'person_name':'小林','dimension':'habits','value':'外向','evidence_type':'observed_by_user','source_quote':'小林說不吃辣'},{'person_name':'不存在的人','dimension':'food','value':'吃辣','evidence_type':'stated_by_person','source_quote':'他喜歡吃辣'}]})
+    before=c.get('/api/state').json()
+    result=runtime.generate(me['owner_id'],'experience',{'raw_text':raw})
+    assert len(result['people'])==1 and result['people'][0]['value']=='不吃辣'
+    assert c.get('/api/state').json()==before
+    with app.state.service.db.connect() as db:assert db.execute('SELECT count(*) AS n FROM person_facts').fetchone()['n']==0

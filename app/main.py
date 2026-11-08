@@ -31,6 +31,9 @@ logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的�
 
 def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None, iap_verifier=None, google_verifier=None):  # PG factory 不執行 DDL
     settings = settings or getattr(database, 'settings', None) or RuntimeSettings.from_env()
+    # 尚未通過資料Gate的公開候選不掛載或啟動任何AI／建帳流程。
+    if settings.public_gate_closed and (os.environ.get('LIFEWORLD_AI_CALLS_APPROVED')=='true' or os.environ.get('LIFEWORLD_AI_API_KEY') or os.environ.get('LIFEWORLD_TEST_ACCOUNT_SEED')):
+        raise ValueError('Closed public gate must not mount private AI/account credentials')
     policy = policy or DemoPolicy()
     if settings.secure_cookies:
         policy = replace(policy, secure_cookies=True)
@@ -67,11 +70,19 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         from .external_auth import ExternalAuth
         app.state.external_auth = ExternalAuth(service,google_verifier or GoogleVerifier(settings.google_client_id),limiter)
     app.state.settings = settings
+    if os.environ.get('LIFEWORLD_TEST_ACCOUNT_SEED'):
+        import json
+        from .test_account import provision
+        provision(service,settings,json.loads(os.environ['LIFEWORLD_TEST_ACCOUNT_SEED']))
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
     from .ai_routes import install as install_ai_routes
+    from .relationship_memory import install as install_memory
+    install_memory(app)
     install_ai_routes(app)  # 保留既有GIS/IAP邊界；僅組裝預設停用的AI候選。
-    app.add_middleware(media.MediaBodyLimit, max_bytes=policy.max_upload_bytes + 65536)
+    audio_max_bytes=int(os.environ.get('LIFEWORLD_AUDIO_MAX_BYTES',str(policy.max_upload_bytes)))
+    if not 1<=audio_max_bytes<=64*1024*1024:raise ValueError('Audio capacity must be bounded to 64MiB')
+    app.add_middleware(media.MediaBodyLimit, max_bytes=max(policy.max_upload_bytes,audio_max_bytes) + 65536)
     if settings.access_mode=='public_alpha':app.add_middleware(AlphaBodyLimit)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts))
 
@@ -92,6 +103,15 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.middleware('http')  # 註冊此 HTTP 路由、例外處理器或中介層
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
+        if settings.public_gate_closed:
+            # 在限流、身分或業務處理之前封閉，確保公開請求不會連接DB。
+            safe=request.method in ('GET','HEAD') and (request.url.path in ('/','/health','/ready','/api/health','/api/capabilities') or request.url.path.startswith('/static/'))
+            if request.url.path=='/api/auth/me' and request.method=='GET':
+                return JSONResponse({'error':{'code':'unauthenticated','message':'尚未登入。'}},status_code=401,headers={'Cache-Control':'no-store'})
+            if not safe:
+                # 尚未登入的私人API回401；登入建立入口則明示環境Gate尚未完成。
+                private_api=request.url.path.startswith('/api/') and not request.url.path.startswith('/api/auth/')
+                return JSONResponse({'error':{'code':'unauthenticated' if private_api else 'release_gate_closed','message':'私人世界尚待資料保存與登入驗收，暫不接受資料或AI操作。'}},status_code=401 if private_api else 503,headers={'Cache-Control':'no-store'})
         # IAP只保護入口，App仍須原有Session／CSRF；只有GET/HEAD健康探針豁免。
         if settings.auth_source_mode=='iap' and not (request.method in ('GET','HEAD') and request.url.path in ('/health','/ready')):
             tokens=request.headers.getlist('x-goog-iap-jwt-assertion')
@@ -101,35 +121,48 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 request.state.lw_iap_subject=await run_in_threadpool(app.state.iap_verifier.verify,tokens[0])
             except DomainError as exc:
                 return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers={'Cache-Control':'no-store'})
-        if settings.google_client_id and request.url.path in ('/api/auth/claim','/api/auth/login'):
-            return JSONResponse({'error':{'code':'google_only','message':'本輪請使用Google登入，訪客仍可繼續。'}},status_code=403,headers={'Cache-Control':'no-store'})
+        # 登入／註冊管道由明確政策控制，Google只是其中一種身分來源。
+        if request.url.path=='/api/auth/claim' and not settings.registration_enabled:
+            return JSONResponse({'error':{'code':'registration_unavailable','message':'目前未開放一般帳密註冊，訪客仍可繼續。'}},status_code=403,headers={'Cache-Control':'no-store'})
+        if request.url.path=='/api/auth/login' and not settings.password_login_available:
+            return JSONResponse({'error':{'code':'password_login_unavailable','message':'帳密登入尚未啟用，請使用已開放的登入方式。'}},status_code=403,headers={'Cache-Control':'no-store'})
         if settings.access_mode=='public_alpha' and request.method not in ('GET','HEAD','OPTIONS'):
-            blocked=request.url.path in ('/api/auth/claim','/api/media/recognize') or '/evidence' in request.url.path
-            blocked=blocked or (request.url.path=='/api/auth/login' and not settings.alpha_login_enabled)
+            blocked=request.url.path=='/api/auth/claim'
+            blocked=blocked or (request.url.path=='/api/auth/login' and not (settings.alpha_login_enabled or settings.test_login_usernames))
             if blocked:
                 return JSONResponse({'error':{'code':'alpha_feature_unavailable','message':'本輪Alpha尚未開放此功能；帳號登入需由管理者啟用。'}},status_code=403,headers={'Cache-Control':'no-store'})
-        if settings.access_mode=='public_alpha' and request.method in ('POST','PUT','PATCH','DELETE') and request.url.path.startswith('/api/') and request.url.path!='/api/auth/logout':
+        if request.url.path=='/api/media/recognize' and request.method=='POST':
+            try:
+                media_user,_=service.session(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),True)
+                require_registered(media_user)
+            except DomainError as exc:
+                return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers={'Cache-Control':'no-store'})
+        if settings.access_mode=='public_alpha' and request.method in ('POST','PUT','PATCH','DELETE') and request.url.path.startswith('/api/') and not request.url.path.startswith('/api/auth/'):
             try:
                 source=limiter.source(request)
                 def source_write_gate():
                     with service.db.connect(write=True) as c:
-                        return limiter.take(c,'alpha_owner_writes','source-write:'+source,settings.alpha_source_writes,3600)
+                        return limiter.take(c,'alpha_owner_writes',('v2:global-write' if settings.auth_source_mode=='shared' else 'source-write:'+source),max(settings.alpha_source_writes,settings.alpha_global_writes) if settings.auth_source_mode=='shared' else settings.alpha_source_writes,3600)
                 error=await run_in_threadpool(source_write_gate)
                 if error:raise error
             except DomainError as exc:
                 return JSONResponse({'error':{'code':exc.code,'message':exc.message}},status_code=exc.status,headers=getattr(exc,'headers',{'Cache-Control':'no-store'}))
         # 未核准的 Cloud Run revision 只供健康／連線驗證，不接業務讀寫。
-        if not settings.business_enabled and request.url.path not in ('/health', '/ready', '/api/health'):
+        if not settings.business_enabled and not settings.public_gate_closed and request.url.path not in ('/health', '/ready', '/api/health'):
             return JSONResponse({'error': {'code': 'business_api_disabled', 'message': '此服務尚未開放業務操作。'}}, status_code=503)
         if request.url.path == '/api/media/recognize':
             # 在 multipart 解析前限制一般已知長度請求，路由內另有串流讀取上限。
             length = request.headers.get('content-length', '')
-            if length.isdigit() and int(length) > policy.max_upload_bytes + 65536:
+            if length.isdigit() and int(length) > max(policy.max_upload_bytes,audio_max_bytes) + 65536:
                 return JSONResponse({'error': {'code': 'upload_too_large', 'message': '素材超過目前本機傳輸上限。'}}, status_code=413)
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):  # 依目前條件選擇下一步處理分支
             origin = request.headers.get('origin')  # 保存「origin」供後續驗證或回傳使用
             expected = settings.external_origin or str(request.base_url).rstrip('/')
-            if origin and origin != expected:  # 依目前條件選擇下一步處理分支
+            # Tag額外來源只授權同一個實際請求Host，不能跨允許來源送出寫入；OAuth仍只用external_origin。
+            # Cloud Run在TLS終止後使用內部HTTP，不能依內部scheme判斷瀏覽器Origin，也不信任X-Forwarded-*。
+            same_authority = not origin or origin.split('://', 1)[-1] == request.url.netloc
+            allowed = (expected,) + settings.write_origins
+            if origin and (origin not in allowed or (settings.write_origins and not same_authority)):
                 return JSONResponse({'error': {'code': 'origin_rejected', 'message': '不允許跨來源寫入。'}}, status_code=403)  # 回傳檢查寫入來源並加入安全與快取標頭的結果
         response = await call_next(request)  # 保存「response」供後續驗證或回傳使用
         response.headers['X-Content-Type-Options'] = 'nosniff'  # 設定回應的安全或快取標頭
@@ -141,8 +174,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
             response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"  # Blob 音訊只供使用者主動試聽，不自動播放。
         if request.url.path=='/' and settings.google_client_id:
+            # GIS需跨來源Origin Referer；只送Origin，不送私人路徑或查詢字串。
+            response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
             csp=response.headers['Content-Security-Policy']
-            csp=csp.replace("script-src 'self'","script-src 'self' https://accounts.google.com/gsi/client").replace("style-src 'self'","style-src 'self' https://accounts.google.com/gsi/style").replace("connect-src 'self'","connect-src 'self' https://accounts.google.com/gsi/")
+            csp=csp.replace("script-src 'self'","script-src 'self' https://accounts.google.com/gsi/client").replace("style-src 'self'","style-src 'self' 'sha256-RU4sU0AaS8IBGZx8XrGt/pa9A5SLA3dQszGeqT5L3Kw=' https://accounts.google.com/gsi/style").replace("connect-src 'self'","connect-src 'self' https://accounts.google.com/gsi/")
             response.headers['Content-Security-Policy']=csp+"; frame-src https://accounts.google.com/gsi/"
             response.headers['Cross-Origin-Opener-Policy']='same-origin-allow-popups'
         return response  # 回傳檢查寫入來源並加入安全與快取標頭的結果
@@ -155,7 +190,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         """傳回實際可用能力與傳輸護欄，不把本機設定宣稱為正式素材政策。"""
         user = current(request)
         return {'recognition_available': user['status']=='registered' and (app.state.ai_runtime.enabled or app.state.media_provider is not None),
-                'max_bytes': policy.max_upload_bytes, 'server_retention': 'none',
+                'max_bytes': min(policy.max_upload_bytes,app.state.ai_runtime.settings.max_media_bytes) if app.state.ai_runtime.enabled else policy.max_upload_bytes, 'audio_max_bytes': audio_max_bytes, 'server_retention': 'none',
                 'image_types': list(media.IMAGE_TYPES), 'audio_types': list(media.AUDIO_TYPES)}
 
     @app.post('/api/media/recognize', tags=['Media'])
@@ -168,8 +203,25 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             require_registered(user)
             with service.db.connect() as connection:
                 service._onboarded(connection, user['id'])
-            content = await file.read(policy.max_upload_bytes + 1)
-            mime = media.validate_media(kind, file.filename, file.content_type, content, policy.max_upload_bytes)
+            if kind=='audio' and app.state.ai_runtime.enabled:
+                mime=(file.content_type or '').split(';')[0].lower()
+                require(mime in media.AUDIO_TYPES,415,'unsupported_media','請選取支援的音訊格式。')
+                require(file.size is not None and 0<file.size<=audio_max_bytes,413,'upload_too_large','音訊超過傳輸容量；素材仍保留。')
+                from .audio_transcription import transcribe
+                from threading import Event
+                cancelled=Event()
+                async def watch_disconnect():
+                    while True:
+                        if await request.is_disconnected():cancelled.set();return
+                        await asyncio.sleep(.25)
+                watcher=asyncio.create_task(watch_disconnect())
+                try:
+                    return await run_in_threadpool(transcribe,app.state.ai_runtime,user['id'],file.file,mime,audio_max_bytes,cancelled)
+                finally:
+                    cancelled.set();watcher.cancel()
+            image_limit=min(policy.max_upload_bytes,app.state.ai_runtime.settings.max_media_bytes) if app.state.ai_runtime.enabled else policy.max_upload_bytes
+            content = await file.read(image_limit + 1)
+            mime = media.validate_media(kind, file.filename, file.content_type, content, image_limit)
             try:
                 if app.state.ai_runtime.enabled:
                     return await asyncio.wait_for(run_in_threadpool(app.state.ai_runtime.recognize,user['id'],kind,mime,content),timeout=30)
@@ -188,7 +240,11 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         # 入口必須由明確啟用的公開OAuth契約配置，沒有client即fail-closed。
         if app.state.external_auth is None:raise DomainError(503,'google_not_configured','Google登入尚未設定，訪客仍可繼續。')
         expected=settings.external_origin or str(request.base_url).rstrip('/')
-        if request.headers.get('origin')!=expected:raise DomainError(403,'origin_rejected','請從本站重新開始登入。')
+        # GIS與一般寫入使用同一精確Tag白名單；仍必須有Origin，不變更Google audience或IAP audience。
+        origin=request.headers.get('origin')
+        same_authority=bool(origin) and origin.split('://',1)[-1]==request.url.netloc
+        if origin not in ((expected,)+settings.write_origins) or (settings.write_origins and not same_authority):
+            raise DomainError(403,'origin_rejected','請從本站重新開始登入。')
         try:
             with service.db.connect() as c:c.execute('SELECT provider,issuer,subject,owner_id,created_at FROM external_identities LIMIT 0')
         except Exception:raise DomainError(503,'google_schema_not_ready','Google登入尚未完成設定，訪客資料會保留。') from None
@@ -214,9 +270,15 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.get('/ready', tags=['System'])
     def readiness():
+        if settings.public_gate_closed:
+            return JSONResponse({'status':'unavailable','reason':'release_gates_pending'},status_code=503,headers={'Cache-Control':'no-store'})
         try:
             service.db.check_ready()
             limiter.ready(service.db)
+            if app.state.feature_store is not None:
+                with service.db.connect() as c:
+                    c.execute('SELECT owner_id FROM relationship_features LIMIT 0')
+                    c.execute('SELECT owner_id FROM relationship_memory_preferences LIMIT 0')
             if settings.google_client_id:
                 with service.db.connect() as c:
                     c.execute('SELECT provider,issuer,subject,owner_id,created_at FROM external_identities LIMIT 0')
@@ -228,11 +290,15 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     @app.get('/api/capabilities',tags=['Identity'])
     def capabilities():
+        if settings.public_gate_closed:
+            return {'access_mode':settings.access_mode,'public_gate_closed':True,'accounts_available':False,'password_login_available':False,'registration_available':False,'media_available':False,'google_login_available':False,'ai_available':False,'ai_status':'release_gates_pending','writes_available':False,'points':'accumulation_only','redemption_available':False}
         """公開模式說明不含憑證／內部資料；UI與後端共用範圍。"""
         alpha=settings.access_mode=='public_alpha'
-        return {'access_mode':settings.access_mode,'accounts_available':not alpha or settings.alpha_login_enabled,
-                'registration_available':not alpha,
-                'media_available':False if alpha else app.state.ai_runtime.enabled or app.state.media_provider is not None,
+        return {'access_mode':settings.access_mode,'accounts_available':settings.password_login_available,
+                'password_login_available':settings.password_login_available,
+                'registration_available':not alpha and settings.registration_enabled,
+                'media_available':app.state.ai_runtime.enabled or app.state.media_provider is not None,
+                'relationship_memory_available':app.state.feature_store is not None,
                 'google_login_available':bool(settings.google_client_id),'ai_available':app.state.ai_runtime.enabled,
                 'ai_status':'configured_not_verified' if app.state.ai_runtime.enabled else 'not_configured','writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
@@ -272,7 +338,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 if exc.status != 401:  # 依目前條件選擇下一步處理分支
                     raise  # 中止目前操作並向呼叫端傳遞錯誤
         try:
-            result, token = service.login(data, request.cookies.get('lw_session'),limiter=limiter,request=request,registered_only=settings.access_mode=='public_alpha')  # 核對密碼並建立工作階段，不合併訪客資料
+            result, token = service.login(data, request.cookies.get('lw_session'),limiter=limiter,request=request,registered_only=True,allowed_usernames=settings.test_login_usernames or None)  # 核對密碼並建立工作階段，不合併訪客資料
         except DomainError:raise
         except Exception:raise protection_unavailable() from None
         cookie(response, token)  # 設定不可由 JavaScript 讀取的工作階段 Cookie

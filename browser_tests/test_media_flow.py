@@ -20,6 +20,10 @@ def prepare(page):
         'deadline': (today + timedelta(days=40)).isoformat(),
         'actions': [{'title': name, 'dates': [today.isoformat()]} for name in ['閱讀', '整理', '分享']]})
     assert result.status == 201
+    # 辨識只供已註冊帳號；測試密碼執行期產生，不落盤。
+    import secrets
+    claimed=page.request.post(BASE+'/api/auth/claim',headers=headers,data={'username':'media_'+secrets.token_hex(6),'password':secrets.token_urlsafe(24)})
+    assert claimed.status==200
     page.goto(BASE + '/#record')
     page.reload()  # API 準備後重新載入身分，避免只改 hash 沿用匿名頁面的記憶體狀態。
     expect(page.locator('#record-form')).to_be_visible()

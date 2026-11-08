@@ -4,6 +4,7 @@
 """
 import json
 import re
+from urllib.error import HTTPError
 from .ai_provider_http import https_transport
 from .ai_provider_base import EvalError,ModelResult
 
@@ -51,5 +52,8 @@ class GeminiProvider:
             if out is not None:out+=thoughts or 0
             # API未直接提供帳單金額，不能捏造0；評測庫持續占用核准的預留額。
             return ModelResult(text,prompt_tokens,out,None,data.get('responseId'))
+        except HTTPError as exc:
+            error=EvalError('provider_http_error');error.http_status=exc.code
+            raise error from None
         except EvalError:raise
         except Exception:raise EvalError('provider_failed') from None
