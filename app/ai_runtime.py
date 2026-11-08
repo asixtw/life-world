@@ -79,7 +79,7 @@ class AIRuntime:
                 # 僅加總成本預留metadata，包含失敗/費用未知；與滾動24h次數額度分開。
                 value="(response::jsonb->>'reservation_microusd')::bigint" if self.service.db.backend=='postgresql' else "json_extract(response,'$.reservation_microusd')"
                 total=c.execute(f"SELECT COALESCE(sum({value}),0) AS used FROM requests WHERE operation='ai_attempt_v1'").fetchone()['used']
-                require(total+s.reservation_microusd<=s.max_total_budget_microusd,429,'ai_total_budget_reached','測試期 AI 總預算已達上限，請聯絡管理者；原始紀錄仍可手動編輯。')
+                require(int(total)+s.reservation_microusd<=s.max_total_budget_microusd,429,'ai_total_budget_reached','測試期 AI 總預算已達上限，請聯絡管理者；原始紀錄仍可手動編輯。')
             request_id=str(uuid4());receipt={'operation':operation,'created_at':now.isoformat(),'reservation_microusd':s.reservation_microusd}
             c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_attempt_v1',request_id,fingerprint,json.dumps(receipt)))
         return request_id
@@ -95,6 +95,12 @@ class AIRuntime:
         elif operation=='media':prompt['system']+='音訊只轉錄確實聽到的語句，不摘要或補寫；沒有語音時回傳[無可辨識語音]。忠實擷取可辨識文字；不確定內容明示未知；名片逐行列姓名、公司、職稱、聯絡方式，不猜測。回傳 {"text":"待校對文字"}。'
         else:prompt['system']+='回傳 {"summary":"待編輯摘要","tasks":["可選後續任務"]}；每項任務不超過300字，提出具體可執行的下一步（動作與產出／時間）；不要建議「確認是否記錄」或僅複述已完成事項。資訊不足時回空tasks，不猜測承諾。'
         if inline_media:prompt['inline_media']=inline_media
+        # 記憶開啟後只讀經來源重驗的有限特徵；模擬輸出永遠不是特徵來源。
+        import os
+        if operation!='media' and os.environ.get('LIFEWORLD_RELATIONSHIP_MEMORY_ENABLED','false')=='true':
+            from .relationship_memory import FeatureStore
+            prompt['case']={**case,'personalization_memory':FeatureStore(self.service).context(owner,case.get('person_id'))}
+            require(len(json.dumps(prompt['case'],ensure_ascii=False).encode())<=self.settings.max_input_bytes,413,'ai_input_too_large','有效記憶與本次資料超過容量；請縮小所選來源。')
         fingerprint=hashlib.sha256((operation+'\0'+encoded).encode()).hexdigest();request_id=self.reserve(owner,operation,fingerprint)
         try:
             result=self.provider.generate(prompt,self.settings.max_output_tokens)

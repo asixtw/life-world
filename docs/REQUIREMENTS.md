@@ -47,3 +47,7 @@ Python + FastAPI、SQLite、純 HTML/CSS/JavaScript，無 Node 建置需求。�
 
 ### 首頁三習慣摘要（2026-11-03 本輪）
 世界首頁集中目前挑戰與三個緊湊習慣列；數字讀後端精確字串、下次安排依目標時區。待回顧優先回顧但保留記錄入口，不更改採計。首頁不顯示積分；完整範圍及限制見 [HOME_HABIT_OVERVIEW](HOME_HABIT_OVERVIEW.md)。
+
+## 2026-11-08 Owner MVP P0更新
+
+Google、真Gemini摘要與任務、語音、原版UI，以及Hidden Relationship Intelligence均為MVP P0。四類特徵需持久保存、來源可追溯、跨Owner隔離、版本與撤回傳播；使用者可修正、停用與刪除。劇場台詞不成為正式事實或訓練集。實作與線上狀態見[記憶契約](RELATIONSHIP_MEMORY_CONTRACT.md)，不得以人物卡或API存在代替驗收。

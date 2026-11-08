@@ -11,3 +11,10 @@
 |公開主流量切換|NOT RUN|新lw-public-alpha-dc471d2為0%，舊entry-6fd3725仍100%；Staging不變|
 
 [實際版本與驗收收據](GUEST_ALPHA_LIVE_ACCEPTANCE.md)。Source Commit dc471d2fd02d2686576fd19b7971fc8a3e5b1c6f，Image sha256:4235181863fe65f0fa99c9a9bac94a583171d1a4290f7ed438d800a055e86396。
+
+## 2026-11-08 MVP P0整合更新
+
+- 原版共用UI已部署lw-public-ui-7907691；主網址Guest與測試帳號Chromium PASS。
+- 真AI／語音候選9b02b45發現PG預算sum字串型別錯誤，正在修正；尚未切主流量。
+- Google Client ID已核對，27項安全回歸PASS；真Google瀏覽器登入仍NOT RUN。
+- [Hidden Relationship Intelligence](RELATIONSHIP_MEMORY_CONTRACT.md)正式列MVP P0。本機已開始持久化、撤回、跨Owner與登入測試；Alpha新表受完整還原Gate阻擋，不標線上PASS。

@@ -77,6 +77,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
     from .ai_routes import install as install_ai_routes
+    from .relationship_memory import install as install_memory
+    install_memory(app)
     install_ai_routes(app)  # 保留既有GIS/IAP邊界；僅組裝預設停用的AI候選。
     audio_max_bytes=int(os.environ.get('LIFEWORLD_AUDIO_MAX_BYTES',str(policy.max_upload_bytes)))
     if not 1<=audio_max_bytes<=64*1024*1024:raise ValueError('Audio capacity must be bounded to 64MiB')
@@ -265,6 +267,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         try:
             service.db.check_ready()
             limiter.ready(service.db)
+            if app.state.feature_store is not None:
+                with service.db.connect() as c:
+                    c.execute('SELECT owner_id FROM relationship_features LIMIT 0')
+                    c.execute('SELECT owner_id FROM relationship_memory_preferences LIMIT 0')
             if settings.google_client_id:
                 with service.db.connect() as c:
                     c.execute('SELECT provider,issuer,subject,owner_id,created_at FROM external_identities LIMIT 0')
@@ -284,6 +290,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 'password_login_available':settings.password_login_available,
                 'registration_available':not alpha and settings.registration_enabled,
                 'media_available':app.state.ai_runtime.enabled or app.state.media_provider is not None,
+                'relationship_memory_available':app.state.feature_store is not None,
                 'google_login_available':bool(settings.google_client_id),'ai_available':app.state.ai_runtime.enabled,
                 'ai_status':'configured_not_verified' if app.state.ai_runtime.enabled else 'not_configured','writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}

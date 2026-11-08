@@ -90,6 +90,6 @@ def install(app):
         with service.db.connect() as db:
             records=[dict(row) for ref in source_ids for row in db.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(ref,who)).fetchall()]
         context=build_context(facts,records,data.message,service.now().isoformat())
-        result=app.state.ai_runtime.generate(who,'simulation',{'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message})
+        result=app.state.ai_runtime.generate(who,'simulation',{'person_id':person_id,'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message})
         # 一般人物卡／對話UI不暴露內部雙端標籤；只回可解釋的來源與有限行為。
         return {**result,'simulation':True,'behavior':context['behavior'],'behavior_source':'rules','source_experience_ids':source_ids,'uncertainty':'simulation_not_prediction','notice':result['notice']+' 私人模擬，不是對真人反應的預測；不寫入人物事實。'}
