@@ -161,11 +161,11 @@ class AlphaDatabase:
 
 
 class AlphaBodyLimit:
-    """在解析前限制所有Alpha寫入本文，包括無Content-Length的串流。"""
+    """限制 JSON 寫入；媒體由獨立串流護欄負責，避免錄音誤套64KiB。"""
     def __init__(self,app,max_bytes=65536):self.app,self.max_bytes=app,max_bytes
 
     async def __call__(self,scope,receive,send):
-        if scope['type']!='http' or not scope['path'].startswith('/api/') or scope['method'] in ('GET','HEAD','OPTIONS'):
+        if scope['type']!='http' or not scope['path'].startswith('/api/') or scope['path']=='/api/media/recognize' or scope['method'] in ('GET','HEAD','OPTIONS'):
             return await self.app(scope,receive,send)
         from starlette.responses import JSONResponse
         chunks=[];size=0

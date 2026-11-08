@@ -24,30 +24,47 @@ class MediaBodyLimit:
     async def __call__(self, scope, receive, send):
         if scope['type'] != 'http' or scope['path'] != '/api/media/recognize':
             return await self.app(scope, receive, send)
-        parts, size = [], 0
-        while True:
-            message = await receive()
-            if message['type'] == 'http.disconnect':
-                return
-            content = message.get('body', b'')
-            size += len(content)
-            if size > self.max_bytes:
-                response = JSONResponse({'error': {'code': 'upload_too_large',
-                                                  'message': '素材超過目前本機傳輸上限。'}}, status_code=413)
-                return await response(scope, receive, send)
-            parts.append(content)
-            if not message.get('more_body', False):
-                break
-        consumed = False
+        size = 0
+        started = False
+        exceeded = False
+        rejected = False
+        from starlette.exceptions import HTTPException
+        class UploadLimitExceeded(HTTPException):
+            def __init__(self):
+                super().__init__(413, "素材超過目前傳輸容量；原素材仍保留於此裝置。")
 
         async def bounded_receive():
-            nonlocal consumed
-            if not consumed:
-                consumed = True
-                return {'type': 'http.request', 'body': b''.join(parts), 'more_body': False}
-            return await receive()
+            nonlocal size, exceeded
+            message = await receive()
+            if message['type'] == 'http.request':
+                size += len(message.get('body', b''))
+                if size > self.max_bytes:
+                    exceeded = True
+                    raise UploadLimitExceeded()
+            return message
 
-        return await self.app(scope, bounded_receive, send)
+        async def tracked_send(message):
+            nonlocal started, rejected
+            if exceeded:
+                # Starlette 可能先處理 HTTPException；統一保留既有 API 錯誤契約。
+                if not rejected:
+                    rejected = True
+                    await JSONResponse({'error': {'code': 'upload_too_large',
+                        'message': '素材超過目前傳輸容量；原素材仍保留於此裝置。'}}, status_code=413)(scope, receive, send)
+                return
+            if message['type'] == 'http.response.start':
+                started = True
+            await send(message)
+
+        try:
+            # 逐段傳入 multipart parser，讓 UploadFile 自行 spooling；不複製整個音檔到 RAM。
+            return await self.app(scope, bounded_receive, tracked_send)
+        except UploadLimitExceeded:
+            if started:
+                raise
+            response = JSONResponse({'error': {'code': 'upload_too_large',
+                'message': '素材超過目前傳輸容量；原始素材仍保留於此裝置。'}}, status_code=413)
+            return await response(scope, receive, send)
 
 
 class MediaProvider(Protocol):
