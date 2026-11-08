@@ -1,0 +1,16 @@
+{
+  "original_sha256": "e1ca757b9e7d46e22332c688d17743fef1b0973dfbb5166b45089d4c1ce55d35",
+  "original_preserved": true,
+  "commit_identical_to_original": true,
+  "rollback_only_change": "COMMIT; -> ROLLBACK;",
+  "probe_role": "lw_alpha_tx_probe_c2bb85cada267dd0",
+  "real_alpha_execution": "NOT_RUN_OWNER_STUDIO_ONLY",
+  "sql_files": {
+    "02_PRE_POST_VERIFY.sql": "8a5f72269d1ff7166e3f65111644df7d7c2c40a7588a9dbedaae3fe88a6aba0e",
+    "02_PUBLIC_ROLES_COMMIT.sql": "e1ca757b9e7d46e22332c688d17743fef1b0973dfbb5166b45089d4c1ce55d35",
+    "02_PUBLIC_ROLES_REVIEW.sql": "e1ca757b9e7d46e22332c688d17743fef1b0973dfbb5166b45089d4c1ce55d35",
+    "02_PUBLIC_ROLES_ROLLBACK.sql": "9b4edc30c887c14c215b43084f44d241ae309cef07b11e2ee082c03532ca529e",
+    "02_PUBLIC_SCHEMA_INVENTORY.sql": "6810c8e3b520622b6cae9dfd6ae1457c22eab5541140ad15f85438c257b6ae43",
+    "02_TRANSACTION_PROBE.sql": "bed4820586dae593bbf2f1a1fb2db0a17369e5bee1b609544bbc96948325d98d"
+  }
+}
