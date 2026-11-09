@@ -61,6 +61,9 @@ def test_assistant_failure_preserves_draft_and_manual_confirmation(app, client):
         def suggest(self, text):  # 建立可手動審閱的整理候選，不寫入正式事實
             raise TimeoutError('test provider timeout')  # 中止目前操作並向呼叫端傳遞錯誤
     _, goal = onboard(client); d = draft(client, goal)  # 完成訪客、Bio 與第一目標的測試前置流程
+    # 先保留Guest拒絕規則，再以註冊者驗證真正的Provider失敗退路。
+    assert client.post('/api/drafts/' + d['id'] + '/suggest').status_code == 403
+    register(client)
     app.state.service.assistant = Broken()  # 保存「app.state.service.assistant」供後續驗證或回傳使用
     assert client.post('/api/drafts/' + d['id'] + '/suggest').status_code == 503  # 核對 HTTP 狀態，避免失敗請求被當成成功
     assert client.get('/api/drafts/' + d['id']).json()['raw_text'] == d['raw_text']  # 斷言整理服務失敗仍保留原文且可手動確認的預期結果

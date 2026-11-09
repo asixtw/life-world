@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "decoder": "ffmpeg version 9.0 Copyright (c) 2000-2026 the FFmpeg developers",
+  "tests": [
+    {
+      "seconds": 2,
+      "input_bytes": 384044,
+      "segments": 1,
+      "frames": [
+        32000
+      ],
+      "original_preserved": true,
+      "draft_only": true
+    },
+    {
+      "seconds": 61,
+      "input_bytes": 11712044,
+      "segments": 3,
+      "frames": [
+        480000,
+        480000,
+        16000
+      ],
+      "original_preserved": true,
+      "draft_only": true
+    }
+  ],
+  "provider": "explicit fixture / zero real calls"
+}

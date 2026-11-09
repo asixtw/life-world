@@ -50,7 +50,7 @@ const GoalsUI = (() => { // 將建立草稿與回顧編輯狀態集中管理。
     const d=load(),i=d.step-2,a=d.actions[i],titles=['為目標取名','達成的樣子與期限','第一個重要習慣','第二個重要習慣','第三個重要習慣','檢查這次挑戰']; // 固定且清楚的步驟。
     let content=''; // 僅渲染目前步驟，避免長表單。
     if(d.step===0) content=`<div class="field"><label for="goal-title">目標名稱</label><input id="goal-title" name="title" required maxlength="160" value="${esc(d.title)}" placeholder="例如：完成第一個作品"></div>`; // 命名是第一個操作。
-    else if(d.step===1) content=`<div class="field"><label for="outcome">達成時會是什麼樣子？</label><textarea id="outcome" name="outcome" required maxlength="4000">${esc(d.outcome)}</textarea></div><div class="field"><label for="goal-deadline">挑戰截止日（必選）</label><input type="date" id="goal-deadline" name="deadline" required min="${today()}" value="${esc(d.deadline)}"><small>開始挑戰當天起算；截止日包含 ${esc(state.me.timezone)} 當地整天。</small></div>`; // 目標期限與月編輯週期分開。
+    else if(d.step===1) content=`<div class="field"><label for="outcome">達成時會是什麼樣子？</label><textarea id="outcome" name="outcome" required maxlength="4000">${esc(d.outcome)}</textarea></div><div class="field"><label for="goal-deadline">挑戰截止日（必選）</label><input type="date" id="goal-deadline" name="deadline" required min="${today()}" value="${esc(d.deadline)}"><small id="goal-date-help">開始日：${esc(today())}；截止日包含 ${esc(state.me.timezone)} 當地整天。請選日期或使用下方快捷設定。</small><div class="button-row space-top"><button type="button" class="secondary" data-gj="deadline-offset" data-days="7">一週後</button><button type="button" class="secondary" data-gj="deadline-offset" data-days="30">30 天後</button></div></div>`; // 目標期限與月編輯週期分開。
     else if(d.step<5) content=`<div class="field"><label for="action-title-${i}">習慣 ${i+1} 名稱</label><input id="action-title-${i}" required maxlength="160" value="${esc(a.title)}" placeholder="例如：閱讀、運動、主動聯繫"></div><details class="gj-quantity"><summary>每次預期 ${esc(a.per_occurrence)} ${esc(a.unit)} · 調整數量</summary><div class="form-grid space-top"><div class="field"><label for="target-${i}">每次預期量</label><input id="target-${i}" type="number" min="0.000001" max="1000000000000" step="0.000001" required value="${esc(a.per_occurrence)}"></div><div class="field"><label for="unit-${i}">計量單位</label><input id="unit-${i}" required maxlength="20" value="${esc(a.unit)}"></div></div></details>${calendar(a,i,today(),d.deadline)}`; // 數量收起，日期直接操作。
     else content=`<h2>${esc(d.title)}</h2><p class="record-content">${esc(d.outcome)}</p><p>${today()} ～ ${esc(d.deadline)} · ${esc(state.me.timezone)}</p>${d.actions.map((item,n)=>`<article class="gj-summary-item"><h3>${n+1}. ${esc(item.title)}</h3><p>${esc(summary(item))}</p><button type="button" class="text-button" data-gj="edit-step" data-step="${n+2}">修改習慣 ${n+1}</button></article>`).join('')}<div class="callout">安排不是已完成。記錄真實經歷並確認貢獻後，進度才會累計；成果由你提供佐證並親自確認。</div>`; // 確認總覽不預加進度。
     return `<div class="narrow">${heading(titles[d.step],'一次專注一個目標，為它建立三個重要習慣。')}<form id="goal-form" class="card" data-step="${d.step}"><p class="step-label">第 ${d.step+1}／6 步 · 這份草稿只保存在目前裝置</p>${content}<div class="button-row space-top">${d.step?'<button type="button" class="secondary" data-gj="back">上一步</button>':''}<button type="submit" class="primary">${d.step===5?(state.me.lumi_hatched?'確認設定，開始挑戰':'確認設定，建立目標蛋 →'):'下一步 →'}</button><button type="button" class="text-button" data-gj="pause">稍後繼續</button></div></form></div>`; // 全部確認後才呼叫建立 API。
@@ -101,6 +101,7 @@ const GoalsUI = (() => { // 將建立草稿與回顧編輯狀態集中管理。
       const body={request_id:d.request_id,title:d.title,outcome:d.outcome,deadline:d.deadline,actions:d.actions.map(({title,unit,per_occurrence,dates,weekdays,cycle})=>({title,unit,per_occurrence,dates:[...dates].sort(),weekdays,cycle}))}; // 不把游標或畫面狀態送進 API。
       const hatched=state.me.lumi_hatched,goal=await api('/goals',{method:'POST',body}); // 相同草稿重試沿用 ID。
       try {localStorage.removeItem(key());} catch {} // 正式成功後才清草稿。
+      state.guestSaveNoticePending=true; // 只有server成功保存後，在下一畫面提醒Guest保存期限。
       draft=null;edit=null;await refresh();navigate(hatched?'goal/'+goal.id:'birth');return true; // 只有首次顯示 Lumi 誕生。
     } // 其他表單使用回顧流程。
     if(!['goal-review-form','goal-end-form'].includes(form.id)&&!form.matches('.pending-accept-form')) return false; // 不攔截經歷或人物表單。
@@ -131,6 +132,8 @@ const GoalsUI = (() => { // 將建立草稿與回顧編輯狀態集中管理。
     const target=event.target.closest('[data-gj]');if(!target||target.disabled)return; // 忽略其他模組與停用日期。
     try { // 操作失敗保持目前畫面。
       capture($('#goal-form'));const action=target.dataset.gj; // 先保存可見欄位。
+      // 快捷日期使用伺服器的Owner當地今天；不預填、不自動提交，仍由使用者核對。
+      if(action==='deadline-offset'){const d=load();d.deadline=add(today(),Number(target.dataset.days));save();state.dirty=false;await render({localGoalEdit:true});$('#goal-deadline')?.focus();return;}
       if(action==='focus-complete'){const section=$('#goal-completion');section?.focus({preventScroll:true});section?.scrollIntoView({block:'start'});return;} // 成果主要入口導向可接續的操作區。
       if(action==='open-habit'){if(edit)edit.openHabit=Number(target.dataset.index);return;} // 保留手動展開的習慣面板。
       if(action==='resume'){event.preventDefault();state.dirty=false;navigate('goal-new');return;} // 相同網址也重新顯示保留的草稿。

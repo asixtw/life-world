@@ -1,0 +1,14 @@
+/* 使用既有 CSS Lumi 作 fallback；候選美術核准前不擅自替換角色。 */
+[data-birth] [hidden] {display:none !important;}
+.birth-scene {min-height:320px;display:grid;place-items:center;position:relative;}
+.birth-egg {width:170px;height:220px;position:relative;border:2px solid #cbbf9b;border-radius:50% 50% 44% 44%;background:#fff6da;box-shadow:0 18px 28px #72633e22;overflow:hidden;cursor:pointer;transition:opacity 1.4s ease,transform 1.4s ease;}
+.birth-egg:disabled {cursor:wait;opacity:1;}
+.birth-egg:focus-visible {outline:3px solid #466944;outline-offset:7px;}
+.birth-crack {position:absolute;inset:26% 35% 20% 35%;background:#8e8065;clip-path:polygon(44% 0,54% 27%,36% 39%,65% 60%,43% 77%,53% 100%,46% 100%,35% 77%,56% 60%,28% 39%,46% 26%,38% 0);transform:scaleY(0);transform-origin:top;transition:transform 1.4s ease;}
+.birth-crack-two {inset:42% 15% 15% 48%;transform:scaleY(0) rotate(-35deg);}
+[data-stage="1"] .birth-crack-one {transform:scaleY(.48);}
+[data-stage="2"] .birth-crack-one,[data-stage="3"] .birth-crack-one {transform:scaleY(1);}
+[data-stage="2"] .birth-crack-two,[data-stage="3"] .birth-crack-two {transform:scaleY(1) rotate(-35deg);}
+[data-stage="3"] .birth-egg {opacity:0;transform:scale(1.08) translateY(24px);pointer-events:none;}
+[data-birth-lumi] {position:absolute;inset:0;display:grid;place-items:center;}
+@media(prefers-reduced-motion:reduce){.birth-egg,.birth-crack{transition:none;}}

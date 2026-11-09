@@ -23,5 +23,5 @@ def new_session(connection, owner_id, now, policy):  # 產生隨機工作階段�
     return token, csrf  # 回傳產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊的結果
 
 
-def require_registered(user):  # 在人物操作前要求本機帳號
-    require(user['status'] == 'registered', 403, 'upgrade_required', '人物操作需要先建立本機帳號；目前草稿會保留。')  # 驗證限制：人物操作需要先建立本機帳號；目前草稿會保留。
+def require_registered(user):  # 產品能力只依內部已認證帳號狀態，不依Google或帳密Provider
+    require(user['status'] == 'registered', 403, 'upgrade_required', '此功能需要已認證的正式帳號；目前草稿會保留。')  # 驗證限制：此功能需要已認證的正式帳號；目前草稿會保留。

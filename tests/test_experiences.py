@@ -8,6 +8,7 @@ from conftest import onboard, draft, confirm_payload, register  # 共用測試�
 
 def test_draft_and_suggestion_never_award_or_overwrite_raw(client):  # 驗證：草稿與候選不計分且不覆蓋原文
     _, goal = onboard(client); d = draft(client, goal)  # 完成訪客、Bio 與第一目標的測試前置流程
+    register(client)  # 整理候選現為登入功能；保留原本候選無副作用斷言。
     response = client.post('/api/drafts/' + d['id'] + '/suggest')  # 透過實際測試用戶端操作 API 並保留回應
     assert response.status_code == 200  # 核對 HTTP 狀態，避免失敗請求被當成成功
     assert response.json()['applied'] is False  # 斷言草稿與候選不計分且不覆蓋原文的預期結果

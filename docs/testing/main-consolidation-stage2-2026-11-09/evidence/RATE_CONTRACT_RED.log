@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_public_guest_limit_cannot_be_bypassed_with_xff ______________
+
+tmp_path = PosixPath('/private/var/folders/1d/2xqx9h813b5d2nx4gw684whr0000gn/T/pytest-of-louie.h/pytest-262/test_public_guest_limit_cannot0')
+
+    def test_public_guest_limit_cannot_be_bypassed_with_xff(tmp_path):
+        settings=replace(RuntimeSettings(),access_mode='public_alpha',auth_source_mode='shared',auth_rate_enabled=True,auth_rate_secret='synthetic-only-public-limit-key-'*3,registration_enabled=False,alpha_worlds_total=30,alpha_worlds_daily=30)
+        app=create_app(tmp_path,settings=settings)
+        for i in range(11):
+            with TestClient(app,headers={'X-Forwarded-For':f'198.51.100.{i+1}'}) as c:
+                response=c.post('/api/auth/guest')
+>               assert response.status_code==(201 if i<10 else 429)
+E               assert 201 == 429
+E                +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_public_release_acceptance.py:69: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_public_release_acceptance.py::test_public_guest_limit_cannot_be_bypassed_with_xff
+1 failed in 0.08s

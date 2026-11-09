@@ -1,0 +1,185 @@
+{
+  "base_url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app",
+  "scope": "actual zero-traffic Cloud Run candidate -> real Alpha PostgreSQL",
+  "checks": [
+    {
+      "name": "anonymous:GET /ready",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "anonymous:GET /api/state",
+      "status": "PASS",
+      "http": 401
+    },
+    {
+      "name": "guest_a:POST /api/auth/guest",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "guest_a:cookie_flags",
+      "status": "PASS"
+    },
+    {
+      "name": "guest_a:POST /api/auth/guest",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "guest_a:cookie_flags",
+      "status": "PASS"
+    },
+    {
+      "name": "guest_same_session_same_owner",
+      "status": "PASS"
+    },
+    {
+      "name": "guest_b:POST /api/auth/guest",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "guest_b:cookie_flags",
+      "status": "PASS"
+    },
+    {
+      "name": "different_guest_owners",
+      "status": "PASS"
+    },
+    {
+      "name": "guest_b:GET /api/goals/c7b88332-aa41-44c4-a02e-ace23ca91079",
+      "status": "PASS",
+      "http": 404
+    },
+    {
+      "name": "guest_a:GET /api/goals/592b5781-17d3-493c-917d-2f1e7c3175bf",
+      "status": "PASS",
+      "http": 404
+    },
+    {
+      "name": "guest_a:PUT /api/profile",
+      "status": "PASS",
+      "http": 403
+    },
+    {
+      "name": "guest_a:PUT /api/profile",
+      "status": "PASS",
+      "http": 403
+    },
+    {
+      "name": "guest_a_fresh:GET /api/state",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "guest_refresh_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "account:POST /api/auth/login",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "dedicated_owner_matches",
+      "status": "PASS"
+    },
+    {
+      "name": "dedicated_cookie_flags",
+      "status": "PASS"
+    },
+    {
+      "name": "guest_a:GET /api/goals/d14fac5f-7d8f-4dc1-a42e-34e0a7582d08",
+      "status": "PASS",
+      "http": 404
+    },
+    {
+      "name": "account:GET /api/goals/c7b88332-aa41-44c4-a02e-ace23ca91079",
+      "status": "PASS",
+      "http": 404
+    },
+    {
+      "name": "account:POST /api/experiences/25f07384-3273-4bba-8e3c-650974834861/task-suggestions",
+      "status": "PASS",
+      "http": 503
+    },
+    {
+      "name": "username_ai_not_provider_restricted",
+      "status": "PASS"
+    },
+    {
+      "name": "guest_a:POST /api/experiences/660d7482-8b8e-4980-8d8e-8df3ee047501/task-suggestions",
+      "status": "PASS",
+      "http": 403
+    },
+    {
+      "name": "account:POST /api/auth/logout",
+      "status": "PASS",
+      "http": 204
+    },
+    {
+      "name": "old_session:GET /api/auth/me",
+      "status": "PASS",
+      "http": 401
+    },
+    {
+      "name": "account:POST /api/auth/login",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "account:GET /api/state",
+      "status": "PASS",
+      "http": 200
+    },
+    {
+      "name": "account_relogin_persistence",
+      "status": "PASS"
+    }
+  ],
+  "model_calls": 0,
+  "ai_generation": "NOT RUN: no new authorized model-call allowance; provider disabled",
+  "theater_real_generation": "NOT RUN",
+  "status": "PASS_CORE_HTTP",
+  "worlds": {
+    "guest_a": {
+      "owner_id": "15d998fa-1ed0-4c63-9cae-e17121ee7676",
+      "goal_id": "c7b88332-aa41-44c4-a02e-ace23ca91079",
+      "experience_id": "660d7482-8b8e-4980-8d8e-8df3ee047501",
+      "summary": {
+        "goals": 1,
+        "habits": 3,
+        "experiences": 1,
+        "tasks": 1,
+        "points": 1
+      }
+    },
+    "guest_b": {
+      "owner_id": "f3030570-aae6-4634-baa2-e59ec199d427",
+      "goal_id": "592b5781-17d3-493c-917d-2f1e7c3175bf",
+      "experience_id": "1b6046d6-c784-4381-b1b4-7d1e6ef41678",
+      "summary": {
+        "goals": 1,
+        "habits": 3,
+        "experiences": 1,
+        "tasks": 1,
+        "points": 1
+      }
+    },
+    "account": {
+      "owner_id": "4a008398-da75-4b5f-a6ab-b07f2c001c38",
+      "goal_id": "d14fac5f-7d8f-4dc1-a42e-34e0a7582d08",
+      "experience_id": "25f07384-3273-4bba-8e3c-650974834861",
+      "summary": {
+        "goals": 1,
+        "habits": 3,
+        "experiences": 1,
+        "tasks": 1,
+        "points": 1
+      }
+    }
+  },
+  "backend_restart_readback": "PASS: existing Alpha sessions/worlds read through new zero-traffic revision after container replacement",
+  "public_traffic_switched": false
+}

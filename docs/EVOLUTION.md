@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-07 GCP-144 三階段孵化候選
+
+加入三次明確輸入、防連點及reduced-motion的前端孵化呈現，沿用既有CSS Lumi；25筆候選PNG inventory保留來源與alpha/SHA。4項隔離Chromium測試通過；未部署，未替換正式角色。詳見[美術接入候選](art/README.md)。
+
 ## 2026-11-05 首次 CI/CD 失敗最小修復
 
 Web／API 發布步驟改用官方 google-cloud-cli:slim 與映像自帶 Python 的絕對路徑；一次獨立容器檢查已證實兩者可執行。API 建置契約改驗證 Test→Build→Container Verification→明確 Push→release.py，禁止恢復 images 後置推送，保留公開存取／SQL／hostfix 安全限制。僅 API 契約 3 項及 YAML 基本檢查，發布器主要邏輯、IAM、資料庫、流量不改；正式重新部署須經本次 PR Merge 授權。
@@ -160,3 +164,43 @@ Plan 改為保留匯出時的來源批次／時間／SHA256，不能用建立時
 E2E SQL 的 PASS 列改與檢查同交易，不再依賴 client 的 ON_ERROR_STOP；權限核對補齊 PUBLIC／欄位級／DDL 路徑並改以 OID 支援非 superuser 管理者；00 不再接管既有 DB。預檢另要求測試修訂只有唯一 e2e 路由、單一容器及僅含已審查欄位的 Direct VPC interface；本機 harness 改以非 superuser 管理者執行交付 SQL。API、核心 DDL 與授權矩陣不變，見 [複審紀錄](STEP18_API_E2E_ACCEPTANCE.md)。
 
 定點修正：權限核對由各權限總數改為逐表白名單；00 拆成建角色、建 DB、標記三階段，前段失敗時 session 維持唯讀，不再建立或改寫同名 DB。
+
+### 2026-11-07｜GCP-144 核心介面修正候選（未部署）
+
+修正環境標籤及依 GIS capability 的訪客保存提示；新增跨服務實例讀回、載入成功／失敗與提示瀏覽器測試。API 23 passed、Chromium 4 passed，均為明示隔離測試；線上 PostgreSQL、真實 GIS／AI Gate 仍未通過。見 [本輪驗收](testing/GCP144_CORE_ACCEPTANCE.md)。
+
+### 2026-11-07｜GCP-144 今日整合候選（未部署）
+
+局部整合Google／IAP安全基底、AI草稿、測試版提示與三次孵化；補Guest AI顯示、Fixture標示與既有Guest容量邊界。真實Staging DB/GIS仍待證據，不以本機fixture冒充上線。見[整合驗收](testing/GCP144_RC_ACCEPTANCE.md)。
+
+## 2026-11-08｜GCP-144 RC v3（候選，未部署）
+
+修復交付包版本／Patch基準混用，37檔完整Patch與Parent增量各自重建Tree並綁精確Commit。兩次真實Gemini 3.5 Flash-Lite HTTP200（360 input／121 output tokens、費用null），Browser完成編輯／確認／重送／刷新，僅既有合成SQLite；Call2空任務，不將人工任務當AI輸出。完整API424 passed／28 skipped，精確Commit及各類原始日誌以v3 Manifest為準。Owner最新目標為受IAP保護Staging POC，不自行公開或部署。詳見[RC v3驗收](testing/GCP144_RC_ACCEPTANCE.md)。
+
+## 2026-11-08｜完整公開版核心候選（本機、未提交）
+
+保留RC v3，新增規則式雙端來源情境、有限Behavior JSON、既有模型劇場端點的可操作UI與短期多輪；模擬筆記不回寫真實事實。新增模型收據metadata與獨立聲音開關、核准白名單及成功回執去重。新增範圍5項API／3項Chromium通過，未追加真模型呼叫，未重跑RC v3完整測試。素材逐項呈現待Owner核准；公開Gate尚未通過，見[功能矩陣](testing/PUBLIC_RELEASE_MATRIX.md)。
+
+### Owner委任採用／補製與映像檔推進
+
+已直接整合10張既有PNG／5個既有音效、新增3段可重製的原創程序BGM；所有新產出與沿用檔案分開記錄。原RC v3與PR19保留，新增候選在獨立分支固定來源後建置；未因素材委任自行執行Migration／GRANT或解除IAP。
+
+
+### 2026-11-08：受保護Tag同源寫入修復
+
+新增明確 LIFEWORLD_WRITE_ORIGINS，僅允許精確HTTPS Trusted Host的同源業務寫入；正式OAuth Origin及IAP audience推導不變。Tag Origin與正式Origin不同導致訪客POST403，並非業務旗標關閉（實際為true）。本輪針對Origin／CSRF／身分／Runtime測試38 passed，正式瀏覽器及Product PG閉環待驗收，不把本機測試當部署E2E。
+
+
+### 2026-11-08：Google challenge精確Tag來源
+
+Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能只修一般POST而留下Google第二層canonical-only Gate。26項針對性測試通過；未將工程SQLite／替身驗證器當真GIS或Product PG驗收。Client設定啟用仍須007/008與備份Gate，維持IAP。
+
+
+### 2026-11-08：Release A 日期操作與核心閉環
+
+有效原生日期可正式提交（HTTP201），先前本機畫面工具未能輸入日期，未重現後端提交Bug。新增使用Owner伺服器當地日期的「一週後／30天後」明確快捷，保留日期必填與人工最後提交；Google未配置時顯示狀態及訪客替代路徑。隔離SQLite＋無頭Chromium兩項閉環通過（含三習慣、三次孵化、人工確認、任務、進度、重送不重複獎勵與刷新）；35項Origin／Session／限流回歸通過。這些不是Product PG、真GIS或真模型驗收。
+
+
+### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
+
+修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。

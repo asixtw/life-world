@@ -10,6 +10,7 @@ LABEL org.opencontainers.image.source="https://github.com/asixtw/life-world" \
       org.opencontainers.image.revision=$VCS_REF
 ENV PATH=/opt/venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
     LIFEWORLD_DB_BACKEND=postgresql LIFEWORLD_DATA_DIR=/tmp/lifeworld PORT=8080
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN groupadd --gid 10001 lifeworld && useradd --uid 10001 --gid 10001 --no-create-home lifeworld
 COPY --from=dependencies /opt/venv /opt/venv
 WORKDIR /srv/lifeworld

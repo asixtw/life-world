@@ -141,7 +141,8 @@ class StoryInput(Model):  # 草稿與正式人物核對共用資料
         return self  # 回傳唯一且合法的角色資料
 
 
-class DraftCreate(WithContributions):  # 尚未確認的原始經歷輸入
+class DraftCreate(WithContributions):
+    request_id: Optional[str] = Field(default=None,min_length=1,max_length=128)  # 可選重送識別；相容舊客戶端。  # 尚未確認的原始經歷輸入
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=False)  # 設定輸入欄位驗證策略
     raw_text: str = Field(min_length=1, max_length=20000)  # 設定原始經歷文字（保留空白與換行）的型別、預設值與輸入限制
     occurred_at: datetime  # 設定帶時區的實際發生時間的型別、預設值與輸入限制
@@ -403,3 +404,15 @@ class PendingAccept(Model):  # 延長後逐筆核對採計。
     def explicit_confirm(cls, value):  # 只接受布林 True。
         if value is not True: raise ValueError('請明確確認採計')  # 防止數字轉型。
         return value  # 回傳確認旗標。
+
+
+class GoogleChallenge(Model):
+    """登入前明確選擇是否保存Guest；未知欄位拒絕。"""
+    mode: Literal['login','upgrade']
+    discard_guest: bool = False
+
+
+class GoogleExchange(Model):
+    """ID token僅作交換，不接受前端自報owner/email。"""
+    challenge_id: str = Field(pattern=r'^[0-9a-f-]{36}$')
+    credential: str = Field(min_length=1,max_length=16384)

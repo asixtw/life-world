@@ -33,7 +33,7 @@ def test_alpha_rejects_credentials_and_external_media(alpha):
         assert c.get('/api/capabilities').json()['access_mode']=='public_alpha'
         assert c.post('/api/auth/login',json={'username':'fake','password':'x'}).status_code==403
         assert c.post('/api/auth/claim',json={'username':'fake','password':'long-password'}).status_code==403
-        assert c.post('/api/media/recognize').status_code==403
+        assert c.post('/api/media/recognize').status_code==401  # 真媒體服務已開放；匿名先拒絕，不先解析multipart。
         assert count(app,'users')==0
 
 

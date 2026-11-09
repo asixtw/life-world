@@ -94,7 +94,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             token, csrf = new_session(c, user['id'], self.now(), self.policy)  # 產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊
             return self.public_user(self._owned_user(c, user['id']), csrf), token  # 回傳將原訪客世界升級為本機帳號並輪換工作階段的結果
 
-    def login(self, data, existing_token=None, limiter=None, request=None, registered_only=False):
+    def login(self, data, existing_token=None, limiter=None, request=None, registered_only=False, allowed_usernames=None):
         """來源先限流、帳號採軟桶；失敗計數提交後才回HTTP錯誤。"""
         outcome=None
         with self.db.connect(write=True) as c:
@@ -102,7 +102,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             if outcome is None:
                 user=c.execute('SELECT * FROM users WHERE username=?',(data.username.lower(),)).fetchone()
                 # Alpha只接受已預建registered帳號；未知或無效類型仍走替代hash，維持統一失敗語意。
-                eligible=user is not None and (not registered_only or user['status']=='registered')
+                eligible=user is not None and (not registered_only or user['status']=='registered') and (allowed_usernames is None or user['username'] in allowed_usernames)
                 valid=PASSWORDS.verify(data.password,user['password_hash'] if eligible and user['password_hash'] else DUMMY_HASH)
                 if not eligible or not valid:
                     outcome=(limiter.failure(c,data.username) if limiter else None) or DomainError(401,'invalid_credentials','帳號或密碼不正確。')
@@ -190,13 +190,19 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
         self._valid_time(data.occurred_at)  # 拒絕尚未發生的真實經歷
         with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
+            fingerprint=None
+            if data.request_id:
+                old,fingerprint=self._cached(c,owner,'create_draft',data.request_id,data.model_dump(mode='json',exclude={'request_id'}))
+                if old is not None:return old
             self._related(c, user, data.goal_id, data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
             draft_id, now = uid(), self.now().isoformat()  # 保存「(draft_id, now)」供後續驗證或回傳使用
             c.execute("INSERT INTO drafts VALUES (?,?,?,?,?,?,?,'draft',1,?,?)",
                       (draft_id, owner, data.goal_id, data.person_id, data.raw_text,
                        data.occurred_at.astimezone(timezone.utc).isoformat(), encoded([v.model_dump() for v in data.contributions]), now, now))  # 新增經歷草稿；值以參數傳入
             self._store_draft_story(c, owner, draft_id, data.raw_text, data.story)  # 同交易保存未確認的人物整理
-            return self._draft(c, owner, draft_id)  # 回傳保存尚未確認、不計分的原始經歷草稿的結果
+            result=self._draft(c,owner,draft_id)
+            if data.request_id:self._remember(c,owner,'create_draft',data.request_id,fingerprint,result)
+            return result  # 回傳保存尚未確認、不計分的原始經歷草稿的結果
 
     def _draft(self, c, owner, draft_id):  # 讀取有權限的草稿並還原貢獻清單
         result = dict(self._owned(c, 'drafts', draft_id, owner))  # 準備本次操作的回傳資料
@@ -228,6 +234,9 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             return self._draft(c, owner, draft_id)  # 回傳檢查版本後更新尚未確認的草稿的結果
 
     def suggest(self, owner, draft_id):  # 建立可手動審閱的整理候選，不寫入正式事實
+        # 候選整理即使目前是ManualAssistant，也屬登入功能，避免未來provider接入後越權。
+        with self.db.connect() as c:
+            require_registered(self._owned_user(c, owner))
         draft = self.draft(owner, draft_id)  # 準備目前尚未確認的原始經歷
         require(draft['status'] == 'draft', 409, 'already_confirmed', '這份草稿已經確認。')  # 驗證限制：這份草稿已經確認。
         try:  # 保護可能失敗的操作，交由下方例外分支處理
