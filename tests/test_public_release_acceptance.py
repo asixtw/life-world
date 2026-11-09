@@ -60,10 +60,14 @@ def test_public_password_core_journey_and_owner_isolation(tmp_path):
         assert b.get('/api/auth/me').json()['owner_id']==other.json()['owner_id']
 
 
-def test_public_guest_limit_cannot_be_bypassed_with_xff(tmp_path):
+def test_normal_guests_are_fair_and_xff_does_not_split_shared_bucket(tmp_path):
     settings=replace(RuntimeSettings(),access_mode='public_alpha',auth_source_mode='shared',auth_rate_enabled=True,auth_rate_secret='synthetic-only-public-limit-key-'*3,registration_enabled=False,alpha_worlds_total=30,alpha_worlds_daily=30)
     app=create_app(tmp_path,settings=settings)
     for i in range(11):
         with TestClient(app,headers={'X-Forwarded-For':f'198.51.100.{i+1}'}) as c:
             response=c.post('/api/auth/guest')
-            assert response.status_code==(201 if i<10 else 429)
+            assert response.status_code==201
+    # shared來源是粗全域，不把所有正常訪客誤當單人10次；偽造XFF仍共用同一HMAC桶。
+    with app.state.service.db.connect() as db:
+        rows=db.execute("SELECT attempts FROM auth_rate_buckets WHERE scope='guest_source_create'").fetchall()
+        assert len(rows)==1 and rows[0]['attempts']==11

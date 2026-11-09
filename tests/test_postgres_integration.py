@@ -60,7 +60,11 @@ def test_catalog_types_constraints_ownership_and_no_theater(app, tmp_path):
         expected_types, expected_not_null, expected_fk = {},set(),set()
         with Database(tmp_path / 'explicit-sqlite-schema-reference').connect() as reference:
             tables = [r[0] for r in reference.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
-            assert len(tables) == 32
+            # PG核心006固定32表；SQLite另有尚未批准部署PG的009記憶契約，不能當PG已建表。
+            sqlite_only={'relationship_memory_preferences','relationship_features'}
+            assert len(tables)==34 and sqlite_only.issubset(tables)
+            tables=[table for table in tables if table not in sqlite_only]
+            assert len(tables)==32
             for table in tables:
                 for col in reference.execute('PRAGMA table_info("' + table + '")'):
                     key = (table,col['name'])

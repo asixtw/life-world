@@ -142,3 +142,7 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 ### Owner委任採用後的素材整合驗證
 
 對新增整合再做必要驗證，未重跑原RC v3全套：API5 passed、受影響新Chromium3 passed；實際localhost HTTP畫面與8音檔解碼、手機無溢位、三次蛋圖淡入及壞圖fallback通過。3段原創程序BGM已重製並逐檔SHA相符。修正背景被後載CSS覆蓋、訪客按鈕換行及草稿音效應使用`/experiences/drafts`路徑。沒有新真實模型呼叫。
+
+## 2026-11-09 Main 整合 Stage2 隔離回歸
+
+[完整收據與範圍](testing/main-consolidation-stage2-2026-11-09/README.md)：SQLite 512 passed／17 PG-only skipped；隔離PG18.6模式529 passed；Node13 passed；Chromium39案例覆蓋（原跨日skip已補測PASS）；發布政策24 passed；真ffmpeg短／長音訊解碼PASS。僅測試契約／工具／文件變更，沒有更動產品限額或正式流量。Merge仍待CI隔離與Owner明確授權，未Build／部署。

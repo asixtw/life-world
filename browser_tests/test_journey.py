@@ -45,7 +45,8 @@ def create_goal(page, title):  # 逐步確認目標與三個習慣。
 def onboarding(page):  # 以真實瀏覽器完成首次旅程並檢查 Lumi 出現時機
     page.goto(BASE)  # 開啟隔離測試網站的指定頁面
     expect(page.get_by_role('heading', name='把每一步，種成自己的世界。')).to_be_visible()  # 等待並核對目前畫面狀態
-    expect(page.locator('.lumi')).to_have_count(0)  # 等待並核對目前畫面狀態
+    # 歡迎頁共用Lumi插畫已核准；它不代表訪客已孵化自己的寵物。
+    expect(page.locator('.hero .lumi')).to_have_count(1)
     page.get_by_role('button', name='不用註冊，先開始').click()  # 依使用者動線點擊畫面入口
     page.locator('#profile-name').fill('測試小光')  # 填入此步驟的虛構表單內容
     page.locator('#bio').fill('以真實的一小步，建立自己的世界。')  # 填入此步驟的虛構表單內容

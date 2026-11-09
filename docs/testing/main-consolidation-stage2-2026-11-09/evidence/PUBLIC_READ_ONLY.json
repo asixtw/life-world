@@ -1,0 +1,13 @@
+{
+  "status": {
+    "latestReadyRevisionName": "lw-public-camera-8f377fa",
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "lw-public-camera-8f377fa",
+        "tag": "alpha-guest-review",
+        "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+      }
+    ]
+  }
+}
