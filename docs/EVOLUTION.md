@@ -204,3 +204,22 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
 
 修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。
+
+## 2026-11-09｜連線池歸還與 shutdown 定點修補
+
+在68102f2獨立分支修正close後再入池競態、清理例外洩漏名額及首個資源close失敗中止其餘清理。維持非等待式shutdown，不改runtime或資料模型；完整生命週期競態仍列限制。見[驗證紀錄](testing/POOL_SHUTDOWN_REVIEW_20261109.md)。
+
+## 2026-11-09 音訊／孵化生命週期增量
+
+保留既有採用素材與三次孵化，補齊音效／BGM 停用、離頁、晚到播放取消、失敗重試、場景缺檔無聲退路及同一 DOM mount 去重。沒有新增媒體、資料模型或部署；[22 項前端契約與驗收界線](art/AUDIO_LIFECYCLE_20261109.md)。
+
+## 2026-11-09 pool 生命週期隔離修補候選
+
+以 66fd8d4 為基底，新增四個失敗重現，再以 mutex 內 Connector 清理責任移交、closed 檢查與局部參照修復；完整離線回歸 536 passed／17 skipped。這是未發布候選，不提升為真 PG、Cloud SQL 或部署驗收。詳細語義及保留風險見 [pool 審查](testing/POOL_SHUTDOWN_REVIEW_20261109.md)。
+
+同日再加入 opener 計數與延後清理責任移交，保留 close 非等待語義；provider 錯誤與清理錯誤皆有合成覆蓋。最新完整離線回歸 540 passed／17 skipped，取代中間版本536結果；仍未發布。
+
+
+### 2026-11-09 整合證據補充（取代上文「最新」的時間性敘述）
+
+完整整合版離線回歸為 **549 passed、17 PG skipped、13 warnings**。上文540屬歷史pool階段結果。OSSANG先前專用PG18執行17必測全通過，但該次整體542 passed、2 failed、13 Node skipped，且早於最後整合；不能當成本head完整Windows回歸。新core在Windows實機記憶體載入的constructor及6個CLI拒絕probe已通過，僅證明fail-closed路徑，不是Windows全功能或ACL驗收。詳見 `CORE_SAFETY_INTEGRATION_20261109.md`（位於 docs/testing）。三線完整驗收仍未完成。

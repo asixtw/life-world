@@ -1,0 +1,54 @@
+{
+  "base_commit": "68102f230aa947a434286ba9260e1ae75f6634b0",
+  "scope": "Production audio and birth lifecycle only; original adopted media unchanged",
+  "baseline_tests": {
+    "passed": 8,
+    "failed": 14,
+    "total": 22
+  },
+  "final_node_tests": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0
+  },
+  "pytest_wrappers": {
+    "passed": 2,
+    "failed": 0,
+    "network_connections": "blocked",
+    "environment": "minimal"
+  },
+  "media": {
+    "adopted_images_verified": 10,
+    "adopted_audio_verified": 8,
+    "hash_matches": 18,
+    "ffmpeg_decode_passed": 18,
+    "bgm_reproduced_exactly": 3
+  },
+  "native_browser_this_revision": "NOT_RUN",
+  "human_listening": "NOT_RUN",
+  "database_or_cloud_changes": false,
+  "deployment": false,
+  "assets_changed": false,
+  "files": [
+    {
+      "path": "app/static/audio.js",
+      "sha256": "c7fbc72b44edea9c25f77f5f9ee42b7c92e1c7ecdb60efe8c3715bd39548592e"
+    },
+    {
+      "path": "app/static/birth.js",
+      "sha256": "65d721ed4b46b5e0eae3bbf3447cb506accc8319c62c3601992ebf896ae2d432"
+    },
+    {
+      "path": "tests/frontend_audio_lifecycle.cjs",
+      "sha256": "7a9984cdd7089e328a768e500e97edc6abe5ec5310e217b486b883c408243b99"
+    },
+    {
+      "path": "tests/frontend_birth_lifecycle.cjs",
+      "sha256": "0616977569d2f779e43acb883f95f17a07b9707015bd8c1d32499e8dbba4a0c5"
+    },
+    {
+      "path": "tests/test_frontend_audio_birth_lifecycle.py",
+      "sha256": "67fea56f56479b79f44c16f9fd9360f4370338174e858824d5c72ba7c96c13f4"
+    }
+  ]
+}

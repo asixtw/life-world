@@ -1,11 +1,12 @@
 """只測獨立合成評測；測試provider明示替身，絕不呼叫外部服務。"""
 from concurrent.futures import ThreadPoolExecutor
 import json
+import os
 import sqlite3
 import threading
 
 import pytest
-from model_eval.core import EvaluationStore, EvalError, ModelResult, SCORE_FIELDS
+from model_eval.core import EvaluationStore, EvalError, ModelResult, SCORE_FIELDS, validate_case
 
 
 class Stub:
@@ -24,6 +25,7 @@ def case():
             'turns': [{'speaker': 'user', 'text': '你何時方便？'}]}
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_records_snapshot_unknown_cost_human_score_and_no_product_tables(tmp_path):
     store, provider = EvaluationStore(tmp_path), Stub()
     data = case()
@@ -46,6 +48,7 @@ def test_records_snapshot_unknown_cost_human_score_and_no_product_tables(tmp_pat
     assert store.path.stat().st_mode & 0o777 == 0o600
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_idempotent_run_and_attempt_conflict(tmp_path):
     store, provider = EvaluationStore(tmp_path), Stub()
     run = store.prepare(case(), provider, 'same')
@@ -59,6 +62,7 @@ def test_idempotent_run_and_attempt_conflict(tmp_path):
     with pytest.raises(EvalError): store.execute(run, provider, 'new-attempt')
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_live_provider_never_called_without_approval(tmp_path):
     store, provider = EvaluationStore(tmp_path), Stub()
     provider.live = True
@@ -67,6 +71,7 @@ def test_live_provider_never_called_without_approval(tmp_path):
     assert provider.calls == 0 and store.get(run)['attempts'] == []
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_failure_is_sanitized_and_one_explicit_retry_is_charged(tmp_path):
     store, provider = EvaluationStore(tmp_path), Stub()
     def fail(*args):
@@ -82,6 +87,7 @@ def test_failure_is_sanitized_and_one_explicit_retry_is_charged(tmp_path):
     with pytest.raises(EvalError): store.execute(run, provider, 'retry-2', retry=True)
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_stop_discards_late_output_but_preserves_usage(tmp_path):
     store, provider = EvaluationStore(tmp_path), Stub()
     entered, release = threading.Event(), threading.Event()
@@ -102,6 +108,7 @@ def test_stop_discards_late_output_but_preserves_usage(tmp_path):
     assert result['attempts'][0]['actual_cost'] == 20000
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_shared_budget_is_atomic_across_independent_stores(tmp_path):
     stores = [EvaluationStore(tmp_path, budget_microusd=200000) for _ in range(3)]
     providers = [Stub() for _ in range(6)]
@@ -115,11 +122,13 @@ def test_shared_budget_is_atomic_across_independent_stores(tmp_path):
 
 
 @pytest.mark.parametrize('field,value', [('synthetic_only', False), ('sources', []), ('turns', []), ('character', {})])
-def test_invalid_cases_are_rejected(tmp_path, field, value):
+def test_invalid_cases_are_rejected(field, value):
     data = case(); data[field] = value
-    with pytest.raises(EvalError): EvaluationStore(tmp_path).prepare(data, Stub(), 'invalid')
+    with pytest.raises(EvalError, match='^synthetic_case_required$'):
+        validate_case(data)
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_policy_cannot_be_raised_by_other_process(tmp_path):
     EvaluationStore(tmp_path, budget_microusd=100000)
     with pytest.raises(EvalError, match='policy_conflict'): EvaluationStore(tmp_path, budget_microusd=200000)

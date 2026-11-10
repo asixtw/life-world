@@ -1,0 +1,390 @@
+TAP version 13
+# Subtest: 預設不播；已保存偏好在第一次手勢前也不自動播
+ok 1 - 預設不播；已保存偏好在第一次手勢前也不自動播
+  ---
+  duration_ms: 3.565385
+  type: 'test'
+  ...
+# Subtest: 關閉音效立即停止所有在播音效，音樂不受影響
+not ok 2 - 關閉音效立即停止所有在播音效，音樂不受影響
+  ---
+  duration_ms: 6.964831
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:56:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(h.tracks.slice(1).every(a => a.paused))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:59:51)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 音效 pending 後停用，晚到成功不可留下聲音
+not ok 3 - 音效 pending 後停用，晚到成功不可留下聲音
+  ---
+  duration_ms: 2.021513
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:61:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:64:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 音樂 pending 後停用，晚到成功不可留下聲音
+not ok 4 - 音樂 pending 後停用，晚到成功不可留下聲音
+  ---
+  duration_ms: 1.472606
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:66:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:69:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 路由切換停止舊 BGM，舊 Promise 不影響新場景
+not ok 5 - 路由切換停止舊 BGM，舊 Promise 不影響新場景
+  ---
+  duration_ms: 0.794095
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:71:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    false !== true
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:75:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 自動播放拒絕後，下次手勢可重試同場景
+not ok 6 - 自動播放拒絕後，下次手勢可重試同場景
+  ---
+  duration_ms: 1.174847
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:78:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    1 !== 2
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:81:23)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 重複手勢或路由不建立重疊 BGM
+ok 7 - 重複手勢或路由不建立重疊 BGM
+  ---
+  duration_ms: 1.396482
+  type: 'test'
+  ...
+# Subtest: 背景頁停所有音軌，回前景只恢復目前場景 BGM
+not ok 8 - 背景頁停所有音軌，回前景只恢復目前場景 BGM
+  ---
+  duration_ms: 1.132383
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:88:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(h.tracks.every(a => a.paused))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:91:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: pagehide 清理，pageshow 不重播音效也不繞過使用者停用
+not ok 9 - pagehide 清理，pageshow 不重播音效也不繞過使用者停用
+  ---
+  duration_ms: 1.454308
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:95:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(h.tracks.every(a => a.paused))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:97:63)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 返回頁面只恢復一條 BGM，重複可見事件不重疊
+not ok 10 - 返回頁面只恢復一條 BGM，重複可見事件不重疊
+  ---
+  duration_ms: 0.924321
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:100:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    3 !== 2
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:103:31)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 新場景 BGM 缺失時停止舊場景，保留無聲退路
+not ok 11 - 新場景 BGM 缺失時停止舊場景，保留無聲退路
+  ---
+  duration_ms: 0.816368
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:108:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    false !== true
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:111:66)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 素材撤銷立即停止已播與 pending 音軌
+not ok 12 - 素材撤銷立即停止已播與 pending 音軌
+  ---
+  duration_ms: 0.69117
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:113:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    false !== true
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:115:41)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 非核准、外站與不合法 manifest 不可播放且不拋例外
+not ok 13 - 非核准、外站與不合法 manifest 不可播放且不拋例外
+  ---
+  duration_ms: 0.860425
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:118:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Got unwanted exception.
+    Actual message: "Cannot read properties of null (reading 'approved')"
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  actual:
+  error: "Cannot read properties of null (reading 'approved')"
+  name: 'TypeError'
+  stack: |-
+    Object.configure (evalmachine.<anonymous>:24:16)
+    <baseline-replay>/tests/frontend_audio_lifecycle.cjs:120:35
+    getActual (node:assert:611:5)
+    strict.doesNotThrow (node:assert:779:32)
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:120:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+  operator: 'doesNotThrow'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:120:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 自然結束與媒體錯誤都釋放音訊來源
+not ok 14 - 自然結束與媒體錯誤都釋放音訊來源
+  ---
+  duration_ms: 0.855277
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:124:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + '/static/audio/ui-tap.wav'
+    - ''
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ''
+  actual: '/static/audio/ui-tap.wav'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:126:37)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 快速連點音效有並發上限，停用後全部釋放
+not ok 15 - 快速連點音效有並發上限，停用後全部釋放
+  ---
+  duration_ms: 3.452636
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_audio_lifecycle.cjs:129:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(h.tracks.filter(a => !a.paused).length <= 8)
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_audio_lifecycle.cjs:132:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 播放／建構失敗不拋到產品操作
+ok 16 - 播放／建構失敗不拋到產品操作
+  ---
+  duration_ms: 0.547654
+  type: 'test'
+  ...
+# Subtest: 成功回執保留去重，偏好儲存不包含 owner 或回執
+ok 17 - 成功回執保留去重，偏好儲存不包含 owner 或回執
+  ---
+  duration_ms: 1.260988
+  type: 'test'
+  ...
+# Subtest: 三次明確輸入、動畫鎖與最終聲音：reduced=false
+ok 18 - 三次明確輸入、動畫鎖與最終聲音：reduced=false
+  ---
+  duration_ms: 2.888167
+  type: 'test'
+  ...
+# Subtest: 三次明確輸入、動畫鎖與最終聲音：reduced=true
+ok 19 - 三次明確輸入、動畫鎖與最終聲音：reduced=true
+  ---
+  duration_ms: 1.298414
+  type: 'test'
+  ...
+# Subtest: 相同 DOM 重複 mount 不重綁、不重複播孵化聲或移動焦點
+not ok 20 - 相同 DOM 重複 mount 不重綁、不重複播孵化聲或移動焦點
+  ---
+  duration_ms: 1.592556
+  type: 'test'
+  location: '<baseline-replay>/tests/frontend_birth_lifecycle.cjs:37:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    3 !== 1
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<baseline-replay>/tests/frontend_birth_lifecycle.cjs:39:63)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 離開孵化頁後，舊計時器不可揭露、移焦或播放
+ok 21 - 離開孵化頁後，舊計時器不可揭露、移焦或播放
+  ---
+  duration_ms: 0.886003
+  type: 'test'
+  ...
+# Subtest: 既有顯示保留可讀狀態、三階段按鈕與美術 fallback 標記
+ok 22 - 既有顯示保留可讀狀態、三階段按鈕與美術 fallback 標記
+  ---
+  duration_ms: 0.722618
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 8
+# fail 14
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 124.28716
