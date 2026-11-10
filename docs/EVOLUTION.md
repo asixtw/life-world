@@ -204,3 +204,7 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
 
 修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。
+
+## 2026-11-10｜四步經歷與人物關聯（Draft）
+
+原文／媒體 → 目標活動量 → 人物角色 → 人工確認；同 Owner 角色、標籤與共同場合複用。待新增人物與經歷在確認交易內建立，普通日記不進交會，提及不計參與或見面。仍待 Code Review，未部署／未改 Alpha；[契約、限制與驗收](experience/2026-11-10/README.md)。

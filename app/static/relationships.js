@@ -120,10 +120,17 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     const f=evidence.fact; // 讀取目前表單或資訊來源內容
     return `<div class="narrow">${link(query().get('return')||'person/'+personId+'?tab=overview','← 返回人物總覽','text-button')}${c.heading('人物資訊的來源',dims[f.dimension]+' · '+f.value)}<p class="record-content">${h(f.description)}</p><div class="stack">${evidence.sources.map(s=>`<article class="card"><span class="tag">${evidenceNames[s.evidence_type]}</span><p class="record-meta">發生於 ${h(c.time(s.occurred_at))}</p><h3>${h(s.summary)}</h3><div class="raw-source">${h(s.raw_text)}</div><div class="callout">這是使用者已確認的記錄，不代表平台獨立查證。</div>${btn('fact-revoke','撤回此來源','secondary',`data-experience="${s.id}"`)}</article>`).join('')||c.empty('目前沒有有效來源；此資訊不再列為已知維度。')}</div></div>`; // 組合「顯示人物資訊的原文、時間、證據類型與撤回入口」所需的畫面或提交資料
   } // 結束目前回呼、區塊或模組定義
-  function personForm(p=null) { // 產生多角色、分類、標籤與備註編輯表單
-    return `<h2 id="account-heading">${p?'編輯人物':'記下一位重要的人。'}</h2><form id="person-form" ${p?`data-person="${p.id}" data-revision="${p.revision}"`:''}><div class="field"><label for="person-name">稱呼</label><input id="person-name" name="name" maxlength="100" required value="${h(p?.name||'')}"></div><div class="field"><label for="person-role">角色（可多個，以逗號分隔）</label><input id="person-role" name="roles_text" value="${h(p?.roles.join('、')||'')}" placeholder="客戶、跑步夥伴"></div><div class="field"><label for="person-category">主分類</label><select id="person-category" name="category">${Object.entries(categories).map(([v,t])=>`<option value="${v}" ${(p?.category||'other')===v?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label for="person-tags">標籤（以逗號分隔）</label><input id="person-tags" name="tags_text" value="${h(p?.tags.join('、')||'')}"></div><div class="field"><label for="common-context">共同場合／交集（自行記錄）</label><input id="common-context" name="common_context" maxlength="1000" value="${h(p?.common_context||'')}"></div><div class="field"><label for="person-notes">自行記錄的備註</label><textarea id="person-notes" name="notes" maxlength="4000">${h(p?.notes||'')}</textarea></div><button class="primary">保存人物</button></form>`; // 組合「產生多角色、分類、標籤與備註編輯表單」所需的畫面或提交資料
-  } // 結束目前回呼、區塊或模組定義
-  function openPersonEditor(p=null) { editorPerson=p; c.dialog(personForm(p)); } // 記住編輯前人物資料再開啟表單
+  function personForm(p=null) { // 同一 Owner 完整世界清單，與分頁／搜尋結果無關。
+    const own=c.state.world?.user?.owner_id===c.state.me?.owner_id?c.state.world.people:[];
+    const unique=items=>[...new Set(items.map(x=>String(x||'').trim()).filter(Boolean))];
+    const choices=(key,label)=>{
+      const selected=(p?.[key]||[]).map(x=>String(x||'').trim()).filter(Boolean), values=unique([...selected,...own.flatMap(x=>x[key]||[])]);
+      return `<fieldset><legend>${label}（可多選）</legend><div class="label-choices">${values.map(v=>`<label class="check-line"><input type="checkbox" name="${key}_selected" value="${h(v)}" ${selected.includes(v)?'checked':''}>${h(v)}</label>`).join('')||'<p class="small muted">尚無已用選項，可以自行輸入。</p>'}</div><label for="person-${key}">新增${label}（以逗號分隔）</label><input id="person-${key}" name="${key}_text" placeholder="可自行輸入"></fieldset>`;
+    };
+    const contexts=unique([p?.common_context,...own.map(x=>x.common_context)]);
+    return `<h2 id="account-heading">${p?'編輯人物':'記下一位重要的人。'}</h2><form id="person-form" ${p?`data-person="${h(p.id)}" data-revision="${p.revision}"`:''}><div class="field"><label for="person-name">稱呼</label><input id="person-name" name="name" maxlength="100" required value="${h(p?.name||'')}"></div>${choices('roles','角色')}${choices('tags','標籤')}<div class="field"><label for="person-category">主分類</label><select id="person-category" name="category">${Object.entries(categories).map(([v,t])=>`<option value="${v}" ${(p?.category||'other')===v?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label for="common-context">共同場合／交集（可選用或自行輸入）</label><input id="common-context" name="common_context" list="person-contexts" maxlength="1000" value="${h(p?.common_context||'')}"><datalist id="person-contexts">${contexts.map(v=>`<option value="${h(v)}"></option>`).join('')}</datalist></div><div class="field"><label for="person-notes">自行記錄的備註</label><textarea id="person-notes" name="notes" maxlength="4000">${h(p?.notes||'')}</textarea></div><button class="primary">保存人物</button></form>`;
+  }
+  function openPersonEditor(p=null) { ensureOwner(); editorPerson=p; c.dialog(personForm(p)); } // 不保留前一 Owner 的候選。
   async function reviewExtras(personId) { // 在經歷核對頁加入互動分類與逐項人物更新
     if(!personId || personId==='__upgrade' || c.state.me.status==='guest') return '<p class="small muted">本次沒有選擇人物，不會更新人物檔案。</p>'; // 依目前選項或狀態進入對應處理分支
     const data=await c.api('/people/'+encodeURIComponent(personId)+'/overview'); // 等待伺服器完成讀取或保存，再進入下一步
@@ -179,9 +186,9 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     const f=new FormData(form), id=form.id; // 讀取使用者目前表單值，不直接推論人物資訊
     if(id==='people-filter-form') { c.state.dirty=false; c.navigate(listingRoute({q:f.get('q'),sort:f.get('sort'),category:f.get('category'),followed_only:f.has('followed_only')?'true':null,selected:null,offset:null})); return true; } // 成功保存或明確導覽後清除未保存旗標
     if(id==='person-form') { // 依目前選項或狀態進入對應處理分支
-      const unchanged = !!editorPerson && editorPerson.id===form.dataset.person; // 只有確實編輯同一人物，才沿用原始角色與標籤陣列
-      const roles=unchanged && f.get('roles_text')===editorPerson.roles.join('、')?editorPerson.roles:tokens(f.get('roles_text')); // 文字未變更時保留舊陣列，避免把舊角色文字誤拆分
-      const tags=unchanged && f.get('tags_text')===editorPerson.tags.join('、')?editorPerson.tags:tokens(f.get('tags_text')); // 文字未變更時保留舊陣列，避免把舊角色文字誤拆分
+      // 已選既有項目保留完整字串，只有新輸入才依逗號拆分，避免破壞歷史標籤。
+      const roles=[...new Set([...f.getAll('roles_selected'),...tokens(f.get('roles_text'))])];
+      const tags=[...new Set([...f.getAll('tags_selected'),...tokens(f.get('tags_text'))])];
       const body={name:f.get('name'),roles,tags,category:f.get('category'),notes:f.get('notes'),common_context:f.get('common_context')}; // 組合使用者明確提供的 API 提交內容
       const p=await c.api('/people'+(form.dataset.person?'/'+form.dataset.person:''),json(form.dataset.person?'PATCH':'POST',form.dataset.person?{...body,expected_revision:Number(form.dataset.revision)}:body)); // 等待伺服器完成讀取或保存，再進入下一步
       await c.refreshKeepingForm(); document.querySelector('#account-dialog').close(); // 重新讀取伺服器確認的資料，再更新畫面

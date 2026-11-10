@@ -18,3 +18,8 @@
   .media-inputs > label { flex: 1 1 70px; }
   .media-panel button { min-height: 44px; }
 }
+
+/* 分步導覽不讓既有 button display 覆蓋原生 hidden；手機保留完整標籤。 */
+[data-experience-flow] [hidden], [data-story-editor] [hidden] { display: none !important; }
+.label-choices { display:flex; flex-wrap:wrap; gap:.4rem 1rem; max-height:12rem; overflow:auto; }
+.label-choices .check-line { overflow-wrap:anywhere; }

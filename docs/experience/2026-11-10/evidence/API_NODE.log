@@ -1,0 +1,23 @@
+.............................................................s........s. [ 13%]
+........................................................................ [ 26%]
+........................................................................ [ 39%]
+........................................................................ [ 53%]
+........................................................................ [ 66%]
+........................................................................ [ 79%]
+........ssssssssssssss...............s.................................. [ 93%]
+.....................................                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_alpha_deployment_contract.py:35: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_alpha_prebuilt_login.py:113: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_postgres_integration.py:34: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [4] tests/test_postgres_integration.py:119: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:134: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:153: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [2] tests/test_postgres_integration.py:171: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:198: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:216: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
+524 passed, 17 skipped in 17.08s

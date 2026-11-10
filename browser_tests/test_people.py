@@ -110,7 +110,8 @@ def test_original_people_flow_views_sources_and_context(page, width):  # 驗證�
     expect(page.locator('#person-goals')).to_contain_text('整理合作提案')  # 等待並核對目前畫面狀態
     shot(page, f'people-{width}-goals.png')  # 保存目前畫面的驗收截圖
     page.locator('#person-goals').get_by_role('link',name='記錄這個目標的經歷').click()  # 依使用者動線點擊畫面入口
-    expect(page.locator('#person-id')).to_have_value(p['id'])  # 等待並核對目前畫面狀態
+    expect(page.locator('#person-id')).to_have_value('')  # 舊主要人物僅作提示，不能自動推定參與
+    expect(page.locator('.callout').filter(has_text='原先關聯：')).to_contain_text(p['name'])  # 等待並核對目前畫面狀態
     expect(page.locator('#goal-id')).to_have_value(goal['id'])  # 等待並核對目前畫面狀態
     page.get_by_role('link',name='返回人物頁',exact=True).click()  # 依使用者動線點擊畫面入口
     expect(page.get_by_role('tab',name='合作與目標',exact=True)).to_have_attribute('aria-selected','true')  # 等待並核對目前畫面狀態

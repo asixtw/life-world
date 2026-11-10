@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_reusable_choices_empty_legacy_escape_and_owner ______________
+tests/test_person_choices_frontend.py:33: in test_reusable_choices_empty_legacy_escape_and_owner
+    assert len([x for x in inputs if x.get('name') == 'roles_selected' and x.get('value') == '合作']) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+=========================== short test summary info ============================
+FAILED tests/test_person_choices_frontend.py::test_reusable_choices_empty_legacy_escape_and_owner
+1 failed in 0.04s
