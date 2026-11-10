@@ -183,13 +183,15 @@ def test_guest_upgrade_unlocks_only_people_region(page):
     before=page.evaluate("""()=>{window.keptHeading=document.querySelector('#main h1');window.keptActions=document.querySelector('#main .actions');return UX.getState();}""")
     page.locator('#people-region [data-action=upgrade]').click()
     page.locator('[data-action=auth-demo]').click()
-    expect(page.locator('#people-region [data-action=pick]')).to_be_visible()
+    expect(page.locator('[name=people-mode][value=none]')).to_be_checked()
     after=page.evaluate('UX.getState()')
     assert after['step']==3 and after['session']['ownerId']==before['session']['ownerId']
     assert after['raw']==before['raw'] and after['qty']==before['qty'] and after['photo']==before['photo'] and after['audio']==before['audio']
     assert page.evaluate("window.keptHeading===document.querySelector('#main h1')&&window.keptActions===document.querySelector('#main .actions')")
+    assert after['related']==before['related'] and after['people']==before['people']
     assert after['session']['status']=='registered'
     assert page.locator('#account-region [data-action=upgrade]').count()==0
+    page.locator('[name=people-mode][value=some]').check()
     page.locator('#people-region [data-action=new-person]').click()
     page.locator('#new-name').fill('新認識的小林')
     page.locator('[data-action=add-person]').click()
@@ -212,6 +214,8 @@ def test_upgrade_failure_or_cancel_preserves_guest(page,outcome):
     else:expect(page.locator('#sheet .notice.error')).to_be_visible()
     after=page.evaluate('UX.getState()')
     assert after['session']==before['session'] and after['raw']==before['raw'] and after['qty']==before['qty'] and after['step']==3
+    for key in ['related','people','goal','drafts','draftId','summary','photo','audio']:
+        assert after[key]==before[key]
     assert page.locator('#people-region [data-action=pick]').count()==0
 
 
@@ -235,3 +239,23 @@ def test_unavailable_account_capabilities_have_no_auth_action(page):
     page.locator('[data-action=account-menu]').click()
     assert page.locator('#sheet [data-action=auth-demo]').count()==0
     expect(page.locator('#sheet')).to_contain_text('沒有可用的驗證入口')
+
+
+def test_guest_upgrade_without_people_can_continue(page):
+    """升級只解鎖能力，不能代替使用者選擇人物或修改世界內容。"""
+    scene(page,'guestStep3')
+    before=page.evaluate('UX.getState()')
+    page.locator('#people-region [data-action=upgrade]').click()
+    page.locator('[data-action=auth-demo]').click()
+    expect(page.locator('[name=people-mode][value=none]')).to_be_checked()
+    after=page.evaluate('UX.getState()')
+    for key in ['step','raw','qty','goal','related','people','drafts','draftId','summary','photo','audio']:
+        assert after[key]==before[key],key
+    assert after['session']['ownerId']==before['session']['ownerId']
+    folder=ROOT/'screenshots-upgrade-fix'/str(page.viewport_size['width'])
+    folder.mkdir(parents=True,exist_ok=True)
+    page.screenshot(path=str(folder/'upgrade-no-people.png'),full_page=True)
+    page.locator('[data-action=next]').click()
+    assert page.evaluate('UX.getState().step')==4
+    expect(page.locator('#main')).to_contain_text('沒有相關人物')
+    page.screenshot(path=str(folder/'upgrade-continue-step4.png'),full_page=True)

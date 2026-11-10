@@ -1,3 +1,5 @@
+[R2 最後補修：第三步升級狀態及新截圖](UPGRADE_STATE_FIX.md)
+
 # Life World 經歷 UX v0.3 Candidate R2
 
 **NOT APPROVED；Owner 決定預設 Changes Requested。** 本輪是設計核准關卡，不是產品實作／資料庫／正式登入驗收。PR #24 保持 Draft。

@@ -67,7 +67,7 @@ const UX=(()=>{
   if(scene==='deleteSuccess'){s.drafts=s.drafts.filter(d=>d.id!=='draft-one');s.deleted=true;}
   if(['guestAccount','guestStep3','upgradeConfirm','upgradeSuccess','oldWorldWarning','authFailure','authCancelled','authUnavailable','authConflict'].includes(scene)){s.identity='guest';s.step=scene==='guestAccount'?1:3;s.goal=true;s.qty=['0.5','1',''];}
   s.session=sessionFixture(s.identity,'world-one',scene!=='authUnavailable');
-  if(scene==='upgradeSuccess'){s.identity='registered';s.session=sessionFixture('registered');s.related=true;s.accountMessage='世界已升級（示意），仍在第 3 步；Owner 與輸入保留。';}
+  if(scene==='upgradeSuccess'){s.identity='registered';s.session=sessionFixture('registered');s.accountMessage='世界已升級（示意），仍在第 3 步；Owner 與輸入保留。';}
   if(scene==='authCancelled')s.accountMessage='Google 驗證已取消（示意），仍是原訪客世界，內容沒有變更。';
   if(['summaryChanged','summaryReviewed','manualUnrelated'].includes(scene)){
    s.step=4;s.summary='這是我親自整理並保留的摘要。';s.summaryEdited=true;s.related=true;s.people=[member('yi'),member('an','participant')];s.people[0].changes=[{...change(),accepted:true}];s.people[1].changes=[{id:'an-manual',label:'興趣與嗜好',old:'',value:'登山',origin:'使用者輸入 · 示意',quote:'小安加入我們，說他開始喜歡登山',supported:true,accepted:true}];
@@ -124,7 +124,8 @@ const UX=(()=>{
  }
  function deliverUpgradeFixture(){ // 只替換帳號與人物區；測試必須確認 Owner、路由、DOM 與編輯值不變。
   s.session=sessionFixture('registered',s.session.ownerId);s.identity=s.session.status;
-  s.accountMessage='世界已升級（設計示意），原 Owner 與輸入保留。';if(s.step===3)s.related=true;renderAccount();
+  // 身分升級只解鎖能力，不代替使用者選擇人物或變更經歷內容。
+  s.accountMessage='世界已升級（設計示意），原 Owner 與輸入保留。';renderAccount();
   const region=$('#people-region');if(region)region.innerHTML=peopleRegion();
   if(s.step===1){const fragment=document.createElement('div');fragment.innerHTML=step1();$('#main .input-tabs').innerHTML=fragment.querySelector('.input-tabs').innerHTML;$('#ai-region').innerHTML=fragment.querySelector('#ai-region').innerHTML;} // 保留原文 textarea 與素材容器，只解鎖能力區。
   if(!$('#account-feedback'))$('#main').insertAdjacentHTML('afterbegin','<div id="account-feedback" class="notice success" role="status"></div>');
