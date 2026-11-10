@@ -1,5 +1,7 @@
 # 共同規格入口
 
+- [UX v0.3 Candidate 設計審核](experience/ux-v03-candidate/README.md)：NOT APPROVED，Owner 明確核准前停止產品串接；[互動 Demo](experience/ux-v03-candidate/index.html)／[合併關卡](experience/ux-v03-candidate/MERGE_GATES.md)。
+
 - [2026-11-10 經歷四步與人物關聯修復候選](experience/2026-11-10/README.md)：未合併／未部署，v0.2 UX、待新增人物交易及交會顯示邊界。
 
 > 2026-11-08 Owner最新範圍：首次公開版包含核心人物理解／劇場、美術核准接入、聲音v0.2規劃及獨立開關。先讀[公開完成矩陣](testing/PUBLIC_RELEASE_MATRIX.md)，不再沿用先凍結核心劇場的發布範圍。RC v3保留；新程式為本機候選，不能當已公開／已部署。

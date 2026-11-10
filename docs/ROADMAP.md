@@ -38,3 +38,10 @@ GCP 暫定分工為 Cloud Run Web 同源前端／API、Cloud SQL PostgreSQL、�
 - 實作：四步文字流程、同 Owner 人物選項複用、交會角色過濾、確認交易內建立待新增人物。
 - 本機驗收與限制：[交付入口](experience/2026-11-10/README.md)。Draft PR／人工審查階段，不代表正式 Alpha 或真模型驗收。
 - PR #22 獨立；背景 AI／特徵演算法、伺服器草稿刪除、正式發布不納入本批。
+
+## 2026-11-10｜PR24 UX 設計關卡
+
+- 狀態：UX v0.3 Candidate／Changes Requested／NOT APPROVED。
+- 本輪只有[獨立互動設計與審查素材](experience/ux-v03-candidate/README.md)，沒有修改產品 app／API。
+- 合併前新增：人物變更與來源預覽、草稿安全刪除、第三步簡化、第四步摘要化、多人定向一致性；PR22第三步同Owner升級後局部解鎖並保留輸入，取消／失敗維持Guest。
+- Owner 回覆「UX v0.3 核准」後才進入資料契約與產品串接；真 Google／Alpha 聯合驗收仍 NOT RUN。

@@ -1,5 +1,8 @@
 # 經歷四步流程與人物關聯修復（Draft，未部署）
 
+> **2026-11-10 Owner 設計關卡：Changes Requested。** 舊第三／四步畫面未獲設計核准；先審查 [UX v0.3 Candidate](../ux-v03-candidate/README.md) 與[合併前清單](../ux-v03-candidate/MERGE_GATES.md)。收到「UX v0.3 核准」前不進行後續產品串接、Merge 或 Deploy。原下方功能測試不等於設計核准。
+
+
 以 main `68102f230aa947a434286ba9260e1ae75f6634b0` 為基準。Owner 最新整合指令優先於交接附件原「暫緩四步」範圍。v0.2 原型只作 UX 參考，沒有採用模擬 AI。
 
 ## 修改與原因
