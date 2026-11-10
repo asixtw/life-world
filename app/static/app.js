@@ -54,10 +54,12 @@ function showError(error) { // 在頁面與對話框顯示可閱讀的錯誤
   if ($('#source-dialog')?.open) $('#source-error').textContent=error.message+fields; // 來源儲存失敗保持表單並顯示退路
 } // 結束目前回呼、區塊或模組定義
 async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與連線失敗處理
+  if(state.googleUncertain && options.method && !['GET','HEAD'].includes(options.method) && path!=='/auth/external/status' && !(path==='/auth/external/exchange' && options.googleExchangeOnce))throw new Error('登入交換結果尚未核對，請先核對登入結果；原表單會保留。');
   const headers = {'X-CSRF-Token':state.csrf, ...options.headers}; // 為寫入請求帶上目前工作階段的 CSRF 代碼
   if (options.body && !(options.body instanceof FormData)) { // 依目前選項或狀態進入對應處理分支
     headers['Content-Type'] = 'application/json'; options.body = JSON.stringify(options.body); // 序列化提交內容供 API 或請求指紋使用
   } // 結束目前回呼、區塊或模組定義
+  delete options.googleExchangeOnce;
   let response; // 保存待讀取的伺服器回應
   try { response = await fetch('/api' + path, {...options, headers, credentials:'same-origin', cache:'no-store'}); } // 以同來源 Cookie 送出請求，停用 API 快取
   catch { throw new Error('目前無法連線。請保留內容，連線恢復後再送出；尚未確認保存成功。'); } // 顯示失敗原因，讓使用者保留內容並重試
@@ -291,7 +293,8 @@ function accountView(mode = 'account') { // 顯示帳號、升級或登入表單
   const memoryControl=state.me && state.capabilities?.relationship_memory_available?button('memory-settings','個人化資料與記憶','text-button'):'';
   if (state.capabilities?.google_login_available && mode!=='test-login' && !(mode==='account' && state.me?.status==='registered')) {
     const upgrade=state.me?.status==='guest' && mode!=='login';
-    dialog(`<h2 id="account-heading">${upgrade?'使用Google帳號保存我的世界':'Google登入'}</h2><p>${upgrade?'會保留目前目標、經歷與積分；已屬於其他世界的Google帳號不會自動合併。':'登入已有世界；不同帳號資料不會自動合併。'}</p>${!upgrade&&state.me?.status==='guest'?'<label><input id="google-discard" type="checkbox">我了解登入其他帳號不會合併目前訪客資料</label>':''}<button type="button" class="primary" data-action="google-start" data-mode="${upgrade?'upgrade':'login'}">${upgrade?'使用 Google 帳號保存我的世界':'繼續使用 Google 登入'}</button><div id="google-button"></div>${state.capabilities?.password_login_available?button('test-login-dialog','測試帳號登入','secondary'):''}${memoryControl}${aiUsageControl}${button("retry-guest-cleanup","重試清除已離開的訪客草稿","text-button")}${upgrade?button("google-login-existing","登入既有世界","secondary"):""}${state.me?'<label><input id="clear-local-media" type="checkbox">登出後清除此瀏覽器目前世界的媒體草稿（不刪除伺服器資料）</label><p class="small muted">未勾選會留在此裝置；不代表雲端備份。清除網站資料也會移除。</p>'+button('logout','登出','secondary'):''}`);
+    const consent=!upgrade && (!state.me || state.me.status==='guest');
+    dialog(`<h2 id="account-heading">${upgrade?'保存或切換你的世界':'登入以前的世界'}</h2><p>${upgrade?'保存目前世界會綁定Google，保留原本目標、草稿、經歷、進度與獎勵。':'只登入已綁定的Google世界；找不到時不會建立新帳號或放棄訪客資料。'}</p>${consent?'<p class="callout">兩個世界不會合併。成功切換後，原訪客世界將進入待清除程序，至少14天後才符合永久清除條件；目前不提供恢復功能。</p><label><input id="google-discard" type="checkbox">我確認成功登入後放棄目前訪客世界及其本機媒體草稿</label>':''}<button type="button" class="primary" data-action="google-start" data-mode="${upgrade?'upgrade':'login'}">${upgrade?'保存目前世界':'繼續使用 Google 登入'}</button>${upgrade?button('google-login-existing','登入以前的世界','secondary'):''}<p id="google-status" role="status" aria-live="polite">尚未開始驗證，訪客資料保持不變。</p><div id="google-button"></div>${button('google-cancel','取消Google驗證','text-button')}${button('google-reconcile','核對登入結果','text-button')}${state.capabilities?.password_login_available?button('test-login-dialog','測試帳號登入','secondary'):''}${memoryControl}${aiUsageControl}${button('retry-guest-cleanup','重試清除已離開的訪客草稿','text-button')}${state.me?button('logout','登出','secondary'):''}`);
     return;
   }
   if(mode==='test-login'){if(!state.capabilities?.password_login_available)throw new Error('測試帳號登入尚未啟用。');mode='login';}
@@ -307,38 +310,67 @@ function accountView(mode = 'account') { // 顯示帳號、升級或登入表單
   } // 結束目前回呼、區塊或模組定義
 } // 結束目前回呼、區塊或模組定義
 let googleSdkPromise;
-async function startGoogleLogin(mode) { // 使用者明確選擇後才載入外部GIS；不使用One Tap強迫登入。
-  if (!state.me) {
-    const me=await api('/auth/guest',{method:'POST'});state.me=me;state.csrf=me.csrf_token;
+async function completeGoogleTransition(attempt,me,receipt) {
+  // 只依後端綁定新Session的收據清理；不憑畫面跳轉或不同owner猜測交換已提交。
+  if(receipt.status!=='committed' || receipt.source_owner_id!==attempt.sourceOwner || receipt.owner_id!==me.owner_id || receipt.mode!==attempt.mode)throw new Error('登入收據無法核對，請保留原表單。');
+  const sameOwner=me.owner_id===attempt.sourceOwner;
+  if(attempt.mode==='upgrade' && !sameOwner)throw new Error('保存世界的Owner不一致，已停止畫面切換。');
+  if(!sameOwner && attempt.sourceGuest && (!attempt.discard || !receipt.guest_abandoned))throw new Error('沒有已提交的訪客放棄收據，已停止切換。');
+  state.csrf=me.csrf_token;state.me=me;state.googleUncertain=false;
+  if(sameOwner){
+    // 不重新render或navigate：完整保留目前路由、未保存欄位、媒體及草稿狀態。
+    await refresh();navigation(state.route);state.googleAttempt=null;$('#account-dialog').close();toast('已保存目前世界，原本進度與尚未完成的表單都保留。');return;
   }
-  const challenge=await api('/auth/external/challenge',{method:'POST',body:{mode,discard_guest:!!$('#google-discard')?.checked}});
+  lockRenderControls();state.world=null;state.draft=null;state.candidate=null;state.aiPeople=[];state.requests.clear();DashboardUI.clear();
+  await refresh();state.googleAttempt=null;$('#account-dialog').close();navigate(state.me.lumi_hatched?'world':'profile');
+  if(receipt.guest_abandoned && attempt.sourceOwner!==me.owner_id)GuestLocalCleanup.enqueue(attempt.sourceOwner).catch(()=>toast('訪客本機素材清理尚未完成，可於帳號選單重試。'));
+}
+async function reconcileGoogleTransition(attempt) {
+  // 未知結果先讀Cookie目前的Session，再查同Session收據；不自動重送exchange。
+  const response=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});
+  if(!response.ok)throw new Error('目前無法核對登入Session，請保留原表單並稍後核對。');
+  const me=await response.json();state.csrf=me.csrf_token;
+  const receipt=await api('/auth/external/status',{method:'POST',body:{challenge_id:attempt.challenge.challenge_id}});
+  if(receipt.status==='committed'){await completeGoogleTransition(attempt,me,receipt);return true;}
+  if(me.owner_id!==attempt.sourceOwner)throw new Error('目前Session與原世界不一致，請先核對帳號；不會清除資料。');
+  if(!attempt.definitive && !receipt.expired)throw new Error('交換可能仍在處理，尚無可確認結果；請稍後再次核對，不要重送。');
+  state.me=me;state.googleUncertain=false;attempt.exchangeStarted=false;state.googleAttempt=null;$('#google-button')?.replaceChildren();if($('#google-discard'))$('#google-discard').disabled=false;return false;
+}
+async function startGoogleLogin(mode) {
+  if(state.googleUncertain)throw new Error('請先核對上一次登入結果，勿重複驗證。');
+  const discard=!!$('#google-discard')?.checked;
+  if(mode==='login' && (!state.me || state.me.status==='guest') && !discard)throw new Error('請先確認放棄訪客資料與至少14天清除告知，才開始驗證。');
+  const attempt={mode,discard,sourceOwner:state.me?.owner_id,sourceGuest:!state.me || state.me.status==='guest',exchangeStarted:false};state.googleAttempt=attempt;
+  $('#google-status').textContent='正在準備Google驗證；尚未切換或清除資料。';
+  if(!state.me){const me=await api('/auth/guest',{method:'POST'});state.me=me;state.csrf=me.csrf_token;attempt.sourceOwner=me.owner_id;}
+  if($('#google-discard'))$('#google-discard').disabled=true;
+  attempt.challenge=await api('/auth/external/challenge',{method:'POST',body:{mode,discard_guest:discard}});
+  if(state.googleAttempt!==attempt || !$('#account-dialog').open)return;
   googleSdkPromise ||= new Promise((resolve,reject)=>{
     if(window.google?.accounts?.id){resolve();return;}
     const script=document.createElement('script');script.src='https://accounts.google.com/gsi/client';script.async=true;
-    script.onload=resolve;script.onerror=()=>{script.remove();googleSdkPromise=null;reject(new Error('Google登入載入失敗，訪客資料會保留。'));};document.head.appendChild(script);
+    script.onload=resolve;script.onerror=()=>{script.remove();googleSdkPromise=null;reject(new Error('Google驗證服務暫時不可用，原訪客世界與表單保持。'));};document.head.appendChild(script);
   });
-  await googleSdkPromise;
-  // 每次challenge均換nonce；對話框關閉後舊回呼不得登入其他世界。
-  const attempt=state.googleAttempt=challenge.challenge_id;
-  google.accounts.id.initialize({client_id:challenge.client_id,nonce:challenge.nonce,auto_select:false,ux_mode:'popup',callback:async response=>{
-    if(state.googleAttempt!==attempt || !$('#account-dialog').open)return;
-    try {
-      const previousGuest=mode==='login' && $('#google-discard')?.checked && state.me?.status==='guest' ? state.me.owner_id : null;
-      const result=await api('/auth/external/exchange',{method:'POST',body:{challenge_id:challenge.challenge_id,credential:response.credential}});
-      state.csrf=result.csrf_token;state.me=result;state.googleAttempt=null;state.world=null;state.candidate=null;state.aiPeople=[];DashboardUI.clear();
-      if(previousGuest && previousGuest!==result.owner_id){
-        await GuestLocalCleanup.enqueue(previousGuest);
-        state.draft=null;state.candidate=null;
-      }
-      $('#account-dialog').close();await refresh();navigate(state.me.lumi_hatched?'world':'profile');
-    } catch(error) {
-      // 回應若在Cookie輪換後遺失，先恢復現有Session顯示，不重做升級或重發獎勵。
-      try {await refresh();} catch {}
-      $('#dialog-error').textContent=error.message+' 若已登入，關閉此視窗後即可繼續；否則請重新開始。';
+  await googleSdkPromise;if(state.googleAttempt!==attempt || !$('#account-dialog').open)return;
+  google.accounts.id.initialize({client_id:attempt.challenge.client_id,nonce:attempt.challenge.nonce,auto_select:false,ux_mode:'popup',callback:async response=>{
+    if(state.googleAttempt!==attempt || !$('#account-dialog').open || attempt.exchangeStarted)return;
+    if(!response.credential){$('#google-status').textContent='Google驗證未完成或已取消，原訪客資料保持。';return;}
+    attempt.exchangeStarted=true;state.googleUncertain=true;$('#google-status').textContent='正在交換身分，請稍候；結果不明時會先核對Session。';
+    try{
+      // exchange本身僅送出一次；狀態未明期間其餘寫入維持阻擋。
+      const result=await api('/auth/external/exchange',{method:'POST',googleExchangeOnce:true,body:{challenge_id:attempt.challenge.challenge_id,credential:response.credential}});
+      attempt.definitive=true;state.googleUncertain=true;state.csrf=result.csrf_token;
+      await reconcileGoogleTransition(attempt);
+    }catch(error){
+      attempt.definitive=attempt.definitive || Number.isInteger(error.status);state.googleUncertain=true;
+      try{if(await reconcileGoogleTransition(attempt))return;}catch{}
+      if($('#dialog-error'))$('#dialog-error').textContent=error.message+(state.googleUncertain?' 結果尚未確認，請點「核對登入結果」，不要重送。':' 原訪客世界與表單保留，尚未切換。');
     }
   }});
   google.accounts.id.renderButton($('#google-button'),{type:'standard',theme:'outline',size:'large'});
+  $('#google-status').textContent='請完成Google驗證；關閉Google視窗不會放棄訪客世界。';
 }
+
 function formSnapshot() { // 暫存目前表單值與未保存狀態
   const form = $('#record-form') || $('#review-form') || $('#note-form') || $('#complete-form'); // 取得本次操作的表單
   return form ? {id:form.id, values:[...new FormData(form).entries()], dirty:state.dirty} : null; // 讀取使用者目前表單值，不直接推論人物資訊
@@ -457,7 +489,7 @@ document.addEventListener('click', async event => { // 監聽點擊
     if(action==='test-login-dialog')accountView('test-login');
     if (action === 'claim-dialog') accountView('claim'); // 開啟升級帳號表單
     if (action === 'login-dialog') {if(state.capabilities?.access_mode==='public_alpha'&&!state.capabilities.accounts_available)throw new Error('Alpha預建帳號登入尚未啟用。');accountView('login');} // 開啟登入表單
-    if (action === 'close-account') $('#account-dialog').close(); // 關閉對話框
+    if (action === 'close-account') {if(state.googleUncertain)throw new Error('登入結果正在核對，請先核對登入結果；不能把已送出的交換當作取消。');$('#account-dialog').close();} // 關閉對話框
     if (action === 'stay-on-form') {state.pendingRoute = null; $('#account-dialog').close();} // 保留輸入並繼續編輯
     if (action === 'discard-and-leave') {await MediaUI.discard(); const route = state.pendingRoute; state.pendingRoute = null; ConnectionsUI.clearReview(state.draft?.id); $('#account-dialog').close(); navigate(route);} // 明確捨棄時不在下次核對偷偷還原修改
     if (action === 'keep-local-and-leave') {await MediaUI.keepLocal(); const route=state.pendingRoute; state.pendingRoute=null; $('#account-dialog').close(); navigate(route);}
@@ -477,6 +509,8 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (action === 'edit-current-draft') {state.editingDraft = true; navigate('record');} // 帶回目前草稿進行修改
     if (action === 'retry-guest-cleanup') {await GuestLocalCleanup.retry();return;}
     if (action === 'google-login-existing') {accountView('login');return;}
+    if(action==='google-cancel'){if(state.googleAttempt?.exchangeStarted){await reconcileGoogleTransition(state.googleAttempt);return;}state.googleAttempt=null;if($('#google-discard'))$('#google-discard').disabled=false;window.google?.accounts?.id?.cancel?.();$('#google-button').replaceChildren();$('#google-status').textContent='已取消Google驗證，原訪客世界與表單保持。';return;}
+    if(action==='google-reconcile'){if(state.googleAttempt?.challenge){const done=await reconcileGoogleTransition(state.googleAttempt);if(!done)$('#google-status').textContent='此交換尚未提交，原訪客世界保持，可重新開始驗證。';}return;}
     if (action === 'google-start') {await startGoogleLogin(event.target.closest('[data-action]').dataset.mode);return;}
     if(action==='ai-usage'){
       const usage=await api('/ai/usage'),usd=n=>'$'+(Number(n)/1000000).toFixed(2);
@@ -563,7 +597,8 @@ window.addEventListener('hashchange', () => { // 監聽路由變更並保護未�
   if (state.dirty && destination !== state.route) {history.replaceState(null, '', '#' + state.route); leaveDialog(destination); return;} // 依目前選項或狀態進入對應處理分支
   $('#notice').innerHTML = ''; render().catch(showError); // 執行「處理hashchange事件與對應的介面狀態」的目前處理步驟
 }); // 結束目前回呼、區塊或模組定義
-$('#account-dialog').addEventListener('close', () => {$('#account-content').replaceChildren();}); // 執行「處理hashchange事件與對應的介面狀態」的目前處理步驟
+$('#account-dialog').addEventListener('cancel',event=>{if(state.googleUncertain){event.preventDefault();showError(new Error('登入結果尚未確認，請保留表單並核對登入結果。'));}});
+$('#account-dialog').addEventListener('close', () => {if(!state.googleAttempt?.exchangeStarted)state.googleAttempt=null;$('#account-content').replaceChildren();}); // 執行「處理hashchange事件與對應的介面狀態」的目前處理步驟
 window.addEventListener('beforeunload', event => {if (state.dirty) {event.preventDefault(); event.returnValue = '';}}); // 監聽關閉頁面以保護未保存內容
 window.addEventListener('offline', () => {$('#notice').innerHTML = '<div class="callout error-message">目前離線；尚未送出的內容沒有保存成功。請保留此頁，連線後再試。</div>';}); // 監聽離線狀態並提示保留輸入
 async function start() { // 讀取既有身分後啟動畫面

@@ -145,3 +145,9 @@ HabitScheduleDisclosure v0.3沿用calendar端點，每次明確請求當月與�
 後端每次由有效來源重算User／Person／Relationship／Context提示及有限Behavior；內部雙端標籤不回傳一般人物卡。回應保留utterance／provider／model／request_id／applied=false，另帶`behavior`（action=ask_question|share_context|acknowledge、tone=supportive、reason_codes、simulation=true）、`behavior_source=rules`、`source_experience_ids`、`uncertainty=simulation_not_prediction`。Provider替身notice不得覆蓋成真實AI。未啟用回503、Guest403、來源不存在／撤回422、跨Owner拒絕；不寫人物事實、經歷、進度或獎勵。
 
 `ai_result_v1`私有收據新增Provider／Model／可為null的Provider Request ID；Token用量與未知成本null不變，不存來源／輸出全文。這些候選變更不代表Staging API已部署。
+
+## 2026-11-10 Google世界轉換契約（修復候選，未部署）
+
+`upgrade`保留來源Owner；`login`只登入既有Google映射，未知映射404 `google_world_not_found`，不建立新世界。Guest切換不同Owner需明確`discard_guest=true`，成功提交後才啟動既有14天待清除；同Owner不建立待清除紀錄。
+
+新增 `POST /api/auth/external/status`，輸入`{challenge_id}`，同源／當前Session／CSRF驗證。已提交時回`{status:"committed",mode,source_owner_id,owner_id,guest_abandoned}`；未提交回`{status:"not_committed",owner_id,expired}`。只核對既有收據與owner交易鎖，不重送交換或新增清除。不同Session／Owner無權查詢。完整邊界及驗收見[修復包](auth/google-world-transition-2026-11-10/README.md)。

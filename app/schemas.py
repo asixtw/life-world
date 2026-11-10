@@ -416,3 +416,8 @@ class GoogleExchange(Model):
     """ID token僅作交換，不接受前端自報owner/email。"""
     challenge_id: str = Field(pattern=r'^[0-9a-f-]{36}$')
     credential: str = Field(min_length=1,max_length=16384)
+
+
+class GoogleExchangeStatus(Model):
+    """只核對已驗證Session的交換收據，不接收token或自報owner。"""
+    challenge_id: str = Field(pattern=r'^[0-9a-f-]{36}$')

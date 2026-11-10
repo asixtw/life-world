@@ -67,7 +67,7 @@ def test_normal_login_returns_google_owner_not_same_email_local_account(setup):
         me,_=onboard(first);body=challenge(first,v);r=first.post('/api/auth/external/exchange',json=body);assert r.status_code==200
         owner=r.json()['owner_id']
     with client_for(app) as second:
-        guest(second);body=challenge(second,v,mode='login',token='second-token')
+        guest(second);body=challenge(second,v,mode='login',token='second-token',discard_guest=True)
         r=second.post('/api/auth/external/exchange',json=body);assert r.status_code==200 and r.json()['owner_id']==owner
     with client_for(app) as local:
         me,_=onboard(local)
@@ -76,7 +76,8 @@ def test_normal_login_returns_google_owner_not_same_email_local_account(setup):
         # 前端自報email/user_id一律422，不參與任何帳號合併。
         assert local.post('/api/auth/external/exchange',json={**body,'email':'same@example.invalid','user_id':owner}).status_code==422
         body=challenge(local,v,subject='brand-new-subject',mode='login',token='new-token')
-        r=local.post('/api/auth/external/exchange',json=body);assert r.status_code==200 and r.json()['owner_id']!=me['owner_id']
+        r=local.post('/api/auth/external/exchange',json=body);assert r.status_code==404
+        assert local.get('/api/auth/me').json()['owner_id']==me['owner_id']
 
 
 def test_different_owner_conflict_and_no_automatic_data_merge(setup):
