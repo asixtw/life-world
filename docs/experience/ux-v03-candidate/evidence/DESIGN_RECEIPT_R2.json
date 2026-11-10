@@ -1,0 +1,35 @@
+{
+  "design": "UX v0.3 Candidate R2",
+  "owner_decision": "Changes Requested",
+  "approved": false,
+  "directions_approved": "five requested directions only; not overall UX",
+  "reference_commit": "8d9357959b46718b51059b0f4bc9dfde5c69840a",
+  "product_baseline": "7013894b868f1d50c3a2704977b20d500891ce35",
+  "product_app_diff": [],
+  "design_tests": "56 passed",
+  "r2_screenshots": 99,
+  "r1_screenshots_preserved": 76,
+  "normal_viewports": [
+    390,
+    1440
+  ],
+  "extra_viewports": [
+    320
+  ],
+  "stress_simulations": [
+    "CSS 22px text",
+    "Chromium page scale 1.5",
+    "short visible viewport 380px"
+  ],
+  "real_ios_android_keyboard": "NOT RUN",
+  "api_or_external_model_requests": 0,
+  "cloud_or_production_db_changes": false,
+  "gate_b_c": "NOT COMPLETE",
+  "source_sha256": {
+    "index.html": "0e0cb9e6ac973685fb6aa8a71351dc1dd2a56cb9a59372d22dea4e89545fd0f5",
+    "demo.js": "475b3f056cf3fa70039a398b52c4ea0607b677115a927fc33c5ee3b46fc4668e",
+    "demo.css": "aa4fa1de0732e39f88c423a060787558bf77d55436deb694544fee620933c933",
+    "tests/test_candidate.py": "5b8594df9aef6423260560fe47acb03c9f83c69eed9e19db6c769944ff67e85c",
+    "tests/test_review_revision.py": "5422e4afb5413f067b39d7ac58e9cc3d2a11a986c6adb5686ebc76906b21f28c"
+  }
+}

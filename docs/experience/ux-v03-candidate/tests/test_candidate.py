@@ -5,7 +5,7 @@ import pytest
 from playwright.sync_api import sync_playwright, expect
 
 ROOT=Path(__file__).resolve().parents[1]
-SCENES=['guestAccount','guestStep3','upgradeConfirm','upgradeSuccess','oldWorldWarning','registeredAccount','authFailure','authCancelled','authUnavailable','authConflict','step1','media','empty','guest','aiOff','step2','goal','step3','existing','new','multiple','mention','step4','multiUpdates','newPreview','updatePreview','noChanges','source','saveFailure','saveSuccess','drafts','draftEmpty','deleteConfirm','deleteFailure','deleteConflict','deleteSuccess','leave']
+SCENES=['summaryChanged','summaryReviewed','manualUnrelated','aiManual','aiConsentFirst','aiAuthorized','aiFailure','aiCandidate','guestAccount','guestStep3','upgradeConfirm','upgradeSuccess','oldWorldWarning','registeredAccount','authFailure','authCancelled','authUnavailable','authConflict','step1','media','empty','guest','aiOff','step2','goal','step3','existing','new','multiple','mention','step4','multiUpdates','newPreview','updatePreview','noChanges','source','saveFailure','saveSuccess','drafts','draftEmpty','deleteConfirm','deleteFailure','deleteConflict','deleteSuccess','leave']
 
 
 @pytest.fixture(params=[390,1440])
@@ -30,7 +30,7 @@ def scene(page,name):
 def test_all_scenes_and_screenshots(page):
     width=page.viewport_size['width']
     page.set_viewport_size({'width':width,'height':844 if width==390 else 1000})
-    folder=ROOT/'screenshots'/str(width);folder.mkdir(parents=True,exist_ok=True)
+    folder=ROOT/'screenshots-r2'/str(width);folder.mkdir(parents=True,exist_ok=True)
     for name in SCENES:
         scene(page,name)
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),name
@@ -38,16 +38,17 @@ def test_all_scenes_and_screenshots(page):
         assert page.locator('.workspace').get_by_role('tab',name='正式帳號').count()==0
         modal=page.locator('#sheet').is_visible()
         page.screenshot(path=str(folder/(name+'.png')),full_page=not modal)
-        if modal and page.locator('#sheet').evaluate('(n)=>n.scrollHeight>n.clientHeight+2'):
-            page.locator('#sheet').evaluate('(n)=>n.scrollTop=n.scrollHeight')
+        if modal and page.locator('#sheet .sheet-body').evaluate('(n)=>n.scrollHeight>n.clientHeight+2'):
+            page.locator('#sheet .sheet-body').evaluate('(n)=>n.scrollTop=n.scrollHeight')
             page.screenshot(path=str(folder/(name+'-detail-bottom.png')),full_page=False)
         # 最後操作按鈕可捲到可視範圍，手機固定導覽不覆蓋可操作區。
         if not page.locator('#sheet').is_visible() and name.startswith('step'):
             button=page.locator('#main .actions .primary')
             button.scroll_into_view_if_needed()
             box=button.bounding_box()
-            nav=page.locator('.sidebar').bounding_box()
-            if width==390: assert box['y']+box['height']<=nav['y']+1
+            if width==390:
+                assert not page.locator('.sidebar').is_visible()
+                assert box['y']+box['height']<=page.viewport_size['height']+1
 
 
 def test_four_steps_keep_data_and_no_person_write(page):
@@ -70,7 +71,7 @@ def test_four_steps_keep_data_and_no_person_write(page):
     expect(page.locator('#summary')).to_have_value('與小林讀書，也提到怡君。')
     expect(page.locator('.person-preview')).to_have_count(1)
     page.locator('.person-preview').click()
-    expect(page.locator('#sheet')).to_contain_text('待建立資料')
+    expect(page.locator('#sheet')).to_contain_text('確認後會保存')
     expect(page.locator('#sheet')).not_to_contain_text('興趣與嗜好')
     page.locator('[data-action=preview-edit]').click()
     expect(page.locator('[data-role]')).to_have_value('interaction')
@@ -113,7 +114,7 @@ def test_multi_mentions_and_unsupported_fields(page):
         expect(page.locator('#sheet-title')).to_contain_text(name)
         page.get_by_role('button',name='關閉預覽',exact=True).click()
     scene(page,'newPreview')
-    expect(page.locator('#sheet')).to_contain_text('此欄位尚無正式保存契約')
+    expect(page.locator('#sheet')).to_contain_text('目前沒有正式保存契約')
     assert page.locator('[data-change]').count()==0
     scene(page,'mention')
     page.locator('[data-action=mention-source]').click()
