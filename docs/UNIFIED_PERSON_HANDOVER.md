@@ -94,4 +94,9 @@
 
 ## 8. Alpha 資料庫的 010 升級
 
-`life_world_alpha` 還沒有升到 010。升級腳本的審視結果在倉庫外：`C:\LifeWorld_project\alpha-unification-20261110\alpha_migration_010_review\ALPHA_MIGRATION_010_REVIEW_20261111.md`。重點是升級要和這個分支的程式一起上：舊程式的訪客資料清除會因為外鍵清單改變而拒絕執行（`app/guest_fk.py`、`app/guest_lifecycle.py`）。
+`life_world_alpha` 在 2026-11-11 還沒有升到 010。升級腳本的審視結果、實際採用的腳本與預檢查詢在倉庫外：`C:\LifeWorld_project\alpha-unification-20261110\alpha_migration_010_review\`（先看 `ALPHA_MIGRATION_010_REVIEW_20261111.md`）。腳本已在 Alpha 試跑成功（結尾還原，沒有留下變更），正式升級由 Jerry 執行。
+
+升級後要注意兩件事：
+
+- Alpha 現行舊程式（`68102f2`）的訪客清除工作（`app/guest_maintenance.py` → `GuestPurger._purge`）會因為外鍵與表清單改變而拒絕執行（`unreviewed_fk`、`unreviewed_table`）；這個分支的程式兩種結構都支援（`app/guest_fk.py` 的 `CONTRACTS`）。網站本身不做這個檢查，推論可以繼續用舊程式，但沒有實測。
+- 要在 Alpha 使用這個分支的人物功能，除了換程式，還要以 `link_table` 的關係來源設定部署（和 E2E 相同），否則 `/api/persons` 會回 `unified_people_not_enabled`。
