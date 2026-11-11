@@ -1,8 +1,8 @@
 'use strict';
 window.ExperienceUI=(()=>{
   let c, flow=null;
-  /** @typedef {{ownerId:string,draftId:?string,expectedRevision:?number,currentStep:number,rawText:string,occurredAt:string,goalId:?string,contributions:Array,personId:?string,pendingPerson:?Object,story:?Object,editedSummary:string,hasSummary:boolean,summarySourceRaw:?string,aiConsent:boolean,aiCandidate:?string,dirty:boolean,requestId:?string,mediaScope:?string}} ExperienceFlowState */
-  function initialize(context){c=context;}
+  /** @typedef {{ownerId:string,draftId:?string,expectedRevision:?number,currentStep:number,rawText:string,occurredAt:string,goalId:?string,contributions:Array,personId:?string,pendingPerson:?Object,story:?Object,editedSummary:string,hasSummary:boolean,summarySourceRaw:?string,summarySourceHash:?string,tasks:Array<string>,personCandidates:Array<Object>,supplementInputs:Record<string,Object>,aiConsent:boolean,aiCandidate:?string,dirty:boolean,requestId:?string,mediaScope:?string}} ExperienceFlowState */
+  function initialize(context){c=context;window.PersonSupplementsUI?.initialize({state:c.state,esc:c.esc,toast:c.toast,getFlow:()=>flow,people:currentReviewPeople});}
   function capture(event){ // 單一 DOM 是編輯值來源，換步不重建媒體或清空表單。
     const form=document.querySelector('#record-form,#review-form');if(!form||!flow)return;
     const f=new FormData(form),refreshPeople=!event||!['summary','tasks'].includes(event.target?.name);
@@ -12,7 +12,7 @@ window.ExperienceUI=(()=>{
     if(f.has('tasks'))flow.tasks=String(f.get('tasks')).split('\n').map(t=>t.trim()).filter(Boolean);
     if(form.querySelector('[data-summary-source-review]')?.checked){flow.summarySourceRaw=flow.rawText;flow.summarySourceHash=c.state.draft?.raw_sha256;}
     if(event?.target?.id==='story-reviewed'&&event.target.checked)flow.personReviewSignature=reviewStorySignature(form);
-    flow.aiCandidate=c.state.candidate||null;if(refreshPeople)refreshReviewSummary(); // 編輯摘要不重建人物卡或反覆掃描長原文。
+    flow.aiCandidate=c.state.candidate||null;if(refreshPeople){refreshReviewSummary();window.PersonSupplementsUI?.refresh();} // 編輯摘要不重建人物卡或反覆掃描長原文。
   }
   function summaryState(d){
     // 同Owner同草稿才沿用未保存摘要；來源內容不同就要求明確重核對，不能套用到另一份草稿。
@@ -23,8 +23,14 @@ window.ExperienceUI=(()=>{
   function tasksState(d){return flow?.ownerId===c.state.me?.owner_id&&flow.draftId===d.id&&flow.tasks?flow.tasks:d.review?.tasks||[];}
   function reviewSnapshot(){
     // 只保存本Owner本草稿的核對資料；逐人採用與排除均保留到最終Confirm。
-    capture();const d=c.state.draft;if(!d||flow?.ownerId!==c.state.me?.owner_id||flow.draftId!==d.id||!flow.hasSummary)return undefined;
-    return {...(d.review||{}),summary:flow.editedSummary,summary_source_sha256:flow.summarySourceHash??(flow.summarySourceRaw===flow.rawText?d.raw_sha256:null),summary_needs_review:flow.summarySourceRaw!==flow.rawText,tasks:flow.tasks||[],person_candidates:flow.personCandidates||d.review?.person_candidates||[]};
+    capture();const d=document.querySelector('#record-form')&&!c.state.editingDraft?null:c.state.draft;if(flow?.ownerId!==c.state.me?.owner_id||flow.draftId!==(document.querySelector('#record-form')&&!c.state.editingDraft?null:d?.id)||!flow.hasSummary&&!flow.personCandidates?.length)return undefined;
+    return {...(d?.review||{}),summary:flow.hasSummary?flow.editedSummary:null,summary_source_sha256:flow.summarySourceHash??(flow.summarySourceRaw===flow.rawText?d?.raw_sha256:null)??null,summary_needs_review:flow.hasSummary&&flow.summarySourceRaw!==flow.rawText,tasks:flow.tasks||[],person_candidates:flow.personCandidates||d?.review?.person_candidates||[]};
+  }
+  function storyForDraft(form){
+    window.PersonSupplementsUI?.validate(form);const story=window.ConnectionsUI.collectEditor(form);
+    // 單人舊介面的穩定暫存鍵只在有逐人候選時轉成多人契約，不提前建立人物。
+    if(story?.pending_person&&flow?.personCandidates?.some(x=>x.target.client_ref==='legacy')){story.pending_people=[{...story.pending_person,client_ref:'legacy'}];delete story.pending_person;}
+    return story;
   }
   function summaryReview(d){
     return summaryState(d).needsReview?'<div class="callout" role="status">原始經歷已修改，這份摘要需要重新核對。你的摘要已保留，不代表它已與新原文一致。<label class="check-line"><input type="checkbox" data-summary-source-review required>我已對照新原文，重新核對目前摘要。</label></div>':'';
@@ -163,9 +169,9 @@ window.ExperienceUI=(()=>{
       c.state.experienceFlow=flow;return;
     }
     // 從第四步選擇修改原文應回第一步；同一份record表單的局部恢復才保留原步。
-    const carry=flow?.ownerId===c.state.me.owner_id&&flow.draftId===c.state.draft?.id?flow:null;
+    const carry=flow?.ownerId===c.state.me.owner_id&&flow.draftId===(c.state.editingDraft?c.state.draft?.id:null)?flow:null;
     const previousStep=flow?.ownerId===c.state.me.owner_id&&flow.currentStep<=3?flow.currentStep:1;
-    flow={ownerId:c.state.me.owner_id,draftId:c.state.editingDraft?c.state.draft?.id:null,expectedRevision:c.state.draft?.revision,currentStep:1,rawText:'',occurredAt:'',goalId:null,contributions:[],personId:null,pendingPerson:null,story:null,editedSummary:carry?.editedSummary??'',hasSummary:carry?.hasSummary||false,summarySourceRaw:carry?.summarySourceRaw??null,summarySourceHash:carry?.summarySourceHash??null,tasks:carry?.tasks,personCandidates:carry?.personCandidates,personReviewSignature:carry?.personReviewSignature??null,aiConsent:false,aiCandidate:null,dirty:false,requestId:null,mediaScope:null};
+    flow={ownerId:c.state.me.owner_id,draftId:c.state.editingDraft?c.state.draft?.id:null,expectedRevision:c.state.draft?.revision,currentStep:1,rawText:'',occurredAt:'',goalId:null,contributions:[],personId:null,pendingPerson:null,story:null,editedSummary:carry?.editedSummary??'',hasSummary:carry?.hasSummary||false,summarySourceRaw:carry?.summarySourceRaw??null,summarySourceHash:carry?.summarySourceHash??null,tasks:carry?.tasks,personCandidates:carry?.personCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.person_candidates||[]:[]),supplementInputs:carry?.supplementInputs||{},personReviewSignature:carry?.personReviewSignature??null,aiConsent:false,aiCandidate:null,dirty:false,requestId:null,mediaScope:null};
     const sections=[1,2,3].map(n=>{const x=document.createElement('section');x.dataset.experienceStep=n;return x;});
     const nodes=[...form.children], goal=form.querySelector('#goal-id')?.closest('.field'),person=form.querySelector('#person-id');
     for(const node of nodes){
@@ -196,7 +202,7 @@ window.ExperienceUI=(()=>{
     if(!section)return;
     section.innerHTML=c.personControls(flow.story);
     delete section.dataset.guestLocked;
-    window.ConnectionsUI.hydrateEditors();
+    window.ConnectionsUI.hydrateEditors();window.PersonSupplementsUI?.refresh();
   }
-  return {initialize,mount,capture,refreshCapabilities,summaryState,summaryReview,tasksState,reviewSnapshot,refreshReviewSummary,getState:()=>flow};
+  return {initialize,mount,capture,refreshCapabilities,summaryState,summaryReview,tasksState,reviewSnapshot,storyForDraft,refreshReviewSummary,getState:()=>flow};
 })();

@@ -1,17 +1,18 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準dd4bea4；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準9025536；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
-| 完整本機API及Node suite | **740 PASS、70 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
-| 本輪工作流/候選/用量/世界交換Chromium（同次） | **50 PASS**（27工作流/預覽＋12核對草稿＋3用量＋8 GIS替身）；evidence/CANDIDATE_INTEGRATION_BROWSER.log |
+| 完整本機API及Node suite | **741 PASS、71 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
+| 本輪工作流/補充/用量/世界交換Chromium（同次） | **55 PASS**（27工作流/預覽＋17草稿/補充＋3用量＋8 GIS替身）；evidence/STEP3_INTEGRATION_BROWSER.log |
+| 補充加入後自動收合與本機恢復（最後UI調整後） | **4 PASS**，STEP3_COLLAPSE_BROWSER.log；不是額外4個不同案例，不與55加總 |
 | 人物候選版本衝突／確認503重試 | 追加分開執行 **1 PASS／2 PASS**；CANDIDATE_VERSION_BROWSER.log、CANDIDATE_RETRY_BROWSER.log，不與50重複加總 |
-| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述50項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
-| Google世界交換Chromium | 本次50項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
-| 受限本機PG18人物/草稿/AI | **36 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
+| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述55項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
+| Google世界交換Chromium | 本次55項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
+| 受限本機PG18人物/草稿/AI | **37 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
 | AI專項 | evidence/AI_POLICY_SQLITE.log：36 PASS/7 PG SKIP；AI_POLICY_PG18.log：另行7 PASS |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
 | 真Google、新GCP整合Revision、真AI/媒體Provider、Safari | **NOT RUN（本輪）** |
@@ -50,8 +51,8 @@ Alpha仍是舊Runtime，非敏感現況/候選設定及停止程序見[AI_BUDGET
 
 ## 未完成／發布Gate
 
-1. **完整PR24 Candidate A1/A2四步尚未完成**：第三步收合補充輸入及基本資料原值→新值差異仍待串接；第四步四維候選逐項人工核對與原有事實讀取已接上，不能當成完整人物補充完成；當前第三步還含舊fieldset，第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
-2. DraftReview已可保存摘要/任務/四維事實候選及逐人target；SQLite/PG重新登入讀回與同名人物分流已驗證。第三步收合補充輸入、生日/任職候選草稿及同名核對狀態尚未接齊。第四步已可逐人核對已保存四維候選並選用同一Confirm交易；不得誤稱完整人物補充已可用。未支援欄位不開放白填。
+1. **完整PR24 Candidate A1/A2四步尚未完成**：第三步已能加入四維補充候選，但人物選擇仍含舊fieldset，尚待收斂；基本資料候選與差異仍待串接；第四步四維候選逐項人工核對與原有事實讀取已接上，不能當成完整人物補充完成；當前第三步還含舊fieldset，第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
+2. DraftReview已可保存摘要/任務/四維事實候選及逐人target；SQLite/PG重新登入讀回與同名人物分流已驗證。第三步四維補充已接上；生日/任職候選草稿及同名核對狀態尚未接齊。第四步已可逐人核對已保存四維候選並選用同一Confirm交易；不得誤稱完整人物補充已可用。未支援欄位不開放白填。
 3. Feature Store PG兩表未建立；衍生失效/長期記憶與人物基本資料AI上下文尚未完成。來源撤回API不代表Feature Store已驗收。不啟用額外AI。
 4. GuestPurger需依真實FK及011新增表審查，維持fail-closed；未啟用正式刪除排程。
 5. 正式011/最小權限、完整Sequence補驗、GCP E2E、備份Restore/Rollback演練、真Google聯合驗收、固定Release SHA/Digest/Revision仍待完成。
@@ -72,7 +73,7 @@ Python使用/private/tmp/lw-integration-venv，Node使用已驗SHA的/private/tm
 
 ```sh
 PATH=/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin:$PATH LIFEWORLD_NODE=/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node python -m pytest tests -q --tb=short
-LIFEWORLD_TEST_URL=http://127.0.0.1:8191 GOOGLE_TRANSITION_TEST_URL=http://127.0.0.1:8188 python -m pytest browser_tests/test_draft_review.py browser_tests/test_integration_person_details.py browser_tests/test_ai_usage_personal.py browser_tests/test_google_world_transition.py -q --tb=short
+LIFEWORLD_TEST_URL=http://127.0.0.1:8192 GOOGLE_TRANSITION_TEST_URL=http://127.0.0.1:8188 python -m pytest browser_tests/test_draft_review.py browser_tests/test_integration_person_details.py browser_tests/test_ai_usage_personal.py browser_tests/test_google_world_transition.py -q --tb=short
 GOOGLE_TRANSITION_TEST_URL=http://127.0.0.1:8188 python -m pytest browser_tests/test_google_world_transition.py -q --tb=short
 LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json python -m pytest tests/test_pg_integration_person_details.py tests/ai/test_pg_ai_usage.py -q --tb=short
 ```
@@ -94,6 +95,17 @@ LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json pyt
 - 逐項採用或排除；source_kind仍是輸入管道，evidence_type明確選擇且無預設推測。raw來源變動後需對照當前原文/片段重新勾選；缺失片段不能採用。候選原版本保留，不因讀取新人物資料靜默改expected_person_revision。
 - 採用/排除只改本草稿前端狀態；保存核對草稿可跨重新整理恢復，正式Confirm才與人物/事實/來源/經歷/進度/任務/獎勵同交易。與舊單人候選同時選用明確報錯，不靜默丟棄。503後保留核對結果，可重試，不重複建人/計分。
 - 抽屜更新單列狀態不重建全表單，關閉焦點回人物卡；較舊GET以Owner/草稿/人物key防止污染新抽屜。320/390/1440的新增與原有→本次資訊畫面已作本機Chromium證據。
-- 第三步「＋補充這次了解的人物資訊」輸入尚未接上；本輪以API合成草稿驗證真實第四步/Confirm，沒有把種入候選當成完整端到端產品。完整UX、真Google、外部AI與GCP整合Gate不變。
+- 第三步四維補充已在本輪接上，另以實際UI輸入完成第三步→第四步→Confirm，證據見下一節；既有API種入候選測試仍保留作低層回歸。完整UX、真Google、外部AI與GCP整合Gate不變。
 
 本輪候選畫面：[320px待建人物排除](screenshots/320-targeted-candidate-review.png)、[390px原有/新增事實](screenshots/390-prior-and-candidate-facts.png)、[1440px原有/新增事實](screenshots/1440-prior-and-candidate-facts.png)。此UI階段可回復至dd4bea4支援envelope的reader，但不能據此宣稱Alpha舊Runtime可無損回復新格式。
+
+
+## 第三步收合補充（本輪，未部署）
+
+- 新模組experience_supplements.js沿用原四步/Owner/草稿與Confirm，不呼叫獨立建人或事實寫入API；每位人物預設收合，加入候選後自動收合並回復焦點，第四步才逐項採用。公司/職稱/生日的本次候選未接通，不開放白填或繞存。
+- 已選既有人物與待建人物各自維護四維內容、來源、證據類型；單人舊表單只在需要時轉為穩定legacy client_ref的多人契約，加入第二人不換掉第一人的候選target。同名不合併。
+- 未加入候選的文字會阻擋伺服器保存，提供清空本次輸入，不清除已加入候選；既有Owner/draft IndexedDB可保留已加入及尚未完成內容。移除人物不默默把候選轉給別人，需重新關聯或明確移除。伺服器草稿不建人；最終交易才建人/寫事實/計分。
+- 實際測試發現僅提及者的事實會被舊參與來源檢查拒絕。修復只對人物事實接受已人工配對且有效的提及來源；其他API的參與/關係來源規則不放寬，不新增參與/互動列。SQLite及受限PG18驗證、相同請求去重與零互動統計通過。
+- 320/390/1440實際UI輸入兩位人物不同資訊→返回→保存草稿→逐項核對→Confirm→API讀回事實/一次獎勵通過，不預先種入人物候選。未加入輸入保護及新分頁本機恢復另已測試。舊fieldset仍偏長，不能視為Candidate整體視覺完成。
+- fact_sources既有API尚未顯式投影manual/raw輸入管道；該資訊目前保存在已確認草稿的DraftReview JSON，與evidence_type分開。完整來源瀏覽/來源撤回衍生失效仍需完成，不冒稱已全數整合。
+- [第三步契約與限制](STEP3_SUPPLEMENT_CONTRACT.md)、[390px](screenshots/390-step3-supplement-input.png)、[1440px](screenshots/1440-step3-supplement-input.png)。保持Draft／NO-GO，沒有正式DB/權限/部署操作。

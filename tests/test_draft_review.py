@@ -1,5 +1,7 @@
 """同一草稿JSON保存人工摘要及逐人候選；保存不建人，確認才原子寫入。"""
 import hashlib
+import pytest
+from app.errors import DomainError
 from fastapi.testclient import TestClient
 from conftest import onboard,register,draft,confirm_payload
 
@@ -115,3 +117,23 @@ def test_review_invalid_targets_and_duplicate_refs_do_not_create_drafts(client):
     r['person_candidates'].append(r['person_candidates'][0].copy())
     response=client.post('/api/experiences/drafts',json={'raw_text':raw,'occurred_at':'2026-10-27T00:00:00Z','contributions':[],'review':r})
     assert response.status_code==422 and not client.get('/api/state').json()['drafts']
+
+
+def test_confirmed_mention_can_source_explicit_fact_without_becoming_interaction(client):
+    _,g=onboard(client);register(client);raw='今天提到小明。'
+    r={'summary':'提到人物的真實記錄','summary_source_sha256':sha(raw),'tasks':[],'person_candidates':[{'candidate_ref':'mention-fact','target':{'client_ref':'mentioned'},'dimension':'food','value':'清淡','source_kind':'manual','evidence_type':'stated_by_person','selected':True}]}
+    d=draft(client,g,raw_text=raw,contributions=[],story={'pending_people':[{'client_ref':'mentioned','name':'小明','relation':'mention','start':raw.index('小明')}]},review=r)
+    payload=confirm_payload(d,summary=r['summary'],tasks=[],contributions=[],story=d['story'],story_reviewed=True,use_saved_review=True)
+    response=client.post('/api/drafts/'+d['id']+'/confirm',json=payload);assert response.status_code==201,response.text
+    pid=response.json()['created_people']['mentioned'];overview=client.get('/api/people/'+pid+'/overview').json()
+    assert overview['facts']['food'][0]['value']=='清淡'
+    assert overview['stats']['interactions']==0
+    assert client.post('/api/drafts/'+d['id']+'/confirm',json=payload).json()==response.json()
+    # 人物事實可引用已人工配對的提及，不把提及變成其他API的參與/關係來源。
+    with client.app.state.service.db.connect() as c:
+        assert not c.execute('SELECT * FROM experience_participants WHERE person_id=?',(pid,)).fetchall()
+        assert not c.execute('SELECT * FROM interaction_people WHERE person_id=?',(pid,)).fetchall()
+        owner=client.get('/api/auth/me').json()['owner_id']
+        with pytest.raises(DomainError) as rejected:
+            client.app.state.service._source_experience(c,owner,response.json()['experience_id'],[pid])
+        assert rejected.value.code=='unrelated_source'

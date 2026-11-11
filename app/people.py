@@ -120,11 +120,14 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             return [r[0] for r in c.execute('SELECT person_id FROM experience_participants WHERE experience_id=?', (row['id'],))]
         return [row['person_id']]
 
-    def _source_experience(self, c, owner, experience_id, person_ids=None):  # 要求來源是同帳號且與人物相關的已確認經歷
+    def _source_experience(self, c, owner, experience_id, person_ids=None, *, allow_confirmed_mentions=False):  # 要求來源是同帳號且與人物相關的已確認經歷
         row = c.execute('SELECT * FROM experiences WHERE id=? AND owner_id=?', (experience_id, owner)).fetchone()  # 執行目前交易中的參數化查詢
         require(row is not None, 404, 'not_found', '找不到可引用的已確認經歷。')  # 驗證限制：找不到可引用的已確認經歷。
         if person_ids is not None:  # 依人物選擇或人物資料狀態套用限制
-            linked = self._experience_people(c, row)  # 與「可引用來源清單」共用同一規則
+            linked = self._experience_people(c, row)  # 參與來源規則不因人物補充而放寬。
+            if allow_confirmed_mentions:
+                # 僅人物事實接受已人工配對且有效的提及；不改互動、關係或見面統計。
+                linked += [r[0] for r in c.execute("SELECT m.person_id FROM experience_mentions m JOIN experience_stories s ON s.experience_id=m.experience_id AND s.owner_id=m.owner_id WHERE m.owner_id=? AND m.experience_id=? AND m.status='matched' AND m.person_id IS NOT NULL AND s.reviewed=TRUE AND s.available=TRUE",(owner,experience_id))]
             require(any(pid in linked for pid in person_ids), 422, 'unrelated_source', '來源必須是與這位人物有關的已確認經歷。')  # 不能引用其他人的故事作本人陳述
         return row  # 回傳要求來源是同帳號且與人物相關的已確認經歷的結果
 
@@ -205,7 +208,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
 
     def _write_fact(self, c, owner, person_id, data, source_ids):  # 正規化同值資訊、增加來源並保留使用者指定的衝突
         self._owned(c, 'people', person_id, owner)  # 限制查詢資料表並核對資源所屬帳號
-        for source_id in source_ids: self._source_experience(c, owner, source_id, [person_id])  # 逐項處理清單中的資料，保留目前交易或查詢條件
+        for source_id in source_ids: self._source_experience(c, owner, source_id, [person_id], allow_confirmed_mentions=True)  # 明確核對的人物資訊可源自提及，不推論出席。
         normalized = unicodedata.normalize('NFKC', data.value).strip().casefold()  # 統一字寬與大小寫後辨識同值人物資訊
         old = c.execute('SELECT * FROM person_facts WHERE person_id=? AND dimension=? AND normalized_value=?',
                         (person_id, data.dimension, normalized)).fetchone()  # 執行目前交易中的參數化查詢

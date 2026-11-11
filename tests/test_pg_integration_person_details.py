@@ -112,3 +112,5 @@ from test_draft_review import (
  test_manual_candidates_survive_raw_edit_and_two_targets_remain_separate,
  test_review_invalid_targets_and_duplicate_refs_do_not_create_drafts,
 )
+
+from test_draft_review import test_confirmed_mention_can_source_explicit_fact_without_becoming_interaction

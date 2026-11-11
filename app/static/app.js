@@ -416,7 +416,7 @@ async function saveDraft(form, review, destination = 'history') { // 新增或�
   await MediaUI.awaitReady(); // 縮圖完成才綁定素材與保存伺服器草稿。
   const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.has('calendar_time')?f.get('calendar_date')+'T'+f.get('calendar_time'):f.get('occurred_at'),form.dataset.calendarZone||state.me.timezone),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
   const savedReview=ExperienceUI.reviewSnapshot();if(savedReview)body.review=savedReview;
-  body.story=ConnectionsUI.collectEditor(form); // 草稿只保存候選，不建立正式人物連結
+  body.story=ExperienceUI.storyForDraft(form); // 草稿只保存候選，不建立正式人物連結
   if (body.person_id === '__upgrade') throw new Error('請先建立帳號後再選擇人物。'); // 依目前選項或狀態進入對應處理分支
   let result; // 保存伺服器已確認的操作結果
   if (state.editingDraft && state.draft?.status === 'draft') result = await api('/drafts/' + state.draft.id,{method:'PUT',body:{...body,expected_revision:state.draft.revision}}); // 等待伺服器完成讀取或保存，再進入下一步
@@ -430,7 +430,7 @@ async function saveDraft(form, review, destination = 'history') { // 新增或�
 async function saveReviewDraft(destination='history') { // 核對頁可保存而不建人、計分或確認經歷。
   const form=$('#review-form'),d=state.draft;if(!form||!d)return;
   const f=new FormData(form),review=ExperienceUI.reviewSnapshot();
-  const result=await api('/drafts/'+d.id,{method:'PUT',body:{raw_text:d.raw_text,occurred_at:d.occurred_at,goal_id:d.goal_id,person_id:f.get('person_id')||null,contributions:contributions(form),story:ConnectionsUI.collectEditor(form),review,expected_revision:d.revision}});
+  const result=await api('/drafts/'+d.id,{method:'PUT',body:{raw_text:d.raw_text,occurred_at:d.occurred_at,goal_id:d.goal_id,person_id:f.get('person_id')||null,contributions:contributions(form),story:ExperienceUI.storyForDraft(form),review,expected_revision:d.revision}});
   ConnectionsUI.clearReview(d.id);state.draft=result;state.dirty=false;await refresh();navigate(destination);toast('核對草稿已保存至伺服器，尚未建立人物或計分。');
 }
 function leaveDialog(route) { // 離開前提供保存草稿、繼續編輯或明確捨棄
@@ -588,7 +588,7 @@ document.addEventListener('submit', async event => { // 監聽表單提交
     if (form.id === 'review-form') { // 依目前選項或狀態進入對應處理分支
       const body = {...PeopleUI.reviewPayload(form),expected_revision:state.draft.revision,summary:f.get('summary'),person_id:f.get('person_id') || null,contributions:contributions(form),tasks:String(f.get('tasks')).split('\n').map(x => x.trim()).filter(Boolean)}; // 組合使用者明確提供的 API 提交內容
       const reviewSnapshot=ExperienceUI.reviewSnapshot();if(reviewSnapshot){body.reviewed_summary_sha256=reviewSnapshot.summary_source_sha256;if(reviewSnapshot.person_candidates.length){if(body.person_updates?.length)throw new Error('此草稿使用逐人人物補充；請先取消舊版單人候選，避免兩份資訊互相覆蓋。');body.review=reviewSnapshot;delete body.person_updates;}}
-      body.story=ConnectionsUI.collectEditor(form); body.story_reviewed=f.has('story_reviewed'); // 正式角色需獨立人工接受
+      body.story=ExperienceUI.storyForDraft(form); body.story_reviewed=f.has('story_reviewed'); // 正式角色需獨立人工接受
       if(body.story) { if(body.person_id&&!body.story.participants.some(p=>p.person_id===body.person_id)) throw new Error('主要關聯人物不在參與清單，請調整主要人物或參與者；提及者請在提及區核對。'); body.person_id=body.person_id||body.story.participants[0]?.person_id||null; body.interaction_type=f.get('story_interaction_type')||'unknown'; } // 不將原人物資訊候選誤套到另一位參與者
       const result = await api('/drafts/' + state.draft.id + '/confirm',{method:'POST',body:{...body,request_id:requestId('confirm:' + state.draft.id,body)}}); // 等待伺服器完成讀取或保存，再進入下一步
       ConnectionsUI.clearReview(state.draft.id); // 確認成功後清除核對暫存

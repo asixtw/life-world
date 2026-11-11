@@ -77,7 +77,8 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
     if(list)list.insertAdjacentHTML('beforeend',pendingTargetRow(next));
     else{
       const current=collectEditor(root.closest('form'))?.pending_person;
-      const people=current?[{...current,client_ref:crypto.randomUUID()},next]:[next];
+      // 第一位舊式待建人物沿用補充候選的草稿內穩定鍵，新增第二人不能改寫其target。
+      const people=current?[{...current,client_ref:'legacy'},next]:[next];
       const legacy=root.querySelector('[name=pending_person_enabled]')?.closest('details');
       if(!legacy)throw new Error('目前無法加入人物，請保留草稿並重新載入。');
       legacy.outerHTML=pendingPeopleSummary(people);
