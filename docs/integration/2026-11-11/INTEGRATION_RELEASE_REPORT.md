@@ -1,19 +1,19 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準6c9c736；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準0eee0a3；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
 | 本輪四步＋AI授權Chromium（同次，新版隔離服務） | **14 PASS**（四步6＋授權8）；evidence/FOUR_STEP_AND_AI_BROWSER.log；替身非真模型 |
-| 完整本機API及Node suite | **748 PASS、79 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
+| 完整本機API及Node suite | **754 PASS、85 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
 | 前一UI階段工作流/精簡人物/用量/世界交換Chromium（前一階段同次） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
 | 最後重複提示文字調整後 | **6 PASS**（三尺寸選擇及補充完整確認），COMPACT_PEOPLE_COPY_BROWSER.log；不與66加總 |
 | 人物候選版本衝突／確認503重試 | 追加分開執行 **1 PASS／2 PASS**；CANDIDATE_VERSION_BROWSER.log、CANDIDATE_RETRY_BROWSER.log，不與本次66重複加總 |
 | 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述66項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
 | Google世界交換Chromium | 本次66項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
-| 受限本機PG18人物/草稿/AI | **45 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
+| 受限本機PG18人物/草稿/AI | **51 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
 | 草稿AI授權專項（前一後端階段） | SQLite **6 PASS**；缺撤回權限的PG額外 **1 PASS**，不與完整套件加總；DRAFT_AI_CONSENT_SCOPE.log、DRAFT_AI_CONSENT_PERMISSION.log |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
 | 真Google、新GCP整合Revision、真AI/媒體Provider、Safari | **NOT RUN（本輪）** |
@@ -53,7 +53,7 @@ Alpha仍是舊Runtime，非敏感現況/候選設定及停止程序見[AI_BUDGET
 ## 未完成／發布Gate
 
 1. **完整PR24 Candidate A1/A2四步尚未完成**：第三步人物選擇已換為精簡搜尋/卡片/明確角色，四維補充預設收合；基本資料候選與差異仍待串接；第四步四維候選逐項人工核對與原有事實讀取已接上，不能當成完整人物補充完成；第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
-2. DraftReview已可保存摘要/任務/四維事實候選及逐人target；SQLite/PG重新登入讀回與同名人物分流已驗證。第三步四維補充已接上；生日/任職候選草稿及同名核對狀態尚未接齊。第四步已可逐人核對已保存四維候選並選用同一Confirm交易；不得誤稱完整人物補充已可用。未支援欄位不開放白填。
+2. DraftReview已可保存摘要/任務/四維事實候選及逐人target；SQLite/PG重新登入讀回與同名人物分流已驗證。第三步四維補充已接上；生日/任職候選草稿後端已接上，UI及同名核對狀態尚未接齊。第四步已可逐人核對已保存四維候選並選用同一Confirm交易；不得誤稱完整人物補充已可用。未支援欄位不開放白填。
 3. Feature Store PG兩表未建立；衍生失效/長期記憶與人物基本資料AI上下文尚未完成。來源撤回API不代表Feature Store已驗收。不啟用額外AI。
 4. GuestPurger需依真實FK及011新增表審查，維持fail-closed；未啟用正式刪除排程。
 5. 正式011/最小權限、完整Sequence補驗、GCP E2E、備份Restore/Rollback演練、真Google聯合驗收、固定Release SHA/Digest/Revision仍待完成。
@@ -163,3 +163,13 @@ LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json pyt
 最終同次收據：`LIFEWORLD_TEST_URL=http://127.0.0.1:8194 python -m pytest browser_tests/test_experience_four_steps.py browser_tests/test_draft_ai_consent_ui.py -q --tb=short` → **14 PASS，60.93秒**，evidence/FOUR_STEP_AND_AI_BROWSER.log。草稿AI radio紅燈見DRAFT_AI_RADIO_RED.log。沒有任何Provider外部呼叫或正式資料寫入。
 
 新畫面：[320px第四步](screenshots/four-step-regression/320-step4.png)、[390px第二步](screenshots/four-step-regression/390-step2.png)、[1440px第三步](screenshots/four-step-regression/1440-step3.png)、[390px手動預設](screenshots/390-draft-ai-manual.png)；其餘三尺寸完整四步在[four-step-regression](screenshots/four-step-regression/README.md)。不以截圖或14項PASS宣稱整體UX已核准。
+
+
+## 生日/任職核對草稿與同交易確認（本輪後端，未發布）
+
+- 沿用draft_stories的JSON保存兩類候選清單；逐人target、候選ref、來源/hash、版本與採用/排除分離，合計100項。不新增表、不將基本資料塞四維事實。未完成生日/任職可保留，正式Confirm前驗完整性與來源；空白生日不默認刪除，清空需明確clear。
+- 任職PATCH只保存實際提供欄位；最初測試抓出序列化默認null會破壞PATCH語意，已用受限serializer保留欄位存在性。生日未知年、不猜年齡；既有任職指定employment_id且Owner/person一致，不改其他工作。
+- SQLite23 PASS（新6＋既有DraftReview9＋基本資料8），DRAFT_BASIC_REVIEW_SQLITE.log；完整API/Node754 PASS/85 SKIP；受限本機PG18 51 PASS，含新6案例。來源紅燈DRAFT_BASIC_REVIEW_RED.log，未修改後端保護來遷就測試。所有資料合成，沒有模型或GCP呼叫。
+- 重登讀回、同名雙人物各自基本資料、原文更改raw失效/manual保留、未完成不能確認、候選排除、Guest/Owner隔離、舊Confirm409/混用422、任職部分更新/保留其他欄位、晚期衝突回滾與重送去重均實測。正式歷史及獎勵與Confirm共用交易。
+- **基本資料候選前端尚未接上**：第三/四步輸入、原值/新值/來源核對及重新進入的真瀏覽器流程NOT RUN；不把API種入當產品流程完成。生日/任職詳情頁是先前獨立能力，不能代表經歷候選UI完成。下一步需將此契約接進每張人物卡與第四步。
+- 新清單對舊讀取器非完全可逆；空清單省略以保留舊請求，但新候選須相容reader與混合Revision/資料回復演練，不能直接退0eee0a3並假稱新候選完整。見DRAFT_REVIEW_CONTRACT.md。Alpha仍未接此格式；無正式Migration/GRANT或發布。

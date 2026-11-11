@@ -3,7 +3,7 @@ from decimal import Decimal, InvalidOperation  # 以精確十進位處理貢獻�
 from typing import List, Optional, Literal  # 宣告可選欄位、清單與受限字串型別
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError  # 使用 IANA 時區轉換日期與時間
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictBool, field_validator, model_validator  # 定義輸入模型、型別、長度與跨欄位驗證
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictBool, field_validator, field_serializer, model_validator  # 定義輸入模型、型別、長度與跨欄位驗證
 
 
 def decimal_string(value):  # 驗證正數、上限與小數位數，避免浮點誤差
@@ -364,6 +364,48 @@ class DraftPersonCandidate(Model):
         return self
 
 
+class DraftBasicCandidate(Model):
+    """基本資料候選的來源與決定；與已確認DTO分開，不提前創建人物或來源。"""
+    model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
+    candidate_ref: str = Field(min_length=1,max_length=128)
+    target: PersonUpdateTarget
+    expected_revision: StrictInt = Field(default=0,ge=0)
+    source_kind: Literal['manual','raw']
+    source_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$')
+    quote: Optional[str] = Field(default=None,max_length=2000)
+    evidence_type: Optional[Literal['stated_by_person','observed_by_user','documented_source']] = None
+    selected: StrictBool = False
+    excluded: StrictBool = False
+    needs_review: StrictBool = False
+
+    @model_validator(mode='after')
+    def distinct_decision(self):
+        if self.selected and self.excluded:raise ValueError('候選不可同時採用及排除')
+        return self
+
+
+class DraftBirthdayValue(Model):
+    """草稿可保留尚未填完的月日；正式日期驗證在核對/確認時使用BirthdayValue。"""
+    birth_year: Optional[StrictInt] = Field(default=None,ge=1,le=9999)
+    birth_month: Optional[StrictInt] = Field(default=None,ge=1,le=12)
+    birth_day: Optional[StrictInt] = Field(default=None,ge=1,le=31)
+
+
+class DraftBirthdayCandidate(DraftBasicCandidate):
+    clear: StrictBool = Field(default=False,exclude_if=lambda v:not v)
+    value: DraftBirthdayValue = Field(default_factory=DraftBirthdayValue)
+
+
+class DraftEmploymentCandidate(DraftBasicCandidate):
+    employment_id: Optional[str] = Field(default=None,min_length=1,max_length=128)
+    value: EmploymentPatchValue = Field(default_factory=EmploymentPatchValue)
+
+    @field_serializer('value')
+    def preserve_patch_presence(self,value,info):
+        # 保存/讀回不能把未填欄位補成顯式null，否則PATCH語意被改變且下一次驗證失敗。
+        return value.model_dump(mode=info.mode,exclude_unset=True)
+
+
 class DraftReview(Model):
     model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
     summary: Optional[str] = Field(default=None,max_length=20000)
@@ -372,9 +414,14 @@ class DraftReview(Model):
     tasks: List[str] = Field(default_factory=list,max_length=20)
     person_candidates: List[DraftPersonCandidate] = Field(default_factory=list,max_length=100)
 
+    birthday_candidates: List[DraftBirthdayCandidate] = Field(default_factory=list,max_length=100,exclude_if=lambda v:not v)
+    employment_candidates: List[DraftEmploymentCandidate] = Field(default_factory=list,max_length=100,exclude_if=lambda v:not v)
+
     @model_validator(mode='after')
     def unique_candidates(self):
-        refs=[p.candidate_ref for p in self.person_candidates]
+        candidates=[*self.person_candidates,*self.birthday_candidates,*self.employment_candidates]
+        if len(candidates)>100:raise ValueError('本次人物補充候選合計最多100項')
+        refs=[p.candidate_ref for p in candidates]
         if len(refs)!=len(set(refs)):raise ValueError('人物候選代碼不可重複')
         if any(not t.strip() or len(t)>300 for t in self.tasks):raise ValueError('任務需有內容且最多300字')
         return self
