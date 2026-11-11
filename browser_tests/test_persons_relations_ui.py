@@ -27,7 +27,8 @@ PREPARE = """async (goal) => {
     return data;
   };
   const person = (key, body) => call('/persons', 'POST', {request_id: 'rel-ui-' + key, ...body});
-  const a = await person('a', {name: '周瑜', person_subtype: 'historical', description: '東吳軍事統帥，赤壁之戰的主帥。', tags: ['正史三國']});
+  // 我的經歷只能關聯真實人物（後端檢查），所以有我的經歷的周瑜不設歷史子類型
+  const a = await person('a', {name: '周瑜', description: '東吳軍事統帥，赤壁之戰的主帥。', tags: ['正史三國']});
   const b = await person('b', {name: '孫策', person_subtype: 'historical', description: '江東之主。'});
   const twin = await person('twin', {name: '周瑜', person_type: 'fictional', description: '架空三國的現代企業家。'});
   const d = await person('d', {name: '諸葛亮', person_subtype: 'historical', description: '蜀漢丞相。'});
@@ -130,7 +131,7 @@ def test_person_relations_in_detail_page(page):
     open_relations(page, ids['b'])
     expect(page.get_by_role('heading', name='孫策', exact=True)).to_be_visible()
     expect(card_of(page, '周瑜')).to_contain_text('兩人共同平定江東，建立長期合作及信任關係。')
-    expect(card_of(page, '周瑜')).to_contain_text('歷史人物')
+    expect(card_of(page, '周瑜')).to_contain_text('真實類型')
     shot(page, '04_other_person_sees_same_relation.png')
 
     # 5. 選到已有關係的人物：自動切換為編輯並載入原內容，不覆蓋

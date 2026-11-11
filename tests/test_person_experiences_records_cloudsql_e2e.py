@@ -24,7 +24,7 @@ def relation_patch(client, connection_id, request_id, expected_revision, **body)
 
 def test_records_list_and_relation_sources_on_cloud_sql():
     c, _, _ = account('rec')
-    zhou = create(c, '周瑜', 'rec-a', person_subtype='historical', description='東吳軍事統帥')
+    zhou = create(c, '周瑜', 'rec-a', description='東吳軍事統帥')  # 我的經歷只能關聯真實人物（後端檢查），所以有我的經歷的人物不設歷史子類型
     sun = create(c, '孫策', 'rec-b', person_subtype='historical', description='江東之主')
     lu = create(c, '魯肅', 'rec-c', person_subtype='historical')
     mine = record(c, zhou, 1)  # 一筆我的經歷（與周瑜有關）

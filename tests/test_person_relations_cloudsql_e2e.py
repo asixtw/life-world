@@ -60,10 +60,10 @@ def set_person_status(client, person, request_id, status):
 
 def test_person_relations_on_cloud_sql():
     c, username, password = account('rel')
-    a = create(c, '周瑜', 'rel-a', person_subtype='historical', description='東吳軍事統帥')
+    a = create(c, '周瑜', 'rel-a', description='東吳軍事統帥')  # 我的經歷只能關聯真實人物（後端檢查），所以有我的經歷的人物不設歷史子類型
     b = create(c, '孫策', 'rel-b', person_subtype='historical', description='江東之主')
     twin = create(c, '周瑜', 'rel-twin', person_type='fictional', description='架空三國的現代企業家')  # 同名人物
-    d = create(c, '諸葛亮', 'rel-d', person_subtype='historical')
+    d = create(c, '諸葛亮', 'rel-d')
     e1, e2, unrelated = record(c, a, 1), record(c, a, 2), record(c, d, 3)
 
     # 來源：只列與兩端至少一人有關的已確認紀錄

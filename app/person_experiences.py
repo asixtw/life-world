@@ -13,6 +13,7 @@
 import re
 from datetime import datetime, timezone
 
+from . import relation_sources
 from .errors import require
 from .persons import record_summary, uid
 
@@ -183,6 +184,13 @@ class PersonExperiencesMixin:
                 for person_id in added:  # 原本就在經歷裡的人物即使已封存也保留；新加入的必須是使用中的人物
                     require(self._person_row(c, owner, person_id)['status'] == 'active', 409, 'person_archived',
                             '已封存的人物不能加入經歷；恢復人物後即可選擇。')
+            # 這筆經歷若是關係的來源：不能封存，也不能把參與人物改到和那段關係無關（主體不能改，一定留著）。先擋下來，什麼都不寫。
+            archiving = data.status == 'archived' and row['status'] != 'archived'
+            if archiving:
+                relation_sources.require_still_related(c, owner, 'person_experience', experience_id, None, '這筆經歷', '不能封存')
+            elif removed:
+                remaining = {people['subject']['id']} | (current - removed) | set(added)
+                relation_sources.require_still_related(c, owner, 'person_experience', experience_id, remaining, '這筆經歷', '移除這位參與人物後就和這段關係無關了')
             now = self.now().isoformat()
             assignments = ''.join(key + '=?,' for key in updates)  # 欄位名稱只來自上面的固定清單
             c.execute('UPDATE subject_experiences SET ' + assignments + 'revision=revision+1,updated_at=? WHERE id=? AND owner_id=?',

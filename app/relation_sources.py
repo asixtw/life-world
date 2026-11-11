@@ -76,6 +76,29 @@ def check_person_experience(c, owner, subject_experience_id, person_ids):
     require(linked is not None, 422, 'unrelated_source', '來源人物經歷必須有這段關係的其中一人擔任主體或參與者。')
 
 
+def connections_using(c, owner, kind, source_id):
+    """引用這筆來源的關係（使用中與已封存的都算）：[{id, person_a, person_b}]。"""
+    column = KINDS[kind][0]
+    rows = c.execute('SELECT k.id,k.person_a,k.person_b FROM ' + TABLE + ' s JOIN person_connections k ON k.id=s.connection_id AND k.owner_id=s.owner_id'
+                     ' WHERE s.owner_id=? AND s.' + column + '=? ORDER BY k.id', (owner, source_id)).fetchall()
+    return [{'id': row['id'], 'person_a': row['person_a'], 'person_b': row['person_b']} for row in rows]
+
+
+def require_still_related(c, owner, kind, source_id, remaining, subject, consequence):
+    """來源被關係引用時，不能改到讓引用失效。
+
+    remaining＝修改後仍與這筆來源有關的人物；None 代表這筆來源將不能再被引用（例如封存）。
+    任何一段引用它的關係兩端都不在 remaining 裡，就回 409 relation_source_in_use：不修改來源、不修改關係、不刪除引用，
+    由使用者自己先到那段關係調整來源。subject、consequence 只用來組成訊息。
+    """
+    for link in connections_using(c, owner, kind, source_id):
+        if remaining is not None and (link['person_a'] in remaining or link['person_b'] in remaining):
+            continue
+        names = [c.execute('SELECT name FROM people WHERE id=? AND owner_id=?', (pid, owner)).fetchone()['name'] for pid in (link['person_a'], link['person_b'])]
+        require(False, 409, 'relation_source_in_use',
+                subject + '是「' + names[0] + '／' + names[1] + '」這段關係的來源，' + consequence + '。請先到這段關係移除這個來源，再回來修改。')
+
+
 # ---- 關係類型與狀態（Unified Person P4）----
 RELATION_KINDS = ('family', 'partner', 'friend', 'colleague', 'classmate', 'mentor', 'client', 'business', 'neighbor', 'rival', 'enemy', 'other')
 ARCHIVED = 'archived'  # person_connections.confirmation_status：封存（不刪除）；其他值都視為使用中

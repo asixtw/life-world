@@ -206,9 +206,24 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin, PersonsMixin, PersonE
         if person_id:  # 依人物選擇或人物資料狀態套用限制
             require_registered(user)  # 驗證限制：條件不成立即拒絕操作，避免部分寫入
             self._owned(c, 'people', person_id, user['id'])  # 限制查詢資料表並核對資源所屬帳號
+            self._recordable_person(c, user['id'], person_id)  # 我的經歷只能關聯使用中的真實人物（草稿建立、修改與確認都檢查）
         for contribution in contributions:  # 逐項處理清單中的資料，保留目前交易或查詢條件
             action = c.execute('SELECT * FROM actions WHERE id=? AND owner_id=?', (contribution.action_id, user['id'])).fetchone()  # 執行目前交易中的參數化查詢
             require(action is not None and action['goal_id'] == goal_id, 422, 'invalid_action', '貢獻行動必須屬於本次選擇的目標。')  # 驗證限制：貢獻行動必須屬於本次選擇的目標。
+
+    def _recordable_person(self, c, owner, person_id):
+        """我的經歷是本人實際參與的事：關聯或參與的人物必須是使用中的真實人物，歷史人物與虛構人物一律拒絕。
+
+        前端的篩選只是方便選擇，這裡才是防護；拒絕發生在寫入之前，所以不會產生草稿、經歷、積分或目標進度。
+        人物類型是 Schema 010 的欄位：還在舊結構（legacy_jsonb）時沒有類型可查，維持原行為。
+        """
+        if self.relation_source_store != relation_sources.LINK:
+            return
+        row = c.execute('SELECT person_type,person_subtype,status FROM people WHERE id=? AND owner_id=?', (person_id, owner)).fetchone()
+        require(row is not None, 404, 'not_found', '找不到可存取的資料。')  # 他人的人物同樣回 404，不透露是否存在
+        require(row['status'] == 'active', 409, 'person_archived', '這位人物已封存，不能關聯我的經歷；恢復人物後即可選擇。')
+        require(row['person_type'] == 'real' and row['person_subtype'] != 'historical', 422, 'person_not_recordable',
+                '我的經歷只能關聯真實人物；歷史人物與虛構人物的經歷請記在「人物經歷」。')
 
     def _valid_time(self, occurred_at):  # 拒絕尚未發生的真實經歷
         require(occurred_at.astimezone(timezone.utc) <= self.now(), 422, 'future_event', '真實經歷的發生時間不能在未來。')  # 驗證限制：真實經歷的發生時間不能在未來。

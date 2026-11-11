@@ -29,7 +29,8 @@ PREPARE = """async (goal) => {
     return data;
   };
   const person = (key, body) => call('/persons', 'POST', {request_id: 'rec-ui-' + key, ...body});
-  const zhou = await person('a', {name: '周瑜', person_subtype: 'historical', description: '東吳軍事統帥，赤壁之戰的主帥。'});
+  // 我的經歷只能關聯真實人物（後端檢查），所以有我的經歷的周瑜不設歷史子類型
+  const zhou = await person('a', {name: '周瑜', description: '東吳軍事統帥，赤壁之戰的主帥。'});
   const sun = await person('b', {name: '孫策', person_subtype: 'historical', description: '江東之主。'});
   const draft = await call('/experiences/drafts', 'POST', {raw_text: '和朋友討論周瑜的策略。', occurred_at: new Date(Date.now() - 120000).toISOString(), goal_id: goal.id,
     person_id: zhou.id, contributions: [{action_id: goal.actions[0].id, quantity: '0.5'}]});
@@ -74,6 +75,7 @@ def test_records_page_and_relation_sources(page):
     dialog.locator('#persons-exp-title').fill('平定江東')
     dialog.locator('#persons-exp-content').fill('與孫策一同平定江東，建立東吳的基業。')
     dialog.locator('#persons-exp-year').fill('199')
+    dialog.locator('#persons-exp-type').select_option('historical')  # 周瑜是真實人物，性質要自己選「歷史」
     dialog.get_by_role('button', name='儲存經歷').click()
     expect(dialog).to_be_hidden()
     expect(people.get_by_role('heading', name='人物經歷（1）')).to_be_visible()
@@ -165,6 +167,14 @@ def test_records_page_and_relation_sources(page):
     expect(dialog.locator('input[name=relation_source]:checked')).to_have_count(1)
     dialog.get_by_role('button', name='取消').click()
     expect(dialog).to_be_hidden()
+
+    # 7b. 被關係引用為來源的人物經歷不能封存（否則關係會留下失效的來源）：畫面說明原因，經歷仍在
+    page.goto(BASE + '/#history?view=people')
+    cards.filter(has_text='平定江東').get_by_role('button', name='封存').click()
+    expect(page.get_by_text('這段關係的來源，不能封存').first).to_be_visible()
+    shot(page, 'rec_05b_cited_experience_cannot_be_archived.png')
+    page.reload()
+    expect(people.get_by_role('heading', name='人物經歷（2）')).to_be_visible()
 
     # 8. 我的經歷不受影響：紀錄頁的我的經歷還是原本那一筆、積分沒有變；「全部」頁籤兩種都在並標示類型
     page.goto(BASE + '/#history')

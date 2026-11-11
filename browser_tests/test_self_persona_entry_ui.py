@@ -27,10 +27,27 @@ PEOPLE = """async () => {
     const r = await fetch('/api/persons', {method: 'POST', credentials: 'same-origin',
       headers: {'Content-Type': 'application/json', 'X-CSRF-Token': me.csrf_token}, body: JSON.stringify({request_id: 'self-ui-' + key, ...body})});
     if (!r.ok) throw new Error('persons ' + r.status + ' ' + await r.text());
+    return (await r.json()).id;
   };
   await person('a', {name: '王小明', description: '大學同學。'});                                  // 真實人物：可以關聯我的經歷
-  await person('b', {name: '周瑜', person_subtype: 'historical', description: '東吳軍事統帥。'});  // 歷史人物：不列
-  await person('c', {name: '沈知衡', person_subtype: 'original', description: '原創人物。'});      // 虛構人物：不列
+  const hist = await person('b', {name: '周瑜', person_subtype: 'historical', description: '東吳軍事統帥。'});  // 歷史人物：不列
+  const fict = await person('c', {name: '沈知衡', person_subtype: 'original', description: '原創人物。'});      // 虛構人物：不列
+  return [hist, fict];
+}"""
+
+BYPASS = """async (ids) => {  // 不經過畫面的選擇器，直接打 API
+  const me = await fetch('/api/auth/me', {credentials: 'same-origin'}).then(r => r.json());
+  const state = await fetch('/api/state', {credentials: 'same-origin'}).then(r => r.json());
+  const goal = state.goals[0], out = [];
+  for (const person_id of ids) {
+    const r = await fetch('/api/experiences/drafts', {method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json', 'X-CSRF-Token': me.csrf_token},
+      body: JSON.stringify({raw_text: '繞過選擇器的測試。', occurred_at: new Date(Date.now() - 120000).toISOString(), goal_id: goal.id, person_id,
+        contributions: [{action_id: goal.actions[0].id, quantity: '0.5'}]})});
+    out.push([r.status, ((await r.json()).error || {}).code]);
+  }
+  const after = await fetch('/api/state', {credentials: 'same-origin'}).then(r => r.json());
+  return {results: out, drafts: [state.drafts.length, after.drafts.length], points: [state.rewards.total, after.rewards.total]};
 }"""
 
 
@@ -104,7 +121,7 @@ def test_my_settings_under_persons_and_my_experiences_under_records(page):
     shot(page, 'me_05_my_settings_saved_and_consented.png')
 
     # 6. 紀錄：第一個頁籤是「我的經歷」；我的設定不在這裡
-    page.evaluate(PEOPLE)
+    ineligible = page.evaluate(PEOPLE)
     page.reload()  # 剛才直接用 API 建立了人物；重新整理後 App 才會讀到
     nav.get_by_role('link', name='紀錄').click()
     tabs = page.locator('.record-tabs')
@@ -121,6 +138,9 @@ def test_my_settings_under_persons_and_my_experiences_under_records(page):
     expect(page.locator('.participant-option')).to_have_count(1)
     expect(page.locator('.participant-option')).to_contain_text('王小明')
     shot(page, 'me_07_record_form_real_people_only.png')
+    bypass = page.evaluate(BYPASS, ineligible)  # 前端的篩選不是唯一防護：直接打 API 也被後端拒絕，沒有草稿、沒有積分
+    assert bypass['results'] == [[422, 'person_not_recordable'], [422, 'person_not_recordable']], bypass
+    assert bypass['drafts'][0] == bypass['drafts'][1] and bypass['points'][0] == bypass['points'][1], bypass
 
     # 8. 剛才動過表單，離開時 App 會先問要不要保存；捨棄後回到人物首頁，重新整理後仍在
     nav.get_by_role('link', name='人物').click()

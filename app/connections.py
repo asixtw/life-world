@@ -3,12 +3,15 @@ import json  # 保存草稿與人工更正歷史
 from uuid import uuid4  # 為線索與歷史產生固定識別碼
 from .errors import require  # 沿用一致的領域錯誤
 from .security import require_registered  # 正式人物整理仍受帳號門檻保護
+from . import relation_sources  # 關係來源的完整性檢查
 
 
 class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
-    def _validate_story(self, c, owner, raw, story):  # 核對人物所有權與精確來源位置
+    def _validate_story(self, c, owner, raw, story, keep=()):  # 核對人物所有權與精確來源位置；keep＝更正舊故事時原本就在名單裡的人物
         if story.participants or story.mentions: require_registered(self._onboarded(c, owner))  # 純提及也不能繞過升級
-        for p in story.participants: self._owned(c, 'people', p.person_id, owner)  # 每位參與者都須屬於本人
+        for p in story.participants:  # 每位參與者都須屬於本人，而且是可以出現在我的經歷裡的人物
+            self._owned(c, 'people', p.person_id, owner)
+            if p.person_id not in keep: self._recordable_person(c, owner, p.person_id)  # 有一位不合規就整筆拒絕；舊故事原有的參與者不追溯
         for m in story.mentions:  # 每處原文人名獨立核對
             require(0 <= m.start < m.end <= len(raw) and raw[m.start:m.end] == m.name, 422, 'invalid_source_span', '提及位置與原始文字不符，請重新選取。')  # Unicode 位移與原句完全一致
             if m.person_id: self._owned(c, 'people', m.person_id, owner)  # 正式配對必須是可存取人物
@@ -61,7 +64,8 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             return {'items': [self._story_detail(c, owner, r[0], involvement == 'legacy') for r in ids], 'total': total, 'limit': limit, 'offset': offset}  # 只組合當頁來源
 
     def _write_story(self, c, owner, experience_id, raw, story):  # 在同一確認／修正交易保存角色
-        self._validate_story(c, owner, raw, story)  # 先核對全部輸入才改資料
+        keep = {r[0] for r in c.execute('SELECT person_id FROM experience_participants WHERE experience_id=?', (experience_id,))}  # 這筆經歷原本的參與者
+        self._validate_story(c, owner, raw, story, keep)  # 先核對全部輸入才改資料
         c.execute('DELETE FROM experience_participants WHERE experience_id=?', (experience_id,))  # 更正只影響這一份來源
         c.execute('DELETE FROM experience_mentions WHERE experience_id=?', (experience_id,))  # 舊線索 ID 失效，歷史仍保留
         c.execute('UPDATE experience_stories SET title=?,reviewed=TRUE WHERE experience_id=?', (story.title, experience_id))  # 只接受人工審閱的標題與角色
@@ -110,6 +114,9 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             cached, fingerprint = self._cached(c, owner, op, data.request_id, data.model_dump())  # 相同提交不重做更正
             if cached: return cached  # 回原回執
             self._revision(before, data.expected_revision)  # 拒絕舊版本覆寫
+            if self.relation_source_store == relation_sources.LINK:  # 這筆經歷若是關係的來源，更正後的名單仍要和那段關係有關
+                relation_sources.require_still_related(c, owner, 'experience', experience_id, {p.person_id for p in data.story.participants},
+                                                       '這筆經歷', '更正參與人物後就和這段關係無關了')
             self._write_story(c, owner, experience_id, before['raw_text'], data.story)  # 驗證並保存新名單
             c.execute('UPDATE experience_stories SET revision=revision+1 WHERE experience_id=?', (experience_id,))  # 推進故事版本
             self._sync_story_event(c, experience_id)  # 更新已有事件的直接互動統計

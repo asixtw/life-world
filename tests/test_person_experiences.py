@@ -22,11 +22,12 @@ PERSON_KEYS = {'id', 'name', 'person_type', 'person_subtype', 'status', 'descrip
 
 
 def world(client, username='exp_owner'):
-    """帳號、四位人物（周瑜、孫策、魯肅、小喬），一筆與周瑜有關的已確認我的經歷。"""
+    """帳號、四位人物（周瑜是真實人物，孫策、魯肅、小喬是歷史人物），一筆與周瑜有關的已確認我的經歷。"""
     _, goal = onboard(client)
     register(client, username)
-    people = {name: client.post('/api/persons', json={'request_id': f'{username}-{name}', 'name': name, 'person_subtype': 'historical',
-                                                       'description': name + '的簡介'}).json() for name in ('周瑜', '孫策', '魯肅', '小喬')}
+    # 我的經歷只能關聯真實人物（2026-11-11 起後端也檢查），所以有我的經歷的這一位不設歷史子類型；其餘三位是歷史人物
+    people = {name: client.post('/api/persons', json={'request_id': f'{username}-{name}', 'name': name, 'description': name + '的簡介',
+                                                       **({} if name == '周瑜' else {'person_subtype': 'historical'})}).json() for name in ('周瑜', '孫策', '魯肅', '小喬')}
     d = draft(client, goal, person_id=people['周瑜']['id'], raw_text='與周瑜討論合作。')
     done = client.post(f"/api/drafts/{d['id']}/confirm", json=confirm_payload(d, request_id=f'{username}-confirm', summary='與周瑜討論合作'))
     assert done.status_code == 201, done.text
