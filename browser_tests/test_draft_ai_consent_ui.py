@@ -19,8 +19,12 @@ def test_manual_default_first_consent_cancel_and_reuse_keep_candidate_editable(p
     expect(manual).to_be_checked();expect(ai).to_be_enabled()
     expect(page.locator('[data-draft-ai-retry]')).to_be_hidden()
     expect(page.locator('[data-draft-ai-receipts]')).to_be_hidden()
+    # radio不能繼承文字輸入100%寬，否則手機選項文字會逐字直排。
+    bounds=manual.bounding_box();assert bounds and bounds['width']<=24 and bounds['height']<=24
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     assert page.request.get(BASE+'/api/ai/usage').json()['calls']==0
     page.locator('#summary').fill('自己編輯的摘要')
+    ART.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(ART/f'{width}-draft-ai-manual.png'),full_page=True)
     ai.check();expect(page.locator('#draft-ai-consent-dialog')).to_be_visible()
     expect(page.locator('#draft-ai-consent-dialog')).to_contain_text('測試替身')
     ART.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(ART/f'{width}-draft-ai-first-consent.png'))

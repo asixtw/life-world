@@ -1,11 +1,12 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準3797f60；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準6c9c736；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
+| 本輪四步＋AI授權Chromium（同次，新版隔離服務） | **14 PASS**（四步6＋授權8）；evidence/FOUR_STEP_AND_AI_BROWSER.log；替身非真模型 |
 | 完整本機API及Node suite | **748 PASS、79 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
 | 前一UI階段工作流/精簡人物/用量/世界交換Chromium（前一階段同次） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
 | 最後重複提示文字調整後 | **6 PASS**（三尺寸選擇及補充完整確認），COMPACT_PEOPLE_COPY_BROWSER.log；不與66加總 |
@@ -13,7 +14,7 @@
 | 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述66項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
 | Google世界交換Chromium | 本次66項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
 | 受限本機PG18人物/草稿/AI | **45 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
-| 草稿AI授權專項（本輪） | SQLite **6 PASS**；缺撤回權限的PG額外 **1 PASS**，不與完整套件加總；DRAFT_AI_CONSENT_SCOPE.log、DRAFT_AI_CONSENT_PERMISSION.log |
+| 草稿AI授權專項（前一後端階段） | SQLite **6 PASS**；缺撤回權限的PG額外 **1 PASS**，不與完整套件加總；DRAFT_AI_CONSENT_SCOPE.log、DRAFT_AI_CONSENT_PERMISSION.log |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
 | 真Google、新GCP整合Revision、真AI/媒體Provider、Safari | **NOT RUN（本輪）** |
 
@@ -146,5 +147,19 @@ LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json pyt
 ### 本輪額外回歸與明確失敗
 
 - 現行精簡人物/核對草稿/人物詳情/本人用量58項Chromium PASS，AI_CHANGE_WORKFLOW_BROWSER.log（既有8192隔離服務，當輪靜態UI；不是新授權後端驗收）。AI授權8項另在新版8194替身服務測試，不把兩組混為真模型E2E。
-- 另執行較早的test_experience_four_steps.py，390第一例FAIL：等待已被精簡選擇卡取代的#pending-person-name。擴大批次因相同舊定位器重複失敗中斷，再以-x單獨重現1 FAIL，LEGACY_FOUR_STEP_SELECTOR_FAILURE.log。這組舊套件其餘項目NOT RUN；需另行更新選擇器並保留原業務斷言，不刪案例/降低需求，不能標示全部瀏覽器全綠。現行對應行為由上列58項涵蓋，但不冒充舊套件通過。
+- 另執行較早的test_experience_four_steps.py，390第一例FAIL：等待已被精簡選擇卡取代的#pending-person-name。擴大批次因相同舊定位器重複失敗中斷，再以-x單獨重現1 FAIL，LEGACY_FOUR_STEP_SELECTOR_FAILURE.log。該次執行的其餘項目NOT RUN；後續已更新選擇器、固定合成時間與離開目的地，並保留原業務斷言，見下節重新驗證，不刪案例/降低需求。現行對應行為由上列58項涵蓋，但不冒充舊套件通過。
 - 指令：LIFEWORLD_TEST_URL=http://127.0.0.1:8194 python -m pytest browser_tests/test_draft_ai_consent_ui.py -q；PG/root指令沿用本報告先前列法。所有瀏覽器Provider均合成替身。
+
+
+## 四步套件維護與320px AI選項修復（本輪，未發布）
+
+- 更新test_experience_four_steps.py以操作現行逐人卡片、明確角色和「離開記錄」入口；不再操作已移除的單人欄位/隱藏主導覽。離開回紀錄後確認主導覽恢復並可回世界。明確合成發生時間配合固定伺服器日期，不修改禁止未來經歷規則。
+- 保留原先純日記、人物數、交會、目標0.5、影像保留、503後輸入保留、取消不留孤立人物/草稿及一次獎勵斷言；追加讀取真story_detail驗證兩位人物各自interacted，以及重送瀏覽器實際Confirm payload取得相同結果且不重複建人/發獎。320/390/1440四步畫面獨立存放，保留歷史設計包原貌。
+- 視覺檢查另發現AI radio繼承文字框100%寬度，在320px把選項擠成直排；尺寸測試紅燈206×44px。只調整草稿AI區塊為18px原生單選及44px整行觸控範圍，保留既有配色/元件。新測試約束radio尺寸、無水平溢出，並提供手動預設與首次授權畫面。
+- 四步6項先在既有8192服務PASS；局部CSS修正後AI授權8項PASS。最終新版8194服務同次完整結果及指令見下方證據；Provider明示替身，不發外部AI。API/Node748 PASS/79 SKIP與受限PG45 PASS沿用上一程式階段的收據，本輪只有前端CSS/測試變動，不冒稱重新執行後端套件。
+- 舊四步定位器失敗已修復並保留原失敗收據作追溯；不再是現行套件未解阻塞。完整人物基本資料候選與來源/Feature Store/GCP E2E等未完成範圍不變，Owner UX及Code Review未通過；不代表可Merge或Alpha發布。
+
+
+最終同次收據：`LIFEWORLD_TEST_URL=http://127.0.0.1:8194 python -m pytest browser_tests/test_experience_four_steps.py browser_tests/test_draft_ai_consent_ui.py -q --tb=short` → **14 PASS，60.93秒**，evidence/FOUR_STEP_AND_AI_BROWSER.log。草稿AI radio紅燈見DRAFT_AI_RADIO_RED.log。沒有任何Provider外部呼叫或正式資料寫入。
+
+新畫面：[320px第四步](screenshots/four-step-regression/320-step4.png)、[390px第二步](screenshots/four-step-regression/390-step2.png)、[1440px第三步](screenshots/four-step-regression/1440-step3.png)、[390px手動預設](screenshots/390-draft-ai-manual.png)；其餘三尺寸完整四步在[four-step-regression](screenshots/four-step-regression/README.md)。不以截圖或14項PASS宣稱整體UX已核准。

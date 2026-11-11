@@ -726,3 +726,7 @@ footer{
 
 /* 草稿AI狀態由JS切換；共用inline-flex按鈕不可覆蓋hidden語意。 */
 [data-draft-ai] [hidden]{display:none!important}
+/* AI單選維持小型原生控制項；整行label保留44px觸控範圍，避免擠壓手機文字。 */
+[data-draft-ai]{min-width:0}
+[data-draft-ai] .check-line{min-height:44px;align-items:center;margin:8px 0}
+[data-draft-ai] input[type=radio]{width:18px;height:18px;min-height:18px;padding:0;flex:0 0 18px;margin:0;accent-color:var(--green)}
