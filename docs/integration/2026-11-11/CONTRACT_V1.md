@@ -22,7 +22,7 @@ PR24是四步／人物選填／逐項來源核對的權威，保留Candidate未�
 
 ## Schema010選取與權威
 
-people維持唯一主檔；person_type/subtype/aliases/status/description/origin_type以實際Alpha核准結構為準，不把交接DDL直接套用。/api/people與/api/persons共用人物讀寫與Owner/類型檢查；九項進階設定僅詳情頁可選，不放四步、未核准入口不新增。
+people維持唯一主檔；person_type/subtype/aliases/status/description/origin_type以實際Alpha核准結構為準，不把交接DDL直接套用。/api/people與/api/persons共用人物讀寫與Owner/類型檢查；Jerry九項完整角色設定、人物作品、進階劇場與角色創作不因分支存在而核准；不列R+1或已承諾未來工作。僅保留必要資料相容，未核准入口不得新增或開啟。
 
 person_facts/fact_sources是正式核對資訊；relationship_features/preferences僅授權範圍內衍生資料，不互覆。person_connections來源需單一部署模式：link_table為新目標，舊JSON僅轉移前兼容，禁止兩邊獨立寫成權威。
 

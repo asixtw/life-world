@@ -23,7 +23,7 @@ Owner提供兩份Studio結果，原始檔SHA256見 evidence/schema/*.source.json
 - 保留現況：010兩庫結構、既有Migration歷史、Owner與隔離、目前正式Runtime／流量。
 - 相容性修正：所有對010已擴欄的INSERT明確列欄、來源權威採單一link_table模式、舊API共用people。Alpha仍legacy模式時不得雙寫新來源。
 - Additive草案：生日/任職目前值與歷史；PG Feature Store另列，不混入011；DELETE最小權限需另行審查。
-- 延後／未開入口：新增完整人物劇場/作品/九項設定流程，不把Jerry UI直接移入PR24。
+- 未核准、不得自動納入規劃：Jerry進階劇場/人物作品/AI角色演出/完整角色創作。相容資料保留不等於核准入口或R+1承諾，不把Jerry UI移入PR24。
 - 人工裁決：UX整體核准、011實體命名與權限、補齊Migration lineage收據政策、E2E套用批准及正式Alpha發布批准。
 
 尚未進行任何正式SQL寫入、Migration、GRANT、Build或Deploy；Schema結構相同不能替代應用程式讀寫及回滾實測。

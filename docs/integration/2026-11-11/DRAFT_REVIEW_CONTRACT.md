@@ -22,7 +22,7 @@ Confirm可明確傳review，或use_saved_review=true選用已保存內容。summ
 
 同一draft_stories.payload使用experience_draft_v2 envelope：story與review。既有純StoryInput JSON仍可讀。沒有新建資料表、Migration或擴權；但不支援envelope的舊程式不可直接拿來當無損回滾版本，正式發布前需reader相容策略及回復演練。本輪Alpha沒有寫入新格式。
 
-生日/任職等基本資料候選已納入獨立清單，不塞入四維事實；第三/四步基本資料UI仍待整合。前端已接摘要/任務保存及第四步逐人候選採用/排除、證據類型、來源與原有事實預覽，選用後由同一Confirm原子保存；草稿含候選時不得混入舊單人person_updates。第三步已接四維收合補充輸入，人物選擇已換為精簡卡片，完整UX未核准；見STEP3_SUPPLEMENT_CONTRACT.md。生日/任職候選UI仍是整合缺口。
+生日/任職等基本資料候選已納入獨立清單，不塞入四維事實；第三/四步基本資料UI已接，Owner UX核准仍待完成。前端已接摘要/任務保存及第四步逐人候選採用/排除、證據類型、來源與原有事實預覽，選用後由同一Confirm原子保存；草稿含候選時不得混入舊單人person_updates。第三步已接四維收合補充輸入，人物選擇已換為精簡卡片，完整UX未核准；見STEP3_SUPPLEMENT_CONTRACT.md。生日/任職候選UI已接，完整UX核准仍是Gate。
 
 ## 測試
 
@@ -43,7 +43,7 @@ review新增birthday_candidates[]、employment_candidates[]；與person_candidat
 
 ### 客戶端與回復邊界
 
-本輪後端完成不代表PR24基本資料UI接好。第三/四步生日、任職輸入/差異/逐項核對的實際瀏覽器驗收NOT RUN，不以API種入候選代替。現有四維畫面不得宣稱已能編輯基本資料候選；完整UI是合併前阻擋。
+第三/四步生日、任職輸入/差異/逐項核對已在本機受限PG18走真UI→API→DB閉環，包含重登、撤銷候選、來源重核對、失敗/未知回應重試。不以API種入候選代替UI；結果見整合報告。Owner整體UX、實機Safari及GCP仍未驗收。
 
 空清單不序列化，原本四維草稿相容；但舊版DraftReview extra=forbid不認得新欄位，不能假定0eee0a3或Alpha舊映像可無損讀回新候選。正式啟用前須相容reader、固定版本/混合Revision與資料回復演練；不刪候選當回滾。本輪新格式只存在本機合成資料。
 

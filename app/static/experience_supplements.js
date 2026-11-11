@@ -2,7 +2,7 @@
 /** 第三步逐人選填補充；只產生草稿候選，不呼叫建人或事實寫入API。 */
 window.PersonSupplementsUI=(()=>{
   let c;
-  const dims={interests:'興趣與嗜好',food:'飲食偏好',skills:'專長與背景',habits:'互動習慣'};
+  const dims={interests:'興趣與嗜好',food:'飲食偏好',skills:'專長與背景',habits:'互動習慣',birthday:'生日（月日，年份選填）',employment:'公司／組織與職稱'};
   const evidence={stated_by_person:'人物本人告知',observed_by_user:'我觀察到',documented_source:'文件記載'};
   const esc=x=>c.esc(x);
   function initialize(context){c=context;}
@@ -11,8 +11,10 @@ window.PersonSupplementsUI=(()=>{
   function field(key,label,input){return `<label class="field">${label}${input}</label>`;}
   function options(values,value){return '<option value="">請選擇</option>'+Object.entries(values).map(([k,v])=>`<option value="${k}" ${value===k?'selected':''}>${esc(v)}</option>`).join('');}
   function renderCard(person,values){
-    return `<details class="card space-top" data-supplement-person="${esc(person.key)}"><summary>${esc(person.name)} · ＋ 補充這次了解的人物資訊（選填）</summary><div class="space-top">${field('dimension','資訊類別',`<select data-supplement-input="dimension">${options(dims,values.dimension)}</select>`)}${field('value','這次了解的資訊',`<input data-supplement-input="value" maxlength="160" value="${esc(values.value||'')}">`)}${field('evidence','這項資訊從何得知？',`<select data-supplement-input="evidence_type">${options(evidence,values.evidence_type)}</select>`)}<details><summary>資料來源與補充說明</summary>${field('source','輸入來源',`<select data-supplement-input="source_kind"><option value="manual" ${values.source_kind!=='raw'?'selected':''}>我手動提供</option><option value="raw" ${values.source_kind==='raw'?'selected':''}>本次原文片段</option></select>`)}${field('quote','原文片段（選擇原文來源時填寫）',`<textarea data-supplement-input="quote" maxlength="2000">${esc(values.quote||'')}</textarea>`)}${field('description','補充說明（選填）',`<textarea data-supplement-input="description" maxlength="2000">${esc(values.description||'')}</textarea>`)}</details><p class="small muted">公司、職稱、生日的本次經歷候選介面尚未接通，這裡不開放輸入，也不會存入其他欄位。核對這份資料不代表向人物本人獨立查證。</p><div class="button-row"><button type="button" class="secondary" data-supplement-add>加入待核對項目</button><button type="button" class="text-button" data-supplement-reset>清空這次輸入</button></div><div data-supplement-candidates class="space-top"></div></div></details>`;
+    return `<details class="card space-top" data-supplement-person="${esc(person.key)}"><summary>${esc(person.name)} · ＋ 補充這次了解的人物資訊（選填）</summary><div class="space-top">${field('dimension','資訊類別',`<select data-supplement-input="dimension">${options(dims,values.dimension)}</select>`)}${field('value','這次了解的資訊',`<input data-supplement-input="value" maxlength="160" value="${esc(values.value||'')}">`)}${BasicCandidatesUI.inputs(values)}${field('evidence','這項資訊從何得知？',`<select data-supplement-input="evidence_type">${options(evidence,values.evidence_type)}</select>`)}${field('source','輸入來源',`<select data-supplement-input="source_kind"><option value="" ${!values.source_kind?'selected':''}>請選擇輸入來源</option><option value="manual" ${values.source_kind==='manual'?'selected':''}>我手動提供</option><option value="raw" ${values.source_kind==='raw'?'selected':''}>本次原文片段</option></select>`)}<details><summary>原文片段與補充說明</summary>${field('quote','原文片段（選擇原文來源時填寫）',`<textarea data-supplement-input="quote" maxlength="2000">${esc(values.quote||'')}</textarea>`)}${field('description','補充說明（選填）',`<textarea data-supplement-input="description" maxlength="2000">${esc(values.description||'')}</textarea>`)}</details><p class="small muted">公司／職稱與生日依正式結構化候選保存，不存入其他欄位。核對這份資料不代表向人物本人獨立查證。</p><div class="button-row"><button type="button" class="secondary" data-supplement-add>加入待核對項目</button><button type="button" class="text-button" data-supplement-reset>清空這次輸入</button></div><div data-supplement-candidates class="space-top"></div></div></details>`;
   }
+  function all(f){return [...(f.personCandidates||[]),...BasicCandidatesUI.entries(f).map(({x})=>x)];}
+  function hasInput(v){return !!(v.value?.trim()||v.description?.trim()||v.quote?.trim()||['birth_year','birth_month','birth_day','company_name','job_title','valid_from','valid_to'].some(k=>v[k]));}
   function captureInputs(form){
     const f=current();if(!f)return;
     f.supplementInputs||={};
@@ -27,38 +29,49 @@ window.PersonSupplementsUI=(()=>{
     for(const row of [...cards.querySelectorAll('[data-supplement-person]')])if(!keys.has(row.dataset.supplementPerson))row.remove();
     for(const p of people){
       let row=[...cards.children].find(n=>n.dataset.supplementPerson===p.key);
-      if(!row){cards.insertAdjacentHTML('beforeend',renderCard(p,f.supplementInputs[p.key]||{}));row=cards.lastElementChild;}
-      const own=f.personCandidates.filter(x=>keyOf(x)===p.key);
+      if(!row){cards.insertAdjacentHTML('beforeend',renderCard(p,f.supplementInputs[p.key]||{}));row=cards.lastElementChild;BasicCandidatesUI.configure(row);}
+      const own=all(f).filter(x=>keyOf(x)===p.key);
       row.querySelector('summary').textContent=p.name+' · ＋ 補充這次了解的人物資訊（選填）'+(own.length?' · '+own.length+' 項待核對':'');
-      row.querySelector('[data-supplement-candidates]').innerHTML=own.map(x=>`<p class="small">待核對：${esc(dims[x.dimension]||'人物資訊')} · ${esc(x.value)} <button type="button" class="text-button" data-supplement-remove="${esc(x.candidate_ref)}">移除此候選</button></p>`).join('');
+      row.querySelector('[data-supplement-candidates]').innerHTML=own.map(x=>`<p class="small">待核對：${esc(dims[x.dimension]||'人物資訊')} · ${esc(typeof x.value==='string'?x.value:BasicCandidatesUI.text(Object.hasOwn(x.value,'birth_month')?'birthday':'employment',x))} <button type="button" class="text-button" data-supplement-remove="${esc(x.candidate_ref)}">移除此候選</button></p>`).join('');
     }
-    const orphans=[...new Set([...f.personCandidates.map(keyOf),...Object.keys(f.supplementInputs).filter(k=>Object.values(f.supplementInputs[k]).some(v=>v&&v!=='manual'))].filter(k=>!keys.has(k)))];
+    const orphans=[...new Set([...all(f).map(keyOf),...Object.keys(f.supplementInputs).filter(k=>hasInput(f.supplementInputs[k]))].filter(k=>!keys.has(k)))];
     root.querySelector('[data-supplement-orphans]').innerHTML=orphans.map(key=>`<div class="callout"><p>有補充候選的人物已不在本次關聯，輸入仍保留。請重新關聯或明確移除補充後再保存。</p><button type="button" class="text-button" data-supplement-clear="${esc(key)}">移除此人物的補充候選</button></div>`).join('');
     root.hidden=!people.length&&!orphans.length;
   }
-  function add(row){
+  async function add(row){
     const f=current(),form=row.closest('form');if(!f)return;
     captureInputs(form);const key=row.dataset.supplementPerson,person=c.people(form).find(p=>p.key===key),v=f.supplementInputs[key];
-    if(!person||!v.dimension||!v.value?.trim())throw new Error('請選資訊類別並填寫內容，或保留不補充。');
-    if(f.personCandidates.length>=100)throw new Error('每份草稿最多100項補充候選；現有輸入保留。');
+    const basic=['birthday','employment'].includes(v.dimension);
+    if(!person||!v.dimension||!basic&&!v.value?.trim())throw new Error('請選資訊類別並填寫內容，或保留不補充。');
+    // 換類別不刪舊輸入；加入候選前必須處理其他類別尚未保存的內容。
+    const birthInput=['birth_year','birth_month','birth_day'].some(k=>v[k]),jobInput=['company_name','job_title','valid_from','valid_to'].some(k=>v[k]);
+    if(basic&&(v.value?.trim()||v.description?.trim())||v.dimension==='birthday'&&jobInput||v.dimension==='employment'&&birthInput||!basic&&(birthInput||jobInput))throw new Error('其他資訊類別還有未保存輸入；請切回加入候選，或明確清空後再繼續，不會默默捨棄。');
+    if(!['manual','raw'].includes(v.source_kind))throw new Error('請選擇資訊輸入來源，不會自動推定來源或證據。');
+    if(all(f).length>=100)throw new Error('每份草稿最多100項補充候選；現有輸入保留。');
     if(f.personCandidates.some(x=>keyOf(x)===key&&x.dimension===v.dimension&&x.value===v.value.trim()))throw new Error('已加入相同人物、類別與內容的候選，請於第四步核對。');
     const raw=form.elements.raw_text.value;
     if(v.source_kind==='raw'&&(!v.quote?.trim()||!raw.includes(v.quote)))throw new Error('請填寫目前原文中確實存在的片段，不會自動猜測來源。');
     const revision=person.personId?c.state.world.people.find(p=>p.id===person.personId)?.revision:null;
-    f.personCandidates.push({candidate_ref:crypto.randomUUID(),target:person.personId?{person_id:person.personId}:{client_ref:key.slice(8)},expected_person_revision:revision||null,dimension:v.dimension,value:v.value.trim(),description:v.description||'',source_kind:v.source_kind||'manual',evidence_type:v.evidence_type||null,quote:v.source_kind==='raw'?v.quote:null,source_sha256:null,selected:false,excluded:false,needs_review:!v.evidence_type||v.source_kind==='raw'});
-    f.supplementInputs[key]={};row.querySelectorAll('[data-supplement-input]').forEach(n=>n.value=n.dataset.supplementInput==='source_kind'?'manual':'');
-    c.state.dirty=true;refresh(form);row.open=false;row.querySelector('summary').focus();c.toast('已加入待核對項目；第四步逐項確認後才會正式保存。');
+    if(basic){
+      const snapshot=JSON.stringify(v),created=await BasicCandidatesUI.create(person,v,raw);
+      if(current()!==f||!row.isConnected||form.elements.raw_text.value!==raw||JSON.stringify(Object.fromEntries([...row.querySelectorAll('[data-supplement-input]')].map(n=>[n.dataset.supplementInput,n.value])))!==snapshot)throw new Error('補充內容已改變，未加入舊候選；請重新確認。');
+      if(all(f).length>=100)throw new Error('每份草稿最多100項補充候選；輸入保留。');
+      if(all(f).some(x=>keyOf(x)===key&&typeof x.value==='object'&&(created.kind==='birthday'?Object.hasOwn(x.value,'birth_month'):x.employment_id&&x.employment_id===created.x.employment_id||JSON.stringify(x.value)===JSON.stringify(created.x.value))))throw new Error('已有此人物的相同基本資料候選，請先移除或核對。');
+      const list=created.kind==='birthday'?'birthdayCandidates':'employmentCandidates';f[list]||=[];f[list].push(created.x);
+    }else f.personCandidates.push({candidate_ref:crypto.randomUUID(),target:person.personId?{person_id:person.personId}:{client_ref:key.slice(8)},expected_person_revision:revision||null,dimension:v.dimension,value:v.value.trim(),description:v.description||'',source_kind:v.source_kind||'manual',evidence_type:v.evidence_type||null,quote:v.source_kind==='raw'?v.quote:null,source_sha256:null,selected:false,excluded:false,needs_review:!v.evidence_type||v.source_kind==='raw'});
+    f.supplementInputs[key]={};row.querySelectorAll('[data-supplement-input]').forEach(n=>n.value='');
+    BasicCandidatesUI.configure(row);c.state.dirty=true;refresh(form);row.open=false;row.querySelector('summary').focus();c.toast('已加入待核對項目；第四步逐項確認後才會正式保存。');
     form.dispatchEvent(new Event('input',{bubbles:true}));
   }
   function validate(form){
     const f=current();if(!f)return;
     captureInputs(form);const keys=new Set(c.people(form).map(p=>p.key));
-    if(f.personCandidates?.some(x=>!keys.has(keyOf(x))))throw new Error('請重新關聯補充候選所屬人物，或明確移除該候選；不會自動轉給其他人物。');
-    if(Object.values(f.supplementInputs||{}).some(v=>v.value?.trim()||v.description?.trim()||v.quote?.trim()))throw new Error('補充資訊尚未加入候選；請加入待核對項目或清空後再保存，避免遺漏輸入。');
+    if(all(f).some(x=>!keys.has(keyOf(x))))throw new Error('請重新關聯補充候選所屬人物，或明確移除該候選；不會自動轉給其他人物。');
+    if(Object.values(f.supplementInputs||{}).some(hasInput))throw new Error('補充資訊尚未加入候選；請加入待核對項目或清空後再保存，避免遺漏輸入。');
   }
   function persist(form){
     const f=current(),field=form?.querySelector('#experience-person-supplements');if(!f||!field)return;
-    captureInputs(form);field.value=JSON.stringify({owner_id:f.ownerId,candidates:f.personCandidates||[],inputs:f.supplementInputs||{}});
+    captureInputs(form);field.value=JSON.stringify({owner_id:f.ownerId,candidates:f.personCandidates||[],birthday_candidates:f.birthdayCandidates||[],employment_candidates:f.employmentCandidates||[],inputs:f.supplementInputs||{}});
   }
   function validCandidate(x){
     const text=(v,max)=>typeof v==='string'&&v.length<=max;
@@ -69,13 +82,13 @@ window.PersonSupplementsUI=(()=>{
   }
   function restore(form){
     const f=current(),field=form?.querySelector('#experience-person-supplements');if(!f||!field?.value)return;
-    try{const saved=JSON.parse(field.value);if(saved.owner_id!==f.ownerId||!Array.isArray(saved.candidates)||saved.candidates.length>100||!saved.candidates.every(validCandidate)||!validInputs(saved.inputs))throw new Error();f.personCandidates=saved.candidates;f.supplementInputs=saved.inputs&&typeof saved.inputs==='object'&&!Array.isArray(saved.inputs)?saved.inputs:{};form.querySelector('[data-supplement-cards]')?.replaceChildren();refresh(form);}catch{c.toast('本機人物補充草稿無法安全還原；原始素材仍保留，請勿覆蓋。');}
+    try{const saved=JSON.parse(field.value);if(saved.owner_id!==f.ownerId||!Array.isArray(saved.candidates)||saved.candidates.length>100||!saved.candidates.every(validCandidate)||!validInputs(saved.inputs))throw new Error();if(![['birthday',saved.birthday_candidates||[]],['employment',saved.employment_candidates||[]]].every(([kind,list])=>Array.isArray(list)&&list.length<=100&&list.every(x=>BasicCandidatesUI.valid(kind,x)))||saved.candidates.length+(saved.birthday_candidates||[]).length+(saved.employment_candidates||[]).length>100)throw new Error();f.personCandidates=saved.candidates;f.birthdayCandidates=saved.birthday_candidates||[];f.employmentCandidates=saved.employment_candidates||[];f.supplementInputs=saved.inputs&&typeof saved.inputs==='object'&&!Array.isArray(saved.inputs)?saved.inputs:{};form.querySelector('[data-supplement-cards]')?.replaceChildren();refresh(form);}catch{c.toast('本機人物補充草稿無法安全還原；原始素材仍保留，請勿覆蓋。');}
   }
   document.addEventListener('input',event=>{if(event.target.matches('[data-supplement-input]'))captureInputs(event.target.closest('form'));});
-  document.addEventListener('click',event=>{
+  document.addEventListener('click',async event=>{
     const f=current();if(!f)return;
     const reset=event.target.closest('[data-supplement-reset]'),addButton=event.target.closest('[data-supplement-add]'),remove=event.target.closest('[data-supplement-remove]'),clear=event.target.closest('[data-supplement-clear]');
-    try{if(reset){const row=reset.closest('[data-supplement-person]');f.supplementInputs[row.dataset.supplementPerson]={};row.querySelectorAll('[data-supplement-input]').forEach(n=>n.value=n.dataset.supplementInput==='source_kind'?'manual':'');c.state.dirty=true;row.closest('form').dispatchEvent(new Event('input',{bubbles:true}));}if(addButton)add(addButton.closest('[data-supplement-person]'));if(remove){f.personCandidates=f.personCandidates.filter(x=>x.candidate_ref!==remove.dataset.supplementRemove);c.state.dirty=true;refresh();document.querySelector('#record-form')?.dispatchEvent(new Event('input',{bubbles:true}));}if(clear){f.personCandidates=f.personCandidates.filter(x=>keyOf(x)!==clear.dataset.supplementClear);delete f.supplementInputs[clear.dataset.supplementClear];c.state.dirty=true;refresh();document.querySelector('#record-form')?.dispatchEvent(new Event('input',{bubbles:true}));}}catch(error){c.toast(error.message);}
+    try{if(reset){const row=reset.closest('[data-supplement-person]');f.supplementInputs[row.dataset.supplementPerson]={};row.querySelectorAll('[data-supplement-input]').forEach(n=>n.value='');BasicCandidatesUI.configure(row);c.state.dirty=true;row.closest('form').dispatchEvent(new Event('input',{bubbles:true}));}if(addButton){if(addButton.disabled)return;addButton.disabled=true;try{await add(addButton.closest('[data-supplement-person]'));}finally{if(addButton.isConnected)addButton.disabled=false;}}if(remove){f.personCandidates=f.personCandidates.filter(x=>x.candidate_ref!==remove.dataset.supplementRemove);f.birthdayCandidates=(f.birthdayCandidates||[]).filter(x=>x.candidate_ref!==remove.dataset.supplementRemove);f.employmentCandidates=(f.employmentCandidates||[]).filter(x=>x.candidate_ref!==remove.dataset.supplementRemove);c.state.dirty=true;refresh();document.querySelector('#record-form')?.dispatchEvent(new Event('input',{bubbles:true}));}if(clear){f.personCandidates=f.personCandidates.filter(x=>keyOf(x)!==clear.dataset.supplementClear);f.birthdayCandidates=(f.birthdayCandidates||[]).filter(x=>keyOf(x)!==clear.dataset.supplementClear);f.employmentCandidates=(f.employmentCandidates||[]).filter(x=>keyOf(x)!==clear.dataset.supplementClear);delete f.supplementInputs[clear.dataset.supplementClear];c.state.dirty=true;refresh();document.querySelector('#record-form')?.dispatchEvent(new Event('input',{bubbles:true}));}}catch(error){c.toast(error.message);}
   });
   return {initialize,refresh,validate,persist,restore};
 })();
