@@ -70,4 +70,4 @@ SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic
 SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
-740 passed, 70 skipped in 30.91s
+740 passed, 70 skipped in 38.60s

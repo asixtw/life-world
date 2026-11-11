@@ -22,7 +22,7 @@ Confirm可明確傳review，或use_saved_review=true選用已保存內容。summ
 
 同一draft_stories.payload使用experience_draft_v2 envelope：story與review。既有純StoryInput JSON仍可讀。沒有新建資料表、Migration或擴權；但不支援envelope的舊程式不可直接拿來當無損回滾版本，正式發布前需reader相容策略及回復演練。本輪Alpha沒有寫入新格式。
 
-生日/任職等基本資料候選尚未納入本DraftReview DTO，不塞入四維事實。前端目前接摘要/任務保存；逐人補充UI尚未完成，遇已保存人物候選暫阻正式確認並提供保留草稿。這是整合缺口，非已完成產品能力。
+生日/任職等基本資料候選尚未納入本DraftReview DTO，不塞入四維事實。前端已接摘要/任務保存及第四步逐人候選採用/排除、證據類型、來源與原有事實預覽，選用後由同一Confirm原子保存；草稿含候選時不得混入舊單人person_updates。第三步收合補充輸入尚未接上，不能宣稱完整四步人物補充可用。生日/任職候選UI仍是整合缺口。
 
 ## 測試
 

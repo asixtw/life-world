@@ -68,3 +68,97 @@ def test_saving_unreviewed_summary_does_not_silently_accept_missing_source_hash(
     assert read['review']['summary_needs_review'], '保存草稿不得等同來源核對'
     page.goto(BASE+'/#review/'+d['id']);page.reload()
     expect(page.locator('[data-summary-source-review]')).not_to_be_checked()
+
+
+@pytest.mark.parametrize('width',[320,390,1440])
+def test_two_person_review_candidates_are_checked_independently_before_confirm(page,width):
+    page.set_viewport_size({'width':width,'height':950})
+    person,headers=seed(page);raw='小安說喜歡登山，小明只在原文被提到。'
+    review={'summary':'人工摘要','summary_source_sha256':hashlib.sha256(raw.encode()).hexdigest(),'tasks':[],'person_candidates':[
+        {'candidate_ref':'fact-a','target':{'person_id':person['id']},'expected_person_revision':person['revision'],'dimension':'interests','value':'登山','source_kind':'manual','evidence_type':'stated_by_person'},
+        {'candidate_ref':'fact-b','target':{'client_ref':'new-b'},'dimension':'food','value':'清淡','source_kind':'manual','evidence_type':'observed_by_user'}]}
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':raw,'occurred_at':'2026-10-27T00:00:00Z','contributions':[],'story':{'participants':[{'person_id':person['id'],'interacted':True}],'pending_people':[{'client_ref':'new-b','name':'小明','relation':'mention','start':raw.index('小明')}]},'review':review});assert r.ok,r.text();d=r.json()
+    page.goto(BASE+'/#review/'+d['id']);page.reload()
+    page.locator('[data-experience-preview="existing:'+person['id']+'"]').click()
+    expect(page.locator('#experience-person-preview')).to_contain_text('登山')
+    expect(page.locator('#experience-person-preview')).not_to_contain_text('清淡')
+    page.locator('[data-candidate-select="fact-a"]').check()
+    page.get_by_role('button',name='完成檢視',exact=True).click()
+    page.locator('[data-experience-preview="pending:new-b"]').click()
+    expect(page.locator('#experience-person-preview')).to_contain_text('清淡')
+    page.locator('[data-candidate-exclude="fact-b"]').click()
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    ART.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(ART/f'{width}-targeted-candidate-review.png'))
+    page.get_by_role('button',name='完成檢視',exact=True).click()
+    page.get_by_role('button',name='保存核對草稿並離開',exact=True).click()
+    expect(page.locator('#review-form')).to_have_count(0)
+    saved=page.request.get(BASE+'/api/drafts/'+d['id']).json()['review']['person_candidates']
+    assert saved[0]['selected'] and saved[1]['excluded']
+    page.goto(BASE+'/#review/'+d['id']);page.reload()
+    page.locator('#story-reviewed').check()
+    assert not page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['facts']['interests']
+    if width==390:
+        page.route('**/api/drafts/'+d['id']+'/confirm',lambda route:route.fulfill(status=503,content_type='application/json',body='{"error":{"code":"temporarily_unavailable","message":"合成確認失敗"}}'))
+        page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+        expect(page.locator('#notice')).to_contain_text('合成確認失敗')
+        assert not page.request.get(BASE+'/api/state').json()['experiences']
+        page.unroute('**/api/drafts/'+d['id']+'/confirm')
+    page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+    expect(page.locator('#review-form')).to_have_count(0)
+    state=page.request.get(BASE+'/api/state').json();new=next(p for p in state['people'] if p['name']=='小明')
+    a=page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['facts']
+    b=page.request.get(BASE+'/api/people/'+new['id']+'/overview').json()['facts']
+    assert a['interests'][0]['value']=='登山' and not b['food']
+    assert len(state['experiences'])==len(state['rewards']['events'])==1
+
+
+def test_raw_candidate_recheck_and_missing_evidence_do_not_guess_or_write_early(page):
+    person,headers=seed(page);raw='本人說喜歡閱讀。';digest=hashlib.sha256(raw.encode()).hexdigest()
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':raw,'occurred_at':'2026-10-27T00:00:00Z','contributions':[],'story':{'participants':[{'person_id':person['id'],'interacted':True}]},'review':{'summary':raw,'summary_source_sha256':digest,'tasks':[],'person_candidates':[{'candidate_ref':'needs-evidence','target':{'person_id':person['id']},'expected_person_revision':person['revision'],'dimension':'interests','value':'閱讀','source_kind':'raw','source_sha256':'0'*64,'quote':'喜歡閱讀'}]}});assert r.ok,r.text();d=r.json()
+    page.goto(BASE+'/#review/'+d['id']);page.reload()
+    card=page.locator('[data-experience-preview="existing:'+person['id']+'"]');card.click()
+    evidence=page.locator('[data-candidate-evidence="needs-evidence"]')
+    expect(evidence).to_have_value('')
+    # 缺證據不能採用；不是把manual/raw當成本人告知或觀察。
+    page.locator('[data-candidate-select="needs-evidence"]').click()
+    expect(page.locator('[data-candidate-select="needs-evidence"]')).not_to_be_checked()
+    evidence.select_option('stated_by_person')
+    page.locator('[data-candidate-select="needs-evidence"]').check()
+    expect(page.locator('[data-candidate-result]')).to_have_text('確認後會保存')
+    page.get_by_role('button',name='完成檢視',exact=True).click();expect(card).to_be_focused()
+    assert not page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['facts']['interests']
+    page.locator('#story-reviewed').check()
+    page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+    expect(page.locator('#review-form')).to_have_count(0)
+    assert page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['facts']['interests'][0]['value']=='閱讀'
+
+
+@pytest.mark.parametrize('width',[320,390,1440])
+def test_existing_person_preview_shows_prior_facts_without_overwriting_them(page,width):
+    page.set_viewport_size({'width':width,'height':950});person,headers=seed(page)
+    old=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':'先前本人告知喜歡閱讀。','occurred_at':'2026-10-27T00:00:00Z','contributions':[]}).json()
+    r=page.request.post(BASE+'/api/drafts/'+old['id']+'/confirm',headers=headers,data={'request_id':'prior-fact','expected_revision':old['revision'],'summary':'先前喜歡閱讀','contributions':[],'tasks':[],'story_reviewed':True,'story':{'participants':[{'person_id':person['id'],'interacted':True}]},'targeted_person_updates':[{'target':{'person_id':person['id']},'expected_person_revision':person['revision'],'dimension':'interests','value':'閱讀','evidence_type':'stated_by_person','selected':True,'source_kind':'manual','source_revision':old['revision']}]});assert r.ok,r.text()
+    prior=page.request.get(BASE+'/api/people/'+person['id']+'/overview').json();raw='這次本人說也喜歡登山。'
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':raw,'occurred_at':'2026-10-27T00:00:00Z','contributions':[],'story':{'participants':[{'person_id':person['id'],'interacted':True}]},'review':{'summary':raw,'summary_source_sha256':hashlib.sha256(raw.encode()).hexdigest(),'tasks':[],'person_candidates':[{'candidate_ref':'new-interest','target':{'person_id':person['id']},'expected_person_revision':prior['person']['revision'],'dimension':'interests','value':'登山','source_kind':'manual','evidence_type':'stated_by_person'}]}});assert r.ok,r.text();d=r.json()
+    page.goto(BASE+'/#review/'+d['id']);page.reload();page.locator('[data-experience-preview="existing:'+person['id']+'"]').click()
+    expect(page.locator('[data-prior-facts]')).to_contain_text('閱讀')
+    expect(page.locator('[data-person-candidate-review]')).to_contain_text('本次新增：登山')
+    page.locator('[data-candidate-select="new-interest"]').check()
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    ART.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(ART/f'{width}-prior-and-candidate-facts.png'))
+    assert page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['facts']==prior['facts']
+
+
+def test_candidate_person_version_conflict_keeps_review_and_does_not_write(page):
+    person,headers=seed(page);raw='手動補充。'
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':raw,'occurred_at':'2026-10-27T00:00:00Z','contributions':[],'story':{'participants':[{'person_id':person['id'],'interacted':True}]},'review':{'summary':raw,'summary_source_sha256':hashlib.sha256(raw.encode()).hexdigest(),'tasks':[],'person_candidates':[{'candidate_ref':'stale-version','target':{'person_id':person['id']},'expected_person_revision':person['revision']+1,'dimension':'habits','value':'先傳訊息','source_kind':'manual','evidence_type':'stated_by_person'}]}});assert r.ok,r.text();d=r.json()
+    page.goto(BASE+'/#review/'+d['id']);page.reload();page.locator('[data-experience-preview="existing:'+person['id']+'"]').click()
+    expect(page.locator('[data-prior-facts]')).to_contain_text('候選不會自動套用到新版')
+    page.locator('[data-candidate-select="stale-version"]').check();page.get_by_role('button',name='完成檢視',exact=True).click()
+    page.locator('#story-reviewed').check()
+    with page.expect_response(lambda r:r.url.endswith('/api/drafts/'+d['id']+'/confirm')) as result:
+        page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+    assert result.value.status==409
+    expect(page.locator('#review-form')).to_be_visible()
+    assert not page.request.get(BASE+'/api/state').json()['experiences']
+    assert not page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['facts']['habits']
