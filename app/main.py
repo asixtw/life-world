@@ -260,6 +260,11 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         if token:cookie(response,token)
         return {**result,'replayed':replayed}
 
+    @app.post('/api/auth/external/status',tags=['Identity'])
+    def google_exchange_status(request:Request,data:schemas.GoogleExchangeStatus):
+        # 採同源POST與當前CSRF；只SELECT既有requests，不新增Schema或權限。
+        return external(request).status(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),data.challenge_id)
+
     @app.get('/api/health', tags=['System'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def health():  # 回報本機服務的健康狀態
         return {'status': 'ok', 'mode': 'cloud-preparation' if settings.cloud_run else 'local-development'}

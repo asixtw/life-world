@@ -38,7 +38,7 @@ class GuestPurger:
             else:
                 # Current evidence bytes live in SQL (no object-store adapter).
                 # They are deleted with their row in the final atomic purge.
-                with self.db.connect() as c:c.execute('SELECT content FROM evidence LIMIT 0')
+                with self.db.connect() as c:c.execute('SELECT 1 FROM evidence LIMIT 0') # 只確認SQL媒體路徑，不需授予worker讀取二進位內容。
             with self.db.connect(write=True,owner=owner) as c:
                 c.execute("UPDATE guest_abandonments SET media_state='done' WHERE owner_id=? AND status<>'completed'",(owner,))
         except Exception:

@@ -6,6 +6,89 @@
     "version": "0.4.0"
   },
   "paths": {
+    "/api/personalization": {
+      "get": {
+        "summary": "Get Preferences",
+        "operationId": "get_preferences_api_personalization_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Put Preferences",
+        "operationId": "put_preferences_api_personalization_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Erase Preferences",
+        "operationId": "erase_preferences_api_personalization_delete",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/usage": {
+      "get": {
+        "tags": [
+          "AI drafts"
+        ],
+        "summary": "Ai Usage",
+        "operationId": "ai_usage_api_ai_usage_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/experiences/{experience_id}/task-suggestions": {
       "post": {
         "tags": [
@@ -294,6 +377,45 @@
         }
       }
     },
+    "/api/auth/external/status": {
+      "post": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Google Exchange Status",
+        "operationId": "google_exchange_status_api_auth_external_status_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleExchangeStatus"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "tags": [
@@ -357,7 +479,6 @@
           "Identity"
         ],
         "summary": "Capabilities",
-        "description": "公開模式說明不含憑證／內部資料；UI與後端共用範圍。",
         "operationId": "capabilities_api_capabilities_get",
         "responses": {
           "200": {
@@ -3144,6 +3265,22 @@
         "title": "GoogleExchange",
         "description": "ID token僅作交換，不接受前端自報owner/email。"
       },
+      "GoogleExchangeStatus": {
+        "properties": {
+          "challenge_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f-]{36}$",
+            "title": "Challenge Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "challenge_id"
+        ],
+        "title": "GoogleExchangeStatus",
+        "description": "只核對已驗證Session的交換收據，不接收token或自報owner。"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -3694,6 +3831,27 @@
           "evidence_type"
         ],
         "title": "PersonUpdateCandidate"
+      },
+      "Preferences": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "preferences": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Preferences"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "Preferences"
       },
       "Profile": {
         "properties": {

@@ -70,6 +70,8 @@ class ExternalAuth:
                 saved=json.loads(consumed['response'])
                 require(saved['owner_id']==user['id'] and saved['session_hash']==digest(token) and saved['credential_hash']==digest(credential),409,'challenge_used','此登入請求已使用，請重新開始。')
                 return self.service.public_user(user,csrf),None,True
+            # 驗簽或等待跨裝置鎖期間也可能逾時；提交前必須再驗到期，拒絕晚到交換。
+            require(datetime.fromisoformat(details['expires_at'])>self.service.now(),401,'challenge_expired','登入請求已過期，請重新開始。')
             require(user['id']==row['owner_id'] and secrets.compare_digest(details['binding'],digest(token)),403,'challenge_binding','登入請求不屬於此工作階段。')
             identity=c.execute('SELECT owner_id FROM external_identities WHERE provider=? AND issuer=? AND subject=?',('google',issuer,subject)).fetchone()
             if details['mode']=='upgrade':
@@ -78,11 +80,10 @@ class ExternalAuth:
                 owner=user['id']
                 c.execute("UPDATE users SET status='registered' WHERE id=?",(owner,))
             else:
-                has_data=bool(c.execute('SELECT id FROM goals WHERE owner_id=? LIMIT 1',(user['id'],)).fetchone() or c.execute('SELECT id FROM drafts WHERE owner_id=? LIMIT 1',(user['id'],)).fetchone())
-                require(user['status']!='guest' or not has_data or details['discard_guest'],409,'guest_conflict','此瀏覽器有訪客資料；請選擇保存目前世界或明確離開，不會自動合併。')
-                if identity:owner=identity['owner_id']
-                else:
-                    owner=str(uuid4());c.execute("INSERT INTO users(id,status,created_at) VALUES (?,'registered',?)",(owner,self.service.now().isoformat()))
+                # 「登入以前的世界」只接受既有身分；新使用者必須明確upgrade原訪客世界。
+                require(identity is not None,404,'google_world_not_found','此Google帳號尚無既有世界；請選擇保存目前世界，不會建立或清除任何世界。')
+                owner=identity['owner_id']
+                require(user['status']!='guest' or owner==user['id'] or details['discard_guest'],409,'guest_conflict','登入以前的世界前，請明確同意放棄目前訪客資料；不會合併，至少14天後才符合永久清除條件。')
             if identity is None:c.execute('INSERT INTO external_identities(provider,issuer,subject,owner_id,created_at) VALUES (?,?,?,?,?)',('google',issuer,subject,owner,self.service.now().isoformat()))
             if details['mode']=='login' and details['discard_guest'] and user['status']=='guest' and owner!=user['id']:
                 from .guest_lifecycle import abandon
@@ -90,7 +91,24 @@ class ExternalAuth:
             # 未明確放棄時，只輪替當前瀏覽器的Session。
             c.execute('DELETE FROM sessions WHERE token_hash=?',(digest(token),))
             session,new_csrf=new_session(c,owner,self.service.now(),self.service.policy)
-            receipt={'owner_id':owner,'credential_hash':digest(credential),'session_hash':digest(session)}
+            receipt={'owner_id':owner,'mode':details['mode'],'source_owner_id':user['id'],'guest_abandoned':details['mode']=='login' and bool(details['discard_guest']) and user['status']=='guest' and owner!=user['id'],'credential_hash':digest(credential),'session_hash':digest(session)}
             c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(row['owner_id'],EXCHANGE,identifier,digest(credential),json.dumps(receipt)))
             result=self.service.public_user(c.execute('SELECT * FROM users WHERE id=?',(owner,)).fetchone(),new_csrf)
         return result,session,False
+
+    def status(self,token,csrf,identifier):
+        """讀取本次交換是否已提交；只授權當前Session，永不重做交換或放棄。"""
+        current,_=self.service.session(token,csrf,True)
+        # 與交換共用owner交易鎖；到期且無收據時，不能有舊交易稍後才提交。
+        with self._write(current['id']) as c:
+            user,_=self._session(c,token,csrf)
+            challenge=c.execute('SELECT * FROM requests WHERE operation=? AND request_id=?',(CHALLENGE,identifier)).fetchone()
+            require(challenge is not None,404,'challenge_required','找不到此登入請求。')
+            done=c.execute('SELECT response FROM requests WHERE owner_id=? AND operation=? AND request_id=?',(challenge['owner_id'],EXCHANGE,identifier)).fetchone()
+            if done:
+                receipt=json.loads(done['response'])
+                require(receipt['owner_id']==user['id'] and secrets.compare_digest(receipt['session_hash'],digest(token)),403,'challenge_binding','登入結果不屬於此工作階段。')
+                details=json.loads(challenge['response'])
+                return {'status':'committed','mode':receipt.get('mode',details['mode']),'source_owner_id':challenge['owner_id'],'owner_id':user['id'],'guest_abandoned':receipt.get('guest_abandoned',False)}
+            require(challenge['owner_id']==user['id'] and secrets.compare_digest(json.loads(challenge['response'])['binding'],digest(token)),403,'challenge_binding','登入請求不屬於此工作階段。')
+            return {'status':'not_committed','owner_id':user['id'],'expired':datetime.fromisoformat(json.loads(challenge['response'])['expires_at'])<=self.service.now()}
