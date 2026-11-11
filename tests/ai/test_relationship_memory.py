@@ -1,5 +1,6 @@
 """持久記憶使用真本機DB；隔離驗證不等於Alpha Migration或線上PASS。"""
 import secrets
+import pytest
 from datetime import datetime,timezone
 from fastapi.testclient import TestClient
 from app.main import create_app
@@ -41,7 +42,7 @@ def test_four_subjects_and_revoked_source_are_recomputed(tmp_path):
         c.headers['X-CSRF-Token']=r.json()['csrf_token'];owner=r.json()['owner_id']
         person=c.post('/api/people',json={'name':'合成閱讀夥伴'}).json()
         d=draft(c,g,person_id=person['id'])
-        r=c.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d,summary='與合成夥伴閱讀植物書籍',person_id=person['id']))
+        r=c.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d,summary='與合成夥伴閱讀植物書籍',person_id=person['id'],story={'participants':[{'person_id':person['id'],'interacted':True}]},story_reviewed=True))
         assert r.status_code==201
         experience=c.get('/api/state').json()['experiences'][0]
         f=c.post('/api/people/'+person['id']+'/facts',json={'request_id':secrets.token_hex(8),'dimension':'interests','value':'閱讀植物書籍','evidence_type':'stated_by_person','source_experience_ids':[experience['id']],'confirmed':True}).json()
@@ -88,3 +89,41 @@ def test_withdrawn_story_not_reused_in_any_memory_subject(tmp_path):
         restored=c.post('/api/connections/stories/'+experience['id']+'/availability',json={'request_id':'restore-story','expected_revision':r.json()['revision'],'available':True})
         assert restored.status_code==200,restored.text
         assert any(experience['id'] in f['source_refs'] for f in store.context(owner,person['id'])['features'])
+
+
+@pytest.mark.parametrize('role',['mention','participant','interaction'])
+def test_fact_source_does_not_imply_direct_interaction(tmp_path,role):
+    """有真實人物資訊不等於見過面；只信明確核對的interacted角色。"""
+    app=create_app(tmp_path,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
+    with TestClient(app) as c:
+        me,g=onboard(c)
+        r=c.post('/api/auth/claim',json={'username':'role_'+secrets.token_hex(4),'password':secrets.token_urlsafe(24)})
+        c.headers['X-CSRF-Token']=r.json()['csrf_token'];owner=r.json()['owner_id']
+        person=c.post('/api/people',json={'name':'小安'}).json()
+        raw='提到小安喜歡閱讀'
+        story={'mentions':[{'name':'小安','start':2,'end':4,'person_id':person['id']}]} if role=='mention' else {'participants':[{'person_id':person['id'],'interacted':role=='interaction'}]}
+        d=draft(c,g,raw_text=raw,person_id=None,contributions=[],story=story)
+        r=c.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d,summary=raw,story=story,story_reviewed=True))
+        assert r.status_code==201,r.text
+        experience=c.get('/api/state').json()['experiences'][0]
+        r=c.post('/api/people/'+person['id']+'/facts',json={'request_id':'role-fact','dimension':'interests','value':'閱讀','evidence_type':'documented_source','source_experience_ids':[experience['id']],'confirmed':True})
+        assert r.status_code==201,r.text
+        store=FeatureStore(app.state.service);store.configure(owner,True,{})
+        features=store.context(owner,person['id'])['features']
+        assert any(f['subject_type']=='person' for f in features)
+        interactions=[f for f in features if f['feature_key']=='confirmed_interaction']
+        assert bool(interactions)==(role=='interaction')
+        if interactions:assert interactions[0]['source_refs']==[experience['id']]
+        overview=c.get('/api/people/'+person['id']+'/overview').json()
+        assert overview['stats']['interactions']==(1 if role=='interaction' else 0)
+        if role=='interaction':
+            current=c.get('/api/connections/stories/'+experience['id']).json()
+            changed=c.put('/api/connections/stories/'+experience['id']+'/people',json={
+                'request_id':'correct-role','expected_revision':current['revision'],'confirmed':True,
+                'story':{'participants':[{'person_id':person['id'],'interacted':False}]}})
+            assert changed.status_code==200,changed.text
+            refreshed=store.context(owner,person['id'])['features']
+            assert not any(f['feature_key']=='confirmed_interaction' for f in refreshed)
+            assert any(f['subject_type']=='person' for f in refreshed)
+        state=c.get('/api/state').json()
+        assert len(state['experiences'])==len(state['rewards']['events'])==1

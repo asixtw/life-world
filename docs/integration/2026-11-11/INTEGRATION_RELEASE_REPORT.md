@@ -115,3 +115,9 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 新增紅燈測試重現：交會available=false後，FeatureStore仍由experiences重建User/Context及人物來源特徵。現已在記錄查詢與人物事實來源投影排除此類撤回來源；正式經歷、獎勵及人物事實不刪除。測試包含持久快照不再含撤回ID、明確恢復後重新可用、原經歷與獎勵各一筆、人物正式事實保留。
 
 完整本機SQLite/Node **767 PASS、87 SKIP**（31.56秒），收據[MEMORY_WITHDRAWAL_TESTS.log](MEMORY_WITHDRAWAL_TESTS.log)；比前次增加1測試與2個專用PG入口案例的SKIP，不把SKIP當PASS。這項修正尚未跑PG Feature Store（快照缺表，未核准Migration）、真Gemini或瀏覽器，均NOT RUN。旗標及正式設定未啟用/改動。來源用途同意、提及誤當互動、並行撤回/快取/版本傳播仍未閉環，Gate B不通過。
+
+### 提及／共同參與不推論直接互動（QA）
+
+先以三種角色重現2 FAIL/1 PASS：有有效人物事實時，僅提及及未互動共同參與均被誤列confirmed_interaction。修正後僅相同Owner、reviewed=true、available=true且明確interacted=true的事實來源納入；保留來自提及的有效人物資訊，既有主關聯未核對不升格。原四類正向測試改以明確互動角色建立來源，不以primary person推論。追加角色更正後衍生特徵撤回、正式人物資訊保留與經歷/獎勵仍各一筆的斷言。
+
+完整本機SQLite／Node **770 PASS、87 SKIP**（32.19秒），收據[MEMORY_ROLE_TESTS.log](MEMORY_ROLE_TESTS.log)。本輪沒有PG Feature Store表、瀏覽器/真模型/實機驗收（NOT RUN），沒有開啟背景旗標。這是有限規則一致性修正，不是背景標籤引擎、人格推論或全部長期記憶完成；用途同意與來源版本/並行撤回仍為Gate B阻擋。

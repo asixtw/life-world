@@ -61,7 +61,15 @@ class FeatureStore:
         for f in derived['user_features']:add('user',owner,f['tag'],{'topic':f['tag'].split('.')[-1]},f['source_refs'],'recorded_context_not_personality')
         if person:
             for f in facts:add('person',person,'fact:'+f['fact_id'],{'reported':f['value']},f['source_experience_ids'],'user_confirmed_report_not_external_truth')
-            valid=sorted({s for f in facts for s in f['source_experience_ids']})
+            # 事實可由提及或共同參與來源取得；不能把有來源誤稱直接互動。
+            with self.db.connect() as c:
+                valid=sorted({source for f in facts for source in f['source_experience_ids'] if c.execute('''
+                    SELECT 1 FROM experience_participants p
+                    JOIN experience_stories s ON s.experience_id=p.experience_id
+                    JOIN experiences x ON x.id=p.experience_id
+                    WHERE p.experience_id=? AND p.person_id=? AND p.interacted=TRUE
+                    AND s.owner_id=? AND x.owner_id=? AND s.reviewed=TRUE AND s.available=TRUE
+                    ''',(source,person,owner,owner)).fetchone()})
             if valid:add('relationship',person,'confirmed_interaction',{'source_count':len(valid)},valid,'limited_observation')
         if refs:add('context',person or owner,'source_window',{'latest_recorded_at':max(r['occurred_at'] for r in records),'uncertainty':'incomplete_user_records'},refs,'recorded_time_only')
         with self.db.connect(write=True,owner=owner) as c:
