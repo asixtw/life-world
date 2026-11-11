@@ -94,9 +94,11 @@
 
 ## 8. Alpha 資料庫的 010 升級
 
-`life_world_alpha` 在 2026-11-11 還沒有升到 010。升級腳本的審視結果、實際採用的腳本與預檢查詢在倉庫外：`C:\LifeWorld_project\alpha-unification-20261110\alpha_migration_010_review\`（先看 `ALPHA_MIGRATION_010_REVIEW_20261111.md`）。腳本已在 Alpha 試跑成功（結尾還原，沒有留下變更），正式升級由 Jerry 執行。
+`life_world_alpha` 已在 2026-11-11 升到 010（Jerry 以 `postgres` 執行）。升級後核對：42 張表、326 個欄位、81 條外鍵、88 個索引，和 `life_world_e2e` 的結構一致。升級腳本的審視結果、實際採用的腳本與核對查詢在倉庫外：`C:\LifeWorld_project\alpha-unification-20261110\alpha_migration_010_review\`（先看 `ALPHA_MIGRATION_010_REVIEW_20261111.md`）。
 
-升級後要注意兩件事：
+Alpha 的網站（Cloud Run `lw-public`）還是舊程式。升級後做過唯讀檢查：`/ready`、`/health`、`/api/capabilities`、首頁都回 200；會寫入的功能沒有在 Alpha 上實測。
 
-- Alpha 現行舊程式（`68102f2`）的訪客清除工作（`app/guest_maintenance.py` → `GuestPurger._purge`）會因為外鍵與表清單改變而拒絕執行（`unreviewed_fk`、`unreviewed_table`）；這個分支的程式兩種結構都支援（`app/guest_fk.py` 的 `CONTRACTS`）。網站本身不做這個檢查，推論可以繼續用舊程式，但沒有實測。
+還要注意兩件事：
+
+- Alpha 現行的舊程式（revision `lw-public-camera-8f377fa`；相關檔案和 `68102f2` 相同）的訪客清除工作（`app/guest_maintenance.py` → `GuestPurger._purge`）會因為外鍵與表清單改變而拒絕執行（`unreviewed_fk`、`unreviewed_table`）；這個分支的程式兩種結構都支援（`app/guest_fk.py` 的 `CONTRACTS`）。網站本身不做這個檢查，推論可以繼續用舊程式，但沒有實測。
 - 要在 Alpha 使用這個分支的人物功能，除了換程式，還要以 `link_table` 的關係來源設定部署（和 E2E 相同），否則 `/api/persons` 會回 `unified_people_not_enabled`。
