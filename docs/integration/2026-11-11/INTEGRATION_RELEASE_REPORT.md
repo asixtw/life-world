@@ -121,3 +121,11 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 先以三種角色重現2 FAIL/1 PASS：有有效人物事實時，僅提及及未互動共同參與均被誤列confirmed_interaction。修正後僅相同Owner、reviewed=true、available=true且明確interacted=true的事實來源納入；保留來自提及的有效人物資訊，既有主關聯未核對不升格。原四類正向測試改以明確互動角色建立來源，不以primary person推論。追加角色更正後衍生特徵撤回、正式人物資訊保留與經歷/獎勵仍各一筆的斷言。
 
 完整本機SQLite／Node **770 PASS、87 SKIP**（32.19秒），收據[MEMORY_ROLE_TESTS.log](MEMORY_ROLE_TESTS.log)。本輪沒有PG Feature Store表、瀏覽器/真模型/實機驗收（NOT RUN），沒有開啟背景旗標。這是有限規則一致性修正，不是背景標籤引擎、人格推論或全部長期記憶完成；用途同意與來源版本/並行撤回仍為Gate B阻擋。
+
+### GuestPurger 010／011 相容性唯讀查核
+
+2026-11-12以受限lw_e2e_app讀取本機PG18 marker副本目錄；產品Commit `3f9d12b718047c5cb65b821abc7cd4c3911487ca`。46表、90組FK；GuestPurger只核准34表/61組FK，新增29組（010既有增量20、011基本資料9），沒有缺失核准FK。實際`verify_graph`回`unreviewed_fk`。完整複合欄位差異見[evidence/GUEST_PURGER_FK_AUDIT.json](evidence/GUEST_PURGER_FK_AUDIT.json)。這是唯讀catalog/graph函式查核，不是執行purge成功或完整維護驗收。
+
+阻擋發生於資料/媒體刪除前；維持Beta專用DB/維護身分與精確表/FK契約，不放寬網站Runtime。尚須獨立審查：新增表的Owner控制父節點、雙向跨Owner參照、歷史與來源刪除次序、非產品角色相容表的處理、維護帳號逐表最小權限、14天/升級/重試與崩潰恢復。不能只把29組FK加入JSON或把34表改46表便宣稱可清除。未修改Worker/白名單、未執行任何清除或GCP操作。
+
+同次唯讀遠端查核：main仍`68102f230aa947a434286ba9260e1ae75f6634b0`、PR分支仍`3f9d12b`，PR正式reviews為空（不代表Code Review通過）。Gate A UX已送Owner審查；等待回覆不自動核准。其餘發布Gate維持NO-GO。

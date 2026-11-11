@@ -27,3 +27,5 @@ Owner提供兩份Studio結果，原始檔SHA256見 evidence/schema/*.source.json
 - 人工裁決：UX整體核准、011實體命名與權限、補齊Migration lineage收據政策、E2E套用批准及正式Alpha發布批准。
 
 尚未進行任何正式SQL寫入、Migration、GRANT、Build或Deploy；Schema結構相同不能替代應用程式讀寫及回滾實測。
+
+GuestPurger唯讀補查：010+011本機副本90組FK對核准61組，額外29組（20+9），現有graph gate安全停止。詳[發布報告](INTEGRATION_RELEASE_REPORT.md)及FK證據，不據此擴大清除權限。
