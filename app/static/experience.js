@@ -53,6 +53,13 @@ window.ExperienceUI=(()=>{
     return [...items.values()];
   }
   function reviewStorySignature(form){return JSON.stringify({raw:c.state.draft?.raw_text,story:window.ConnectionsUI.collectEditor(form,false)});}
+  /** 卡片顯示本人的即時核對狀態；採用仍不代表已正式寫入。 */
+  function personReviewStatus(person){
+    const facts=candidateForPerson(person),basic=BasicCandidatesUI.entries(flow).filter(({x})=>BasicCandidatesUI.onPerson(x,person));
+    const all=[...facts,...basic.map(({x})=>x)];if(!all.length)return '沒有補充資訊變更 · ';
+    const pending=facts.filter(x=>!x.excluded&&(!x.selected||!candidateReady(x)||x.needs_review)).length+basic.filter(({kind,x})=>!x.excluded&&(!x.selected||!BasicCandidatesUI.ready(kind,x)||x.needs_review)).length;
+    return pending?`${pending} 項待核對 · `:`已核對：採用 ${all.filter(x=>x.selected&&!x.excluded).length} 項／排除 ${all.filter(x=>x.excluded).length} 項 · `;
+  }
   function refreshReviewSummary(){
     const form=document.querySelector('#review-form'),root=document.querySelector('#experience-review-overview');
     if(!form||!root||flow?.ownerId!==c.state.me?.owner_id||flow.currentStep!==4)return;
@@ -60,7 +67,7 @@ window.ExperienceUI=(()=>{
     const quantities=[...form.querySelectorAll('[name^="quantity-"]')].filter(n=>Number(n.value)>0).map(n=>{
       const action=goal?.actions.find(a=>a.id===n.name.slice(9));return action?`${action.title} ${n.value} ${action.unit}`:'';
     }).filter(Boolean);
-    root.innerHTML=`<section class="review-block"><h3>目標與進度</h3><p>${c.esc(goal?.title||'本次不關聯目標')}</p><p class="small">${c.esc(quantities.join(' · ')||'沒有新增活動量')}</p></section><section class="review-block"><h3>人物關聯</h3><div class="stack">${people.length?people.map(p=>`<button type="button" class="card experience-person-preview" data-experience-preview="${c.esc(p.key)}"><strong>${c.esc(p.name)}</strong><span class="tag">${p.isNew?'待建立':p.unmatched?'原文提及，待配對':'既有人物'}</span><span class="small">${c.esc([...new Set(p.roles)].map(r=>roleText[r]||'尚未選角色').join(' · '))}</span><span class="small muted">${candidateForPerson(p).length+BasicCandidatesUI.entries(flow).filter(({x})=>BasicCandidatesUI.onPerson(x,p)).length?'有待核對的資訊變更 · ':''}查看本次關聯與保存範圍 ›</span></button>`).join(''):'<p>沒有相關人物，不建立或修改人物資料。</p>'}</div></section>`;
+    root.innerHTML=`<section class="review-block"><h3>目標與進度</h3><p>${c.esc(goal?.title||'本次不關聯目標')}</p><p class="small">${c.esc(quantities.join(' · ')||'沒有新增活動量')}</p></section><section class="review-block"><h3>人物關聯</h3><div class="stack">${people.length?people.map(p=>`<button type="button" class="card experience-person-preview" data-experience-preview="${c.esc(p.key)}"><strong>${c.esc(p.name)}</strong><span class="tag">${p.isNew?'待建立':p.unmatched?'原文提及，待配對':'既有人物'}</span><span class="small">${c.esc([...new Set(p.roles)].map(r=>roleText[r]||'尚未選角色').join(' · '))}</span><span class="small muted">${c.esc(personReviewStatus(p))}查看本次關聯與保存範圍 ›</span></button>`).join(''):'<p>沒有相關人物，不建立或修改人物資料。</p>'}</div></section>`;
     const candidates=flow.personCandidates||[],pending=candidates.filter(x=>!x.excluded&&(!x.selected||!candidateReady(x)||x.needs_review));
     const basicPending=BasicCandidatesUI.entries(flow).filter(({kind,x})=>!x.excluded&&(!x.selected||x.needs_review||!BasicCandidatesUI.ready(kind,x)));
     const submit=form.querySelector('button.primary:not([type=button])');if(submit)submit.disabled=pending.length+basicPending.length>0;
