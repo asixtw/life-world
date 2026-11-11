@@ -1,18 +1,18 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準7bd852f；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準3797f60；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
-| 完整本機API及Node suite | **747 PASS、78 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
-| 前一UI階段工作流/精簡人物/用量/世界交換Chromium（同次；本輪授權UI未驗） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
+| 完整本機API及Node suite | **748 PASS、79 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
+| 前一UI階段工作流/精簡人物/用量/世界交換Chromium（前一階段同次） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
 | 最後重複提示文字調整後 | **6 PASS**（三尺寸選擇及補充完整確認），COMPACT_PEOPLE_COPY_BROWSER.log；不與66加總 |
 | 人物候選版本衝突／確認503重試 | 追加分開執行 **1 PASS／2 PASS**；CANDIDATE_VERSION_BROWSER.log、CANDIDATE_RETRY_BROWSER.log，不與本次66重複加總 |
 | 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述66項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
 | Google世界交換Chromium | 本次66項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
-| 受限本機PG18人物/草稿/AI | **44 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
+| 受限本機PG18人物/草稿/AI | **45 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
 | 草稿AI授權專項（本輪） | SQLite **6 PASS**；缺撤回權限的PG額外 **1 PASS**，不與完整套件加總；DRAFT_AI_CONSENT_SCOPE.log、DRAFT_AI_CONSENT_PERMISSION.log |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
 | 真Google、新GCP整合Revision、真AI/媒體Provider、Safari | **NOT RUN（本輪）** |
@@ -128,6 +128,23 @@ LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json pyt
 - 實際PG測試發現source_scope的既有CHECK要求JSON物件，已依快照/PG驗證修正，沒有放寬CHECK。44項受限PG套件含6項授權/隔離/Provider變更/撤回/背景範圍測試，以及1項撤回權限缺口驗證；最新狀態欄位另單項重驗通過。
 - Alpha原快照Runtime僅SELECT/INSERT，無revoked_at UPDATE；本機marker副本測試提議的UPDATE(revoked_at)，Owner/用途/來源等其他欄位仍不可UPDATE。正式GCP未GRANT。後端缺撤回能力時停用本用途，不假稱沒有既存同意或允許無法撤回的授權。
 - [契約](ai/DRAFT_AI_CONSENT_CONTRACT.md)、[欄位GRANT審查稿](migrations/DRAFT_AI_CONSENT_COLUMN_GRANT.review.sql)。不是正式套用指令，不新增Migration receipt，不改Schema/Owner/IAM。
-- **前端仍未完成**：單一手動/AI選擇、首次告知、有效同意重用、撤回與失敗狀態待接。現有已配置AI的舊按鈕未經新授權會403，不能宣稱功能可用或發布；目前Alpha舊Runtime完全未變。本輪沒有真模型呼叫或新模型費用。
+- 該後端階段前端未完成；本輪已接上單一選擇/首次告知/重用/撤回，實際結果見下一節。Alpha舊Runtime未變，沒有真模型呼叫或新模型費用。
 
 - 測試授權helper已放tests/conftest.py，避免獨立執行RC測試時依賴AI子目錄匯入；RC＋草稿授權獨立命令11 PASS，DRAFT_AI_CONSENT_HELPER.log，不與完整套件重複加總。
+
+
+## 單一AI選用與來源版本（本輪，未發布）
+
+- 新增draft_ai.js，第四步預設手動，後端能力決定可用狀態；首次揭露用途/提供者後明確授權、相同範圍重用、可撤回。授權與模型均不自動改寫摘要或正式資料。候選採納後仍可編輯，最後Confirm才入庫/一次獎勵。
+- 草稿版本header在費用預留前驗證，成功候選附來源revision/hash；前端切換手動/Owner/草稿後拒絕晚回應。已知失敗明確重試使用新額度，未知傳輸重用ID且409顯示本人收據，不重複呼叫。局部hidden樣式修復確保手動模式不顯示無效重試操作。
+- 實測8項Chromium PASS（320/390/1440首用/取消/重用/人工修改與確認、撤回、Provider失敗/重試、晚回應、未知傳輸去重、不可用）。Provider均明示替身、沒有外部模型呼叫；DRAFT_AI_UI_BROWSER.log。截圖：[390](screenshots/390-draft-ai-first-consent.png)、[320](screenshots/320-draft-ai-first-consent.png)、[1440](screenshots/1440-draft-ai-first-consent.png)。
+- 先驗紅燈：來源版本未檢查即呼叫模型、hidden被共用按鈕樣式覆蓋，收據DRAFT_AI_SOURCE_RED.log與DRAFT_AI_HIDDEN_RED.log。修後完整API/Node748 PASS/79 SKIP；受限本機PG45 PASS，包含新增來源版本案例；跳過案例沒有冒稱全綠。
+- 未完成：人物AI候選逐人採納（現在只讀並引導人工核對）、完整來源/Feature Store契約、實際Gemini/Google/GCP與Safari、Owner整體UX核准及所有發布Gate。正式Alpha仍缺撤回欄位權限，本輪不執行GRANT，不宣稱可供Alpha使用。
+- 回復此UI可退3797f60，後端授權仍fail-closed；停用AI才能避免舊按鈕造成未授權403。來源header是相容新增，無Schema變更。不得藉回復忽略有效同意/預留帳本，或清除草稿/人物資料。
+
+
+### 本輪額外回歸與明確失敗
+
+- 現行精簡人物/核對草稿/人物詳情/本人用量58項Chromium PASS，AI_CHANGE_WORKFLOW_BROWSER.log（既有8192隔離服務，當輪靜態UI；不是新授權後端驗收）。AI授權8項另在新版8194替身服務測試，不把兩組混為真模型E2E。
+- 另執行較早的test_experience_four_steps.py，390第一例FAIL：等待已被精簡選擇卡取代的#pending-person-name。擴大批次因相同舊定位器重複失敗中斷，再以-x單獨重現1 FAIL，LEGACY_FOUR_STEP_SELECTOR_FAILURE.log。這組舊套件其餘項目NOT RUN；需另行更新選擇器並保留原業務斷言，不刪案例/降低需求，不能標示全部瀏覽器全綠。現行對應行為由上列58項涵蓋，但不冒充舊套件通過。
+- 指令：LIFEWORLD_TEST_URL=http://127.0.0.1:8194 python -m pytest browser_tests/test_draft_ai_consent_ui.py -q；PG/root指令沿用本報告先前列法。所有瀏覽器Provider均合成替身。

@@ -723,3 +723,6 @@ footer{
 
 .experience-person-preview{padding:18px;}
 .experience-person-preview .tag{justify-self:start;}
+
+/* 草稿AI狀態由JS切換；共用inline-flex按鈕不可覆蓋hidden語意。 */
+[data-draft-ai] [hidden]{display:none!important}

@@ -417,8 +417,14 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             app.state.ai_runtime.authorize(who)
             source=service.draft(who,draft_id)
             require(source['status']=='draft',409,'already_confirmed','這份草稿已經確認。')
+            # 舊客戶端可省略；新版明確綁定讀取版本，衝突發生在預留與模型之前。
+            expected=request.headers.get('X-Draft-Revision')
+            if expected is not None:
+                require(expected.isascii() and expected.isdecimal() and len(expected)<=10 and int(expected)>0,422,'invalid_draft_revision','草稿版本格式不正確。')
+                require(int(expected)==source['revision'],409,'source_revision_conflict','草稿已在其他畫面修改，請重新讀取並核對。')
             app.state.draft_ai_consent.require(who)  # 授權檢查在預留額度與傳送原文之前。
-            return app.state.ai_runtime.generate(who,'experience',{'raw_text':source['raw_text']},request_id=request.headers.get('Idempotency-Key'))
+            result=app.state.ai_runtime.generate(who,'experience',{'raw_text':source['raw_text']},request_id=request.headers.get('Idempotency-Key'))
+            return {**result,'source_revision':source['revision'],'source_sha256':source['raw_sha256']}
         return service.suggest(who,draft_id)  # 未啟用模型時仍明示原文候選。
 
     @app.delete('/api/drafts/{draft_id}', tags=['Experiences'])

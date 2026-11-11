@@ -1,0 +1,25 @@
+F
+=================================== FAILURES ===================================
+___________________ test_pending_four_steps_and_choices[390] ___________________
+browser_tests/test_experience_four_steps.py:57: in test_pending_four_steps_and_choices
+    page.locator('#pending-person-name').fill('小安')
+../lw-integration-venv/lib/python3.14/site-packages/playwright/sync_api/_generated.py:17780: in fill
+    self._sync(
+../lw-integration-venv/lib/python3.14/site-packages/playwright/_impl/_locator.py:216: in fill
+    return await self._frame.fill(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../lw-integration-venv/lib/python3.14/site-packages/playwright/_impl/_frame.py:610: in fill
+    await self._fill(**locals_to_params(locals()))
+../lw-integration-venv/lib/python3.14/site-packages/playwright/_impl/_frame.py:622: in _fill
+    await self._channel.send("fill", self._timeout, locals_to_params(locals()))
+../lw-integration-venv/lib/python3.14/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+../lw-integration-venv/lib/python3.14/site-packages/playwright/_impl/_connection.py:559: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Locator.fill: Timeout 10000ms exceeded.
+E   Call log:
+E     - waiting for locator("#pending-person-name")
+=========================== short test summary info ============================
+FAILED browser_tests/test_experience_four_steps.py::test_pending_four_steps_and_choices[390]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 21.46s

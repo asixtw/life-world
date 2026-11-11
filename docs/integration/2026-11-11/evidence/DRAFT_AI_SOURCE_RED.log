@@ -1,0 +1,12 @@
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_source_revision_checked_before_cost_and_result_binds_source _______
+tests/ai/test_draft_ai_consent.py:83: in test_source_revision_checked_before_cost_and_result_binds_source
+    r=c.post(path,headers={'X-Draft-Revision':version});assert r.status_code==status,r.text
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"summary":"合成整理","tasks":["合成後續"],"people":[],"provider":"test-transport","model":"synthetic-only","applied":false,"request_id":"7ffe9454-beab-4a0d-8f0c-6867e9ed3731","notice":"測試替身候選，非真實模型輸出；仍需編輯並人工確認。","usage":{"http_status":200,"input_tokens":3,"output_tokens":4,"cost_microusd":null,"reserved_microusd":100,"provider_request_id":null}}
+E   assert 200 == 422
+E    +  where 200 = <Response [200 OK]>.status_code
+=========================== short test summary info ============================
+FAILED tests/ai/test_draft_ai_consent.py::test_source_revision_checked_before_cost_and_result_binds_source
+1 failed, 6 passed in 0.58s

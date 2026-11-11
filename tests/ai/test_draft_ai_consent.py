@@ -73,3 +73,19 @@ def test_raw_draft_grant_does_not_send_background_memory(prepared,monkeypatch):
     d=draft(c,g)
     r=c.post('/api/drafts/'+d['id']+'/suggest');assert r.status_code==200,r.text
     assert not memory and p.calls[0]['case']=={'raw_text':d['raw_text']}
+
+
+def test_source_revision_checked_before_cost_and_result_binds_source(prepared):
+    """另一裝置修改草稿時，舊畫面不可消耗額度或誤採新來源摘要。"""
+    app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime;grant(c);d=draft(c,g)
+    path='/api/drafts/'+d['id']+'/suggest'
+    for version,status in [('wrong',422),('0',422),(str(d['revision']+1),409)]:
+        r=c.post(path,headers={'X-Draft-Revision':version});assert r.status_code==status,r.text
+    assert not p.calls and runtime.usage(me['owner_id'])['calls']==0
+    r=c.post(path,headers={'X-Draft-Revision':str(d['revision']),'Idempotency-Key':'bound-source'})
+    assert r.status_code==200,r.text
+    assert r.json()['source_revision']==d['revision']
+    assert r.json()['source_sha256']==c.get('/api/drafts/'+d['id']).json()['raw_sha256']
+    edited=c.put('/api/drafts/'+d['id'],json={'raw_text':'另一裝置更新的原文','occurred_at':d['occurred_at'],'contributions':[],'expected_revision':d['revision']});assert edited.status_code==200,edited.text
+    r=c.post(path,headers={'X-Draft-Revision':str(d['revision'])});assert r.status_code==409
+    assert len(p.calls)==1 and runtime.usage(me['owner_id'])['calls']==1

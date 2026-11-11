@@ -188,7 +188,7 @@ function recordView() { // 產生原始經歷表單並帶入人物與目標上�
 } // 結束目前回呼、區塊或模組定義
 function reviewView(d) { // 產生人工核對頁，分開保存經歷與勾選人物更新
   const goal = state.world.goals.find(g => g.id === d.goal_id); // 讀取目前選定目標及其行動資料
-  return `<div class="narrow">${heading('04｜檢視並確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><details data-review-raw><summary>查看原始經歷與來源</summary><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div></details><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(ExperienceUI.summaryState(d).value)}</textarea></div>${ExperienceUI.summaryReview(d)}${state.me.status==='registered'?button('suggest',state.capabilities?.ai_available?'使用 AI 整理本篇原文':'用原文建立整理候選','secondary'):''}<p class="small muted">${state.me.status!=='registered'?'訪客請手動核對摘要；登入後才可使用 AI 整理。':state.capabilities?.ai_available?'會將本篇原文傳給已設定模型；回應仍需你編輯並確認。':'目前使用手動原文整理，尚未連接外部 AI。'}</p><div id="candidate-panel"></div><div id="ai-people-panel"></div>${d.review?.person_candidates?.length?'<div class="callout" data-review-candidate-status role="status">請點人物卡逐項核對或排除人物補充，最後確認才保存。</div>':''}<div id="experience-review-overview"></div><div id="experience-review-people-acceptance"></div><details data-review-people-editor><summary>修改本次人物關聯</summary>${experiencePersonField(d.person_id,'review')}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div></details><details data-review-quantities><summary>修改活動量</summary>${contributionFields(goal, d.contributions)}</details><details data-review-tasks><summary>新增或修改後續任務（選填）</summary><div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時">${esc(ExperienceUI.tasksState(d).join('\n'))}</textarea></div></details><div class="callout">只有最後確認才正式保存與計分。這次依目前規則可獲得 ${state.world.policy.points_per_experience} 積分；失敗後重試不重複計分。</div><div class="button-row"><button class="primary" ${d.review?.person_candidates?.length?'disabled':''}>我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}${button('save-review-draft','保存核對草稿並離開','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
+  return `<div class="narrow">${heading('04｜檢視並確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><details data-review-raw><summary>查看原始經歷與來源</summary><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div></details><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(ExperienceUI.summaryState(d).value)}</textarea></div>${ExperienceUI.summaryReview(d)}${DraftAIUI.render()}<div id="candidate-panel"></div><div id="ai-people-panel"></div>${d.review?.person_candidates?.length?'<div class="callout" data-review-candidate-status role="status">請點人物卡逐項核對或排除人物補充，最後確認才保存。</div>':''}<div id="experience-review-overview"></div><div id="experience-review-people-acceptance"></div><details data-review-people-editor><summary>修改本次人物關聯</summary>${experiencePersonField(d.person_id,'review')}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div></details><details data-review-quantities><summary>修改活動量</summary>${contributionFields(goal, d.contributions)}</details><details data-review-tasks><summary>新增或修改後續任務（選填）</summary><div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時">${esc(ExperienceUI.tasksState(d).join('\n'))}</textarea></div></details><div class="callout">只有最後確認才正式保存與計分。這次依目前規則可獲得 ${state.world.policy.points_per_experience} 積分；失敗後重試不重複計分。</div><div class="button-row"><button class="primary" ${d.review?.person_candidates?.length?'disabled':''}>我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}${button('save-review-draft','保存核對草稿並離開','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function historyView() { // 列出已確認經歷與可接續草稿
   const w = state.world, filter = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 讀取目前帳號的世界資料
@@ -255,7 +255,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
     $('#app').innerHTML = html;
     BirthUI.mount(); // 只為孵化頁綁定互動，不改寫伺服器的目標狀態。
     if(state.guestSaveNoticePending){guestSaveNotice();state.guestSaveNoticePending=false;}
-    ExperienceUI.mount(); ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);ExperienceUI.refreshReviewSummary();
+    ExperienceUI.mount();DraftAIUI.mount(); ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);ExperienceUI.refreshReviewSummary();
     const section=params.get('section');if(['gd-today','gd-week','gd-records'].includes(section)){document.getElementById(section)?.focus();document.getElementById(section)?.scrollIntoView({block:'start'});}
     if (state.me && path==='history') await MediaUI.renderDrafts(state.me.owner_id);
     if (state.me && $('#media-panel')) {
@@ -412,6 +412,12 @@ function guestSaveNotice() { // 只在成功保存後提醒；登入者不顯示
     : '目前未開放 Google 保存世界，請保留此瀏覽器的工作階段。';
   $('#notice').textContent='已保存至目前服務。此瀏覽器的訪客工作階段有效期間內可繼續；清除Cookie或工作階段到期後可能無法取回。'+accountHelp;
 }
+function showDraftAICandidate(result){
+      state.aiPeople=result.people||[];
+      $('#ai-people-panel').innerHTML=state.aiPeople.length?'<div class="callout"><strong>原文明示人物資訊候選</strong><p>尚未寫入人物檔案。請返回第三步逐人補充並核對，不會自動套到第一位人物。</p>'+state.aiPeople.map(hint=>'<p>'+esc(hint.person_name)+'：'+esc(hint.value)+'</p><blockquote>'+esc(hint.source_quote)+'</blockquote>').join('')+'</div>':'';
+      state.candidate = result.summary; state.aiTasks=result.tasks||[]; // 等待伺服器完成讀取或保存，再進入下一步
+      $('#candidate-panel').innerHTML = `<div class="callout"><b>整理候選，尚未套用</b><p>${esc(result.notice || '')}</p><div class="raw-source">${esc(result.summary)}</div>${result.tasks?.length?'<p>建議後續任務（套用後仍可編輯或刪除）</p><ul>'+result.tasks.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':''}${button('apply-candidate',result.tasks?.length?'套用摘要與任務草稿':'套用到摘要','secondary')}${button('dismiss-candidate','保留目前摘要','text-button')}</div>`; // 執行「處理click事件與對應的介面狀態」的目前處理步驟
+}
 async function saveDraft(form, review, destination = 'history') { // 新增或依版本修改草稿，成功後接續核對或返回
   await MediaUI.awaitReady(); // 縮圖完成才綁定素材與保存伺服器草稿。
   const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.has('calendar_time')?f.get('calendar_date')+'T'+f.get('calendar_time'):f.get('occurred_at'),form.dataset.calendarZone||state.me.timezone),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
@@ -546,15 +552,7 @@ document.addEventListener('click', async event => { // 監聽點擊
     }
     if(action==='memory-save'){await api('/personalization',{method:'PUT',body:{enabled:$('#memory-enabled').checked,preferences:{summary_style:$('#memory-style').value}}});$('#account-dialog').close();toast('已保存個人化設定。');return;}
     if(action==='memory-delete'){await api('/personalization',{method:'DELETE'});$('#account-dialog').close();toast('已刪除衍生記憶，原始紀錄保留。');return;}
-    if (action === 'suggest') { // 請求手動整理候選而不直接套用
-      const draftId=state.draft.id,ownerId=state.me.owner_id,generation=state.renderGeneration;
-      const result = await api('/drafts/' + draftId + '/suggest',{method:'POST'});
-      if(state.me?.owner_id!==ownerId || state.draft?.id!==draftId || state.renderGeneration!==generation)return;
-      state.aiPeople=result.people||[];
-      $('#ai-people-panel').innerHTML=state.aiPeople.length?`<fieldset><legend>人物資訊候選，尚未保存</legend><p>先選擇對應人物，再套入候選；仍須逐項勾選並確認經歷，才會更新人物資料。</p>${state.aiPeople.map((hint,index)=>`<article class="card"><h3>${esc(hint.person_name)}：${esc(hint.value)}</h3><blockquote>${esc(hint.source_quote)}</blockquote><button type="button" class="secondary" data-action="apply-person-hint" data-index="${index}">填入目前選擇的人物</button></article>`).join('')}</fieldset>`:'';
-      state.candidate = result.summary; state.aiTasks=result.tasks||[]; // 等待伺服器完成讀取或保存，再進入下一步
-      $('#candidate-panel').innerHTML = `<div class="callout"><b>整理候選，尚未套用</b><p>${esc(result.notice || '')}</p><div class="raw-source">${esc(result.summary)}</div>${result.tasks?.length?'<p>建議後續任務（套用後仍可編輯或刪除）</p><ul>'+result.tasks.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':''}${button('apply-candidate',result.tasks?.length?'套用摘要與任務草稿':'套用到摘要','secondary')}${button('dismiss-candidate','保留目前摘要','text-button')}</div>`; // 執行「處理click事件與對應的介面狀態」的目前處理步驟
-    } // 結束目前回呼、區塊或模組定義
+    if(action==='suggest'){await DraftAIUI.choose();return;}
     if(action==='apply-person-hint'){
       const hint=state.aiPeople?.[Number(target.dataset.index)],personId=$('#person-id')?.value;
       if(!hint||!personId)throw new Error('請先選擇或新增這筆資訊對應的人物，再套入候選。');
@@ -568,7 +566,7 @@ document.addEventListener('click', async event => { // 監聽點擊
       document.querySelector('[name="fact_selected_'+hint.dimension+'"]').checked=false;
       state.dirty=true;toast('已填入待核對欄位，請確認人物對應及內容，再逐項勾選。尚未寫入人物資料。');return;
     }
-    if (action === 'apply-candidate') {$('#summary').value = state.candidate; if(state.aiTasks?.length)$('#followups').value=[...new Set([...$('#followups').value.split('\n'),...state.aiTasks].filter(Boolean))].join('\n');state.aiTasks=[]; $('#candidate-panel').innerHTML = ''; state.candidate = null; state.dirty = true;} // 明確將候選放入可編輯摘要
+    if (action === 'apply-candidate') {if(typeof state.candidate!=='string')throw new Error('候選已失效，請重新核對。');$('#summary').value = state.candidate; if(state.aiTasks?.length)$('#followups').value=[...new Set([...$('#followups').value.split('\n'),...state.aiTasks].filter(Boolean))].join('\n');state.aiTasks=[]; $('#candidate-panel').innerHTML = ''; state.candidate = null; state.dirty = true;$('#summary').dispatchEvent(new Event('input',{bubbles:true}));} // 明確將候選放入可編輯摘要
     if (action === 'dismiss-candidate') {$('#candidate-panel').innerHTML = ''; state.candidate = null; state.aiTasks=[];} // 捨棄候選並保留現有摘要
   } catch (error) { showError(error); } // 顯示失敗原因，讓使用者保留內容並重試
   finally {target.disabled = false;} // 操作結束時還原按鈕或載入狀態
@@ -634,6 +632,7 @@ async function start() { // 讀取既有身分後啟動畫面
   await DraftsUI.retryLocalCleanup();
   await render(); // 執行「讀取既有身分後啟動畫面」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
+DraftAIUI.initialize({state,api,esc,id:newId,onCandidate:showDraftAICandidate});
 ExperienceUI.initialize({state,toast,esc,api,personControls:story=>experiencePersonField()+ConnectionsUI.editor(story,'record')});
 MediaUI.initialize({state,api,esc,toast,contributionFields,requestLogin:()=>{toast('登入後可使用辨識；原素材與手動文字會保留。');accountView('claim');}});
 PeopleUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm});

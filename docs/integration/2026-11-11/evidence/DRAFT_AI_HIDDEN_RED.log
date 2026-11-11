@@ -1,0 +1,16 @@
+F
+=================================== FAILURES ===================================
+_ test_manual_default_first_consent_cancel_and_reuse_keep_candidate_editable[320] _
+browser_tests/test_draft_ai_consent_ui.py:20: in test_manual_default_first_consent_cancel_and_reuse_keep_candidate_editable
+    expect(page.locator('[data-draft-ai-retry]')).to_be_hidden()
+E   AssertionError: Locator expected to be hidden
+E   Actual value: visible
+E   Call log:
+E     - Expect "to_be_hidden" with timeout 5000ms
+E     - waiting for locator("[data-draft-ai-retry]")
+E       14 × locator resolved to <button hidden="" type="button" class="secondary" data-draft-ai-retry="">再次整理（會使用額度）</button>
+E          - unexpected value "visible"
+=========================== short test summary info ============================
+FAILED browser_tests/test_draft_ai_consent_ui.py::test_manual_default_first_consent_cancel_and_reuse_keep_candidate_editable[320]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 5 deselected in 5.76s

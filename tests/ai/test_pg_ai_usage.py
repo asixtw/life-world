@@ -34,6 +34,7 @@ from test_draft_ai_consent import (
  test_owner_guest_csrf_and_explicit_confirmation_boundaries,
  test_background_consent_does_not_authorize_unconfirmed_draft,
  test_raw_draft_grant_does_not_send_background_memory,
+ test_source_revision_checked_before_cost_and_result_binds_source,
 )
 
 
