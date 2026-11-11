@@ -230,3 +230,7 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-09 整合證據補充（取代上文「最新」的時間性敘述）
 
 完整整合版離線回歸為 **549 passed、17 PG skipped、13 warnings**。上文540屬歷史pool階段結果。OSSANG先前專用PG18執行17必測全通過，但該次整體542 passed、2 failed、13 Node skipped，且早於最後整合；不能當成本head完整Windows回歸。新core在Windows實機記憶體載入的constructor及6個CLI拒絕probe已通過，僅證明fail-closed路徑，不是Windows全功能或ACL驗收。詳見 `CORE_SAFETY_INTEGRATION_20261109.md`（位於 docs/testing）。三線完整驗收仍未完成。
+
+### 2026-11-12 v1.1資料契約稽核（只讀）
+
+010快照與011本機候選的欄位/FK對照無差異；模板為空、Gold是人工預期，真背景AI NOT RUN。已分離輸入/輸出/正式採納，列出S07獎勵衝突、背景來源失效與九項profile寫入API相容性阻擋；不新增產品或模型呼叫。詳[v1.1稽核](integration/2026-11-12_DATA_CONTRACT_AUDIT/README.md)，維持Draft/NO-GO。

@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hidden AI candidate output envelope — review proposal, not a deployed API or PG schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_kind",
+    "dataset_version",
+    "run_id",
+    "commit_sha",
+    "model_id",
+    "model_version",
+    "provider_request_id",
+    "prompt_version",
+    "schema_version",
+    "candidates",
+    "usage",
+    "case_id",
+    "dataset_sha256",
+    "provider"
+  ],
+  "properties": {
+    "record_kind": {
+      "const": "model_output_candidate"
+    },
+    "dataset_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "model_version": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 256
+    },
+    "provider_request_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 256
+    },
+    "prompt_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "schema_version": {
+      "const": "hidden-candidate-contract-review-v1"
+    },
+    "candidates": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_ref",
+          "subject_type",
+          "subject_external_key",
+          "feature_name_candidate",
+          "value",
+          "context_scope",
+          "epistemic_status",
+          "source_refs",
+          "adoption_state"
+        ],
+        "properties": {
+          "candidate_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "subject_type": {
+            "enum": [
+              "user",
+              "person",
+              "relationship",
+              "context"
+            ]
+          },
+          "subject_external_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "feature_name_candidate": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "context_scope": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "epistemic_status": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "adoption_state": {
+            "const": "candidate"
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source_kind",
+                "external_source_key",
+                "source_revision",
+                "source_sha256",
+                "quote"
+              ],
+              "properties": {
+                "source_kind": {
+                  "enum": [
+                    "confirmed_experience",
+                    "confirmed_fact",
+                    "explicit_preference"
+                  ]
+                },
+                "external_source_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "source_revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "quote": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "input_tokens",
+        "output_tokens",
+        "reserved_microusd",
+        "provider_cost_microusd",
+        "actual_invoice_cost_microusd",
+        "latency_ms"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "success",
+            "failed",
+            "unknown"
+          ]
+        },
+        "input_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "reserved_microusd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "provider_cost_microusd": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "actual_invoice_cost_microusd": {
+          "const": null
+        },
+        "latency_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "dataset_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    }
+  }
+}

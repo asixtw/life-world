@@ -8,6 +8,8 @@
 
 目前整合候選與未完成Gate以[PR26整合報告](integration/2026-11-11/INTEGRATION_RELEASE_REPORT.md)為準：基本資料閉環已在本機受限PG18驗證並轉QA；UX人工核准、Feature Store來源失效審查、GuestPurger FK審查及GCP E2E仍待完成；Jerry進階劇場/人物作品/完整角色創作未核准，不列已承諾下一版。AI單一選用/可撤回授權已在本機驗證，未發布。保持Draft，不自行Merge或發布。
 
+資料製作者與Hidden AI的[v1.1只讀契約盤點](integration/2026-11-12_DATA_CONTRACT_AUDIT/README.md)已交付；模板未成完整世界，來源/授權/語意衝突與未核准API隔離仍屬QA阻擋，不藉資料包擴充產品。
+
 ## 產品規則
 
 1. 確認正式貢獻單位、部分完成粒度、歷史更正及撤銷規則；目前支援使用者輸入正數，最多六位小數。
