@@ -70,6 +70,26 @@ R4 只能以 `Submit-CoreE2EBuild.ps1` 上傳這個固定封裝與它內含的 C
 
 **共用 CA（W1）：** 沿用既有、已信任的本機 CA，不建立新的 Root，也不修改 8445 的 Caddy 設定。啟動前確認 CA 的四個檔案完整；設定驗證改用一次性的隔離儲存目錄；啟動後確認 root 與 intermediate 沒有改變，而且只多出 `lw-core-compare.localhost` 自己的 leaf 憑證。Windows 上兩個 Caddy 同時初始化的檔案鎖風險：**NOT VERIFIED**。
 
+## 作品檔案用的 Cloud Storage（2026-11-11 建立，尚未接上程式）
+
+使用者在 2026-11-11 核准新增一個 bucket 與它的讀寫權限，用途是存放作品的檔案（之後的圖片素材、匯出的 HTML／ZIP）。作品的結構與檔案清單仍然放在 Cloud SQL。
+
+| 項目 | 設定 |
+|---|---|
+| 名稱 | `lw-works-e2e-513506`（只給 e2e 用） |
+| 位置、等級 | `asia-east1`、STANDARD |
+| 存取控制 | 統一 bucket 層級存取；禁止公開存取（enforced） |
+| 生命週期、版本、保留政策 | 都沒有設定。保留多久還沒有決定，所以沒有設任何自動刪除。軟刪除是預設的 7 天 |
+| 權限 | `lw-api-runtime` 在這個 bucket 上有 `roles/storage.objectCreator` 與 `roles/storage.objectViewer` |
+
+注意：
+
+- 服務帳號可以新增和讀取物件，不能刪除也不能覆寫。寫入要用「不存在才建立」的條件，檔名用內容雜湊；同名物件再上傳會被拒絕。
+- `lw-api-runtime` 是 `lw-api-main` 所有 revision 共用的服務帳號，不只是 e2e 標籤。
+- 專案擁有者、編輯者、檢視者的預設繫結是 Cloud Storage 自動建立的，沒有另外調整。
+- 還沒做的：程式還沒有讀寫這個 bucket，部署腳本也還沒有把 bucket 名稱交給服務；服務帳號的權限還沒有實際用過。
+- Alpha（`lw-public`，服務帳號 `lw-public-runtime`）沒有對應的 bucket，要用時另外核准、另外建立。
+
 ## 尚未完成（需要使用者逐項核准）
 
 R1～R6：runtime SA、Cloud SQL Client、DB 密碼 Secret 的讀取權、Cloud Build、Cloud Run 服務、invoker。完成之前，**不能宣稱 E2E 連線已經通過**。
