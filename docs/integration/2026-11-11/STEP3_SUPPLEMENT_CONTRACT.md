@@ -10,4 +10,4 @@ module只改flow.personCandidates與supplementInputs。本機保存在既有Owne
 
 已人工配對且reviewed/available的提及可作明確人物事實的來源；不改來源的角色、不增互動或見面，也不放寬其他API的參與或關係來源規則。跨Owner、無效來源與版本由原後端再次驗證。raw/manual目前保存在草稿review；fact_sources對外API仍只投影傳統證據類型，完整來源瀏覽仍待整合。
 
-公司/職稱/生日的經歷候選介面不開放；不以notes/tags/skills替代。人物選擇仍沿用舊fieldset，尚待精簡至Candidate；這不是完整UX驗收。沒有呼叫外部AI或GCP寫入，發布與Migration Gate不變。測試收據見INTEGRATION_RELEASE_REPORT.md。
+公司/職稱/生日的經歷候選介面不開放；不以notes/tags/skills替代。人物選擇已依COMPACT_PEOPLE_CONTRACT.md改為精簡卡片，但整體Candidate仍待Owner核准；這不是完整UX驗收。沒有呼叫外部AI或GCP寫入，發布與Migration Gate不變。測試收據見INTEGRATION_RELEASE_REPORT.md。

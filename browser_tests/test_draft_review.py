@@ -170,13 +170,13 @@ def test_step3_manual_supplement_to_review_confirm_without_seeded_candidates(pag
     page.goto(BASE+'/#record');page.reload()
     page.locator('#raw-text').fill('和小安閱讀，提到小明。');page.locator('#occurred-at').fill('2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
-    page.locator('#include-story').check();page.locator('[name=story_participant][value="'+person['id']+'"]').check()
+    page.locator('#include-story').check();page.get_by_role('button',name='選擇既有人物',exact=True).click();page.locator('[data-workflow-pick="'+person['id']+'"]').click();page.locator('[data-workflow-person]').first.locator('[data-workflow-role]').select_option('participant')
     card=page.locator('[data-supplement-person="existing:'+person['id']+'"]')
     card.locator('summary').first.click();card.locator('[data-supplement-input=dimension]').select_option('interests');card.locator('[data-supplement-input=value]').fill('登山')
     card.locator('[data-supplement-input=evidence_type]').select_option('stated_by_person')
     card.get_by_role('button',name='加入待核對項目',exact=True).click()
-    page.get_by_role('button',name='＋ 新增人物',exact=True).click();page.locator('#pending-person-name').fill('小明');page.locator('#pending-person-relation').select_option('mention');page.locator('#pending-person-start').select_option('8')
-    second=page.locator('[data-supplement-person="pending:legacy"]');second.locator('summary').first.click()
+    page.get_by_role('button',name='＋ 新增人物',exact=True).click();pending=page.locator('[data-pending-target]').first;pending.locator('[data-target-name]').fill('小明');pending.locator('[data-target-role]').select_option('mention');pending.locator('[data-target-start]').select_option('8');new_ref=pending.get_attribute('data-client-ref')
+    second=page.locator('[data-supplement-person="pending:'+new_ref+'"]');second.locator('summary').first.click()
     second.locator('[data-supplement-input=dimension]').select_option('food');second.locator('[data-supplement-input=value]').fill('清淡');second.locator('[data-supplement-input=evidence_type]').select_option('observed_by_user');second.get_by_role('button',name='加入待核對項目',exact=True).click()
     page.locator('[data-experience-prev]').click();page.locator('[data-experience-next]').click()
     expect(card).to_contain_text('登山');expect(second).to_contain_text('清淡')
@@ -184,7 +184,7 @@ def test_step3_manual_supplement_to_review_confirm_without_seeded_candidates(pag
     ART.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(ART/f'{width}-step3-supplement-input.png'),full_page=True)
     page.locator('[data-experience-review]').click();expect(page.locator('#review-form')).to_be_visible()
     state=page.request.get(BASE+'/api/state').json();assert len(state['people'])==1 and not state['experiences']
-    for key in ['existing:'+person['id'],'pending:legacy']:
+    for key in ['existing:'+person['id'],'pending:'+new_ref]:
         page.locator('[data-experience-preview="'+key+'"]').click();page.locator('[data-candidate-select]').check();page.get_by_role('button',name='完成檢視',exact=True).click()
     page.locator('#story-reviewed').check();page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
     page.wait_for_function("()=>!document.querySelector('#review-form') || !!document.querySelector('#notice .error-message')")
@@ -199,7 +199,7 @@ def test_step3_manual_supplement_to_review_confirm_without_seeded_candidates(pag
 def test_step3_unadded_input_is_protected_and_local_draft_restores_both_stages(page):
     person,headers=seed(page);page.goto(BASE+'/#record');page.reload()
     page.locator('#raw-text').fill('沒有AI的手動記錄。');page.locator('#occurred-at').fill('2026-10-27T12:00');page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
-    page.locator('#include-story').check();page.locator('[name=story_participant][value="'+person['id']+'"]').check()
+    page.locator('#include-story').check();page.get_by_role('button',name='選擇既有人物',exact=True).click();page.locator('[data-workflow-pick="'+person['id']+'"]').click();page.locator('[data-workflow-person]').first.locator('[data-workflow-role]').select_option('participant')
     row=page.locator('[data-supplement-person="existing:'+person['id']+'"]');row.locator('summary').first.click();row.locator('[data-supplement-input=dimension]').select_option('skills');row.locator('[data-supplement-input=value]').fill('繪圖')
     page.locator('[data-experience-review]').click();expect(page.locator('#notice')).to_contain_text('尚未加入候選')
     assert not page.request.get(BASE+'/api/state').json()['drafts']
@@ -220,3 +220,17 @@ def test_step3_unadded_input_is_protected_and_local_draft_restores_both_stages(p
         d=other.request.get(BASE+'/api/state').json()['drafts'][0]
         assert len(d['review']['person_candidates'])==1 and d['review']['person_candidates'][0]['evidence_type'] is None
     finally:other.close()
+
+
+def test_step3_compact_picker_has_explicit_role_and_keeps_plain_diary_path(page):
+    person,headers=seed(page);page.goto(BASE+'/#record');page.reload()
+    page.locator('#raw-text').fill('今天寫了一段日記。');page.locator('#occurred-at').fill('2026-10-27T12:00');page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
+    expect(page.locator('[data-workflow-picker]')).to_be_hidden()
+    page.locator('#include-story').check();page.get_by_role('button',name='選擇既有人物',exact=True).click()
+    page.locator('[data-workflow-pick="'+person['id']+'"]').click()
+    row=page.locator('[data-workflow-person]').first;expect(row.locator('[data-workflow-role]')).to_have_value('')
+    page.locator('[data-experience-review]').click();expect(page.locator('#notice')).to_contain_text('本次角色')
+    assert not page.request.get(BASE+'/api/state').json()['drafts']
+    row.locator('[data-workflow-remove]').click();page.locator('#include-story').uncheck()
+    page.locator('[data-experience-review]').click();expect(page.locator('#review-form')).to_be_visible()
+    expect(page.locator('[data-experience-preview]')).to_have_count(0)

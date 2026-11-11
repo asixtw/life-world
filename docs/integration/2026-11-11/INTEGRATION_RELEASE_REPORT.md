@@ -1,17 +1,17 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準9025536；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準9b0592c；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
 | 完整本機API及Node suite | **741 PASS、71 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
-| 本輪工作流/補充/用量/世界交換Chromium（同次） | **55 PASS**（27工作流/預覽＋17草稿/補充＋3用量＋8 GIS替身）；evidence/STEP3_INTEGRATION_BROWSER.log |
-| 補充加入後自動收合與本機恢復（最後UI調整後） | **4 PASS**，STEP3_COLLAPSE_BROWSER.log；不是額外4個不同案例，不與55加總 |
-| 人物候選版本衝突／確認503重試 | 追加分開執行 **1 PASS／2 PASS**；CANDIDATE_VERSION_BROWSER.log、CANDIDATE_RETRY_BROWSER.log，不與50重複加總 |
-| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述55項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
-| Google世界交換Chromium | 本次55項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
+| 本輪工作流/精簡人物/用量/世界交換Chromium（同次） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
+| 最後重複提示文字調整後 | **6 PASS**（三尺寸選擇及補充完整確認），COMPACT_PEOPLE_COPY_BROWSER.log；不與66加總 |
+| 人物候選版本衝突／確認503重試 | 追加分開執行 **1 PASS／2 PASS**；CANDIDATE_VERSION_BROWSER.log、CANDIDATE_RETRY_BROWSER.log，不與本次66重複加總 |
+| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述66項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
+| Google世界交換Chromium | 本次66項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
 | 受限本機PG18人物/草稿/AI | **37 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
 | AI專項 | evidence/AI_POLICY_SQLITE.log：36 PASS/7 PG SKIP；AI_POLICY_PG18.log：另行7 PASS |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
@@ -51,7 +51,7 @@ Alpha仍是舊Runtime，非敏感現況/候選設定及停止程序見[AI_BUDGET
 
 ## 未完成／發布Gate
 
-1. **完整PR24 Candidate A1/A2四步尚未完成**：第三步已能加入四維補充候選，但人物選擇仍含舊fieldset，尚待收斂；基本資料候選與差異仍待串接；第四步四維候選逐項人工核對與原有事實讀取已接上，不能當成完整人物補充完成；當前第三步還含舊fieldset，第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
+1. **完整PR24 Candidate A1/A2四步尚未完成**：第三步人物選擇已換為精簡搜尋/卡片/明確角色，四維補充預設收合；基本資料候選與差異仍待串接；第四步四維候選逐項人工核對與原有事實讀取已接上，不能當成完整人物補充完成；第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
 2. DraftReview已可保存摘要/任務/四維事實候選及逐人target；SQLite/PG重新登入讀回與同名人物分流已驗證。第三步四維補充已接上；生日/任職候選草稿及同名核對狀態尚未接齊。第四步已可逐人核對已保存四維候選並選用同一Confirm交易；不得誤稱完整人物補充已可用。未支援欄位不開放白填。
 3. Feature Store PG兩表未建立；衍生失效/長期記憶與人物基本資料AI上下文尚未完成。來源撤回API不代表Feature Store已驗收。不啟用額外AI。
 4. GuestPurger需依真實FK及011新增表審查，維持fail-closed；未啟用正式刪除排程。
@@ -106,6 +106,16 @@ LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json pyt
 - 已選既有人物與待建人物各自維護四維內容、來源、證據類型；單人舊表單只在需要時轉為穩定legacy client_ref的多人契約，加入第二人不換掉第一人的候選target。同名不合併。
 - 未加入候選的文字會阻擋伺服器保存，提供清空本次輸入，不清除已加入候選；既有Owner/draft IndexedDB可保留已加入及尚未完成內容。移除人物不默默把候選轉給別人，需重新關聯或明確移除。伺服器草稿不建人；最終交易才建人/寫事實/計分。
 - 實際測試發現僅提及者的事實會被舊參與來源檢查拒絕。修復只對人物事實接受已人工配對且有效的提及來源；其他API的參與/關係來源規則不放寬，不新增參與/互動列。SQLite及受限PG18驗證、相同請求去重與零互動統計通過。
-- 320/390/1440實際UI輸入兩位人物不同資訊→返回→保存草稿→逐項核對→Confirm→API讀回事實/一次獎勵通過，不預先種入人物候選。未加入輸入保護及新分頁本機恢復另已測試。舊fieldset仍偏長，不能視為Candidate整體視覺完成。
+- 320/390/1440實際UI輸入兩位人物不同資訊→返回→保存草稿→逐項核對→Confirm→API讀回事實/一次獎勵通過，不預先種入人物候選。未加入輸入保護及新分頁本機恢復另已測試。其後第三步已改為精簡選擇區，見下一節；完整UX仍需Owner核准。
 - fact_sources既有API尚未顯式投影manual/raw輸入管道；該資訊目前保存在已確認草稿的DraftReview JSON，與evidence_type分開。完整來源瀏覽/來源撤回衍生失效仍需完成，不冒稱已全數整合。
 - [第三步契約與限制](STEP3_SUPPLEMENT_CONTRACT.md)、[390px](screenshots/390-step3-supplement-input.png)、[1440px](screenshots/1440-step3-supplement-input.png)。保持Draft／NO-GO，沒有正式DB/權限/部署操作。
+
+
+## 精簡第三步人物選擇（本輪，未部署）
+
+- 移除第三步整份參與/直接互動checkbox列表，改為「選擇既有人物／新增人物」與所選人物卡。角色必須明確選，沒有預設互動。一般日記不必開啟人物；搜尋無結果、關閉、移除與鍵盤焦點已有測試。
+- 既有人物提及與未配對稱呼都需選原文精確位置，不默認第一處同名；同一人物既參與又被提及的舊資料分別保留，不改歷史事實。其他原文稱呼與故事標題預設收合。第三步四維補充仍沿用前一階段，不新增AI或正式欄位。
+- StoryInput／DraftReview／Confirm契約、Owner及最終交易規則不變；experience_people.js只負責視圖及canonical資料投影，沒有寫入API。第四步修改區與來源管理目前仍用原編輯器，不擅自替換其契約。
+- 本機人物行資料以穩定row key保留未完成角色、來源及Owner；沿用既有Media scope。回退至9b0592c可讀伺服器標準草稿，但舊UI不能自動恢復新workflow_existing_people的本機未保存選擇；正式發布前需相容reader/匯出方案，原始素材不自動刪除。Alpha未寫此本機格式。
+- 最新main唯讀核對仍68102f230aa947a434286ba9260e1ae75f6634b0。66項Chromium套件含10項新選擇契約：三種人物類型、來源、同人雙角色、Owner隔離、未完成恢復、320/390/1440及基本鍵盤。最後僅重複提示文字調整後重跑6項；API/Node仍741 PASS/71 SKIP。PG37是同一後端上一階段的實際收據，本輪無後端變更，不宣稱重跑GCP。
+- [精簡選擇契約](COMPACT_PEOPLE_CONTRACT.md)、[390px](screenshots/390-compact-person-selection.png)、[1440px](screenshots/1440-compact-person-selection.png)。整體UX、Review、GCP E2E及發布Gate不變。
