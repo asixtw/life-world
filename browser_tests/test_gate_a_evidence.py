@@ -14,7 +14,7 @@ def shot(page,width,name):
     """保留完整頁面；先等短暫提示消失，避免截圖遮住主要操作。"""
     expect(page.locator('#toast')).not_to_have_class('visible')
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
-    page.screenshot(path=str(ART/f'{width}-{name}.png'),full_page=True)
+    page.screenshot(path=str(ART/f'{width}-{name}.png'),full_page=not name.startswith('preview'))
 
 
 def add(card,kind,values,source_kind='manual',quote=None):
@@ -91,9 +91,10 @@ def test_gate_a_full_flow_video_and_readback(width):
                         else:row.locator('[data-candidate-select]').check()
                 for row in page.locator('[data-basic-review-row]').all():row.locator('[data-basic-select]').check()
                 # 滾動錄影保留長內容；底部完成按鈕始終可操作。
-                for fraction in (0,.5,1):
+                for fraction in (0,.75,1):
                     body.evaluate('(node,f)=>node.scrollTop=(node.scrollHeight-node.clientHeight)*f',fraction)
                     page.wait_for_timeout(350)
+                    if fraction==.75 and not is_new:shot(page,width,'preview-existing-more')
                 body.evaluate('(node)=>node.scrollTop=0')
                 shot(page,width,'preview-new' if is_new else 'preview-existing')
                 page.get_by_role('button',name='完成檢視',exact=True).click()
