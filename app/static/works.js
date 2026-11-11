@@ -12,6 +12,8 @@ window.WorksUI = (() => {
     ['values', '價值觀', 1500, false, true], ['behavior', '行為模式', 2000, false, true], ['knowledge', '知識與專長', 2000, false, true],
     ['relationships', '人際關係', 2000, false, true], ['boundaries', '界線（不希望 AI 演出的內容）', 1000, false, true], ['appearance', '外觀', 1000, false, true]];
   const TRUTH = {real: '真實的我', mixed: '部分真實', ideal: '理想中的我'};
+  const PERSONA_BLOCKS = [['A', '基本資料', ['display_name', 'public_profile', 'appearance']], ['B', '人格特質', ['personality', 'motivation', 'values']], // 與人物設定相同的分區方式
+    ['C', '能力與知識', ['knowledge']], ['D', '行為與表達', ['behavior', 'speaking_style', 'sample_lines']], ['E', '關係與界線', ['relationships', 'boundaries']]];
   let persona = null; // 目前人設（保存時帶 revision）
 
   function initialize(context) { c = context; }
@@ -25,17 +27,19 @@ window.WorksUI = (() => {
     if (!fresh(ticket)) return '';
     persona = data.persona;
     const content = persona?.content || {};
-    const fields = PERSONA_FIELDS.map(([key, label, max, required, multi]) => `<div class="field"><label for="persona-${key}">${h(label)}${required ? '（必填）' : ''}</label>${multi
+    const inputs = Object.fromEntries(PERSONA_FIELDS.map(([key, label, max, required, multi]) => [key, `<div class="field"><label for="persona-${key}">${h(label)}${required ? '（必填）' : ''}</label>${multi
       ? `<textarea id="persona-${key}" name="${key}" maxlength="${max}" rows="3" ${required ? 'required' : ''}>${h(content[key] || '')}</textarea>`
-      : `<input id="persona-${key}" name="${key}" maxlength="${max}" value="${h(content[key] || '')}" ${required ? 'required' : ''}>`}</div>`).join('');
+      : `<input id="persona-${key}" name="${key}" maxlength="${max}" value="${h(content[key] || '')}" ${required ? 'required' : ''}>`}</div>`]));
+    inputs.sample_lines = `<div class="field"><label for="persona-sample_lines">範例台詞（一行一句，最多 3 句）</label><textarea id="persona-sample_lines" name="sample_lines" rows="3">${h((content.sample_lines || []).join(String.fromCharCode(10)))}</textarea></div>`;
+    const fields = PERSONA_BLOCKS.map(([letter, title, keys]) => `<div class="stack" data-persona-block="${letter}"><h3 class="section-title">${letter}｜${h(title)}</h3>${keys.map(key => inputs[key]).join('')}</div>`).join('');
+    const back = query().get('from') === 'history' ? c.link('history', '← 我的紀錄', 'text-button') : c.link('works', '← 我的作品', 'text-button');
     const truth = Object.entries(TRUTH).map(([key, label]) => `<option value="${key}" ${(content.truth_level || 'mixed') === key ? 'selected' : ''}>${h(label)}</option>`).join('');
     const consent = data.consent
       ? `<p class="callout">已同意（${h(c.time(data.consent.granted_at))}）。${c.button('persona-consent', '撤回同意', 'secondary', 'data-granted="false"')}</p>`
       : `<p class="callout">尚未同意。${persona ? c.button('persona-consent', '我同意', 'primary', 'data-granted="true"') : '請先保存人設再同意。'}</p>`;
-    return `${c.link('works', '← 我的作品', 'text-button')}
-      ${c.heading('我的人設', persona ? `目前 v${persona.version_no}；每次保存都會保留舊版本。` : '建立一份可以讓 AI 扮演你的人設。一個帳號只有一份使用中的人設。')}
+    return `${back}
+      ${c.heading('我的人設', persona ? `目前 v${persona.version_no}；每次保存都會保留舊版本。AI 扮演你時會依照這份設定。` : '建立一份可以讓 AI 扮演你的人設。一個帳號只有一份使用中的人設。')}
       <form id="persona-form" class="card stack">${fields}
-        <div class="field"><label for="persona-sample_lines">範例台詞（一行一句，最多 3 句）</label><textarea id="persona-sample_lines" name="sample_lines" rows="3">${h((content.sample_lines || []).join('\n'))}</textarea></div>
         <div class="field"><label for="persona-truth">這份人設是</label><select id="persona-truth" name="truth_level">${truth}</select></div>
         <div class="button-row"><button type="submit" class="primary">${persona ? '保存新版本' : '建立人設'}</button>${persona ? c.link('work/' + encodeURIComponent(persona.work_id), '查看所有版本') : ''}</div></form>
       <section class="card stack space-top"><h2 class="section-title">同意使用</h2><p>${h(data.consent_text)}</p>${consent}</section>`;

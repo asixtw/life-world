@@ -133,8 +133,8 @@ function goalCard(goal) { // 產生目標摘要卡與詳情入口
 function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').hidden=false; // 資料服務未開放也保留入口，明示降級而不是整個隱藏。
   $('.sidebar').classList.toggle('before-world',!state.me?.lumi_hatched); // 手機首次引導不顯示空白底部導覽。
-  const active = /^persons/.test(route)?'persons':/^(portrayal\/|portrayal-new|character|persona)/.test(route)?'characters':/^(create|runs|run\/|story-new|story\/|play\/|stage|performance\/|portrayal-play\/|works|work\/)/.test(route)?'works':/^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
-  $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],...(PersonsUI.enabled()?[['persons','◎','人物']]:[]),['people','◌','關係'],['characters','☆','角色'],['works','▣','作品']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
+  const active = PersonsUI.enabled()&&/^persona([?]|$)/.test(route)?'history':/^persons/.test(route)?'persons':/^(portrayal\/|portrayal-new|character|persona)/.test(route)?'characters':/^(create|runs|run\/|story-new|story\/|play\/|stage|performance\/|portrayal-play\/|works|work\/)/.test(route)?'works':/^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
+  $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],...(PersonsUI.enabled()?[['persons','◎','人物']]:[]),...PersonsUI.legacyNav(),['works','▣','作品']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
   $('#page-label').textContent = names[route] || (route.startsWith('persons')?'人物':route==='story-new'?'故事開場':route.startsWith('story/')?'故事開場':route.startsWith('play/')?'互動冒險':route==='stage'||route.startsWith('stage/')?'人物劇場':route.startsWith('performance/')?'多角色演出':route.startsWith('portrayal-new')?'從真人資料建立角色卡':route.startsWith('portrayal-play/')?'人物互動試演':route.startsWith('portrayal/')?'人物演繹':route.startsWith('create')?'建立新作品':route==='runs'?'我的生成作品':route.startsWith('run/')?'生成作品':route==='character-ai'?'AI 產生角色卡':route==='works'||route.startsWith('works?')?'作品':route.startsWith('work/')?'作品詳情':route==='persona'?'我的人設':route.startsWith('character-system/')?'系統角色':route.startsWith('character/')?'角色卡':route==='characters'?'角色卡':route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
   $('#account-button').textContent = state.me?.status==='guest' ? '訪客模式' : (state.me?.name?.slice(0,1) || '○'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
@@ -191,13 +191,16 @@ function recordCard(e, typeTag = false) { // 一筆已確認的我的紀錄；ty
 async function historyPage(params) { // 紀錄頁：我的紀錄／人物經歷／全部（後兩者需要新人物系統）
   const view = PersonsUI.enabled() && ['people', 'all'].includes(params.get('view')) ? params.get('view') : 'mine';
   const tabs = PersonsUI.enabled() ? PersonsUI.recordTabs(view) : '';
-  if (view === 'mine') return '<div id="media-local-drafts"></div>' + historyView(tabs); // 我的紀錄：沿用原本的畫面與核對流程
+  if (view === 'mine') { // 我的紀錄：沿用原本的畫面與核對流程；上方加「我的人設」入口（AI 扮演使用者本人時使用）
+    const self = PersonsUI.enabled() ? await api('/self-persona').catch(() => null) : null;
+    return '<div id="media-local-drafts"></div>' + historyView(tabs, PersonsUI.selfCard(self));
+  }
   return PersonsUI.recordsPage(view, params, tabs, {records: state.world.experiences, recordCard});
 }
-function historyView(tabs = '') { // 列出已確認經歷與可接續草稿
+function historyView(tabs = '', self = '') { // 列出已確認經歷與可接續草稿；self＝「我的人設」卡片
   const w = state.world, filter = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 讀取目前帳號的世界資料
   const experiences = filter ? w.experiences.filter(e => e.person_id === filter) : w.experiences; // 保存「experiences」供此流程接續使用
-  return `${heading('收藏每一段真實。','所有已確認的經歷，都帶著原始記錄與發生時間。',link('record','＋ 新的經歷','primary'))}${tabs}${w.drafts.length && !filter ? `<section class="space-bottom"><div class="section-title"><h2>等待你的確認</h2><span class="tag">草稿不計分</span></div><div class="card">${w.drafts.map(d => `<div class="list-item"><div class="item-main"><h3>${esc(d.raw_text.slice(0,65))}</h3><p>${esc(time(d.occurred_at))} · revision ${d.revision}</p></div>${link('review/' + d.id,'繼續核對 →','text-button')}</div>`).join('')}</div></section>` : ''}<div class="button-row space-bottom">${link('private-notes','私人筆記／草稿箱','secondary')}</div><div class="stack">${experiences.length ? experiences.map(e => recordCard(e)).join('') : `<div class="card">${empty('這裡還沒有正式經歷。先記下一次真實行動吧。')}</div>`}</div>`; // 組合「列出已確認經歷與可接續草稿」所需的畫面或提交資料
+  return `${heading('收藏每一段真實。','所有已確認的經歷，都帶著原始記錄與發生時間。',link('record','＋ 新的經歷','primary'))}${tabs}${filter ? '' : self}${w.drafts.length && !filter ? `<section class="space-bottom"><div class="section-title"><h2>等待你的確認</h2><span class="tag">草稿不計分</span></div><div class="card">${w.drafts.map(d => `<div class="list-item"><div class="item-main"><h3>${esc(d.raw_text.slice(0,65))}</h3><p>${esc(time(d.occurred_at))} · revision ${d.revision}</p></div>${link('review/' + d.id,'繼續核對 →','text-button')}</div>`).join('')}</div></section>` : ''}<div class="button-row space-bottom">${link('private-notes','私人筆記／草稿箱','secondary')}</div><div class="stack">${experiences.length ? experiences.map(e => recordCard(e)).join('') : `<div class="card">${empty('這裡還沒有正式經歷。先記下一次真實行動吧。')}</div>`}</div>`; // 組合「列出已確認經歷與可接續草稿」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function notesView() { // 列出既有無人物私人草稿與筆記
   const selected = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 保存「selected」供此流程接續使用

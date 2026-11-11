@@ -994,6 +994,24 @@ window.PersonsUI = (() => {
     return true;
   }
 
+  // ---- 導覽與「我的人設」入口（2026-11-11） ----
+  /** 人物已取代舊的「關係」「角色」：人物系統可用時左側不再列這兩個入口（頁面仍可由作品流程或網址進入）。 */
+  function legacyNav() { return enabled() ? [] : [['people', '◌', '關係'], ['characters', '☆', '角色']]; }
+
+  const SELF_FIELDS = ['display_name', 'public_profile', 'personality', 'speaking_style', 'motivation', 'values', 'behavior', 'knowledge', 'relationships', 'boundaries', 'appearance'];
+  const SELF_TRUTH = {real: '真實的我', mixed: '部分真實', ideal: '理想中的我'};
+  /** 「我的紀錄」上方的「我的人設」卡片：AI 扮演使用者本人時使用的設定。data＝GET /api/self-persona 的回應；讀不到就不顯示。 */
+  function selfCard(data) {
+    if (!enabled() || !data) return '';
+    const persona = data.persona, content = persona?.content || {};
+    const filled = SELF_FIELDS.filter(key => String(content[key] || '').trim()).length + ((content.sample_lines || []).length ? 1 : 0);
+    const body = persona
+      ? `<h3>${h(content.display_name)}</h3><p class="small muted">第 ${persona.version_no} 版 · ${h(SELF_TRUTH[content.truth_level] || '')} · 已填 ${filled}／12 欄 · ${data.consent ? '已同意 AI 使用' : '尚未同意 AI 使用'}</p><p>${h(content.public_profile)}</p>`
+      : `<p>尚未建立。填寫性格、說話方式、動機、價值觀等欄位，AI 才知道怎麼扮演你。</p>`;
+    return `<section class="card stack space-bottom" data-block="self-persona"><div class="section-title"><h2>我的人設</h2><span class="tag">AI 扮演你時使用</span></div>
+      ${body}<div class="button-row">${c.link('persona?from=history', persona ? '編輯我的人設' : '建立我的人設', persona ? 'secondary' : 'primary')}</div></section>`;
+  }
+
   return {initialize, list: listView, createForm, editForm, detail, submit, handleClick, enabled, scrollTarget, experienceSearch, experienceChips,
-    experienceSubjectSearch, experienceSubject: experienceSubjectHtml, recordTabs, recordsPage};
+    experienceSubjectSearch, experienceSubject: experienceSubjectHtml, recordTabs, recordsPage, legacyNav, selfCard};
 })();
