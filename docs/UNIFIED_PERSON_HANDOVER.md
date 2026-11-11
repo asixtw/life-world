@@ -14,6 +14,7 @@
 | 紀錄頁三個頁籤：我的經歷／人物經歷／全部 | `#history`、`#history?view=people`、`#history?view=all` | `app/static/app.js`（`historyPage`）、`persons.js`（`recordsPage`） |
 | 記下我的經歷時，「關聯人物」只列使用中的真實人物（不含歷史人物與虛構人物） | `#record`、`#review/{id}` | `app/static/app.js`（`personField`）、`persons.js`（`recordableIds`） |
 | 我的設定（使用者本人的設定，AI 扮演「我」時使用） | 人物首頁最上方的卡片、右上角帳號視窗的「我的設定」按鈕 → `#persona` | `app/self_persona.py`、`app/static/works.js`（`personaView`）、`persons.js`（`selfCard`、`accountEntry`） |
+| 建立作品時選人物（AI 依正式人物設定演出，開始時鎖定版本） | `#create` 的「① 人物」、作品頁的作品設定 | `app/roleplay.py`（`_person_member`、`_person_persona`、`generation_people`）、`app/static/creation.js` |
 | 左側導覽：世界／目標／紀錄／人物／作品 | 全站 | `app/static/app.js`（`navigation`）、`persons.js`（`legacyNav`） |
 
 人物頁網址是 `#persons/{id}?tab=overview|profile|experiences|relations`。人物列表的卡片整張可點，進入人物頁；完整的編輯表單只從人物頁的「編輯人物」進入。
@@ -58,6 +59,8 @@
 | `GET /api/persons/{id}/connection-sources?other_person_id=` | 可引用的來源（我的經歷＋人物經歷） |
 | `GET /api/persons/{id}/experiences` | 人物頁「經歷」頁籤的兩區資料 |
 | `GET/POST /api/person-experiences`、`GET/PATCH /api/person-experiences/{id}` | 人物經歷總列表、新增、讀取、編輯、封存／恢復 |
+| `GET /api/generation/people` | 建立作品可以選的人物：本人使用中的人物，附最新正式人物設定的識別碼與版號（沒有設定的 `profile` 是 null） |
+| `POST /api/generation/runs` | 建立作品。`setup.participants[]` 的 `source` 可以是 `person`（`ref: {person_id, profile_id?}`）或 `card`（`ref: {work_id, version_no}`） |
 | `GET/PUT /api/self-persona`、`POST /api/self-persona/consent` | 讀取、保存我的人設（已有人設時要帶 `expected_revision`）；同意或撤回給 AI 使用 |
 
 寫入都帶 `request_id`（重送回原結果）與 `expected_revision`（版本不符回 409）。
@@ -78,6 +81,27 @@
 - 使用者要先到那段關係移除來源，才能封存或修改經歷。已封存的關係也算引用。
 - 前端的篩選（記下經歷時只列真實人物）只是方便選擇，不是防護。
 
+### 作品引用人物（2026-11-11）
+
+建立作品的「① 人物」在人物系統啟用時先列人物；舊角色卡收在可展開的區塊裡，仍然可以選，也可以和人物混用。沿用原本的雙人／多人文字生成流程（規劃、逐段生成、保存、恢復），只多了一種人物來源。
+
+| 規則 | 在哪裡 | 不符合時 |
+|---|---|---|
+| 只能選本人使用中、而且有正式人物設定（有回執、九欄不是全空）的人物 | `roleplay.py` 的 `_person_member`（建立作品的交易內，寫入之前） | 404 `not_found`（別人的或不存在）、409 `person_archived`、409 `person_profile_required` |
+| 開始時鎖定當下最新的正式人物設定：記下人物、人物設定的識別碼、版號與九欄內容的雜湊 | 同上，寫進作品的 `meta.participants[]` | 畫面送來的 `profile_id` 不是最新版：409 `person_profile_changed` |
+| 每一段生成前重讀鎖定的那一版，必須仍是正式版本、版號與雜湊相同 | `_person_persona` | 作品停止（`source_unavailable`），已生成的段落保留 |
+| 規劃階段和其他人物只看得到公開簡介（人物簡介，沒有簡介就用身分；最多 400 字） | `_person_member`、`_public` | — |
+| 同一位人物不能重複選；人物和角色卡同名不能一起出場 | 輸入模型、`start_generation` | 422（`duplicate_cast_name`） |
+
+補充：
+
+- 輪到人物發言時，送給模型的人格是姓名、類型（`kind`：fictional／real／historical）、公開簡介，加上九欄。九欄沿用原本的欄位名稱，只有「固有限制與弱點」以 `weaknesses` 送出：它描述人物本身，不是演出規則，沿用 `restrictions` 會和角色卡的「禁止事項」混淆。
+- 人物之後另存的新版本不影響進行中的作品；新建立的作品才用新版本。封存人物不會停止進行中的作品（和角色卡相同），但不能再加入新的作品。
+- 同名的舊角色卡、格式相同但沒有正式回執的筆記，都不會取代正式人物設定。
+- 生成紀錄的 `input_json.persona_ref` 記的是來源：人物來源是 `{source, person_id, profile_id, version, content_sha256}`。它不是送給模型的完整內容；要證明模型實際收到什麼，用本機的擷取型假模型測試（`tests/test_person_source_generation.py`）。
+- 生成不寫回人物、人物設定、我的設定、我的經歷或積分。
+- 真實人物也可以選（沿用「連真人不另要求同意」的裁決）；作品仍是虛構演出。
+
 ## 5. 怎麼驗證
 
 - 本機快速檢查（SQLite，只當輔助）：`python -m pytest -q tests --ignore=tests/product/test_google_verifier.py --ignore=tests/product/test_staging_iap_config.py`（這兩個檔案需要本機沒有安裝的 Google 驗證套件）。這個階段相關的測試檔：`tests/test_persons*.py`、`tests/test_person_*.py`、`tests/test_records_page_view.py`、`tests/test_relation_sources.py`、`tests/test_nav_and_self_persona_view.py`、`tests/test_persona_works.py`。前端畫面測試用 Node 直接執行 `app/static/persons.js`。
@@ -85,6 +109,7 @@
   - API：`LW_E2E_PERSONS=1 LW_E2E_RELATION_SOURCES=1 python -m pytest tests/test_person*_cloudsql_e2e.py tests/test_persons_cloudsql_e2e.py tests/test_relation_sources_cloudsql_e2e.py tests/test_self_persona_cloudsql_e2e.py`
   - Chrome：`LW_E2E_PERSONS_UI=1 python -m pytest browser_tests/test_persons*_ui.py browser_tests/test_records_page_ui.py browser_tests/test_self_persona_entry_ui.py`
   - 兩者都會建立 `persons_ui_` 開頭的合成帳號。
+  - 作品選人物：API 是 `tests/test_person_source_cloudsql_e2e.py`，Chrome 是 `browser_tests/test_creation_people_ui.py`。這個環境的生成服務是真實模型，所以預設只驗收不會呼叫模型的路徑；真的開始生成的案例要另外加 `LW_E2E_LIVE_GENERATION=1`，會計費，執行前要先取得同意。
 - 部署腳本與本機啟動器不在這個倉庫裡（在 `C:\LifeWorld_project\LifeWorld-STARTUP\`）；建置清單是 `deploy/core-e2e-build-sources.txt`，新增 `app/` 底下的檔案要加進清單。
 - 最近一次的數字見 `docs/ACCEPTANCE.md` 最後一節。
 
@@ -100,7 +125,7 @@
 5. 新人物頁沒有「已確認事實」「筆記」的填寫入口；它們只在舊的關係頁（`#person/{id}`），而舊關係頁現在沒有導覽入口，只能由網址進入。
 6. 總覽的經歷統計、AI 依經歷建議更新人物設定，還沒做。
 7. 舊關係頁對已存在的關係再送一次，仍會覆蓋 label 與來源（不動描述與類型）。
-8. 作品還是讀角色卡，沒有改成引用人物；角色卡頁（`#characters`）沒有導覽入口，由作品建立流程的連結或網址進入。建立作品頁（`#create`）的人物清單只列「我的角色卡」，下方的說明還寫著「到『角色』建立新角色」。`lw_user` 的 15 張同名舊角色卡內容和正式人物設定不同（只有公開簡介相同），不能拿來代替人物設定。
+8. 作品已經可以選人物（見第 4 節「作品引用人物」）。還沒做的部分：故事開場、短篇互動、人物劇場仍然只讀角色卡；建立頁的「包含我」與同意文字仍寫「我的人設」；舊角色卡沒有轉成人物的功能，`lw_user` 的 15 張同名舊角色卡還在使用中（內容和正式人物設定不同，只有公開簡介相同）；人物超過 8 位時建立頁有搜尋框，但沒有分頁或依類型篩選；角色卡頁（`#characters`）沒有導覽入口，由網址進入。
 9. 我的設定和人物設定是兩套欄位、兩種儲存方式。「我」在人物首頁只是一張卡片，不是人物列表裡的一筆人物，所以不能當人物經歷的主體或參與人物、不能和人物建立關係。
 10. 舊的瀏覽器測試（`browser_tests/test_character_cards_ui.py`、`test_connections.py`、`test_people.py`）靠點擊導覽的「關係」「角色」進入頁面；在人物系統啟用的環境要改成由網址進入才能執行。這一輪沒有修改也沒有執行它們。
 11. 已經開著的頁面不會自動換成新版程式，部署後要重新整理。
@@ -132,7 +157,7 @@
 | 舊角色卡 | 15 張同名角色卡都在使用中，各第 1 版，沒有被任何作品引用 |
 | 人物經歷與關係 | 人物經歷 20 筆、人物關係 6 筆，補標題之後關係與來源都還在 |
 
-資料上已經沒有缺項。開始生成之前還缺兩件事，都不是資料：`lw_user` 要由本人按「我同意」；建立作品要能選人物並讀正式人物設定（第 6 節第 8 項）。
+資料上已經沒有缺項。建立作品已經可以選人物並讀正式人物設定（2026-11-11 完成，見第 4 節）；開始生成之前只剩 `lw_user` 要由本人按「我同意」，以及第一次用真實模型試跑要先取得同意。
 
 第 3 版人物設定沒有再刪。逐句掃過之後，裡面仍有用「角色可以／不能」（44 句）、「使用者」（155 處）、「某某模式」（29 句）口吻寫的句子，例如「角色可以表現短暫的不甘或尷尬，但不能把這些情緒變成債務」「日常模式：可以聊茶、桌遊設計與工作瑣事」。它們寫的是人物的界線、反應與話題習慣，不是場次狀態或系統規則，照刪除規則應該保留；獨立盤查點名的任照野「此時也不需配樂」也屬於這一類（原文是形容他說實話時不加戲）。作品引用人物設定時要把它當資料，不當指令，「使用者」在沒有「我」出場的作品裡沒有對應的人。
 

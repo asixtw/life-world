@@ -107,6 +107,11 @@ def install(app, service, current, settings=None, provider=None, task_queue=None
         current(request)
         return service.generation_catalog()
 
+    @app.get('/api/generation/people', tags=['Generation'])
+    def generation_people(request: Request):
+        """① 人物：建立作品可以選的人物（本人使用中的人物，以及各自最新的正式人物設定版本）。"""
+        return service.generation_people(current(request)['id'])
+
     @app.post('/api/generation/runs', status_code=201, tags=['Generation'])
     async def generation_start(request: Request, data: roleplay.GenerationStart):
         """建立作品（排隊中）並記下第 0 段（規劃）；之後由頁面逐段推進。"""

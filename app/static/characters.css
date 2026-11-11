@@ -40,6 +40,8 @@
 .play-line { line-height: 1.7; }
 .play-choice { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; cursor: pointer; }
 .play-choice input { margin-top: 4px; }
+.play-choice[hidden] { display: none; }  /* 建立作品的人物搜尋：隱藏不符合的項目（display:flex 會蓋掉 hidden 屬性） */
+.create-people { max-height: 440px; overflow-y: auto; padding-right: 4px; }  /* 人物多的時候在區塊內捲動 */
 
 /* 人物劇場多角色演出 */
 .stage-pick { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-bottom: 1px solid rgba(127,127,127,.15); }

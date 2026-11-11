@@ -28,7 +28,7 @@ import json  # 作品內容與 Provider 輸出
 import re  # 診斷分類（是否為陣容代號）
 from pathlib import Path  # 風格目錄
 import time  # 延遲量測
-from typing import Annotated, List, Literal, Optional
+from typing import Annotated, List, Literal, Optional, Union
 from uuid import uuid4  # 作品、段落與同意紀錄識別碼
 
 from pydantic import Field, StrictBool, StrictInt, StringConstraints, ValidationError, model_validator
@@ -40,6 +40,8 @@ from .ai_text import ProviderFailure  # Provider 固定錯誤碼與 HTTP 狀態
 from .environment import connected_identity, emit_diagnostic, identity_mismatch  # 環境識別
 from .errors import DomainError, require  # 固定領域錯誤
 from .generation import MODULE_NOTICES, MODULE_VERSIONS, MODULES, NOTICES, GenerationModule, encoded  # 共用生成框架
+from .persons import PROFILE_TITLE, is_profile_note, parse_profile, profile_receipts  # 正式人物設定（有回執的版本）
+from . import relation_sources  # 人物系統是否啟用（010）
 from .schemas import Model  # 拒絕多餘欄位的共用輸入模型
 from .task_queue import QueueError  # 排入失敗
 
@@ -170,11 +172,23 @@ class RoleplayStart(Model):
 
 
 # ---- generation_setup.v1：一份設定，每個欄位只屬於一個節點（重新設計文件 §3） ----
+class PersonRef(Model):
+    """引用本人的一位人物；用哪一版人物設定由伺服器在開始時決定並鎖定（有正式回執的最新版）。"""
+    person_id: str = Field(min_length=1, max_length=128)
+    profile_id: Optional[str] = Field(default=None, min_length=1, max_length=128)  # 選填：畫面讀到的最新版；有送就核對，已有新版就不開始
+
+
 class ParticipantRef(Model):
-    """① 人物：只接受自己的角色卡；系統範例與人物演繹要先轉成角色卡（D-44）。"""
-    source: Literal['card'] = 'card'
-    ref: CardRef
+    """① 人物：自己的人物（讀正式人物設定）或自己的角色卡；系統範例與人物演繹要先轉成角色卡（D-44）。"""
+    source: Literal['card', 'person'] = 'card'
+    ref: Union[CardRef, PersonRef]
     position: Optional[Literal['protagonist', 'opponent', 'advisor', 'supporting']] = None
+
+    @model_validator(mode='after')
+    def ref_matches_source(self):
+        if isinstance(self.ref, PersonRef) != (self.source == 'person'):
+            raise ValueError('人物來源與引用的格式不符')
+        return self
 
 
 class SceneStart(Model):
@@ -261,9 +275,9 @@ class GenerationSetup(Model):
 
     @model_validator(mode='after')
     def distinct_participants(self):
-        ids = [item.ref.work_id for item in self.participants]
+        ids = [(item.source, item.ref.person_id if item.source == 'person' else item.ref.work_id) for item in self.participants]
         if len(set(ids)) != len(ids):
-            raise ValueError('同一張角色卡不能重複選取')
+            raise ValueError('同一位人物或同一張角色卡不能重複選取')
         return self
 
 
@@ -368,10 +382,27 @@ SEGMENT_SCHEMA = {
 }
 CARD_PERSONA_FIELDS = ('name', 'kind', 'tagline', 'background', 'personality', 'motivation', 'stance', 'voice', 'knowledge_boundary',
                        'restrictions', 'sample_lines', 'values', 'behavior', 'appearance')
+# 人物設定九欄送給模型時的名稱。只有「固有限制與弱點」改名：它描述人物本身的弱點，不是演出規則，
+# 沿用 restrictions 會和角色卡的「禁止事項」混淆。
+PERSON_PERSONA_FIELDS = (('background', 'background'), ('personality', 'personality'), ('motivation', 'motivation'), ('stance', 'stance'),
+                         ('abilities', 'abilities'), ('expression', 'expression'), ('behavior', 'behavior'),
+                         ('knowledge_boundary', 'knowledge_boundary'), ('restrictions', 'weaknesses'))
+PUBLIC_PROFILE_MAX = 400  # 人物的公開簡介上限（與我的設定的公開簡介相同）
 
 
 def sha256(value):
     return hashlib.sha256(encoded(value).encode()).hexdigest()
+
+
+def persona_ref(member):
+    """生成紀錄留下的來源參照：人物記人物與人物設定版本；角色卡與我的設定記作品版本。都附內容雜湊。"""
+    keys = ('source', 'person_id', 'profile_id', 'version', 'content_sha256') if member['source'] == 'person' else ('source', 'work_id', 'version', 'content_sha256')
+    return {key: member[key] for key in keys}
+
+
+def blank_profile(profile):
+    """九欄全部空白的人物設定等於沒有設定，不能拿來演出。"""
+    return profile is None or not any(value.strip() for value in profile['fields'].values())
 
 
 def request_id(work_id, step, attempt):
@@ -539,7 +570,7 @@ class RoleplaySegmentModule(GenerationModule):
         beat = next(item for item in content['plan']['beats'] if item['beat_no'] == slot['beat_no'])
         stored = {**input_data, 'version_no': work['current_version'], 'speaker_id': speaker['id'], 'beat_no': slot['beat_no'],
                   'witnesses': list(slot['present']),
-                  'persona_ref': {key: speaker[key] for key in ('source', 'work_id', 'version', 'content_sha256')},
+                  'persona_ref': persona_ref(speaker),
                   'visible_turns': [turn['turn_no'] for turn in visible]}
         payload = {
             'module': self.id,
@@ -786,6 +817,51 @@ class RoleplayMixin:
                 'adherence': [{'id': key, 'label': label} for key, label in ADHERENCE_LABELS.items()],
                 'limits': {'max_participants': MAX_CAST, 'max_materials': MAX_MATERIALS, 'max_conditions': 8}}
 
+    def generation_people(self, owner):
+        """① 人物：建立作品可以選的人物。只列本人使用中的人物，附上最新正式人物設定的識別碼與版號；
+        沒有人物設定（或九欄全空）的人物也列出，profile 為 None，畫面標示為不能選。"""
+        if self.relation_source_store != relation_sources.LINK:
+            return {'enabled': False, 'items': []}  # 人物系統尚未啟用：建立頁維持只選角色卡
+        with self.db.connect() as c:
+            self._people_user(c, owner)
+            people = c.execute("SELECT id,name,description,roles,person_type,person_subtype FROM people WHERE owner_id=? AND status='active' "
+                               'ORDER BY created_at DESC,id', (owner,)).fetchall()
+            receipts = profile_receipts(c, owner)
+            latest = {}
+            for note in c.execute("SELECT id,person_id,kind,title,content,created_at FROM notes WHERE owner_id=? AND kind='preparation' AND title=?",
+                                  (owner, PROFILE_TITLE)).fetchall():
+                if not is_profile_note(note, receipts):
+                    continue  # 沒有正式回執的同格式筆記不算人物設定
+                profile = parse_profile(note)
+                best = latest.get(note['person_id'])
+                if best is None or (profile['version'], profile['saved_at'], profile['id']) > (best['version'], best['saved_at'], best['id']):
+                    latest[note['person_id']] = profile
+        items = []
+        for row in people:
+            profile = latest.get(row['id'])
+            items.append({'id': row['id'], 'name': row['name'], 'description': row['description'], 'person_type': row['person_type'],
+                          'person_subtype': row['person_subtype'], 'roles': json.loads(row['roles']),
+                          'profile': None if blank_profile(profile) else {'id': profile['id'], 'version': profile['version']}})
+        return {'enabled': True, 'items': items}
+
+    def _person_member(self, c, owner, ref):
+        """① 人物：引用本人使用中的人物，鎖定此刻最新的正式人物設定（識別碼、版號、九欄內容雜湊）。
+
+        規劃階段與其他人物只看得到公開簡介（人物簡介；沒有簡介就用身分）；九欄只在這位人物發言時讀取。
+        """
+        require(self.relation_source_store == relation_sources.LINK, 409, 'unified_people_not_enabled', '新人物功能要等資料庫升級（010）完成後才開放。')
+        row = c.execute('SELECT id,name,description,roles,person_type,person_subtype,status FROM people WHERE id=? AND owner_id=?',
+                        (ref.person_id, owner)).fetchone()
+        require(row is not None, 404, 'not_found', '找不到可存取的人物。')  # 別人的人物一律 404，不透露是否存在
+        require(row['status'] == 'active', 409, 'person_archived', f"「{row['name']}」已封存，不能加入新的作品；請先恢復。")
+        profile = self._profile(c, owner, ref.person_id)
+        require(not blank_profile(profile), 409, 'person_profile_required', f"「{row['name']}」還沒有人物設定，不能加入作品；請先到人物頁填寫人物設定。")
+        require(ref.profile_id in (None, profile['id']), 409, 'person_profile_changed', f"「{row['name']}」的人物設定已有新版本，請重新整理後再開始。")
+        public = (row['description'] or '').strip() or '、'.join(json.loads(row['roles']))
+        return {'source': 'person', 'person_id': row['id'], 'profile_id': profile['id'], 'version': profile['version'], 'name': row['name'],
+                'public_profile': public[:PUBLIC_PROFILE_MAX], 'kind': 'historical' if row['person_subtype'] == 'historical' else row['person_type'],
+                'content_sha256': sha256(profile['fields'])}
+
     def start_roleplay(self, owner, data):
         """過渡期別名：舊格式請求轉成 generation_setup.v1，建立 generated_work。"""
         return self.start_generation(owner, setup_from_roleplay_start(data))
@@ -834,7 +910,7 @@ class RoleplayMixin:
     def start_generation(self, owner, data, provider_name=None):
         """唯一的建立入口：驗證 generation_setup.v1，建立 generated_work（排隊中）；排入第一個 Task 由路由在交易提交後進行。
 
-        人數＝角色卡數＋（包含我 ? 1 : 0）；module_id 由伺服器推導（D-43）。P1 只開放文字（D-45）。
+        人數＝人物與角色卡數＋（包含我 ? 1 : 0）；module_id 由伺服器推導（D-43）。P1 只開放文字（D-45）。
         """
         setup = data.setup
         with self.db.connect(write=True, owner=owner) as c:
@@ -843,7 +919,7 @@ class RoleplayMixin:
             if cached:
                 return cached
             total = len(setup.participants) + (1 if setup.include_me else 0)
-            require(total >= 1, 422, 'participants_required', '請至少選一張角色卡，或勾選「包含我」。')
+            require(total >= 1, 422, 'participants_required', '請至少選一位人物或一張角色卡，或勾選「包含我」。')
             require(total <= MAX_CAST, 422, 'too_many_participants', f'第一版最多 {MAX_CAST} 位參與人物（含我）。')
             require(setup.output.type == 'text', 422, 'output_not_available', '圖片與圖＋文尚未開放；目前只能生成文字作品。')
             for style_id in setup.style_profile.style_ids:
@@ -853,6 +929,9 @@ class RoleplayMixin:
             cast = []
             for index, participant in enumerate(setup.participants, start=1):
                 ref = participant.ref
+                if participant.source == 'person':  # 人物：讀正式人物設定，不讀角色卡
+                    cast.append({'id': f'c{index}', **self._person_member(c, owner, ref), 'position': participant.position})
+                    continue
                 work = c.execute('SELECT id,kind,status FROM works WHERE id=? AND owner_id=?', (ref.work_id, owner)).fetchone()
                 require(work is not None and work['kind'] == 'character_card', 404, 'not_found', '找不到可存取的角色卡。')
                 require(work['status'] == 'active', 409, 'character_archived', '角色卡已封存，不能加入新的作品；請先恢復。')
@@ -875,7 +954,7 @@ class RoleplayMixin:
                              'name': persona['display_name'], 'public_profile': persona['public_profile'], 'content_sha256': sha256(persona),
                              'position': None, 'consent_id': consent['id']})
             names = [member['name'] for member in cast]
-            require(len(set(names)) == len(names), 422, 'duplicate_cast_name', '參與人物的名稱不能相同；可以先複製角色卡並改名。')
+            require(len(set(names)) == len(names), 422, 'duplicate_cast_name', '參與人物的名稱不能相同；同名的人物與角色卡請只選一個，或先替其中一位改名。')
             materials = [self._material_snapshot(c, owner, ref) for ref in setup.scene_context.shared_history_refs]
             module_id = 'T1' if total == 1 else 'T2'
             content = {'meta': {'module_id': module_id, 'output_type': 'text', 'participants': cast,
@@ -943,7 +1022,8 @@ class RoleplayMixin:
             'id': work['id'], 'kind': work['kind'], 'title': work['title'], 'work_status': work['status'], 'created_at': work['created_at'],
             'updated_at': work['updated_at'], 'module': view['module'], 'module_id': view['module'], 'output_type': view['output_type'],
             'cast': [{'id': member['id'], 'name': member['name'], 'source': member['source'], 'is_user': member['source'] == 'self',
-                      'position': member.get('position')} for member in view['cast']],
+                      'position': member.get('position'), 'person_id': member.get('person_id'), 'version': member.get('version')}
+                     for member in view['cast']],  # person_id 只有人物來源才有；version 是開始時鎖定的設定版本
             'run': {'status': status, 'label': STATUS_LABELS[status], 'notice': notice, 'error': run['error'], 'can_resume': status == 'failed',
                     'completed_segments': saved, 'total_segments': run['total_segments'], 'finished_at': run['finished_at']},
             'usage': {'calls': len(generations), 'input_tokens': sum(row['input_tokens'] or 0 for row in generations),
@@ -1062,6 +1142,8 @@ class RoleplayMixin:
 
     def _roleplay_persona(self, c, owner, member):
         """讀取發言人物固定版本的完整人格；內容雜湊與開始時不同就停止（不用被替換的人格演出）。"""
+        if member['source'] == 'person':
+            return self._person_persona(c, owner, member)
         row = c.execute('SELECT v.content_json FROM work_versions v JOIN works w ON w.id=v.work_id AND w.owner_id=v.owner_id '
                         'WHERE v.work_id=? AND v.owner_id=? AND v.version_no=? AND w.kind=?',
                         (member['work_id'], owner, member['version'], SELF_KIND if member['source'] == 'self' else 'character_card')).fetchone()
@@ -1073,6 +1155,20 @@ class RoleplayMixin:
         if member['source'] == 'self':
             return {'name': content['display_name'], **{key: value for key, value in content.items() if value not in ('', [], None)}}
         return {key: content[key] for key in CARD_PERSONA_FIELDS if content.get(key) not in ('', [], None)}
+
+    def _person_persona(self, c, owner, member):
+        """讀取開始時鎖定的那一版人物設定。它必須仍是正式版本（有回執、屬於同一位人物），版號與九欄內容雜湊都和開始時相同；
+        否則停止，不改用其他版本、同名角色卡或沒有回執的筆記。人物之後另存的新版本不影響進行中的作品。"""
+        note = c.execute('SELECT id,person_id,kind,title,content,created_at FROM notes WHERE id=? AND owner_id=? AND person_id=?',
+                         (member['profile_id'], owner, member['person_id'])).fetchone()
+        if note is None or not is_profile_note(note, profile_receipts(c, owner)):
+            raise StepStop('fatal', 'source_unavailable')
+        profile = parse_profile(note)
+        if profile['version'] != member['version'] or sha256(profile['fields']) != member['content_sha256']:
+            raise StepStop('fatal', 'source_unavailable')
+        persona = {'name': member['name'], 'kind': member.get('kind'), 'public_profile': member.get('public_profile', '')}
+        persona.update({name: profile['fields'][key] for key, name in PERSON_PERSONA_FIELDS})
+        return {key: value for key, value in persona.items() if value not in ('', None)}
 
     def roleplay_recover(self, owner, settings):
         """先在獨立交易回收逾時的 running 紀錄，避免中斷的 Worker 讓作品永遠顯示忙碌。"""

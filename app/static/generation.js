@@ -108,7 +108,8 @@ window.GenerationUI = (() => {
   function settingsView(detail) { // 作品設定（每個欄位只出現一次）與歷史版本
     const s = detail.setup || {};
     const scene = s.scene || {};
-    const rows = [['人物', (detail.cast || []).map(m => h(m.name) + (m.is_user ? '（我）' : '') + (m.position ? `・${POSITIONS[m.position] || m.position}` : '')).join('、')],
+    const rows = [['人物', (detail.cast || []).map(m => h(m.name) + (m.is_user ? '（我）' : '') + (m.source === 'person' && m.version ? `（人物設定第 ${m.version} 版）` : '')
+        + (m.position ? `・${POSITIONS[m.position] || m.position}` : '')).join('、')], // 人物來源：標出開始時鎖定的人物設定版本
       ['場景', h(scene.description || '')], ...(scene.start?.event ? [['起始事件', h(scene.start.event)]] : []), ...(scene.start?.goal ? [['主角目標', h(scene.start.goal)]] : []),
       ...((scene.conditions || []).length ? [['場景條件', scene.conditions.map(h).join('；')]] : []),
       ['風格', [...(s.styles || []).map(x => h(x.label)), h(s.style_notes || '')].filter(Boolean).join('、') || '不指定'],

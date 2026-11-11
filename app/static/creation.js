@@ -6,6 +6,8 @@
 // - 草稿依登入帳號隔離：儲存鍵含 owner_id；登出清除記憶體狀態；換帳號只讀到該帳號自己的草稿。
 // - 開始生成一律建立 generated_work（POST /api/generation/runs）；T1／T2 由伺服器依人數判斷，前端只顯示白話結果。
 // 參考：8445 GenerationWizard.tsx、GENERATION_WORK_CENTER_UNIFIED_UI_REDESIGN_20261108.md §4–§8。
+// 2026-11-11：① 人物先列「人物」（人物系統啟用時）。選到的人物以 source:'person' 送出，伺服器讀取並鎖定他的正式人物設定；
+//   沒有人物設定的人物列出但不能勾選。舊角色卡收在可展開的區塊裡，仍然可以選。
 window.CreationUI = (() => {
   let c;
   const STORE = 'lw-create:draft:'; // ＋ owner_id
@@ -16,10 +18,11 @@ window.CreationUI = (() => {
   const NODE_TITLES = {participants: '① 人物', scene: '② 場景', style: '③ 風格', output: '④ 輸出', materials: '⑤ 素材', direction: '⑥ 演出要求'};
   let owner = null; // 目前草稿所屬的帳號
   let S = blank();
-  let D = null; // 這一頁用到的資料：角色卡、人設、目錄、AI 狀態、可引用的作品
+  let D = null; // 這一頁用到的資料：人物、角色卡、人設、目錄、AI 狀態、可引用的作品
+  const PEOPLE_FILTER_FROM = 8; // 人物超過這個數量才顯示搜尋框
 
   function blank() {
-    return {cards: [], versions: {}, includeMe: true, positions: {},
+    return {persons: [], personFilter: '', cards: [], versions: {}, includeMe: true, positions: {},
       scene: {description: '', preset: '', event: '', goal: '', conditions: ''}, styleIds: [], styleNotes: '',
       output: {type: 'text', length: 'short', form: 'script'}, materialsOpen: false, materials: [],
       directionOpen: false, direction: {adherence: 'faithful', notes: '', avoid: ''}, title: '', open: ['participants'], subs: []};
@@ -44,13 +47,16 @@ window.CreationUI = (() => {
   const fresh = ticket => ticket === c.state.renderGeneration;
 
   // ---- 判斷 ----
-  const count = () => S.cards.length + (S.includeMe ? 1 : 0);
+  const unified = () => Boolean(D?.people?.enabled); // 人物系統啟用：① 人物先列「人物」
+  const personOf = id => (D?.people?.items || []).find(item => item.id === id);
+  const personType = item => item.person_subtype === 'historical' ? '歷史人物' : item.person_type === 'fictional' ? '虛構人物' : '真實人物';
+  const count = () => S.persons.length + S.cards.length + (S.includeMe ? 1 : 0);
   const moduleLabel = () => count() === 1 ? '單人文字' : count() >= 2 && count() <= MAX ? '多人文字' : '';
   const personaReady = () => Boolean(D?.persona?.persona && D?.persona?.consent);
   const participantsDone = () => count() >= 1 && count() <= MAX && (!S.includeMe || personaReady());
   function blocker() {
     if (!D?.status?.available) return 'AI 生成尚未設定，暫時無法開始。';
-    if (count() === 0) return '請在 ① 人物至少選擇 1 位（角色卡或「包含我」）。';
+    if (count() === 0) return `請在 ① 人物至少選擇 1 位（${unified() ? '人物' : '角色卡'}或「包含我」）。`;
     if (count() > MAX) return `第一版最多 ${MAX} 位 AI 參與人物（含我）。`;
     if (S.includeMe && !D.persona.persona) return '勾選「包含我」需要先建立我的人設。';
     if (S.includeMe && !D.persona.consent) return '勾選「包含我」需要先同意讓 AI 依你的人設演出。';
@@ -62,7 +68,8 @@ window.CreationUI = (() => {
   // ---- 摘要（收合時顯示一行） ----
   function summaries() {
     const name = id => (D.cards.find(card => card.id === id) || {}).title || '（已不可用的角色卡）';
-    const people = [...S.cards.map(name), S.includeMe ? (D.persona.persona ? `我（${D.persona.persona.content.display_name}）` : '我') : null].filter(Boolean);
+    const people = [...S.persons.map(id => (personOf(id) || {}).name || '（已不可用的人物）'), ...S.cards.map(name),
+      S.includeMe ? (D.persona.persona ? `我（${D.persona.persona.content.display_name}）` : '我') : null].filter(Boolean);
     const length = (D.catalog.lengths.find(item => item.id === S.output.length) || {}).label || S.output.length;
     const form = (D.catalog.forms.find(item => item.id === S.output.form) || {}).label || S.output.form;
     return {
@@ -80,10 +87,13 @@ window.CreationUI = (() => {
     const ticket = c.state.renderGeneration;
     useOwner();
     if (params?.get('focus') === 'start') { S.open = [...new Set([...S.open, 'scene'])]; S.subs = [...new Set([...S.subs, 'start'])]; save(); history.replaceState(null, '', '#create'); }
-    const [cards, persona, catalog, status] = await Promise.all([c.api('/characters?status=active'), c.api('/self-persona'), c.api('/generation/catalog'), c.api('/generation/status')]);
+    const [cards, persona, catalog, status, people] = await Promise.all([c.api('/characters?status=active'), c.api('/self-persona'), c.api('/generation/catalog'), c.api('/generation/status'),
+      c.api('/generation/people').catch(() => ({enabled: false, items: []}))]); // 人物清單讀不到時不擋住整頁，退回只選角色卡
     if (!fresh(ticket)) return '';
-    D = {cards: cards.items, persona, catalog, status, works: D?.works || null};
+    D = {cards: cards.items, persona, catalog, status, people, works: D?.works || null};
     S.cards = S.cards.filter(id => D.cards.some(card => card.id === id)); // 已封存或刪除的角色卡不能再選
+    S.persons = (S.persons || []).filter(id => Boolean(personOf(id)?.profile)); // 已封存、已不在、或沒有人物設定的人物不能再選
+    if (unified() && S.cards.length && !S.subs.includes('cards')) S.subs = [...S.subs, 'cards']; // 草稿裡已經選了舊角色卡：保持展開，不把已選的項目藏起來
     if (S.materialsOpen && !D.works) await loadWorks();
     return `${c.link('works', '← 作品', 'text-button')}<div id="create-root">${build()}</div>`;
   }
@@ -110,6 +120,22 @@ window.CreationUI = (() => {
       ${open ? `<div class="stack">${body}</div>` : ''}</div>`;
   }
 
+  function personChoice(item) { // 一位可選的人物：姓名、類型與人物設定版本、公開簡介；沒有人物設定就不能勾
+    const about = item.description || (item.roles || []).join('、');
+    const search = (item.name + ' ' + about).toLowerCase();
+    const filter = S.personFilter.trim().toLowerCase();
+    const meta = `${personType(item)}・${item.profile ? `人物設定第 ${item.profile.version} 版` : '還沒有人物設定'}`;
+    return `<label class="play-choice" data-person-choice data-search="${h(search)}" ${filter && !search.includes(filter) ? 'hidden' : ''}>
+        <input type="checkbox" data-bind="person" value="${h(item.id)}" ${S.persons.includes(item.id) ? 'checked' : ''} ${item.profile ? '' : 'disabled'}>
+        <span><strong>${h(item.name)}</strong> <span class="small muted">${h(meta)}</span>${about ? `<br><span class="small muted">${h(about)}</span>` : ''}
+        ${item.profile ? '' : `<br>${c.link('persons/' + encodeURIComponent(item.id), '到人物頁填寫人物設定 →', 'text-button')}`}</span></label>`;
+  }
+
+  function filterPeople() { // 搜尋人物：直接顯示或隱藏清單項目，不重畫（保留輸入游標）
+    const filter = S.personFilter.trim().toLowerCase();
+    document.querySelectorAll('#create-root [data-person-choice]').forEach(node => { node.hidden = Boolean(filter) && !node.dataset.search.includes(filter); });
+  }
+
   function participantsBody() {
     const cards = D.cards.map(item => `<label class="play-choice"><input type="checkbox" data-bind="card" value="${h(item.id)}" data-version="${item.current_version}" ${S.cards.includes(item.id) ? 'checked' : ''}>
         <span><strong>${h(item.title)}</strong>${item.content?.tagline ? `<br><span class="small muted">${h(item.content.tagline)}</span>` : ''}</span></label>`).join('');
@@ -126,13 +152,21 @@ window.CreationUI = (() => {
     } else if (S.includeMe) {
       me = `<p class="small muted">我的人設：${h(persona.persona.content.display_name)}（第 ${persona.persona.version_no} 版，已同意）${c.link('persona', '修改', 'text-button')}</p>`;
     }
-    const positions = count() >= 2 && S.cards.length ? sub('positions', '角色定位（選用）', S.cards.map(id => {
-      const name = (D.cards.find(card => card.id === id) || {}).title || id;
+    const staged = [...S.persons.map(id => [id, (personOf(id) || {}).name || id]), ...S.cards.map(id => [id, (D.cards.find(card => card.id === id) || {}).title || id])];
+    const positions = count() >= 2 && staged.length ? sub('positions', '角色定位（選用）', staged.map(([id, name]) => {
       return `<div class="stage-pick"><span>${h(name)}</span><select data-bind="position" data-id="${h(id)}" aria-label="${h(name)}的角色定位"><option value="">不指定</option>
         ${Object.entries(POSITIONS).map(([key, label]) => `<option value="${key}" ${S.positions[id] === key ? 'selected' : ''}>${label}</option>`).join('')}</select></div>`;
     }).join('')) : '';
-    return `<fieldset class="field"><legend>我的角色卡（可多選）</legend>${cards || '<p class="small muted">還沒有角色卡。</p>'}</fieldset>
-      <p class="small muted">沒有想要的角色？到「角色」建立新角色、複製系統範例，或從真人資料建立。${c.link('characters', '前往角色 →', 'text-button')}</p>
+    const cardPicker = `<fieldset class="field"><legend>我的角色卡（可多選）</legend>${cards || '<p class="small muted">還沒有角色卡。</p>'}</fieldset>`;
+    const pickers = unified() // 人物系統啟用：先列人物；舊角色卡收合在下方，仍然可以選
+      ? `<fieldset class="field"><legend>人物（可多選）</legend>
+          ${D.people.items.length > PEOPLE_FILTER_FROM ? `<input type="search" data-bind="personFilter" value="${h(S.personFilter)}" placeholder="搜尋姓名或簡介" aria-label="搜尋人物">` : ''}
+          <div class="create-people">${D.people.items.map(personChoice).join('') || '<p class="small muted">還沒有人物。</p>'}</div></fieldset>
+        <p class="small muted">AI 依每位人物的「人物設定」演出；開始後使用當時的版本，之後再改不影響這部作品。沒有想要的人物？到「人物」新增並填寫人物設定。${c.link('persons', '前往人物 →', 'text-button')}</p>
+        ${D.cards.length ? sub('cards', `舊角色卡（${D.cards.length} 張）`, `<p class="small muted">角色卡是人物系統之前的資料，內容和人物設定各自獨立；同名的人物與角色卡不能一起出場。</p>${cardPicker}`) : ''}`
+      : `${cardPicker}
+      <p class="small muted">沒有想要的角色？到「角色」建立新角色、複製系統範例，或從真人資料建立。${c.link('characters', '前往角色 →', 'text-button')}</p>`;
+    return `${pickers}
       <label class="play-choice"><input type="checkbox" data-bind="me" ${S.includeMe ? 'checked' : ''}><span><strong>包含我</strong><br><span class="small muted">AI 依「我的人設」扮演你</span></span></label>
       ${me}${positions}
       <p class="${count() > MAX || count() === 0 ? 'callout' : 'small muted'}">AI 參與人物：${count()} 位${moduleLabel() ? `（${moduleLabel()}）` : ''}。第一版最多 ${MAX} 位，由系統自動判斷。</p>
@@ -244,7 +278,9 @@ window.CreationUI = (() => {
     const choice = el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT';
     if (choice && event.type !== 'change') return; // 勾選與選單只處理 change（瀏覽器也會送 input，避免同一次點擊處理兩次）
     let structural = event.type === 'change';
-    if (key === 'card') {
+    if (key === 'personFilter') { S.personFilter = el.value; save(); filterPeople(); return; }
+    if (key === 'person') S.persons = el.checked ? [...new Set([...S.persons, el.value])] : S.persons.filter(id => id !== el.value);
+    else if (key === 'card') {
       S.cards = el.checked ? [...new Set([...S.cards, el.value])] : S.cards.filter(id => id !== el.value);
       S.versions[el.value] = Number(el.dataset.version);
     } else if (key === 'me') S.includeMe = el.checked;
@@ -277,8 +313,11 @@ window.CreationUI = (() => {
 
   function buildSetup() {
     const conditions = S.scene.conditions.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 8);
-    return {participants: S.cards.map(id => ({source: 'card', ref: {work_id: id, version_no: S.versions[id] || (D.cards.find(card => card.id === id) || {}).current_version},
-        ...(count() >= 2 && S.positions[id] ? {position: S.positions[id]} : {})})),
+    const position = id => (count() >= 2 && S.positions[id] ? {position: S.positions[id]} : {});
+    return {participants: [
+        // 人物：只送人物與畫面讀到的人物設定版本；實際使用哪一版由伺服器鎖定，畫面讀到的不是最新版時伺服器會拒絕
+        ...S.persons.map(id => ({source: 'person', ref: {person_id: id, profile_id: personOf(id)?.profile?.id}, ...position(id)})),
+        ...S.cards.map(id => ({source: 'card', ref: {work_id: id, version_no: S.versions[id] || (D.cards.find(card => card.id === id) || {}).current_version}, ...position(id)}))],
       include_me: S.includeMe, title: S.title.trim(),
       scene_context: {description: S.scene.description.trim(), start: {event: S.scene.event.trim(), goal: S.scene.goal.trim()}, conditions,
         ...(S.scene.preset ? {preset_id: S.scene.preset} : {}), shared_history_refs: S.materials.map(m => ({work_id: m.work_id, version_no: m.version_no}))},
