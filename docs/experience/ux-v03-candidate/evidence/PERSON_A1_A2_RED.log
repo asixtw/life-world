@@ -1,0 +1,16 @@
+F
+=================================== FAILURES ===================================
+________ test_evidence_is_explicit_and_independent_of_input_source[390] ________
+docs/experience/ux-v03-candidate/tests/test_supplement.py:178: in test_evidence_is_explicit_and_independent_of_input_source
+    expect(page.locator('[data-supplement-error]')).to_contain_text('從何得知')
+E   AssertionError: Locator expected to contain text '從何得知'
+E   Actual value:  
+E   Call log:
+E     - Expect "to_contain_text" with timeout 5000ms
+E     - waiting for locator("[data-supplement-error]")
+E       14 × locator resolved to <p role="alert" class="source-stale" data-supplement-error="yi"></p>
+E          - unexpected value ""
+=========================== short test summary info ============================
+FAILED docs/experience/ux-v03-candidate/tests/test_supplement.py::test_evidence_is_explicit_and_independent_of_input_source[390]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 30 deselected in 6.18s

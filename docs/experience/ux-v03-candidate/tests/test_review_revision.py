@@ -19,7 +19,7 @@ def test_person_sheet_has_separate_scroll_and_fixed_actions(page):
     assert page.locator('#sheet .sheet-body').count()==1
     assert page.locator('#sheet .sheet-footer [data-action=close]').count()==1
     expect(page.locator('#will-save')).to_contain_text('確認後會保存')
-    expect(page.locator('#not-saving')).to_contain_text('目前不寫入人物檔案')
+    expect(page.locator('#not-saving')).to_contain_text('此次完成後不會保留到人物檔案')
 
 
 def test_mobile_focus_hides_nav_and_restores_after_leave(page):

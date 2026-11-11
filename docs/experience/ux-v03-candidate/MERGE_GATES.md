@@ -1,3 +1,5 @@
+[最新 A1/A2：未保存去向、輸入來源與證據類型](PERSON_SUPPLEMENT_A1_A2.md)；本補修取代先前含糊的「暫不寫入」說明，Gate B/C仍阻擋。
+
 [2026-11-11 人物補充延伸 Candidate：契約差異與 Gate B 待辦](PERSON_SUPPLEMENT_REVIEW.md)。整體 UX 尚未核准，不以設計補充解鎖工程 Gate。
 
 # PR #24 合併前關卡（全部仍需驗收）

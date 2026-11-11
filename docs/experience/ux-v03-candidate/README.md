@@ -1,3 +1,5 @@
+[最新 A1/A2：未保存去向、輸入來源與證據類型](PERSON_SUPPLEMENT_A1_A2.md)；本補修取代先前含糊的「暫不寫入」說明，Gate B/C仍阻擋。
+
 [人物補充互動延伸：差異、契約缺口與 Gate B 提案](PERSON_SUPPLEMENT_REVIEW.md)
 
 [R2 最後補修：第三步升級狀態及新截圖](UPGRADE_STATE_FIX.md)

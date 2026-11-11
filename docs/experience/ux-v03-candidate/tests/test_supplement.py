@@ -8,6 +8,7 @@ def add_fact(page,key,dimension,value):
     page.locator(f'[data-supplement="{key}"]>summary').click()
     page.locator(f'[data-dimension="{key}"]').select_option(dimension)
     page.locator(f'[data-fact-value="{key}"]').fill(value)
+    page.locator(f'[data-fact-evidence="{key}"]').select_option('observed_by_user')
     page.locator(f'[data-action=add-supplement][data-key="{key}"]').click()
 
 
@@ -69,6 +70,7 @@ def test_raw_source_change_invalidates_only_related_fact(page):
     scene(page,'existing')
     page.locator('[data-supplement="yi"]>summary').click()
     page.locator('[data-fact-value="yi"]').fill('攝影')
+    page.locator('[data-fact-evidence="yi"]').select_option('stated_by_person')
     page.locator('[data-fact-source="yi"]').select_option('raw')
     page.locator('[data-fact-quote="yi"]').fill('怡君說最近開始學攝影')
     page.locator('[data-action=add-supplement]').click()
@@ -106,6 +108,7 @@ def test_empty_source_and_duplicate_candidate_validation(page):
     page.locator('[data-action=add-supplement]').click()
     expect(page.locator('[data-supplement-error]')).to_contain_text('請輸入')
     page.locator('[data-fact-value="yi"]').fill('攝影')
+    page.locator('[data-fact-evidence="yi"]').select_option('stated_by_person')
     page.locator('[data-fact-source="yi"]').select_option('raw')
     page.locator('[data-fact-quote="yi"]').fill('不在原文中')
     page.locator('[data-action=add-supplement]').click()
@@ -168,3 +171,51 @@ def test_repeated_confirmation_is_only_one_ui_transition(page):
     expect(page.locator('.success-panel')).to_be_visible()
     assert page.evaluate('UX.getState().people.length')==1
     assert page.evaluate('UX.getState().people[0].changes.length')==1
+
+
+def test_evidence_is_explicit_and_independent_of_input_source(page):
+    scene(page,'existing')
+    page.locator('[data-supplement="yi"]>summary').click()
+    page.locator('[data-fact-value="yi"]').fill('登山')
+    page.locator('[data-action=add-supplement]').click()
+    expect(page.locator('[data-supplement-error]')).to_contain_text('從何得知')
+    assert page.evaluate('UX.getState().people[0].changes.length')==0
+    page.locator('[data-fact-evidence="yi"]').select_option('stated_by_person')
+    page.locator('[data-action=add-supplement]').click()
+    x=page.evaluate('UX.getState().people[0].changes[0]')
+    assert x['sourceKind']=='manual' and x['evidence_type']=='stated_by_person'
+    assert not x['accepted']
+
+
+def test_completion_discloses_unretained_person_information(page):
+    scene(page,'existing')
+    add_fact(page,'yi','company','僅示意公司')
+    page.locator('[data-action=next]').click()
+    page.locator('.person-preview').click()
+    expect(page.locator('#not-saving')).to_contain_text('此次完成後不會保留到人物檔案')
+    page.get_by_role('button',name='完成檢視').click()
+    page.locator('[data-action=confirm]').click()
+    expect(page.locator('.success-panel')).to_contain_text('僅示意公司')
+    expect(page.locator('.success-panel')).to_contain_text('不會稍後自動保存')
+    folder=ROOT/'screenshots-supplement'/str(page.viewport_size['width'])
+    page.screenshot(path=str(folder/'completion-unretained.png'),full_page=True)
+
+
+@pytest.mark.parametrize('evidence',['stated_by_person','observed_by_user','documented_source'])
+@pytest.mark.parametrize('source_kind',['manual','raw'])
+def test_input_channel_never_implies_evidence(page,evidence,source_kind):
+    scene(page,'existing')
+    page.locator('[data-supplement="yi"]>summary').click()
+    expect(page.locator('[data-fact-evidence="yi"]')).to_have_value('')
+    page.locator('[data-fact-source="yi"]').select_option(source_kind)
+    expect(page.locator('[data-fact-evidence="yi"]')).to_have_value('')
+    page.locator('[data-fact-value="yi"]').fill('攝影')
+    if source_kind=='raw':page.locator('[data-fact-quote="yi"]').fill('怡君說最近開始學攝影')
+    page.locator('[data-fact-evidence="yi"]').select_option(evidence)
+    page.locator('[data-action=add-supplement]').click()
+    x=page.evaluate('UX.getState().people[0].changes[0]')
+    assert x['sourceKind']==source_kind and x['evidence_type']==evidence
+    assert x['accepted'] is False
+    page.locator('[data-action=save-draft]').click()
+    page.locator('[data-action=resume]').first.click()
+    assert page.evaluate('UX.getState().people[0].changes[0].evidence_type')==evidence

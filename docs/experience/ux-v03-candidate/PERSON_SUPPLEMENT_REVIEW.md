@@ -1,3 +1,5 @@
+[最新 A1/A2：未保存去向、輸入來源與證據類型](PERSON_SUPPLEMENT_A1_A2.md)；本補修取代先前含糊的「暫不寫入」說明，Gate B/C仍阻擋。
+
 # 人物補充 Candidate｜2026-11-11
 
 狀態：**Gate A Candidate / NOT APPROVED**。延續 `68fdd0f`，不是新的記錄流程。PR #24 維持 Draft。本輪未串 API、DB、Google 或模型。
