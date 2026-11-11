@@ -57,7 +57,7 @@ def synthetic_account(page):
                                  'deadline': (today + timedelta(days=60)).isoformat()})
     page.goto(BASE + '/#persons')
     page.reload()  # 只改 # 不會重新載入；重新整理後 App 才會讀到剛建立的登入狀態
-    return goal  # 目標（含行動）：關係驗收建立我的紀錄時使用
+    return goal  # 目標（含行動）：關係驗收建立我的經歷時使用
 
 
 def create_person(page, name, type_label, description, **extra):

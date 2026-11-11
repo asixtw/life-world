@@ -1,6 +1,6 @@
 # Unified Person 階段交接說明
 
-更新：2026-11-11（第二輪）。分支 `jerry_unified_person`（不合併到 main）。這份文件給接手的開發者：這個階段做了什麼、程式在哪裡、怎麼驗證、還沒做什麼。
+更新：2026-11-11（第三輪）。分支 `jerry_unified_person`（不合併到 main）。這份文件給接手的開發者：這個階段做了什麼、程式在哪裡、怎麼驗證、還沒做什麼。
 
 ## 1. 這個階段完成的功能
 
@@ -9,21 +9,29 @@
 | 人物列表、新增、編輯、封存／恢復 | `#persons`、`#persons-new`、`#persons-edit/{id}` | `app/persons.py`、`app/static/persons.js` |
 | 人物設定（五區塊九欄位，每次儲存新增一版） | 人物頁「人物設定」頁籤、編輯頁 | 同上 |
 | AI 產生／改善人物設定（只回填勾選的欄位，不自動儲存） | 編輯頁 | `app/person_profile_ai.py` |
-| 人物關係（新增、編輯、封存、恢復；來源可引用我的紀錄與人物經歷） | 人物頁「關係」頁籤 | `app/people.py`、`app/relation_sources.py` |
+| 人物關係（新增、編輯、封存、恢復；來源可引用我的經歷與人物經歷） | 人物頁「關係」頁籤 | `app/people.py`、`app/relation_sources.py` |
 | 人物經歷（新增、查看、編輯、封存、恢復；可加參與人物） | 人物頁「經歷」頁籤、紀錄頁「人物經歷」頁籤 | `app/person_experiences.py` |
-| 紀錄頁三個頁籤：我的紀錄／人物經歷／全部 | `#history`、`#history?view=people`、`#history?view=all` | `app/static/app.js`（`historyPage`）、`persons.js`（`recordsPage`） |
-| 我的人設（AI 扮演使用者本人時使用的設定） | 「我的紀錄」上方的卡片 → `#persona?from=history` | `app/self_persona.py`、`app/static/works.js`（`personaView`）、`persons.js`（`selfCard`） |
+| 紀錄頁三個頁籤：我的經歷／人物經歷／全部 | `#history`、`#history?view=people`、`#history?view=all` | `app/static/app.js`（`historyPage`）、`persons.js`（`recordsPage`） |
+| 記下我的經歷時，「關聯人物」只列使用中的真實人物（不含歷史人物與虛構人物） | `#record`、`#review/{id}` | `app/static/app.js`（`personField`）、`persons.js`（`recordableIds`） |
+| 我的設定（使用者本人的設定，AI 扮演「我」時使用） | 人物首頁最上方的卡片、右上角帳號視窗的「我的設定」按鈕 → `#persona` | `app/self_persona.py`、`app/static/works.js`（`personaView`）、`persons.js`（`selfCard`、`accountEntry`） |
 | 左側導覽：世界／目標／紀錄／人物／作品 | 全站 | `app/static/app.js`（`navigation`）、`persons.js`（`legacyNav`） |
 
 人物頁網址是 `#persons/{id}?tab=overview|profile|experiences|relations`。人物列表的卡片整張可點，進入人物頁；完整的編輯表單只從人物頁的「編輯人物」進入。
+
+兩條主要的填寫流程（2026-11-11 第三輪定案）：
+
+- **人物 → 我的設定**：進入「人物」，最上方是「我的設定」卡片（還沒建立時是「建立我的設定」），下面才是搜尋與人物列表。搜尋、篩選、翻頁或看封存時不顯示這張卡片。我的設定頁歸在「人物」底下，返回連結回人物首頁。
+- **紀錄 → 我的經歷**：進入「紀錄」，第一個頁籤是「我的經歷」→「＋ 新的經歷」→ 記下 → 核對 → 確認 → 回到我的經歷。
+
+畫面上的名稱在這一輪改過：「我的紀錄」改稱「我的經歷」，「我的人設」的頁面與入口改稱「我的設定」。程式、API 與資料表的名稱沒有改（`experiences`、`self_persona`、`/api/self-persona`）；後端的同意文字與作品建立流程裡仍寫「我的人設」，我的設定頁上有一行說明兩者是同一份資料。
 
 左側導覽在人物系統可用時不再列出舊的「關係」「角色」。這兩個頁面沒有刪除：`#people`、`#person/{id}`、`#characters` 仍可由網址進入，作品建立流程裡也有前往角色卡的連結。人物系統不可用（資料庫還沒升到 010、或不是以 `link_table` 部署）時，導覽維持原本的入口。
 
 ## 2. 資料分類原則（已裁決，請沿用）
 
-- **我的紀錄**：使用者本人實際參與的生活紀錄。走草稿 → 核對 → 確認，會計入積分與目標。資料表 `experiences`。
+- **我的經歷**（2026-11-11 前畫面上稱為「我的紀錄」）：使用者本人實際參與的生活紀錄。走草稿 → 核對 → 確認，會計入積分與目標。只能關聯真實人物。資料表 `experiences`。
 - **人物經歷**：以人物為主體的經歷，使用者不必參與；性質是真實、歷史或虛構。直接儲存，不計積分、目標與互動統計。資料表 `subject_experiences`、`subject_experience_people`。
-- **我的人設**：使用者本人的設定，給 AI 扮演「我」時使用。一個帳號一份，每次保存新增一版，要另外按「我同意」才會送給 AI。資料表 `works`、`work_versions`（`kind='self_persona'`）、`data_consents`。
+- **我的設定**（資料上的名稱是「我的人設」）：使用者本人的設定，給 AI 扮演「我」時使用。一個帳號一份，每次保存新增一版，要另外按「我同意」才會送給 AI。資料表 `works`、`work_versions`（`kind='self_persona'`）、`data_consents`。
 - **作品**：作品內的場景、演出職稱與演出內容。這個階段沒有動作品。人物是獨立的；作品裡的演出職稱不是人物，也不回寫人物設定。
 - 共同參與不會自動建立人物關係；新增經歷不會自動修改人物設定。
 
@@ -34,7 +42,7 @@
   - 只新增不更新。正式版本靠 `requests` 的回執辨識：`operation='persons:profile:{person_id}'`，`response.id` 等於那一版的 `notes.id`。沒有回執的同格式筆記只是私人筆記。
   - 欄位上限：背景 3000、性格 2000、動機／核心信念／能力／固有限制 1500、行為模式 2000、說話與表達方式 2000、知識範圍 1000。
 - `person_connections`：同一對人物只有一筆；`relation_types`（最多 10 種，API 只讀寫 `kind`）、`description`（雙方共用）、`confirmation_status`（`archived` 表示封存）、`revision`。
-- `person_connection_experience_sources`：關係來源，一列指向一筆我的紀錄或一筆人物經歷，`source_position` 保存順序。
+- `person_connection_experience_sources`：關係來源，一列指向一筆我的經歷或一筆人物經歷，`source_position` 保存順序。
 - `subject_experiences`：`experience_type`（real／historical／fictional，建立後 App 不能改）、`title`、`raw_text`、`occurred_at`＋`occurred_precision`（unknown／year／month／day）、`occurred_label`、`status`、`revision`。
 - `subject_experience_people`：`role` 是 `subject` 或 `participant`。一筆經歷一位主體、0 到 50 位參與人物。
 - 我的人設的內容（`work_versions.content_json`）有十二欄加真實程度：`display_name`、`public_profile`、`personality`、`speaking_style`（四欄必填）、`motivation`、`values`、`behavior`、`knowledge`、`relationships`、`boundaries`、`appearance`、`sample_lines`（最多 3 句）、`truth_level`（real／mixed／ideal）。欄位名稱和人物設定的九欄不同，兩者沒有合併。
@@ -47,7 +55,7 @@
 | `PUT /api/persons/{id}/profile` | 儲存一版人物設定（`expected_profile_id` 防覆蓋） |
 | `POST /api/ai/generate`（module `person_profile`） | AI 產生人物設定候選 |
 | `POST /api/people/{id}/connections`、`PATCH /api/connections/{id}` | 建立、編輯、封存、恢復關係；`source_experience_ids` 與 `source_person_experience_ids` 各自獨立 |
-| `GET /api/persons/{id}/connection-sources?other_person_id=` | 可引用的來源（我的紀錄＋人物經歷） |
+| `GET /api/persons/{id}/connection-sources?other_person_id=` | 可引用的來源（我的經歷＋人物經歷） |
 | `GET /api/persons/{id}/experiences` | 人物頁「經歷」頁籤的兩區資料 |
 | `GET/POST /api/person-experiences`、`GET/PATCH /api/person-experiences/{id}` | 人物經歷總列表、新增、讀取、編輯、封存／恢復 |
 | `GET/PUT /api/self-persona`、`POST /api/self-persona/consent` | 讀取、保存我的人設（已有人設時要帶 `expected_revision`）；同意或撤回給 AI 使用 |
@@ -68,7 +76,7 @@
 
 以下是已知但沒做的項目，原則是「先讓每個填寫入口能用，防呆之後再補」：
 
-1. `#record`（記下經歷）的「關聯人物」下拉沒有依人物類型或封存狀態篩選；「＋ 新增人物」開的是舊的人物表單。
+1. `#record`（記下經歷）的「＋ 新增人物」開的是舊的人物表單。「關聯人物」下拉現在只列使用中的真實人物，但這是前端另外讀一次人物列表做的篩選：真實人物超過 100 位或讀取失敗時會退回不篩選；後端的草稿 API 本身沒有擋歷史或虛構人物。
 2. 人物經歷的性質建立後不能改（資料庫權限只允許更新標題、內容、時間與狀態）；選錯要封存後重建。
 3. 人物經歷的參與人物只有連續輸入加入；依標籤全選、從內容辨識人物候選、找不到人物時保留表單內容前往新增，都還沒做。
 4. 人物經歷沒有「被提及人物」「直接互動」的填寫欄位（資料表支援）。
@@ -76,7 +84,7 @@
 6. 總覽的經歷統計、AI 依經歷建議更新人物設定，還沒做。
 7. 舊關係頁對已存在的關係再送一次，仍會覆蓋 label 與來源（不動描述與類型）。
 8. 作品還是讀角色卡，沒有改成引用人物；角色卡頁（`#characters`）沒有導覽入口，由作品建立流程的連結或網址進入。
-9. 我的人設和人物設定是兩套欄位、兩種儲存方式。「我」沒有出現在人物列表，也不能當人物經歷的主體或參與人物、不能和人物建立關係。
+9. 我的設定和人物設定是兩套欄位、兩種儲存方式。「我」在人物首頁只是一張卡片，不是人物列表裡的一筆人物，所以不能當人物經歷的主體或參與人物、不能和人物建立關係。
 10. 舊的瀏覽器測試（`browser_tests/test_character_cards_ui.py`、`test_connections.py`、`test_people.py`）靠點擊導覽的「關係」「角色」進入頁面；在人物系統啟用的環境要改成由網址進入才能執行。這一輪沒有修改也沒有執行它們。
 11. 已經開著的頁面不會自動換成新版程式，部署後要重新整理。
 12. 沒有在 Cloud SQL 上逐一實測這個階段以外的表單（目標、角色、作品、私人筆記、個人資料）。
@@ -88,7 +96,9 @@
 - 每位人物都有第 2 版人物設定（9／9 欄），第 1 版保留為前一版。內容全部取自原卡、原文照錄；原卡的演出設定與工程章節沒有放進人物設定。
 - 人物經歷 20 筆。16 筆取自原卡（每位 1 到 2 筆，沒有參與人物、日期不確定）；另外 4 筆是為了展示多人參與而寫的範例，內容開頭標了「（範例資料）」，原卡裡沒有。
 - 人物關係 6 筆，全部是範例（說明開頭標了「（範例資料）」），其中 5 筆引用了上面的範例經歷當來源。原卡沒有寫這 15 位人物彼此的關係。
-- 「我的人設」沒有填，因為沒有這個帳號本人的資料來源。
+- 我的設定已填（第 1 版，十二欄），內容是範例，每欄開頭標了「（範例資料）」；沒有替這個帳號按同意，所以 AI 還不能使用它。
+- 我的經歷 3 筆，都是範例（內容開頭標了「（範例資料）」），其中 1 筆是用網站的「記下 → 核對 → 確認」流程建立的；這 3 筆讓這個帳號有 3 點積分，目標的每日行動也有了進度。
+- 另有 1 位範例真實人物「阿哲（範例）」，用來展示我的經歷可以關聯真實人物；其中 1 筆我的經歷關聯了他。
 
 資料檔、SQL 批次腳本、寫入前備份與對照報告含完整文字，沒有放進這個倉庫，位置在 `C:\LifeWorld_project\alpha-unification-20261110\lw_user_import\v2\`（先看 `lw_user_original15_v2_REPORT.md`）。
 

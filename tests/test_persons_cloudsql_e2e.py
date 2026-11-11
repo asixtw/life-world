@@ -46,7 +46,7 @@ def account(tag):
                                                'deadline': (today + timedelta(days=60)).isoformat(),
                                                'actions': [{'title': t, 'unit': u, 'target': '3', 'level': i + 1, 'weekdays': [0, 2, 4], 'dates': days}
                                                            for i, (t, u) in enumerate([('練習', '小時'), ('記錄', '篇'), ('交流', '次')])]})
-    return client, username, password  # client.goal：建立我的紀錄（關係來源驗收）時使用
+    return client, username, password  # client.goal：建立我的經歷（關係來源驗收）時使用
 
 
 def create(client, name, request_id, **body):

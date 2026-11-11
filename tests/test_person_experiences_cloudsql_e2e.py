@@ -1,6 +1,6 @@
 """人物經歷（Unified Person E1）在 Cloud SQL 上的 API 驗收：Local 8030 → Cloud Run e2e → life_world_e2e（PostgreSQL 18.6）。
 
-只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的紀錄與人物經歷）：
+只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的經歷與人物經歷）：
 
     LW_E2E_PERSONS=1 .venv\\Scripts\\python.exe -m pytest -q tests/test_person_experiences_cloudsql_e2e.py
 
@@ -44,7 +44,7 @@ def test_person_experiences_on_cloud_sql():
     sun = create(c, '孫策', 'exp-b', person_subtype='historical', description='江東之主')
     lu = create(c, '魯肅', 'exp-c', person_subtype='historical')
     real = create(c, '王小明', 'exp-d', description='認識的同事')
-    mine = record(c, real, 1)  # 一筆我的紀錄（與王小明有關）
+    mine = record(c, real, 1)  # 一筆我的經歷（與王小明有關）
     before = c.ok('GET', '/state')['rewards']
 
     # 新增：主體＋兩位參與人物；很早的年代只知道年份
@@ -73,7 +73,7 @@ def test_person_experiences_on_cloud_sql():
     for person in (sun, lu):
         seen = tab(c, person)['person_experiences']
         assert seen['total'] == 1 and seen['items'][0]['id'] == item['id'] and seen['items'][0]['role'] == 'participant'
-    # 我的紀錄與人物經歷分開；不計積分、不進我的紀錄、不自動建立關係、不改人物設定
+    # 我的經歷與人物經歷分開；不計積分、不進我的經歷、不自動建立關係、不改人物設定
     assert tab(c, zhou)['records'] == {'items': [], 'total': 0}
     records = tab(c, real)['records']
     assert records['total'] == 1 and records['items'][0]['id'] == mine and tab(c, real)['person_experiences']['total'] == 0

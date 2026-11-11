@@ -28,7 +28,7 @@ LEGACY_KEYS = {'id', 'owner_id', 'person_a', 'person_b', 'label', 'source_experi
 
 
 def world(client, username):
-    """建立帳號、三位人物，以及兩筆主要人物是甲的已確認「我的紀錄」。"""
+    """建立帳號、三位人物，以及兩筆主要人物是甲的已確認「我的經歷」。"""
     _, goal = onboard(client)
     register(client, username)
     a, b, c = (client.post('/api/people', json={'name': n}).json() for n in ('甲', '乙', '丙'))

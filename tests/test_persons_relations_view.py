@@ -61,7 +61,7 @@ def test_relations_tab_lists_active_relations_with_actions_and_no_legacy_page():
 const tab = await UI.detail('p1', 'relations', new URLSearchParams(''));
 assert.ok(has(tab, '人物關係（2）'));  // 使用中：孫策、魯肅；已封存的諸葛亮不在預設列表
 assert.ok(has(tab, 'data-action="persons-relation-new"') && has(tab, '＋ 新增關係'));
-assert.ok(has(tab, '孫策') && has(tab, '朋友') && has(tab, '同事') && has(tab, '一同平定江東') && has(tab, '來源：1 筆我的紀錄') && has(tab, '赤壁之戰前的會議'));
+assert.ok(has(tab, '孫策') && has(tab, '朋友') && has(tab, '同事') && has(tab, '一同平定江東') && has(tab, '來源：1 筆我的經歷') && has(tab, '赤壁之戰前的會議'));
 assert.ok(has(tab, 'data-action="persons-relation-edit" data-connection="c1"'));
 assert.ok(has(tab, 'data-action="persons-relation-status" data-connection="c1" data-revision="3" data-status="archived"'));
 assert.ok(!has(tab, '諸葛亮') && !has(tab, '軍事上的對手'));

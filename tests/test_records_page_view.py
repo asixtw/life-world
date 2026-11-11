@@ -25,7 +25,7 @@ UI.initialize({state: {renderGeneration: 1, capabilities: {unified_people: true}
   time: x => 'T(' + x + ')', toast: m => toasts.push(m), requestId: () => 'rid', render: async () => { renders++; }, navigate() {},
   dialog: html => dialogs.push(html), closeDialog: () => { closed++; }});
 const mine = {records: [{id: 'r1', occurred_at: '2026-11-01T00:00:00+00:00'}, {id: 'r2', occurred_at: '0150-01-01T00:00:00+00:00'}],
-  recordCard: (e, typeTag) => `<article data-record="${e.id}">${typeTag ? '我的紀錄' : ''}</article>`};
+  recordCard: (e, typeTag) => `<article data-record="${e.id}">${typeTag ? '我的經歷' : ''}</article>`};
 const tabs = UI.recordTabs('people');
 """
 
@@ -34,7 +34,7 @@ def test_records_page_has_three_tabs_and_lists_person_experiences_with_clickable
     run_node(RECORDS + r"""
 for (const route of ['history', 'history?view=people', 'history?view=all']) assert.ok(has(tabs, 'href="#' + route + '"'), tabs);
 assert.ok(has(tabs, 'aria-selected="true" href="#history?view=people"') && has(tabs, 'aria-selected="false" href="#history"'), tabs);
-assert.ok(has(tabs, '我的紀錄') && has(tabs, '人物經歷') && has(tabs, '全部'));
+assert.ok(has(tabs, '我的經歷') && has(tabs, '人物經歷') && has(tabs, '全部'));
 
 const html = await UI.recordsPage('people', new URLSearchParams('view=people'), tabs, mine);
 assert.ok(has(html, tabs) && has(html, '人物經歷（3）') && has(html, 'data-action="persons-exp-new"') && has(html, '＋ 新增人物經歷'), html);
@@ -62,7 +62,7 @@ def test_all_tab_merges_both_kinds_newest_first_with_type_tags_and_unknown_dates
 const merged = await UI.recordsPage('all', new URLSearchParams('view=all'), UI.recordTabs('all'), mine);
 const order = [...merged.matchAll(/data-record="(r\d)"|data-exp-card="(x\d)"/g)].map(m => m[1] || m[2]);
 assert.deepEqual(order, ['r1', 'x3', 'x1', 'r2', 'x2']);  // 2026、208 年 12 月、199 年、150 年、不知道時間
-assert.ok(has(merged, '全部（5）') && has(merged, '<article data-record="r1">我的紀錄</article>'), merged);
+assert.ok(has(merged, '全部（5）') && has(merged, '<article data-record="r1">我的經歷</article>'), merged);
 assert.ok(has(cardOf(merged, 'x1'), '>人物經歷<') && has(cardOf(merged, 'x1'), '歷史'), merged);  // 每筆標示類型
 assert.ok(has(merged, 'href="#record"') && has(merged, 'data-action="persons-exp-new"'), merged);  // 兩種新增入口都在
 """)
@@ -102,13 +102,13 @@ detail.connections[0].source_person_experience_ids = ['x1'];
 detail.connections[0].sources.person_experiences = [{id: 'x1', title: '平定江東', experience_type: 'historical', occurred_precision: 'year', occurred_on: '0199',
   occurred_label: '建安四年', subject: '周瑜'}];
 const page = await UI.detail('p1', 'relations', new URLSearchParams(''));
-assert.ok(has(page, '來源：1 筆我的紀錄、1 筆人物經歷') && has(page, '平定江東') && has(page, '歷史'), page);  // 關係卡片列出兩種來源
-assert.ok(has(page, '來源：1 筆我的紀錄') || true);
+assert.ok(has(page, '來源：1 筆我的經歷、1 筆人物經歷') && has(page, '平定江東') && has(page, '歷史'), page);  // 關係卡片列出兩種來源
+assert.ok(has(page, '來源：1 筆我的經歷') || true);
 
 await click({action: 'persons-relation-new', personRef: 'p1'});
 await click({action: 'persons-relation-pick', personRef: 'p9'});
 let html = dialogs.at(-1);
-assert.ok(has(html, 'name="relation_source" value="e2"') && has(html, '江東會議'), html);  // 我的紀錄來源照舊
+assert.ok(has(html, 'name="relation_source" value="e2"') && has(html, '江東會議'), html);  // 我的經歷來源照舊
 assert.ok(has(html, 'name="relation_person_source" value="x1"') && has(html, '平定江東') && has(html, '199 年 · 建安四年'), html);
 assert.ok(has(html, 'name="relation_person_source" value="x7"') && has(html, '架空世界共同創業') && has(html, '虛構') && !has(html, 'value="x7" checked'), html);
 

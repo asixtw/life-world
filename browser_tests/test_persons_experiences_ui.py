@@ -1,6 +1,6 @@
 """人物經歷（Unified Person E1）的 Chrome 畫面驗收：人物詳細頁「經歷」分頁的兩個區塊與人物經歷對話框，對象是 Local 8030 → Cloud SQL life_world_e2e。
 
-只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的紀錄與人物經歷）：
+只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的經歷與人物經歷）：
 
     LW_E2E_PERSONS_UI=1 .venv\\Scripts\\python.exe -m pytest -q browser_tests/test_persons_experiences_ui.py
 
@@ -79,7 +79,7 @@ def test_person_experiences_in_detail_page(page):
     page.locator('.persons-list-card', has_text='東吳軍事統帥').get_by_role('link', name='編輯 周瑜').click()
     page.get_by_role('tab', name='經歷').click()
     expect(panel(page, ids['zhou'])).to_be_visible()
-    expect(records.get_by_role('heading', name='我的紀錄（0）')).to_be_visible()
+    expect(records.get_by_role('heading', name='我的經歷（0）')).to_be_visible()
     expect(records).to_contain_text('以這位人物為主體的經歷，請記在下方的人物經歷')  # 周瑜是歷史人物：不提供「記錄我和他的經歷」
     expect(records.get_by_role('link', name='記錄我和他的經歷')).to_have_count(0)
     expect(people.get_by_role('heading', name='人物經歷（0）')).to_be_visible()
@@ -165,10 +165,10 @@ def test_person_experiences_in_detail_page(page):
     people.get_by_role('link', name='返回使用中的人物經歷').click()
     expect(people.get_by_role('heading', name='人物經歷（2）')).to_be_visible()
 
-    # 7. 真實人物：我的紀錄有內容，「記錄我和他的經歷」帶入人物；從紀錄頁可以回到這個頁籤
+    # 7. 真實人物：我的經歷有內容，「記錄我和他的經歷」帶入人物；從紀錄頁可以回到這個頁籤
     page.goto(f"{BASE}/#persons/{ids['real']}?tab=experiences")
     expect(panel(page, ids['real'])).to_be_visible()
-    expect(records.get_by_role('heading', name='我的紀錄（1）')).to_be_visible()
+    expect(records.get_by_role('heading', name='我的經歷（1）')).to_be_visible()
     expect(records).to_contain_text('和王小明討論合作計畫')
     shot(page, 'exp_07_real_person_records.png')
     records.get_by_role('link', name='記錄我和他的經歷').click()

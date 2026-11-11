@@ -1,6 +1,6 @@
 """「我的人設」在 Cloud SQL 上的 API 驗收：Local 8030 → Cloud Run e2e → life_world_e2e（PostgreSQL）。
 
-「我的人設」是 AI 扮演使用者本人時使用的設定（works／work_versions，kind=self_persona），2026-11-11 起在「我的紀錄」上方有入口。
+「我的人設」是 AI 扮演使用者本人時使用的設定（works／work_versions，kind=self_persona），2026-11-11 起在「我的經歷」上方有入口。
 只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號）：
 
     LW_E2E_PERSONS=1 .venv\\Scripts\\python.exe -m pytest -q tests/test_self_persona_cloudsql_e2e.py

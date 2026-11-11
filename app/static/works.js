@@ -32,16 +32,18 @@ window.WorksUI = (() => {
       : `<input id="persona-${key}" name="${key}" maxlength="${max}" value="${h(content[key] || '')}" ${required ? 'required' : ''}>`}</div>`]));
     inputs.sample_lines = `<div class="field"><label for="persona-sample_lines">範例台詞（一行一句，最多 3 句）</label><textarea id="persona-sample_lines" name="sample_lines" rows="3">${h((content.sample_lines || []).join(String.fromCharCode(10)))}</textarea></div>`;
     const fields = PERSONA_BLOCKS.map(([letter, title, keys]) => `<div class="stack" data-persona-block="${letter}"><h3 class="section-title">${letter}｜${h(title)}</h3>${keys.map(key => inputs[key]).join('')}</div>`).join('');
-    const back = query().get('from') === 'history' ? c.link('history', '← 我的紀錄', 'text-button') : c.link('works', '← 我的作品', 'text-button');
+    // 我的設定歸在「人物」底下；從作品進來的才回作品。人物系統不可用時維持原本的返回位置。
+    const back = query().get('from') !== 'works' && c.state.capabilities?.unified_people ? c.link('persons', '← 人物', 'text-button') : c.link('works', '← 我的作品', 'text-button');
     const truth = Object.entries(TRUTH).map(([key, label]) => `<option value="${key}" ${(content.truth_level || 'mixed') === key ? 'selected' : ''}>${h(label)}</option>`).join('');
     const consent = data.consent
       ? `<p class="callout">已同意（${h(c.time(data.consent.granted_at))}）。${c.button('persona-consent', '撤回同意', 'secondary', 'data-granted="false"')}</p>`
-      : `<p class="callout">尚未同意。${persona ? c.button('persona-consent', '我同意', 'primary', 'data-granted="true"') : '請先保存人設再同意。'}</p>`;
+      : `<p class="callout">尚未同意。${persona ? c.button('persona-consent', '我同意', 'primary', 'data-granted="true"') : '請先保存我的設定再同意。'}</p>`;
     return `${back}
-      ${c.heading('我的人設', persona ? `目前 v${persona.version_no}；每次保存都會保留舊版本。AI 扮演你時會依照這份設定。` : '建立一份可以讓 AI 扮演你的人設。一個帳號只有一份使用中的人設。')}
+      ${c.heading('我的設定', persona ? `目前第 ${persona.version_no} 版；每次保存都會保留舊版本。AI 扮演你時會依照這份設定。` : '填寫你自己的設定，讓 AI 知道怎麼扮演你。一個帳號只有一份使用中的設定。')}
+      <p class="small muted">「我的設定」就是作品裡 AI 扮演你時使用的「我的人設」。你實際做過的事記在${c.link('history', '紀錄 → 我的經歷', 'text-button')}。</p>
       <form id="persona-form" class="card stack">${fields}
-        <div class="field"><label for="persona-truth">這份人設是</label><select id="persona-truth" name="truth_level">${truth}</select></div>
-        <div class="button-row"><button type="submit" class="primary">${persona ? '保存新版本' : '建立人設'}</button>${persona ? c.link('work/' + encodeURIComponent(persona.work_id), '查看所有版本') : ''}</div></form>
+        <div class="field"><label for="persona-truth">這份設定是</label><select id="persona-truth" name="truth_level">${truth}</select></div>
+        <div class="button-row"><button type="submit" class="primary">${persona ? '保存新版本' : '建立我的設定'}</button>${persona ? c.link('work/' + encodeURIComponent(persona.work_id), '查看所有版本') : ''}</div></form>
       <section class="card stack space-top"><h2 class="section-title">同意使用</h2><p>${h(data.consent_text)}</p>${consent}</section>`;
   }
 
@@ -54,7 +56,7 @@ window.WorksUI = (() => {
     const body = {content, ...(persona ? {expected_revision: persona.revision} : {})};
     const result = await c.api('/self-persona', {method: 'PUT', body: {...body, request_id: c.requestId('persona-save', body)}});
     c.state.dirty = false;
-    c.toast(`人設已保存為 v${result.persona.version_no}。`);
+    c.toast(`我的設定已保存為第 ${result.persona.version_no} 版。`);
     await c.render();
   }
 
@@ -127,7 +129,7 @@ window.WorksUI = (() => {
     const PAGES = {story_opening: 'story', story_session: 'play', person_portrayal: 'portrayal', portrayal_session: 'portrayal-play',
       theater_cast: 'stage', theater_performance: 'performance', generated_work: 'run', roleplay_session: 'run'};
     if (PAGES[work.kind]) actions.push(c.link(PAGES[work.kind] + '/' + encodeURIComponent(work.id), '開啟', 'primary'));
-    if (work.kind === 'self_persona') actions.push(c.link('persona', '在人設頁編輯', 'primary'));
+    if (work.kind === 'self_persona') actions.push(c.link('persona?from=works', '在「我的設定」編輯', 'primary'));
     else actions.push(c.button('work-status', work.status === 'archived' ? '恢復' : '封存', 'secondary',
       `data-id="${h(work.id)}" data-status="${work.status === 'archived' ? 'active' : 'archived'}" data-revision="${work.revision}"`));
     return `${c.link('works', '← 我的作品', 'text-button')}

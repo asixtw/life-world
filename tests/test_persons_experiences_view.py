@@ -42,7 +42,7 @@ def test_tab_has_two_blocks_and_never_leaves_the_person_page():
     run_node(PREPARE + r"""
 const html = await UI.detail('p1', 'experiences', new URLSearchParams('tab=experiences'));
 const records = block(html, 'records'), people = block(html, 'person-experiences');
-assert.ok(has(records, '我的紀錄（1）') && has(records, '與周瑜討論合作') && has(records, 'T(2026-11-01T00:00:00+00:00)'), records);
+assert.ok(has(records, '我的經歷（1）') && has(records, '與周瑜討論合作') && has(records, 'T(2026-11-01T00:00:00+00:00)'), records);
 assert.ok(!has(records, 'href="#record') && has(records, '以這位人物為主體的經歷'), records);  // 周瑜是歷史人物：不提供「記錄我和他的經歷」
 assert.ok(has(people, '人物經歷（3）') && has(people, 'data-action="persons-exp-new" data-person-ref="p1"') && has(people, '＋ 新增人物經歷'), people);
 assert.ok(has(people, 'href="#persons/p1?tab=experiences&amp;archived=1"') && has(people, '查看已封存的人物經歷（1）'));

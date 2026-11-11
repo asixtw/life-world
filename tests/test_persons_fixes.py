@@ -223,7 +223,7 @@ const three = await UI.list(new URLSearchParams('offset=100'));
 assert.equal(cards(three), 1); assert.ok(has(three, '第 3／3 頁')); assert.ok(!has(three, '下一頁'));
 const all = [...ids(one), ...ids(two), ...ids(three)];
 assert.equal(all.length, 101); assert.equal(new Set(all).size, 101);
-assert.ok(calls.every(path => path.includes('limit=50')));
+assert.ok(calls.filter(path => path.startsWith('/persons?')).every(path => path.includes('limit=50')));  // 第一頁另外會讀一次我的設定（/self-persona）
 const filtered = await UI.list(new URLSearchParams('q=人物&type=fictional&category=life&status=archived&sort=name&offset=50'));
 const expected = '#persons?q=%E4%BA%BA%E7%89%A9&amp;type=fictional&amp;category=life&amp;status=archived&amp;sort=name';
 assert.ok(has(filtered, `href="${expected}">上一頁`), filtered);

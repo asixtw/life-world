@@ -1,6 +1,6 @@
 """Unified Person P4 的 Chrome 畫面驗收：人物詳細頁「關係」分頁的新增、編輯、封存、恢復，對象是 Local 8030 → Cloud SQL life_world_e2e。
 
-只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的紀錄與關係）：
+只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的經歷與關係）：
 
     LW_E2E_PERSONS_UI=1 .venv\\Scripts\\python.exe -m pytest -q browser_tests/test_persons_relations_ui.py
 
@@ -108,7 +108,7 @@ def test_person_relations_in_detail_page(page):
     expect(dialog.get_by_role('button', name='更換人物')).to_be_visible()
     expect(dialog.locator('.person-card')).to_contain_text('江東之主')
 
-    # 3. 類型多選、共用描述、來源（只列與這兩位人物有關的我的紀錄）
+    # 3. 類型多選、共用描述、來源（只列與這兩位人物有關的我的經歷）
     expect(dialog.locator('input[name=relation_source]')).to_have_count(2)
     dialog.locator('input[name=relation_source]').first.check()
     dialog.get_by_label('朋友', exact=True).check()
@@ -123,7 +123,7 @@ def test_person_relations_in_detail_page(page):
     expect(card).to_contain_text('朋友')
     expect(card).to_contain_text('同事')
     expect(card).to_contain_text('兩人共同平定江東，建立長期合作及信任關係。')
-    expect(card).to_contain_text('來源：1 筆我的紀錄')
+    expect(card).to_contain_text('來源：1 筆我的經歷')
     shot(page, '03_relations_tab_after_create.png')
 
     # 4. 雙方共用：孫策的人物頁看到同一段描述
@@ -153,7 +153,7 @@ def test_person_relations_in_detail_page(page):
     expect(card).to_contain_text('兩人共同平定江東，情同手足。')
     expect(card).to_contain_text('師徒')
     expect(card).not_to_contain_text('同事')
-    expect(card).to_contain_text('來源：1 筆我的紀錄')  # 只改描述與類型，原本的來源保留
+    expect(card).to_contain_text('來源：1 筆我的經歷')  # 只改描述與類型，原本的來源保留
 
     # 6. 卡片上的「編輯」：載入原資料（含已勾選的來源），取消不變更
     card.get_by_role('button', name='編輯').click()
@@ -185,7 +185,7 @@ def test_person_relations_in_detail_page(page):
     expect(dialog).to_be_hidden()
     expect(page.get_by_role('heading', name='人物關係（1）')).to_be_visible()
     expect(card_of(page, '孫策')).to_contain_text('兩人共同平定江東，情同手足。')  # 恢復後內容不變
-    expect(card_of(page, '孫策')).to_contain_text('來源：1 筆我的紀錄')
+    expect(card_of(page, '孫策')).to_contain_text('來源：1 筆我的經歷')
 
     # 8. 與同名人物建立關係；總覽顯示重要關係
     page.get_by_role('button', name='＋ 新增關係').click()

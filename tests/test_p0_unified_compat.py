@@ -129,7 +129,7 @@ def _seed_guest_world(client):
         c.execute('INSERT INTO subject_experience_people(subject_experience_id,owner_id,person_id,role,created_at,interacted) VALUES (?,?,?,?,?,?)',
                   ('g-s', owner, 'g-p1', 'participant', now, 1))
         c.execute('INSERT INTO person_connection_experience_sources(connection_id,owner_id,subject_experience_id) VALUES (?,?,?)', ('g-c', owner, 'g-s'))
-        # 第 81 條 FK：來源也可以是我的紀錄（experiences）；清除時要先刪來源連結，再刪經歷。
+        # 第 81 條 FK：來源也可以是我的經歷（experiences）；清除時要先刪來源連結，再刪經歷。
         c.execute('INSERT INTO person_connection_experience_sources(connection_id,owner_id,experience_id,source_position) VALUES (?,?,?,1)',
                   ('g-c', owner, experience_id))
         c.execute("INSERT INTO works(id,owner_id,kind,title,status,current_version,revision,created_at,updated_at,profile_person_id) "
@@ -267,7 +267,7 @@ def test_subject_experience_without_owner_does_not_touch_points_goals_or_interac
 
 def test_only_the_person_experiences_module_writes_subject_experiences():
     """人物經歷（2026-11-11 E1 起開放）：只有 person_experiences.py 寫入 subject_experiences／subject_experience_people，
-    其他模組（含我的紀錄的草稿／確認流程）都不寫入，兩種經歷不混用。P0 時這裡的期望是「沒有任何模組寫入」。
+    其他模組（含我的經歷的草稿／確認流程）都不寫入，兩種經歷不混用。P0 時這裡的期望是「沒有任何模組寫入」。
 
     E2E 010 前置切換後，關聯表 person_connection_experience_sources 只由 relation_sources.py 寫入；
     人物模組透過它替換來源，readiness 只做 LIMIT 0 讀取，訪客清除以動態表名刪除。

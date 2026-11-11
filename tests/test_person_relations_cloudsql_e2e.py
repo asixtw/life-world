@@ -1,6 +1,6 @@
 """Unified Person P4 在 Cloud SQL 上的 API 驗收：Local 8030 → Cloud Run e2e → life_world_e2e（PostgreSQL 18.6）。
 
-只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的紀錄與關係）：
+只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的經歷與關係）：
 
     LW_E2E_PERSONS=1 .venv\\Scripts\\python.exe -m pytest -q tests/test_person_relations_cloudsql_e2e.py
 
@@ -28,7 +28,7 @@ KINDS = ['family', 'partner', 'friend', 'colleague', 'classmate', 'mentor', 'cli
 
 
 def record(client, person, index):
-    """為這位人物建立一筆已確認的「我的紀錄」；回傳紀錄 ID。發生時間取稍早的現在，避免本機與伺服器時鐘差造成未來時間。"""
+    """為這位人物建立一筆已確認的「我的經歷」；回傳紀錄 ID。發生時間取稍早的現在，避免本機與伺服器時鐘差造成未來時間。"""
     now = datetime.now(TAIPEI)
     moment = now - timedelta(minutes=2)
     if moment.date() != now.date():

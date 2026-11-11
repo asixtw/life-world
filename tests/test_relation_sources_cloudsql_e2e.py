@@ -84,7 +84,7 @@ class Client:
 
 
 def synthetic_world(prefix):
-    """建立合成帳號、目標、三位人物與兩筆主要人物是甲的已確認「我的紀錄」。"""
+    """建立合成帳號、目標、三位人物與兩筆主要人物是甲的已確認「我的經歷」。"""
     client = Client()
     username = prefix + datetime.now(timezone.utc).strftime('%m%d%H%M%S') + secrets.token_hex(2)
     password = 'Syn-' + secrets.token_hex(16)  # 只在記憶體；重新登入驗證後即丟棄
@@ -145,7 +145,7 @@ def test_link_table_round_trip_on_cloud_sql(preflight):
     status, error = c.call('PATCH', f'/connections/{cid}', {'request_id': 'rs-missing', 'expected_revision': 1,
                                                              'source_experience_ids': [w['e1']], 'source_person_experience_ids': ['not-a-real-id']})
     assert status == 404, error
-    assert c.ok('GET', f'/connections/{cid}') == created  # 錯誤整筆回滾：我的紀錄來源也沒被替換
+    assert c.ok('GET', f'/connections/{cid}') == created  # 錯誤整筆回滾：我的經歷來源也沒被替換
 
     replaced = c.ok('PATCH', f'/connections/{cid}', {'request_id': 'rs-replace', 'expected_revision': 1, 'source_experience_ids': [w['e1']]})
     assert replaced['source_experience_ids'] == [w['e1']] and replaced['revision'] == 2

@@ -5,7 +5,7 @@
 //   AI 產生人物設定在編輯表單的「人物特質與設定」區塊：勾選要產生的欄位，結果只回填被選的欄位，未選的保留；按「儲存人物」才保存。
 // - 詳細頁：總覽、人物設定（唯讀，編輯回到同一張表單）、經歷、關係。
 // - 關係（P4）：在詳細頁的「關係」分頁直接新增、編輯、封存、恢復，不需要回舊的關係頁。同一對人物只有一筆關係，描述由雙方共用；
-//   類型選填、可複選（最多 10 種）；選到已有關係的人物時改為編輯（已封存則提供恢復），不覆蓋；來源只列與兩位人物有關的我的紀錄。
+//   類型選填、可複選（最多 10 種）；選到已有關係的人物時改為編輯（已封存則提供恢復），不覆蓋；來源只列與兩位人物有關的我的經歷。
 //   注意：按鈕不可用 data-person 屬性（舊關係模組會攔截），一律用 data-person-ref。
 // 同名人物可並存；類型與分類選填；封存不刪除，已封存的人物只能讀取與恢復。people.notes（人物備註）與 notes 資料表（人物設定版本）是兩回事。
 window.PersonsUI = (() => {
@@ -143,8 +143,11 @@ window.PersonsUI = (() => {
       ${offset > 0 ? c.link(listRoute(filter, offset - PAGE_SIZE), '上一頁', 'secondary') : ''}${offset + PAGE_SIZE < data.total ? c.link(listRoute(filter, offset + PAGE_SIZE), '下一頁', 'secondary') : ''}</nav>`;
     const cards = data.items.map(card).join('');
     const filtered = filter.q || filter.type || filter.category;
+    // 人物首頁最上方是「我的設定」；搜尋、篩選、翻頁或看封存時是在找人物，不顯示。讀不到也不影響人物列表。
+    const self = !filtered && offset === 0 && filter.status === 'active' ? await c.api('/self-persona').catch(() => null) : null;
+    if (!fresh(ticket)) return '';
     listMemory = {owner: ownerId(), route: routePath(c.state.route) === 'persons' ? c.state.route : listRoute(filter, offset)};
-    return `${c.heading('人物', '建立及管理你世界中的人物設定。', c.link('persons-new', '新增人物', 'primary'))}
+    return `${c.heading('人物', '先設定「我」，再建立你世界中的其他人物。', c.link('persons-new', '新增人物', 'primary'))}${selfCard(self)}
       <form id="persons-filter-form" class="card stack space-bottom" role="search" data-search>
         <div class="field"><label for="persons-q">搜尋</label><input id="persons-q" name="q" value="${h(filter.q)}" maxlength="200" placeholder="搜尋人物名稱、別名、背景或標籤"></div>
         <div class="button-row">
@@ -290,7 +293,7 @@ window.PersonsUI = (() => {
     return `<h3 class="section-title">人物基本資料</h3><dl class="char-fields">${rows}</dl>
       ${background ? `<h3 class="section-title">人物背景摘要</h3><dl class="char-fields">${background}</dl>` : ''}
       <h3 class="section-title">人物設定摘要</h3>${data.profile ? `<dl class="char-fields">${profileRows(data.profile, 80)}</dl>` : '<p class="small muted">尚未填寫人物設定。</p>'}
-      <h3 class="section-title">經歷</h3><p class="small">我的紀錄 ${data.experiences.mine} 筆 · 人物經歷 ${data.experiences.person_experiences} 筆</p>
+      <h3 class="section-title">經歷</h3><p class="small">我的經歷 ${data.experiences.mine} 筆 · 人物經歷 ${data.experiences.person_experiences} 筆</p>
       <h3 class="section-title">重要關係</h3>${relations ? `<ul class="char-versions">${relations}</ul>` : '<p class="small muted">還沒有關係。</p>'}
       <p>${c.link(`persons/${encodeId(p.id)}?tab=relations`, '查看與管理關係', 'text-button')}</p>`;
   }
@@ -314,7 +317,7 @@ window.PersonsUI = (() => {
     const locked = data.person.status === 'archived' || x.person.status === 'archived'; // 任一端人物已封存：這段關係只能查看
     const chips = x.relation_types.map(type => `<span class="tag">${h(kindLabel(type.kind))}</span>`).join('');
     const sources = x.sources.experiences, peopleSources = x.sources.person_experiences || [];
-    const sourceCount = [sources.length ? `${sources.length} 筆我的紀錄` : '', peopleSources.length ? `${peopleSources.length} 筆人物經歷` : ''].filter(Boolean).join('、');
+    const sourceCount = [sources.length ? `${sources.length} 筆我的經歷` : '', peopleSources.length ? `${peopleSources.length} 筆人物經歷` : ''].filter(Boolean).join('、');
     const actions = locked ? '<p class="small muted">其中一位人物已封存，恢復人物後才能調整這段關係。</p>'
       : archived ? `<div class="button-row">${c.button('persons-relation-status', '恢復', 'secondary', statusAttrs(x, 'confirmed'))}</div>`
         : `<div class="button-row">${c.button('persons-relation-edit', '編輯', 'text-button', `data-connection="${h(x.id)}"`)}${c.button('persons-relation-status', '封存', 'text-button', statusAttrs(x, 'archived'))}</div>`;
@@ -380,9 +383,9 @@ window.PersonsUI = (() => {
       : '<p class="small muted">沒有與這兩位人物有關的已確認紀錄。</p>';
     const peopleSources = r.eligiblePeople && r.eligiblePeople.length ? r.eligiblePeople.map(s => `<label class="check-line"><input type="checkbox" name="relation_person_source" value="${h(s.id)}"${r.checkedPeople.includes(s.id) ? ' checked' : ''}> <span class="tag">${h(natureLabel(s.experience_type))}</span> ${h(s.title)}　${h(experienceDate(s))}</label>`).join('')
       : '<p class="small muted">沒有與這兩位人物有關的人物經歷。</p>';
-    const sources = !r.other ? '<p class="small muted">選擇另一位人物後，會列出與這兩位人物有關的我的紀錄與人物經歷。</p>'
+    const sources = !r.other ? '<p class="small muted">選擇另一位人物後，會列出與這兩位人物有關的我的經歷與人物經歷。</p>'
       : r.eligible === null ? '<p class="small muted">正在讀取可引用的紀錄…</p>'
-        : `<p class="small muted">我的紀錄</p>${recordSources}<p class="small muted">人物經歷</p>${peopleSources}<p class="small muted">來源可以留空。</p>`;
+        : `<p class="small muted">我的經歷</p>${recordSources}<p class="small muted">人物經歷</p>${peopleSources}<p class="small muted">來源可以留空。</p>`;
     return `<h2 id="account-heading">${title}</h2>
       <form id="persons-relation-form" class="stack">
         <p class="callout small">${RELATION_HINT}</p>
@@ -391,7 +394,7 @@ window.PersonsUI = (() => {
         <fieldset class="field"><legend>關係類型（選填，可複選，最多 ${MAX_RELATION_KINDS} 種）</legend><div class="char-checks">${kinds}</div></fieldset>
         <div class="field"><label for="persons-relation-description">關係描述</label>
           <textarea id="persons-relation-description" name="description" maxlength="2000" rows="4" placeholder="例如：兩人共同平定江東，建立長期合作及信任關係。">${h(r.description)}</textarea></div>
-        <fieldset class="field"><legend>關係來源（選填）：能說明這段關係的我的紀錄與人物經歷</legend>
+        <fieldset class="field"><legend>關係來源（選填）：能說明這段關係的我的經歷與人物經歷</legend>
           <div id="persons-relation-sources" class="stack"${r.other && r.eligible !== null ? ' data-ready="1"' : ''}>${sources}</div></fieldset>
         <div class="button-row">${c.button('close-account', '取消', 'secondary')}<button type="submit" class="primary">儲存關係</button></div>
       </form>`;
@@ -435,7 +438,7 @@ window.PersonsUI = (() => {
     box.focus();
   }
 
-  async function loadEligibleSources() { // 可引用的我的紀錄（與兩端至少一人有關）；編輯時既有來源排在最前面並維持原順序
+  async function loadEligibleSources() { // 可引用的我的經歷（與兩端至少一人有關）；編輯時既有來源排在最前面並維持原順序
     const r = relation, otherId = r.other.id;
     const data = await c.api(`/persons/${encodeId(r.person.id)}/connection-sources?other_person_id=${encodeURIComponent(otherId)}`);
     if (relation !== r || !r.other || r.other.id !== otherId) return; // 期間已換人
@@ -532,8 +535,8 @@ window.PersonsUI = (() => {
     await finishRelation('已建立關係。');
   }
 
-  // ---------------- 經歷（我的紀錄／人物經歷）：人物頁的經歷分頁、紀錄頁的頁籤、人物經歷對話框 ----------------
-  // 分類原則：我的紀錄＝你本人實際參與的生活紀錄（走紀錄的核對流程，計積分與目標）；人物經歷＝以人物為主體的經歷（真實、歷史或虛構，
+  // ---------------- 經歷（我的經歷／人物經歷）：人物頁的經歷分頁、紀錄頁的頁籤、人物經歷對話框 ----------------
+  // 分類原則：我的經歷＝你本人實際參與的生活紀錄（走紀錄的核對流程，計積分與目標）；人物經歷＝以人物為主體的經歷（真實、歷史或虛構，
   // 直接儲存，不計分）；作品內的劇情屬於作品，不在這裡。
   // 人物經歷從人物頁（自動帶入主體）或紀錄頁（先選主體）進入，共用同一個對話框與同一套 API；新增、查看、編輯、封存都不離開原本的頁面。
 
@@ -542,7 +545,7 @@ window.PersonsUI = (() => {
   const natureLabel = key => (NATURES.find(([k]) => k === key) || [key, key])[1];
   const summaryOf = p => ({id: p.id, name: p.name, person_type: p.person_type, person_subtype: p.person_subtype, status: p.status, description: p.description});
   const natureFor = p => (p.person_subtype === 'historical' ? 'historical' : p.person_type === 'fictional' ? 'fictional' : 'real'); // 性質預設值跟著人物類型，可以改
-  // 人物頁的「記錄我和他的經歷」只提供給使用中的真實人物（不含歷史人物）：我的紀錄是你本人實際參與的事。
+  // 人物頁的「記錄我和他的經歷」只提供給使用中的真實人物（不含歷史人物）：我的經歷是你本人實際參與的事。
   const canRecordWith = p => Boolean(p) && p.status === 'active' && p.person_type === 'real' && !p.person_subtype;
   const experienceTitle = x => x.title || clip(x.content, 40); // 沒有標題時顯示內容開頭
   const experienceLocked = x => x.status === 'archived' || !x.subject || x.subject.status === 'archived'; // 已封存的經歷、或主體人物已封存：只能查看
@@ -593,7 +596,7 @@ window.PersonsUI = (() => {
     experienceIndex = new Map(lists.person_experiences.items.map(x => [x.id, x]));
     const recordNote = p.status === 'archived' ? '這位人物已封存，不能新增紀錄。' : canRecordWith(p) ? '' : '以這位人物為主體的經歷，請記在下方的人物經歷。';
     const records = lists.records.items.map(r => `<div class="list-item"><div class="item-main"><h3>${h(r.summary)}</h3><p class="small muted">${h(c.time(r.occurred_at))}</p></div></div>`).join('');
-    const recordBlock = `<section class="person-exp-block" data-block="records"><div class="section-title"><h2>我的紀錄（${lists.records.total}）</h2>
+    const recordBlock = `<section class="person-exp-block" data-block="records"><div class="section-title"><h2>我的經歷（${lists.records.total}）</h2>
         ${canRecordWith(p) ? c.link(`record?person=${id}&return=${encodeURIComponent(here)}`, '記錄我和他的經歷', 'secondary') : ''}</div>
       <p class="small muted">你本人實際參與的事，沿用紀錄的核對流程，會計入積分與目標。${recordNote}</p>
       ${records ? `<div class="card">${records}</div>` : '<p class="small muted">還沒有你和這位人物的紀錄。</p>'}</section>`;
@@ -607,9 +610,9 @@ window.PersonsUI = (() => {
     return recordBlock + peopleBlock;
   }
 
-  // ---- 紀錄頁（左側「紀錄」）：我的紀錄／人物經歷／全部 ----
+  // ---- 紀錄頁（左側「紀錄」）：我的經歷／人物經歷／全部 ----
 
-  const RECORD_VIEWS = [['mine', '我的紀錄', 'history'], ['people', '人物經歷', 'history?view=people'], ['all', '全部', 'history?view=all']];
+  const RECORD_VIEWS = [['mine', '我的經歷', 'history'], ['people', '人物經歷', 'history?view=people'], ['all', '全部', 'history?view=all']];
 
   function recordTabs(view) {
     return `<nav class="person-tabs record-tabs" role="tablist" aria-label="紀錄類型">${RECORD_VIEWS.map(([key, label, route]) =>
@@ -617,8 +620,8 @@ window.PersonsUI = (() => {
   }
 
   /**
-   * 紀錄頁的「人物經歷」與「全部」頁籤（「我的紀錄」頁籤由主程式沿用原本的畫面）。
-   * @param view 'people'｜'all'  @param tabs 頁籤列的 HTML  @param mine {records: 我的紀錄清單, recordCard(e, typeTag): 主程式的紀錄卡片}
+   * 紀錄頁的「人物經歷」與「全部」頁籤（「我的經歷」頁籤由主程式沿用原本的畫面）。
+   * @param view 'people'｜'all'  @param tabs 頁籤列的 HTML  @param mine {records: 我的經歷清單, recordCard(e, typeTag): 主程式的紀錄卡片}
    */
   async function recordsPage(view, params, tabs, mine) {
     if (!enabled()) return unavailable();
@@ -635,12 +638,12 @@ window.PersonsUI = (() => {
         <section data-block="person-experiences"><h2 class="section-title">${archivedView ? '已封存的人物經歷' : '人物經歷'}（${archivedView ? data.archived_total : data.total}）</h2>
         ${cards ? `<div class="stack">${cards}</div>` : `<div class="card">${c.empty(archivedView ? '沒有已封存的人物經歷。' : '還沒有人物經歷。')}</div>`}${toggle}</section>`;
     }
-    // 全部：兩種紀錄合併、由新到舊，每筆標示類型；各自保留原本的操作（我的紀錄不能在這裡改成人物經歷，反之亦然）
+    // 全部：兩種紀錄合併、由新到舊，每筆標示類型；各自保留原本的操作（我的經歷不能在這裡改成人物經歷，反之亦然）
     const merged = [...mine.records.map(e => ({at: Date.parse(e.occurred_at), html: mine.recordCard(e, true)})),
       ...data.items.map(x => ({at: experienceTime(x), html: experienceCard(null, x, {typeTag: true})}))]
       .map(item => ({...item, at: Number.isFinite(item.at) ? item.at : -Infinity}))
       .sort((a, b) => (a.at === b.at ? 0 : a.at > b.at ? -1 : 1));
-    return `${c.heading('全部紀錄', '我的紀錄與人物經歷合併顯示；每筆保留各自的操作方式。',
+    return `${c.heading('全部紀錄', '我的經歷與人物經歷合併顯示；每筆保留各自的操作方式。',
       `<div class="button-row">${c.link('record', '＋ 新的經歷', 'primary')}${c.button('persons-exp-new', '＋ 新增人物經歷', 'secondary')}</div>`)}${tabs}
       <section data-block="all-records"><h2 class="section-title">全部（${merged.length}）</h2>
       ${merged.length ? `<div class="stack">${merged.map(item => item.html).join('')}</div>` : `<div class="card">${c.empty('還沒有任何紀錄。')}</div>`}</section>`;
@@ -1000,18 +1003,35 @@ window.PersonsUI = (() => {
 
   const SELF_FIELDS = ['display_name', 'public_profile', 'personality', 'speaking_style', 'motivation', 'values', 'behavior', 'knowledge', 'relationships', 'boundaries', 'appearance'];
   const SELF_TRUTH = {real: '真實的我', mixed: '部分真實', ideal: '理想中的我'};
-  /** 「我的紀錄」上方的「我的人設」卡片：AI 扮演使用者本人時使用的設定。data＝GET /api/self-persona 的回應；讀不到就不顯示。 */
+  /** 人物首頁最上方的「我的設定」卡片：使用者本人的設定，AI 扮演「我」時使用。data＝GET /api/self-persona 的回應；讀不到就不顯示。 */
   function selfCard(data) {
     if (!enabled() || !data) return '';
     const persona = data.persona, content = persona?.content || {};
     const filled = SELF_FIELDS.filter(key => String(content[key] || '').trim()).length + ((content.sample_lines || []).length ? 1 : 0);
     const body = persona
       ? `<h3>${h(content.display_name)}</h3><p class="small muted">第 ${persona.version_no} 版 · ${h(SELF_TRUTH[content.truth_level] || '')} · 已填 ${filled}／12 欄 · ${data.consent ? '已同意 AI 使用' : '尚未同意 AI 使用'}</p><p>${h(content.public_profile)}</p>`
-      : `<p>尚未建立。填寫性格、說話方式、動機、價值觀等欄位，AI 才知道怎麼扮演你。</p>`;
-    return `<section class="card stack space-bottom" data-block="self-persona"><div class="section-title"><h2>我的人設</h2><span class="tag">AI 扮演你時使用</span></div>
-      ${body}<div class="button-row">${c.link('persona?from=history', persona ? '編輯我的人設' : '建立我的人設', persona ? 'secondary' : 'primary')}</div></section>`;
+      : `<p>尚未建立。填寫你的性格、說話方式、動機、價值觀等欄位，AI 才知道怎麼扮演你。</p>`;
+    return `<section class="card stack space-bottom" data-block="self-persona"><div class="section-title"><h2>我的設定</h2><span class="tag">我 · AI 扮演你時使用</span></div>
+      ${body}<div class="button-row">${c.link('persona', persona ? '編輯我的設定' : '建立我的設定', persona ? 'secondary' : 'primary')}${c.link('history', '我的經歷', 'secondary')}</div></section>`;
+  }
+
+  /** 右上角帳號視窗的「我的設定」入口：已登入（不是訪客）而且人物系統可用時才提供。 */
+  function accountEntry(me) {
+    return enabled() && me?.status === 'registered' ? c.button('self-settings', '我的設定', 'primary') : '';
+  }
+
+  /**
+   * 可以記在「我的經歷」裡的人物：使用中的真實人物（不含歷史人物與虛構人物），因為我的經歷是你本人實際參與的事。
+   * 回傳 id 的 Set；人物系統不可用、讀不到或超過一次能讀的 100 位時回 null（畫面不篩選）。
+   */
+  async function recordableIds() {
+    if (!enabled()) return null;
+    try {
+      const data = await c.api('/persons?person_type=real&status=active&limit=100');
+      return data.total > data.items.length ? null : new Set(data.items.filter(p => p.person_subtype !== 'historical').map(p => p.id));
+    } catch (error) { return null; }
   }
 
   return {initialize, list: listView, createForm, editForm, detail, submit, handleClick, enabled, scrollTarget, experienceSearch, experienceChips,
-    experienceSubjectSearch, experienceSubject: experienceSubjectHtml, recordTabs, recordsPage, legacyNav, selfCard};
+    experienceSubjectSearch, experienceSubject: experienceSubjectHtml, recordTabs, recordsPage, legacyNav, selfCard, accountEntry, recordableIds};
 })();

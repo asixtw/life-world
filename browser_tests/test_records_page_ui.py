@@ -1,12 +1,12 @@
 """人物經歷 E2／E3 的 Chrome 畫面驗收：紀錄頁的三個頁籤、雙入口共用同一筆資料、關係引用人物經歷。對象是 Local 8030 → Cloud SQL life_world_e2e。
 
-只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的紀錄、人物經歷與關係）：
+只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的經歷、人物經歷與關係）：
 
     LW_E2E_PERSONS_UI=1 .venv\\Scripts\\python.exe -m pytest -q browser_tests/test_records_page_ui.py
 
 照 2026-11-11 指令的驗收順序走：
 1 從人物頁新增人物經歷 → 2 從紀錄頁找到同一筆 → 3 從紀錄頁新增另一筆（先選主體）→ 4 回人物頁確認兩筆都在 →
-5 編輯及封存（含恢復）→ 6 從關係表單引用人物經歷 → 7 雙方人物頁都讀得到來源 → 8 我的紀錄不受影響。
+5 編輯及封存（含恢復）→ 6 從關係表單引用人物經歷 → 7 雙方人物頁都讀得到來源 → 8 我的經歷不受影響。
 （9 Owner 隔離由 tests/test_person_experiences_records_cloudsql_e2e.py 在 Cloud SQL 上驗收。）
 設定 LW_E2E_SCREENSHOT_DIR 時，會把實際畫面存成 PNG。
 """
@@ -58,7 +58,7 @@ def test_records_page_and_relation_sources(page):
     page.set_viewport_size({'width': 1440, 'height': 1500})
     goal = synthetic_account(page)
     ids = page.evaluate(PREPARE, goal)
-    page.reload()  # 剛才直接用 API 建立了我的紀錄；重新整理後 App 才會讀到（實際操作時紀錄流程會自己更新）
+    page.reload()  # 剛才直接用 API 建立了我的經歷；重新整理後 App 才會讀到（實際操作時紀錄流程會自己更新）
     dialog = page.locator('#account-dialog')
     people = page.locator('[data-block="person-experiences"]')
     cards = page.locator('[data-exp-card]')
@@ -80,8 +80,8 @@ def test_records_page_and_relation_sources(page):
 
     # 2. 左側「紀錄」→「人物經歷」頁籤：找到同一筆，顯示主體與參與人物
     page.locator('#nav').get_by_role('link', name='紀錄').click()
-    expect(page.get_by_role('tab', name='我的紀錄')).to_be_visible()
-    expect(page.get_by_text('和朋友討論周瑜的策略').first).to_be_visible()  # 預設是我的紀錄，原本的內容都在
+    expect(page.get_by_role('tab', name='我的經歷')).to_be_visible()
+    expect(page.get_by_text('和朋友討論周瑜的策略').first).to_be_visible()  # 預設是我的經歷，原本的內容都在
     page.get_by_role('tab', name='人物經歷').click()
     expect(people.get_by_role('heading', name='人物經歷（1）')).to_be_visible()
     card = cards.filter(has_text='平定江東')
@@ -134,7 +134,7 @@ def test_records_page_and_relation_sources(page):
     people.get_by_role('link', name='返回使用中的人物經歷').click()
     expect(people.get_by_role('heading', name='人物經歷（2）')).to_be_visible()
 
-    # 6. 關係表單引用人物經歷：周瑜 → 關係 → 新增關係 → 孫策；來源有我的紀錄與人物經歷兩組
+    # 6. 關係表單引用人物經歷：周瑜 → 關係 → 新增關係 → 孫策；來源有我的經歷與人物經歷兩組
     person_tab(page, ids['zhou'], 'relations')
     page.get_by_role('button', name='＋ 新增關係').click()
     dialog.locator('#persons-relation-q').fill('孫策')
@@ -151,12 +151,12 @@ def test_records_page_and_relation_sources(page):
     dialog.get_by_role('button', name='儲存關係').click()
     expect(dialog).to_be_hidden()
     relation = page.locator('.person-tab-panel article.card').filter(has=page.get_by_role('link', name='孫策', exact=True))
-    expect(relation).to_contain_text('來源：1 筆我的紀錄、1 筆人物經歷')
+    expect(relation).to_contain_text('來源：1 筆我的經歷、1 筆人物經歷')
 
     # 7. 孫策的人物頁讀到同一組來源；重新編輯時原本的來源仍勾選
     person_tab(page, ids['sun'], 'relations')
     other_side = page.locator('.person-tab-panel article.card').filter(has=page.get_by_role('link', name='周瑜', exact=True))
-    expect(other_side).to_contain_text('來源：1 筆我的紀錄、1 筆人物經歷')
+    expect(other_side).to_contain_text('來源：1 筆我的經歷、1 筆人物經歷')
     other_side.locator('summary').click()
     expect(other_side).to_contain_text('平定江東')
     shot(page, 'rec_05_other_side_reads_sources.png')
@@ -166,14 +166,14 @@ def test_records_page_and_relation_sources(page):
     dialog.get_by_role('button', name='取消').click()
     expect(dialog).to_be_hidden()
 
-    # 8. 我的紀錄不受影響：紀錄頁的我的紀錄還是原本那一筆、積分沒有變；「全部」頁籤兩種都在並標示類型
+    # 8. 我的經歷不受影響：紀錄頁的我的經歷還是原本那一筆、積分沒有變；「全部」頁籤兩種都在並標示類型
     page.goto(BASE + '/#history')
     expect(page.get_by_text('和朋友討論周瑜的策略').first).to_be_visible()
     assert page.evaluate(STATE) == [ids['points'], ids['records']]
     page.get_by_role('tab', name='全部').click()
     block = page.locator('[data-block="all-records"]')
     expect(block.get_by_role('heading', name='全部（3）')).to_be_visible()
-    expect(block.locator('article').nth(0)).to_contain_text('我的紀錄')  # 今天的紀錄最新，排最前面
+    expect(block.locator('article').nth(0)).to_contain_text('我的經歷')  # 今天的紀錄最新，排最前面
     expect(block.locator('[data-exp-card]')).to_have_count(2)
     expect(block.locator('[data-exp-card]').first).to_contain_text('人物經歷')
     shot(page, 'rec_06_all_tab.png')

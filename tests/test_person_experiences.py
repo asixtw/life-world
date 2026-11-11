@@ -4,7 +4,7 @@
 （tests/test_person_experiences_cloudsql_e2e.py、browser_tests/test_persons_experiences_ui.py）。
 
 2026-11-11 產品裁決：
-- 兩種經歷分開：我的紀錄（experiences，草稿→核對→確認，計積分與目標）與人物經歷（subject_experiences，直接儲存，不計積分、目標與互動統計）。
+- 兩種經歷分開：我的經歷（experiences，草稿→核對→確認，計積分與目標）與人物經歷（subject_experiences，直接儲存，不計積分、目標與互動統計）。
 - 人物經歷欄位：標題（選填）、主體（必填，一位）、其他參與人物（選填、最多 50 位）、內容（必填）、性質（真實／歷史／虛構，建立後不能改）、
   發生時間（不知道／年／年月／完整日期）、時間描述（選填）。建立者就是登入帳號，不另外填。
 - 可以只有主體、沒有其他參與人物。已封存的人物不能被選為主體或新加入的參與人物。
@@ -22,7 +22,7 @@ PERSON_KEYS = {'id', 'name', 'person_type', 'person_subtype', 'status', 'descrip
 
 
 def world(client, username='exp_owner'):
-    """帳號、四位人物（周瑜、孫策、魯肅、小喬），一筆與周瑜有關的已確認我的紀錄。"""
+    """帳號、四位人物（周瑜、孫策、魯肅、小喬），一筆與周瑜有關的已確認我的經歷。"""
     _, goal = onboard(client)
     register(client, username)
     people = {name: client.post('/api/persons', json={'request_id': f'{username}-{name}', 'name': name, 'person_subtype': 'historical',
@@ -74,11 +74,11 @@ def test_create_shows_on_subject_and_participant_pages_and_does_not_touch_points
         assert listed['items'][0]['id'] == item['id'] and listed['items'][0]['role'] == role
     assert tab(client, people['小喬'])['person_experiences'] == {'items': [], 'total': 0, 'archived_total': 0}
 
-    # 我的紀錄與人物經歷分開：周瑜有一筆我的紀錄；孫策沒有
+    # 我的經歷與人物經歷分開：周瑜有一筆我的經歷；孫策沒有
     records = tab(client, people['周瑜'])['records']
     assert records['total'] == 1 and records['items'][0]['id'] == record and records['items'][0]['summary'] == '與周瑜討論合作'
     assert tab(client, people['孫策'])['records'] == {'items': [], 'total': 0}
-    # 不計積分、不進我的紀錄、不自動建立關係、不改人物設定
+    # 不計積分、不進我的經歷、不自動建立關係、不改人物設定
     after = client.get('/api/state').json()
     assert after['rewards'] == before['rewards'] and after['experiences'] == before['experiences']
     detail = client.get(f"/api/persons/{people['周瑜']['id']}").json()

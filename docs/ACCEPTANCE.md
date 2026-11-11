@@ -184,3 +184,11 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 `lw_user` 帳號：SQL 批次 `orig15-v2-20261111` 執行後，以該帳號經 API 逐位讀回，15 位人物都是第 2 版人物設定、9／9 欄，原有的備註保留，人物經歷 16 筆。之後以同帳號經 API 新增 4 筆多人參與的範例人物經歷與 6 筆範例關係（都回 201），並在 App 內瀏覽器確認人物頁的關係與經歷頁籤、紀錄頁的人物經歷（20 筆）、我的紀錄上方的人設卡片與人設頁都正確顯示。
 
 本機輔助檢查（SQLite，不算驗收）：`python -m pytest -q -p no:cacheprovider tests --ignore=tests/product/test_google_verifier.py --ignore=tests/product/test_staging_iap_config.py`，903 passed、7 failed、27 skipped、12 errors；失敗與錯誤清單和上一節逐項相同。上一節的命令漏寫了這兩個排除參數（本機缺 Google 驗證套件，這兩個檔案無法收集），已補上。
+
+## 2026-11-11 Unified Person 第三輪
+
+正式驗收（PostgreSQL）：Local 8030 → Cloud Run `lw-api-main` e2e 標籤（revision `lw-api-main-b8030-11111349`）→ Cloud SQL `life_world_e2e`，全部使用 `persons_ui_` 開頭的合成帳號。API：和第二輪相同的六個檔案，共 8 passed、1 skipped（略過的仍是關係來源的舊正向案例），455 個 HTTP 請求。Chrome：六個檔案，共 6 passed；其中 `browser_tests/test_self_persona_entry_ui.py` 依新流程重寫（導覽五項 → 人物首頁最上方的我的設定 → 建立 → 回人物首頁看到摘要 → 從帳號視窗再進去存成第 2 版並同意 → 紀錄的第一個頁籤是我的經歷、上面沒有我的設定 → 記下經歷時「關聯人物」與「整理這段故事的人物」只列真實人物 → 重新整理後仍在）。沒有重跑 AI 的雲端測試，也沒有執行舊的瀏覽器測試（原因同第二輪）。
+
+`lw_user` 帳號（在 App 內瀏覽器實際操作）：從人物首頁的「建立我的設定」填寫十二欄並保存成第 1 版；從右上角帳號視窗的「我的設定」可以進到同一頁；從「紀錄 → 我的經歷 → ＋ 新的經歷」記下一筆，經過核對頁確認保存，回到我的經歷看到這一筆，積分加 1、目標的每日閱讀變成 1／1。之後以同帳號經 API 新增 1 位範例真實人物與 2 筆範例經歷（都回 201）。沒有替這個帳號按「我同意」。
+
+本機輔助檢查（SQLite，不算驗收）：同第二輪的命令，906 passed、7 failed、27 skipped、12 errors；失敗與錯誤清單和第二輪逐項相同。

@@ -1,11 +1,11 @@
 """人物經歷 E2／E3 在 Cloud SQL 上的 API 驗收：Local 8030 → Cloud Run e2e → life_world_e2e（PostgreSQL 18.6）。
 
-只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的紀錄、人物經歷與關係）：
+只在明確開啟時執行（建立 persons_ui_ 開頭的合成帳號、人物、我的經歷、人物經歷與關係）：
 
     LW_E2E_PERSONS=1 .venv\\Scripts\\python.exe -m pytest -q tests/test_person_experiences_records_cloudsql_e2e.py
 
 驗收重點：紀錄頁的人物經歷總列表與人物頁是同一批資料；關係可以引用人物經歷（沿用 person_connection_experience_sources），
-原有的我的紀錄來源與順序不遺失；不相關或已封存的來源被拒絕；Revision 檢查；Owner 隔離；我的紀錄與積分不受影響。
+原有的我的經歷來源與順序不遺失；不相關或已封存的來源被拒絕；Revision 檢查；Owner 隔離；我的經歷與積分不受影響。
 """
 import os
 
@@ -27,7 +27,7 @@ def test_records_list_and_relation_sources_on_cloud_sql():
     zhou = create(c, '周瑜', 'rec-a', person_subtype='historical', description='東吳軍事統帥')
     sun = create(c, '孫策', 'rec-b', person_subtype='historical', description='江東之主')
     lu = create(c, '魯肅', 'rec-c', person_subtype='historical')
-    mine = record(c, zhou, 1)  # 一筆我的紀錄（與周瑜有關）
+    mine = record(c, zhou, 1)  # 一筆我的經歷（與周瑜有關）
     before = c.ok('GET', '/state')
     assert c.ok('GET', '/person-experiences') == {'items': [], 'total': 0, 'archived_total': 0}
 
@@ -45,7 +45,7 @@ def test_records_list_and_relation_sources_on_cloud_sql():
     assert [x['id'] for x in tab(c, sun)['person_experiences']['items']] == [both['id'], only_sun['id']]
     assert [x['id'] for x in c.ok('GET', '/person-experiences?archived=true')['items']] == [archived['id']]
 
-    # 可引用的來源：我的紀錄照舊；人物經歷只列未封存、且兩端至少一人是主體或參與人物的
+    # 可引用的來源：我的經歷照舊；人物經歷只列未封存、且兩端至少一人是主體或參與人物的
     eligible = c.ok('GET', f"/persons/{zhou['id']}/connection-sources?other_person_id={sun['id']}")
     assert [item['id'] for item in eligible['items']] == [mine] and eligible['total'] == 1
     offered = eligible['person_experiences']
@@ -73,14 +73,14 @@ def test_records_list_and_relation_sources_on_cloud_sql():
     code, stale = relation_patch(c, connection['id'], 'rec-rel-stale', 9, source_person_experience_ids=[both['id']])
     assert code == 409 and stale['error']['code'] == 'stale_revision', stale
     assert c.ok('GET', f"/connections/{connection['id']}")['source_person_experience_ids'] == [only_sun['id'], both['id']]
-    # 只改人物經歷來源：我的紀錄來源保留
+    # 只改人物經歷來源：我的經歷來源保留
     code, edited = relation_patch(c, connection['id'], 'rec-rel-2', 1, source_person_experience_ids=[both['id']])
     assert code == 200 and edited['source_experience_ids'] == [mine] and edited['source_person_experience_ids'] == [both['id']], edited
-    # 只改我的紀錄來源：人物經歷來源保留
+    # 只改我的經歷來源：人物經歷來源保留
     code, edited = relation_patch(c, connection['id'], 'rec-rel-3', 2, source_experience_ids=[])
     assert code == 200 and edited['source_experience_ids'] == [] and edited['source_person_experience_ids'] == [both['id']], edited
 
-    # 共同參與不自動建立關係；我的紀錄與積分不受影響
+    # 共同參與不自動建立關係；我的經歷與積分不受影響
     assert c.ok('GET', f"/persons/{lu['id']}")['connections'] == []
     after = c.ok('GET', '/state')
     assert after['rewards'] == before['rewards'] and after['experiences'] == before['experiences']

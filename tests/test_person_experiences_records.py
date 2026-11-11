@@ -3,10 +3,10 @@
 程式自帶的自動測試（開發時快速檢查）；完成依據是部署後在 Cloud SQL life_world_e2e 的實測。
 
 2026-11-11 產品裁決：
-- 紀錄頁有「我的紀錄／人物經歷／全部」；人物經歷從紀錄頁與人物頁進入都是同一筆資料、同一套 API。
-- 關係來源除了我的紀錄，也可以引用人物經歷：同帳號、未封存、關係兩端至少一人是主體或參與人物；
+- 紀錄頁有「我的經歷／人物經歷／全部」；人物經歷從紀錄頁與人物頁進入都是同一筆資料、同一套 API。
+- 關係來源除了我的經歷，也可以引用人物經歷：同帳號、未封存、關係兩端至少一人是主體或參與人物；
   沿用 person_connection_experience_sources，原有來源與順序不因新增來源類型而遺失。
-- 分類原則：我的紀錄＝使用者實際參與的生活紀錄；人物經歷＝以人物為主體（真實／歷史／虛構）；作品內容不在這裡。
+- 分類原則：我的經歷＝使用者實際參與的生活紀錄；人物經歷＝以人物為主體（真實／歷史／虛構）；作品內容不在這裡。
 """
 from fastapi.testclient import TestClient
 
@@ -49,7 +49,7 @@ def test_relation_can_cite_person_experiences_without_losing_record_sources(clie
     archived = create(client, zhou, request_id='r-4', title='已封存的經歷').json()
     assert patch(client, archived['id'], 'r-5', 1, status='archived').status_code == 200
 
-    # 可引用的來源：我的紀錄照舊；人物經歷只列未封存、且兩端至少一人是主體或參與人物的
+    # 可引用的來源：我的經歷照舊；人物經歷只列未封存、且兩端至少一人是主體或參與人物的
     eligible = sources(client, zhou, sun)
     assert [item['id'] for item in eligible['items']] == [record] and eligible['total'] == 1
     listed = eligible['person_experiences']
@@ -76,7 +76,7 @@ def test_relation_can_cite_person_experiences_without_losing_record_sources(clie
         rejected = client.patch(f"/api/connections/{connection['id']}", json={'request_id': 'rel-bad-' + code, 'expected_revision': 1,
                                                                                'source_person_experience_ids': [source_id]})
         assert rejected.status_code == 422 and rejected.json()['error']['code'] == code, rejected.text
-    # 只改人物經歷來源：我的紀錄來源保留
+    # 只改人物經歷來源：我的經歷來源保留
     edited = client.patch(f"/api/connections/{connection['id']}", json={'request_id': 'rel-2', 'expected_revision': 1,
                                                                          'source_person_experience_ids': [both['id']]})
     assert edited.status_code == 200, edited.text
