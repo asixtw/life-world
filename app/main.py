@@ -463,9 +463,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def person_connection_sources(person_id: str, request: Request, other_person_id: str = Query(..., min_length=1, max_length=128)):
         return service.connection_sources(current(request)['id'], person_id, other_person_id)
 
-    @app.put('/api/persons/{person_id}/profile', tags=['Persons'])  # 保存一版人物設定（只新增）
-    def save_unified_profile(person_id: str, request: Request, data: schemas.PersonProfileSave):
-        return service.save_unified_profile(current(request, True)['id'], person_id, data)
+    # 九項角色設定不在核准範圍：不註冊寫入入口，歷史版本讀取與資料保持相容。
 
     @app.get('/api/persons/{person_id}/experiences', tags=['Persons'])  # 人物頁「經歷」分頁：我的紀錄與人物經歷兩區
     def person_experience_lists(person_id: str, request: Request, archived: bool = False):

@@ -12,6 +12,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from conftest import confirm_payload, draft, onboard, register
+from legacy_profile_support import save_legacy_profile
 from app import persons as persons_module
 
 
@@ -28,7 +29,7 @@ def create(client, name, request_id, **body):
 
 
 def save(client, person_id, request_id, expected, **fields):
-    return client.put(f'/api/persons/{person_id}/profile', json={'request_id': request_id, 'expected_profile_id': expected, 'fields': fields})
+    return save_legacy_profile(client, person_id, {'request_id': request_id, 'expected_profile_id': expected, 'fields': fields})
 
 
 def legacy_note_titles(client, person_id):

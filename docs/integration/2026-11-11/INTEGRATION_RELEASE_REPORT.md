@@ -83,7 +83,7 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 - 新生日/任職候選對舊extra=forbid讀取器不完全可逆；舊Alpha/0eee0a3不能直接當無損回退。需相容reader、固定資料契約與演練，不以刪除候選回復。新workflow_existing_people的未保存本機格式亦需相容reader/匯出策略。詳[DraftReview](DRAFT_REVIEW_CONTRACT.md)。
 - 四維source_kind目前保存在DraftReview，fact_sources對外DTO尚未完整投影；不能把傳統evidence_type當來源管道。生日/任職有獨立來源欄位與撤回API，不等於Feature Store衍生失效已完成。
 - Feature Store目前為有限SQLite規則/讀取時重建，非真Gemini背景自動標籤；PG缺表。撤回來源篩選、提及不變互動、用途同意/版本傳播尚需審查，不開啟背景功能。Gold Labels不是模型成果或訓練完成。
-- 範圍稽核發現`PUT /api/persons/{id}/profile`仍註冊九項設定寫入；UI未開不能視為已隔離。需相容審查/隔離未核准入口，不刪歷史設定或承諾下一版。
+- 2026-11-12 QA：已移除未核准的`PUT /api/persons/{id}/profile`路由註冊，OpenAPI不公開，HTTP回404且不新增notes/requests。origin/main原無此入口；保留領域方法及既有歷史資料讀取，不涉及DB變更。原版本/封存/Owner隔離測試改為明確的領域相容性測試，不能當公開寫入功能已驗收。
 - GuestPurger維持Beta專用/安全失敗；新增010/011 FK未完成清除白名單審查，不開Alpha刪除排程。既有正式資料不刪。
 - Alpha仍舊Runtime/額度；新AI有限配置、本人用量隔離/可撤回同意未發布。費用、歷史未知預留及停止程序見[AI政策](ai/AI_BUDGET_POLICY.md)，不將預留當帳單。
 - Cloud基線lw-public為camera-8f377fa／既有Digest，未更動；main Trigger核准保護屬先前唯讀證據，Gate D前須重新核對所有自動發布入口，不能拿舊讀回保證新Merge安全。
@@ -95,3 +95,9 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 後續限QA、驗收阻擋Bug/權限/一致性/必要相容性。Jerry未核准功能不變成下一版承諾。v1.1擬真資料與Hidden標籤只做資料契約/工程缺口盤點，不啟用背景AI或匯入正式資料。
 
 資料契約／Hidden AI盤點已收於[v1.1稽核](../2026-11-12_DATA_CONTRACT_AUDIT/README.md)：010/011欄位與FK比對無差異，但模板未完成、S07獎勵預期衝突及背景來源/授權/版本缺口未解除。Gold與實際AI明確分離；本輪無正式匯入或模型呼叫。
+
+## 6. 未核准角色設定入口隔離（QA）
+
+新增2項紅燈測試先證實原入口回200／仍在OpenAPI，移除註冊後通過。本人`/api/profile`與基本人物編輯保留。完整本機SQLite／Node套件 **766 PASS、85 SKIP**（31.73秒）；85項專用PostgreSQL環境測試未在此命令執行，不能宣稱PG全綠。此修改未重跑瀏覽器或GCP，均NOT RUN；前述人物閉環PG證據屬前一功能版本。命令同第2節完整套件，收據[ROLE_PROFILE_BOUNDARY_TESTS.log](ROLE_PROFILE_BOUNDARY_TESTS.log)。
+
+僅關閉新整合帶入的未核准HTTP寫入入口；歷史notes、requests、GET資料、DTO與領域相容方法皆保留。回復應用程式提交會重新開放入口，故不將回復此提交作為核准發布策略。維持Draft／NO-GO。

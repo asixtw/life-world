@@ -113,3 +113,7 @@ python scripts/audit_synthetic_handoff.py '<Owner提供的v1.1 ZIP路徑>' --loc
 建議順序限已核准核心：先裁決第3節/補齊資料與映射 → 既有Gate B來源/授權/版本/回退審查及阻擋Bug修正 → 經獨立批准的隔離PG/受控E2E重播 → 真模型固定版本/費用收據與Gold獨立比較 → 人工Review/發布Gate。**不啟動新產品功能開發或把Jerry功能排進下一版。**
 
 Owner需決定：資料容器/時間粒度/貢獻/提及映射；S07來源路由與獎勵預期；標籤字典、背景授權/採納政策與品質門檻。現階段不需重跑Studio SQL，不要求API Key，不執行任何正式匯入/設定。UX審查、Code Review、E2E Migration及Merge/Alpha發布仍各自獨立批准，整體維持**Draft／NO-GO**。
+
+### 後續 QA 修正
+
+已在整合分支關閉前述九項設定PUT入口（main原無此路由），保留歷史資料與讀取。詳細紅綠燈及完整本機測試見[發布報告](../2026-11-11/INTEGRATION_RELEASE_REPORT.md#6-未核准角色設定入口隔離qa)。原始稽核發現保留，非宣稱已發布Alpha。

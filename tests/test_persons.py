@@ -13,6 +13,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from conftest import confirm_payload, draft, onboard, register
+from legacy_profile_support import save_legacy_profile
 from app import persons as persons_module
 from app import relation_sources
 from app.config import DemoPolicy
@@ -147,7 +148,7 @@ def test_edit_checks_revision_and_only_changes_sent_fields(client):
 
 
 def save_profile(client, person_id, request_id, expected, **fields):
-    return client.put(f'/api/persons/{person_id}/profile', json={'request_id': request_id, 'expected_profile_id': expected, 'fields': fields})
+    return save_legacy_profile(client, person_id, {'request_id': request_id, 'expected_profile_id': expected, 'fields': fields})
 
 
 def test_profile_save_read_back_versioning_and_stale(client):
@@ -171,7 +172,7 @@ def test_profile_save_read_back_versioning_and_stale(client):
         rows = c.execute("SELECT kind,title FROM notes WHERE person_id=?", (a['id'],)).fetchall()
     assert [tuple(r) for r in rows] == [('preparation', persons_module.PROFILE_TITLE)] * 2  # 只新增，舊版保留
     assert save_profile(client, a['id'], 'pf-4', second.json()['id'], personality='x' * 2001).status_code == 422
-    assert client.put(f"/api/persons/{a['id']}/profile", json={'request_id': 'pf-5', 'expected_profile_id': second.json()['id'],
+    assert save_legacy_profile(client, a['id'], {'request_id': 'pf-5', 'expected_profile_id': second.json()['id'],
                                                                'fields': {'unknown_field': 'x'}}).status_code == 422
 
 
