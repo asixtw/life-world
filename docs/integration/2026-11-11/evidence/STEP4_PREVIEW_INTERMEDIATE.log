@@ -1,0 +1,11 @@
+.........................F                                               [100%]
+=================================== FAILURES ===================================
+_ test_person_review_is_unique_and_resets_only_after_relationship_change[True] _
+browser_tests/test_integration_person_details.py:308: in test_person_review_is_unique_and_resets_only_after_relationship_change
+    assert checkbox.is_checked()==(not change_role)
+E   AssertionError: assert True == not True
+E    +  where True = is_checked()
+E    +    where is_checked = <Locator frame=<Frame name= url='http://127.0.0.1:8190/#review/64b55b69-cc5d-4e7f-a8ce-b9eb22b1a1b0'> selector='#story-reviewed'>.is_checked
+=========================== short test summary info ============================
+FAILED browser_tests/test_integration_person_details.py::test_person_review_is_unique_and_resets_only_after_relationship_change[True]
+1 failed, 25 passed in 16.52s

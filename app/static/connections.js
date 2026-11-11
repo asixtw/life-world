@@ -144,12 +144,22 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
   function remember(route, y) { // 保存探索位置與核對修改，避免返回時重設
     ensureOwner(); // 先清除跨帳號暫存
     if(route.startsWith('people')) { positions.set(route,{y,open:[...document.querySelectorAll('#connections-explorer details[open]')].map(n=>n.dataset.keep)}); if(new URLSearchParams(route.split('?')[1]||'').get('view')==='cards') lastCollection=route; else lastExplore=route; } // 兩種入口分別保留條件
-    if(route.startsWith('review/') && c.state.draft?.id && !discardedReviews.has(c.state.draft.id) && document.querySelector('#review-form')) { const form=document.querySelector('#review-form'); reviewEdits.set(c.state.draft.id,{values:entries(form),story:collectEditor(form,false),dirty:c.state.dirty||reviewEdits.get(c.state.draft.id)?.dirty||false}); } // 返回原文不代表摘要已正式保存
+    if(route.startsWith('review/') && c.state.draft?.id && !discardedReviews.has(c.state.draft.id) && document.querySelector('#review-form')) { const form=document.querySelector('#review-form'); reviewEdits.set(c.state.draft.id,{revision:c.state.draft.revision,values:entries(form),story:collectEditor(form,false),dirty:c.state.dirty||reviewEdits.get(c.state.draft.id)?.dirty||false}); } // 返回原文不代表摘要已正式保存
   } // 完成路由暫存
   function restore(route) { // 恢復展開與核對內容，不將暫存冒充伺服器保存
     const saved=positions.get(route); if(saved) { document.querySelectorAll('#connections-explorer details').forEach(n=>n.open=saved.open.includes(n.dataset.keep)); window.scrollTo(0,saved.y); } // 回到相同探索閱讀位置
     const edit=route.startsWith('review/')?reviewEdits.get(c.state.draft?.id):null, form=document.querySelector('#review-form'); // 只還原同一草稿
-    if(edit && form) { if(edit.story) { const root=form.querySelector('[data-story-editor]'); root.outerHTML=editor(edit.story,'review'); } for(const [name,value] of edit.values) { const nodes=[...form.elements].filter(n=>n.name===name); for(const n of nodes) { if(n.type==='checkbox') n.checked=edit.values.some(([key,v])=>key===name&&v===n.value); else if(n.type!=='file'&&!name.startsWith('mention_')) n.value=value; } } c.state.dirty=edit.dirty; } // 還原明確輸入，不把載入當成修改
+    if(edit && form) {
+      const sameRevision=edit.revision===c.state.draft?.revision;
+      // 返回原文已產生新版時，以伺服器新角色/活動量為準，舊快取不得覆蓋使用者剛改的內容。
+      if(sameRevision&&edit.story){const root=form.querySelector('[data-story-editor]');if(root)root.outerHTML=editor(edit.story,'review');}
+      const values=sameRevision?edit.values:edit.values.filter(([name])=>['summary','tasks','story_reviewed','story_interaction_type','interaction_type','interaction_event_id'].includes(name));
+      for(const [name,value] of values){
+        const nodes=[...form.elements].filter(n=>n.name===name);
+        for(const n of nodes){if(n.type==='checkbox')n.checked=values.some(([key,v])=>key===name&&v===n.value);else if(n.type!=='file'&&!name.startsWith('mention_'))n.value=value;}
+      }
+      c.state.dirty=edit.dirty;
+    } // 還原明確輸入，不把載入當成修改
     hydrateEditors(); // 完成精確來源位置選項
     if(form && route.startsWith('review/')) discardedReviews.delete(c.state.draft?.id); // 重新開始核對後可再追蹤新的修改
   } // 完成返回恢復

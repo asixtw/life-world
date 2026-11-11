@@ -188,7 +188,7 @@ function recordView() { // 產生原始經歷表單並帶入人物與目標上�
 } // 結束目前回呼、區塊或模組定義
 function reviewView(d) { // 產生人工核對頁，分開保存經歷與勾選人物更新
   const goal = state.world.goals.find(g => g.id === d.goal_id); // 讀取目前選定目標及其行動資料
-  return `<div class="narrow">${heading('04｜檢視並確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><h3>原始記錄</h3><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(ExperienceUI.summaryState(d).value)}</textarea></div>${ExperienceUI.summaryReview(d)}${state.me.status==='registered'?button('suggest',state.capabilities?.ai_available?'使用 AI 整理本篇原文':'用原文建立整理候選','secondary'):''}<p class="small muted">${state.me.status!=='registered'?'訪客請手動核對摘要；登入後才可使用 AI 整理。':state.capabilities?.ai_available?'會將本篇原文傳給已設定模型；回應仍需你編輯並確認。':'目前使用手動原文整理，尚未連接外部 AI。'}</p><div id="candidate-panel"></div><div id="ai-people-panel"></div>${experiencePersonField(d.person_id)}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div>${contributionFields(goal, d.contributions)}<div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時"></textarea></div><div class="callout">${goal ? '關聯目標：' + esc(goal.title) + '。' : ''}貢獻與積分將由伺服器一次保存。相同提交重試不會重複入帳。開發設定：每筆確認經歷 ${state.world.policy.points_per_experience} 分。</div><div class="button-row"><button class="primary">我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
+  return `<div class="narrow">${heading('04｜檢視並確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><details data-review-raw><summary>查看原始經歷與來源</summary><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div></details><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(ExperienceUI.summaryState(d).value)}</textarea></div>${ExperienceUI.summaryReview(d)}${state.me.status==='registered'?button('suggest',state.capabilities?.ai_available?'使用 AI 整理本篇原文':'用原文建立整理候選','secondary'):''}<p class="small muted">${state.me.status!=='registered'?'訪客請手動核對摘要；登入後才可使用 AI 整理。':state.capabilities?.ai_available?'會將本篇原文傳給已設定模型；回應仍需你編輯並確認。':'目前使用手動原文整理，尚未連接外部 AI。'}</p><div id="candidate-panel"></div><div id="ai-people-panel"></div><div id="experience-review-overview"></div><div id="experience-review-people-acceptance"></div><details data-review-people-editor><summary>修改本次人物關聯</summary>${experiencePersonField(d.person_id)}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div></details><details data-review-quantities><summary>修改活動量</summary>${contributionFields(goal, d.contributions)}</details><details data-review-tasks><summary>新增或修改後續任務（選填）</summary><div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時"></textarea></div></details><div class="callout">只有最後確認才正式保存與計分。這次依目前規則可獲得 ${state.world.policy.points_per_experience} 積分；失敗後重試不重複計分。</div><div class="button-row"><button class="primary">我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function historyView() { // 列出已確認經歷與可接續草稿
   const w = state.world, filter = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 讀取目前帳號的世界資料
@@ -255,7 +255,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
     $('#app').innerHTML = html;
     BirthUI.mount(); // 只為孵化頁綁定互動，不改寫伺服器的目標狀態。
     if(state.guestSaveNoticePending){guestSaveNotice();state.guestSaveNoticePending=false;}
-    ExperienceUI.mount(); ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);
+    ExperienceUI.mount(); ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);ExperienceUI.refreshReviewSummary();
     const section=params.get('section');if(['gd-today','gd-week','gd-records'].includes(section)){document.getElementById(section)?.focus();document.getElementById(section)?.scrollIntoView({block:'start'});}
     if (state.me && path==='history') await MediaUI.renderDrafts(state.me.owner_id);
     if (state.me && $('#media-panel')) {
@@ -625,7 +625,7 @@ async function start() { // 讀取既有身分後啟動畫面
   await DraftsUI.retryLocalCleanup();
   await render(); // 執行「讀取既有身分後啟動畫面」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
-ExperienceUI.initialize({state,toast,personControls:story=>experiencePersonField()+ConnectionsUI.editor(story,'record')});
+ExperienceUI.initialize({state,toast,esc,personControls:story=>experiencePersonField()+ConnectionsUI.editor(story,'record')});
 MediaUI.initialize({state,api,esc,toast,contributionFields,requestLogin:()=>{toast('登入後可使用辨識；原素材與手動文字會保留。');accountView('claim');}});
 PeopleUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm});
 PersonsUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId:()=>newId(),refresh,render,navigate});

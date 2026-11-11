@@ -704,3 +704,22 @@ footer{
 @media(max-width:680px){
   body.experience-focus .sidebar{display:none;}
 }
+
+/* 第四步只讀預覽：固定標題/完成操作，中間內容獨立捲動；不重建正式確認表單。 */
+.experience-person-preview{width:100%;text-align:left;display:grid;gap:8px;}
+#experience-person-preview{padding:0;width:min(640px,calc(100% - 32px));max-height:90dvh;overflow:hidden;}
+.experience-preview-shell{display:flex;flex-direction:column;max-height:90dvh;}
+.experience-preview-head,.experience-preview-footer{flex:none;padding:18px 24px;}
+.experience-preview-head{display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.experience-preview-head h2{margin:0;overflow-wrap:anywhere;}
+.experience-preview-body{overflow:auto;min-height:0;padding:0 24px 24px;overscroll-behavior:contain;overflow-wrap:anywhere;}
+.experience-preview-footer{border-top:1px solid var(--line);padding-bottom:max(18px,env(safe-area-inset-bottom));}
+@media(max-width:680px){
+ #experience-person-preview{inset:auto 0 0;margin:0;width:100%;max-width:100%;border-radius:24px 24px 0 0;}
+}
+
+.experience-person-preview{min-width:0;overflow-wrap:anywhere;}
+.experience-preview-body .raw-source{max-height:none;overflow:visible;}
+
+.experience-person-preview{padding:18px;}
+.experience-person-preview .tag{justify-self:start;}

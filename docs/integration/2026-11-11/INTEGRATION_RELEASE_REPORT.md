@@ -1,14 +1,14 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準fac5900；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準6ae0322；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
 | 完整本機API及Node suite | **732 PASS、62 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
-| 人物/草稿/摘要/本機多人快照/手機專注Chromium | **18 PASS**；evidence/WORKFLOW_BROWSER.log |
-| 最窄320px及100人容量 | 已含在上述18項同次執行；額外WORKFLOW_320_BROWSER.log保留早期單項收據 |
+| 工作流/預覽及本人AI用量Chromium（同次） | **30 PASS**（27工作流/預覽＋3用量畫面）；evidence/WORKFLOW_BROWSER.log |
+| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述30項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
 | Google世界交換Chromium | **8 PASS**；evidence/GOOGLE_TRANSITION_BROWSER.log，明示GIS替身，非真Google |
 | 受限本機PG18人物/草稿/AI | **28 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
 | AI專項 | evidence/AI_POLICY_SQLITE.log：36 PASS/7 PG SKIP；AI_POLICY_PG18.log：另行7 PASS |
@@ -49,9 +49,31 @@ Alpha仍是舊Runtime，非敏感現況/候選設定及停止程序見[AI_BUDGET
 
 ## 未完成／發布Gate
 
-1. **完整PR24 Candidate A1/A2四步尚未完成**：逐人收合補充、人工核對候選、第四步摘要式可點擊差異/來源Bottom Sheet仍待串接；當前第三步還含舊fieldset，第四步仍有舊核對表單。新增卡片不是最終UX驗收，不能以這組截圖取代Owner審查。
+1. **完整PR24 Candidate A1/A2四步尚未完成**：逐人收合補充、人工核對候選及基本資料原值→新值差異仍待串接；第四步只讀關聯/待建姓名/來源Bottom Sheet已接上，不能當成完整人物補充完成；當前第三步還含舊fieldset，第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
 2. 伺服器草稿尚未保存完整補充候選/手動摘要的跨Session狀態；同名人物核對的跨伺服器草稿恢復需補齊契約，避免重複詢問。未支援欄位不開放白填，不將公司/生日塞進tags/notes。
 3. Feature Store PG兩表未建立；衍生失效/長期記憶與人物基本資料AI上下文尚未完成。來源撤回API不代表Feature Store已驗收。不啟用額外AI。
 4. GuestPurger需依真實FK及011新增表審查，維持fail-closed；未啟用正式刪除排程。
 5. 正式011/最小權限、完整Sequence補驗、GCP E2E、備份Restore/Rollback演練、真Google聯合驗收、固定Release SHA/Digest/Revision仍待完成。
 6. UX Owner核准、Code Review、明確Main Merge及Alpha發布授權均未取得。**保持Draft／NO-GO**，不藉測試PASS跨Gate。
+
+
+## 本輪第四步摘要與只讀預覽
+
+- 原文及原有媒體功能收合於來源區，活動量/人物修改/後續任務預設收合；預覽與實際Confirm共用當前表單值，不另建測試頁或模擬資料模型。
+- 人物卡只顯示名稱、既有/待建/待配對狀態與角色，依person_id/client_ref逐人解析，不把資訊套到第一人。只有本次真正提交的資料才列保存範圍，沒有猜測公司/職稱/生日。當前關聯預覽不是完整人物補充差異預覽。
+- Native Dialog手機Bottom Sheet固定標題/完成操作、body獨立捲動；原文不另套第二層小捲軸。320/390/1440長原文及24px大字實測，關閉/Escape後焦點回原卡片。開關預覽無寫入請求、業務state前後相同。
+- 回歸發現舊review快取會在新草稿版本覆蓋角色/活動量，已依revision保留人工摘要等輸入、以新版草稿角色/數量為準。核對入口去重；角色/原文改變才失效，僅返回查看保留已核對。新活動量0.75真實Confirm讀回0.75，獎勵僅一筆。
+- [390px第四步](screenshots/390-step4-summary.png)、[320px預覽](screenshots/320-step4-person-preview.png)、[1440px預覽](screenshots/1440-step4-person-preview.png)。皆為合成資料，本輪未Deploy、未執行真Google/AI。
+
+### 本輪命令與環境
+
+Python使用/private/tmp/lw-integration-venv，Node使用已驗SHA的/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node。伺服器為隔離SQLite、固定合成時鐘；PG命令只接受已驗證本機marker。下列指令不代表GCP套用授權：
+
+```sh
+LIFEWORLD_NODE=/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node python -m pytest tests -q --tb=short
+LIFEWORLD_TEST_URL=http://127.0.0.1:8190 python -m pytest browser_tests/test_integration_person_details.py browser_tests/test_ai_usage_personal.py -q --tb=short
+GOOGLE_TRANSITION_TEST_URL=http://127.0.0.1:8188 python -m pytest browser_tests/test_google_world_transition.py -q --tb=short
+LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json python -m pytest tests/test_pg_integration_person_details.py tests/ai/test_pg_ai_usage.py -q --tb=short
+```
+
+未完成範圍仍含：完整多人補充候選的跨Session草稿保存、基本資料/事實原值與新值差異、逐項來源/版本確認、AI手動/選用與首次授權的完整Candidate串接。設計/Review/正式Migration/GCP E2E/Merge/Alpha Gate維持未通過。
