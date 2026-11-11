@@ -1,3 +1,5 @@
+[人物補充互動延伸：差異、契約缺口與 Gate B 提案](PERSON_SUPPLEMENT_REVIEW.md)
+
 [R2 最後補修：第三步升級狀態及新截圖](UPGRADE_STATE_FIX.md)
 
 # Life World 經歷 UX v0.3 Candidate R2

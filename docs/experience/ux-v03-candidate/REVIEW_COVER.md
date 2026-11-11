@@ -1,3 +1,5 @@
+[2026-11-11 人物補充延伸 Candidate：契約差異與 Gate B 待辦](PERSON_SUPPLEMENT_REVIEW.md)。整體 UX 尚未核准，不以設計補充解鎖工程 Gate。
+
 # Owner 設計審核封面｜UX v0.3 Candidate R2
 
 - 整體狀態：**Changes Requested／NOT APPROVED**。本次五項修改方向已同意，尚未收到「UX v0.3 核准」。

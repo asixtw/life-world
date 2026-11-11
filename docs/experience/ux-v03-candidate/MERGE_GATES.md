@@ -1,3 +1,5 @@
+[2026-11-11 人物補充延伸 Candidate：契約差異與 Gate B 待辦](PERSON_SUPPLEMENT_REVIEW.md)。整體 UX 尚未核准，不以設計補充解鎖工程 Gate。
+
 # PR #24 合併前關卡（全部仍需驗收）
 
 **Owner 決定：Changes Requested。UX v0.3 Candidate R2，NOT APPROVED。五項修正方向已同意，不代表整體 UX 核准。**

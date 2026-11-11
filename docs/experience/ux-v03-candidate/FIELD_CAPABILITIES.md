@@ -1,3 +1,5 @@
+[2026-11-11 人物補充延伸 Candidate：契約差異與 Gate B 待辦](PERSON_SUPPLEMENT_REVIEW.md)。整體 UX 尚未核准，不以設計補充解鎖工程 Gate。
+
 # 人物與草稿能力核對：設計缺口，不是新資料模型核准
 
 基準：PR24 `7013894`；本輪只讀 Repo、既有 Alpha 初始化 SQL 與歷史收據。**未連正式 DB 做即時欄位查詢**，不能以這份文件冒稱當前 Cloud SQL schema 驗收。

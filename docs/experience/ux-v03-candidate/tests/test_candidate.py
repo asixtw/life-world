@@ -114,7 +114,7 @@ def test_multi_mentions_and_unsupported_fields(page):
         expect(page.locator('#sheet-title')).to_contain_text(name)
         page.get_by_role('button',name='關閉預覽',exact=True).click()
     scene(page,'newPreview')
-    expect(page.locator('#sheet')).to_contain_text('目前沒有正式保存契約')
+    expect(page.locator('#sheet')).to_contain_text('尚未支援正式寫入')
     assert page.locator('[data-change]').count()==0
     scene(page,'mention')
     page.locator('[data-action=mention-source]').click()
