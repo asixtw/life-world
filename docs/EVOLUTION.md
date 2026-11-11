@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-11 PR26整合候選（未部署）
+
+延續多人交易、AI可配置有限預算與本人用量隔離，加入DraftReview摘要/任務及逐人四維候選保存契約；跨Session、Owner隔離、來源失效與回滾已在本機SQLite/PG18驗證。核對頁可保存後重新整理讀回，來源未核對不因保存而解除。完整人物補充UI、UX核准、正式Schema/發布Gate未完成。完整結果與限制見[整合報告](integration/2026-11-11/INTEGRATION_RELEASE_REPORT.md)，不將本機PASS視為Alpha已套用。
+
 ## 2026-11-07 GCP-144 三階段孵化候選
 
 加入三次明確輸入、防連點及reduced-motion的前端孵化呈現，沿用既有CSS Lumi；25筆候選PNG inventory保留來源與alpha/SHA。4項隔離Chromium測試通過；未部署，未替換正式角色。詳見[美術接入候選](art/README.md)。

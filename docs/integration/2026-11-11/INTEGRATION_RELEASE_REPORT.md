@@ -1,16 +1,16 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準6ae0322；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準7cedccf；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
-| 完整本機API及Node suite | **732 PASS、62 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
-| 工作流/預覽及本人AI用量Chromium（同次） | **30 PASS**（27工作流/預覽＋3用量畫面）；evidence/WORKFLOW_BROWSER.log |
-| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述30項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
+| 完整本機API及Node suite | **740 PASS、70 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
+| 工作流/預覽及本人AI用量Chromium（同次） | **35 PASS**（27工作流/預覽＋5核對草稿＋3用量畫面）；evidence/WORKFLOW_BROWSER.log |
+| 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述35項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
 | Google世界交換Chromium | **8 PASS**；evidence/GOOGLE_TRANSITION_BROWSER.log，明示GIS替身，非真Google |
-| 受限本機PG18人物/草稿/AI | **28 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
+| 受限本機PG18人物/草稿/AI | **36 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
 | AI專項 | evidence/AI_POLICY_SQLITE.log：36 PASS/7 PG SKIP；AI_POLICY_PG18.log：另行7 PASS |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
 | 真Google、新GCP整合Revision、真AI/媒體Provider、Safari | **NOT RUN（本輪）** |
@@ -24,7 +24,7 @@
 - 第三步可在原待建人物介面新增第二位以上、逐人更改稱呼/角色、選精確提及位置、移除候選。確認前沒有新人物；提及不計直接互動。320/390/1440實測。仍非完整Candidate A1/A2人物補充介面。
 - 未完成角色可保留為Owner隔離的本機草稿，包含穩定client_ref及「是否關聯人物」選擇；離開後新分頁恢復不自動改related，不先建正式人物。沿用既有IndexedDB，不另存伺服器媒體或改帳號交易。
 - 同Owner Google升級只局部解鎖人物區，保留原表單DOM、步驟、原文、數量與不關聯人物選擇；取消/拒絕交換不改訪客資料。真Google聯合驗收仍未執行。
-- 第四步返回修改原文時回Step1。保留同Owner同草稿的手動摘要；原文改動後出現明確重核對勾選，確認前不能略過。未改原文不重置；重新核對後只返回查看不重複索取。另一份草稿不沿用摘要。此為活躍流程狀態，尚未新增伺服器草稿摘要契約，不能承諾跨Session恢復未保存摘要。
+- 第四步返回修改原文時回Step1。保留同Owner同草稿的手動摘要；原文改動後出現明確重核對勾選，確認前不能略過。未改原文不重置；重新核對後只返回查看不重複索取。另一份草稿不沿用摘要。另已新增可選DraftReview JSON契約及「保存核對草稿並離開」，已保存摘要/任務可重新整理讀回；未保存的變更仍不承諾跨Session恢復。
 - 手機四步暫時隱藏全域底部導覽，提供明確「離開記錄」，沿用未保存保護；離開恢復導覽，伺服器草稿保留。320/390實測。沒有自行標記UX Approved。
 - 草稿DELETE API與局部UI，成功收據後只清精確Owner/draft本機素材。缺DELETE權限會503且關聯資料完整回滾；同request可安全重試。
 - 人物詳情生日/任職讀寫、版本歷史、來源撤回與二次確認；保留原值/quote/confirmed_at，append-only撤回歷史。不是刪除原經歷，也不改獎勵。
@@ -50,7 +50,7 @@ Alpha仍是舊Runtime，非敏感現況/候選設定及停止程序見[AI_BUDGET
 ## 未完成／發布Gate
 
 1. **完整PR24 Candidate A1/A2四步尚未完成**：逐人收合補充、人工核對候選及基本資料原值→新值差異仍待串接；第四步只讀關聯/待建姓名/來源Bottom Sheet已接上，不能當成完整人物補充完成；當前第三步還含舊fieldset，第四步修改區仍保留舊編輯器，但預設畫面已收合為摘要。不能以這組工程截圖取代Owner審查。
-2. 伺服器草稿尚未保存完整補充候選/手動摘要的跨Session狀態；同名人物核對的跨伺服器草稿恢復需補齊契約，避免重複詢問。未支援欄位不開放白填，不將公司/生日塞進tags/notes。
+2. DraftReview已可保存摘要/任務/四維事實候選及逐人target；SQLite/PG重新登入讀回與同名人物分流已驗證。完整逐人補充UI、生日/任職候選草稿及同名核對狀態尚未接齊。舊預覽遇到已保存人物候選明確阻擋正式確認，仍可保存草稿；不得誤稱完整人物補充已可用。未支援欄位不開放白填。
 3. Feature Store PG兩表未建立；衍生失效/長期記憶與人物基本資料AI上下文尚未完成。來源撤回API不代表Feature Store已驗收。不啟用額外AI。
 4. GuestPurger需依真實FK及011新增表審查，維持fail-closed；未啟用正式刪除排程。
 5. 正式011/最小權限、完整Sequence補驗、GCP E2E、備份Restore/Rollback演練、真Google聯合驗收、固定Release SHA/Digest/Revision仍待完成。
@@ -70,10 +70,18 @@ Alpha仍是舊Runtime，非敏感現況/候選設定及停止程序見[AI_BUDGET
 Python使用/private/tmp/lw-integration-venv，Node使用已驗SHA的/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node。伺服器為隔離SQLite、固定合成時鐘；PG命令只接受已驗證本機marker。下列指令不代表GCP套用授權：
 
 ```sh
-LIFEWORLD_NODE=/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node python -m pytest tests -q --tb=short
-LIFEWORLD_TEST_URL=http://127.0.0.1:8190 python -m pytest browser_tests/test_integration_person_details.py browser_tests/test_ai_usage_personal.py -q --tb=short
+PATH=/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin:$PATH LIFEWORLD_NODE=/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node python -m pytest tests -q --tb=short
+LIFEWORLD_TEST_URL=http://127.0.0.1:8191 python -m pytest browser_tests/test_draft_review.py browser_tests/test_integration_person_details.py browser_tests/test_ai_usage_personal.py -q --tb=short
 GOOGLE_TRANSITION_TEST_URL=http://127.0.0.1:8188 python -m pytest browser_tests/test_google_world_transition.py -q --tb=short
 LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json python -m pytest tests/test_pg_integration_person_details.py tests/ai/test_pg_ai_usage.py -q --tb=short
 ```
 
-未完成範圍仍含：完整多人補充候選的跨Session草稿保存、基本資料/事實原值與新值差異、逐項來源/版本確認、AI手動/選用與首次授權的完整Candidate串接。設計/Review/正式Migration/GCP E2E/Merge/Alpha Gate維持未通過。
+未完成範圍仍含：完整多人補充UI與基本資料候選草稿、基本資料/事實原值與新值差異、逐項來源/版本確認、AI手動/選用與首次授權的完整Candidate串接。設計/Review/正式Migration/GCP E2E/Merge/Alpha Gate維持未通過。
+
+
+## 本輪核對草稿契約
+
+- 詳見[DRAFT_REVIEW_CONTRACT](DRAFT_REVIEW_CONTRACT.md)。沿用draft_stories既有JSON，沒有新建DB表或改正式資料；draft.review與story分開，最後Confirm才將明確選用的四維候選轉為targeted updates。
+- 8項SQLite新案例及同契約PG案例，驗證摘要/任務保存、原文改動重核對、手動來源保留、雙Owner隔離、重新登入讀回、同名雙人不合併、無效證據不猜預設、晚期版本衝突全交易回滾與重送。
+- Chromium在320/390/1440實際保存核對草稿→重新整理→正式確認；503保存失敗保留輸入，來源重核對後保存讀回；缺來源hash的摘要只保存不會被誤視為已核對。紅燈曾重現保存摘要讀回卻顯示原文，已修復。新畫面[screenshots/390-saved-review-roundtrip.png](screenshots/390-saved-review-roundtrip.png)。不代表Owner UX核准。
+- **Rollback風險**：新的experience_draft_v2 JSON須使用支援此格式的reader；不能假定直接退回不支援格式的舊應用可無損讀取。正式部署前須完成reader相容發布/回復驗證。當前沒有在Alpha寫入此格式。

@@ -21,6 +21,7 @@ from .person_experiences import PersonExperiencesMixin
 from . import relation_sources
 from .person_details import PersonDetailsMixin
 from .confirm_targets import ConfirmTargetsMixin
+from .draft_review import DraftReviewMixin,source_hash
 from .people import PeopleMixin  # 載入人物來源與互動事件服務擴充
 from .connections import ConnectionsMixin  # 載入逐經歷人物角色與故事探索服務
 from .goals import GoalsMixin  # 載入單一挑戰、日期安排與人工回顧。
@@ -34,7 +35,7 @@ def encoded(value):  # 以穩定鍵序序列化 JSON，供指紋與資料保存�
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))  # 回傳以穩定鍵序序列化 JSON，供指紋與資料保存使用的結果
 
 
-class LifeWorld(PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, ConfirmTargetsMixin, GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用既有交易與帳本。
+class LifeWorld(DraftReviewMixin, PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, ConfirmTargetsMixin, GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用既有交易與帳本。
     def __init__(self, db, policy, clock=None, assistant=None):  # 注入資料庫、設定、時鐘與整理提供者
         self.relation_source_store = relation_sources.default_store(getattr(db, 'backend', 'sqlite'))
         self.db = db  # 保存「self.db」供後續驗證或回傳使用
@@ -205,7 +206,7 @@ class LifeWorld(PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, Confir
             c.execute("INSERT INTO drafts VALUES (?,?,?,?,?,?,?,'draft',1,?,?)",
                       (draft_id, owner, data.goal_id, data.person_id, data.raw_text,
                        data.occurred_at.astimezone(timezone.utc).isoformat(), encoded([v.model_dump() for v in data.contributions]), now, now))  # 新增經歷草稿；值以參數傳入
-            self._store_draft_story(c, owner, draft_id, data.raw_text, data.story)  # 同交易保存未確認的人物整理
+            self._store_draft_content(c, owner, draft_id, data.raw_text, data.story, data.review)  # 同交易保存角色及核對草稿。
             result=self._draft(c,owner,draft_id)
             if data.request_id:self._remember(c,owner,'create_draft',data.request_id,fingerprint,result)
             return result  # 回傳保存尚未確認、不計分的原始經歷草稿的結果
@@ -214,7 +215,11 @@ class LifeWorld(PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, Confir
         result = dict(self._owned(c, 'drafts', draft_id, owner))  # 準備本次操作的回傳資料
         result['contributions'] = json.loads(result['contributions'])  # 保存「result['contributions']」供後續驗證或回傳使用
         story = c.execute('SELECT payload FROM draft_stories WHERE draft_id=?', (draft_id,)).fetchone()  # 回讀未確認的多人整理
-        result['story'] = json.loads(story[0]) if story else None  # 舊草稿仍可正常讀取
+        payload=json.loads(story[0]) if story else None
+        envelope=isinstance(payload,dict) and payload.get('_format')=='experience_draft_v2'
+        result['story']=payload.get('story') if envelope else payload
+        result['review']=payload.get('review') if envelope else None
+        result['raw_sha256']=source_hash(result['raw_text'])  # 來源重核對只綁定本Owner原文，不是新的事實。
         return result  # 回傳讀取有權限的草稿並還原貢獻清單的結果
 
     def draft(self, owner, draft_id):  # 讀取原始草稿與人工貢獻設定
@@ -230,10 +235,10 @@ class LifeWorld(PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, Confir
             require(draft['status'] == 'draft', 409, 'already_confirmed', '已確認的原始紀錄不可用草稿方式修改。')  # 驗證限制：已確認的原始紀錄不可用草稿方式修改。
             require(draft['revision'] == data.expected_revision, 409, 'revision_conflict', '草稿已有新版，請重新載入。')  # 驗證限制：草稿已有新版，請重新載入。
             self._related(c, user, data.goal_id, data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
-            if 'story' in data.model_fields_set: self._store_draft_story(c, owner, draft_id, data.raw_text, data.story)  # 明確送出時才取代角色整理
-            elif draft['story'] is not None:  # 舊客戶端編輯原文時仍需保護來源位置
-                from .schemas import StoryInput  # 僅為相容更新還原已保存型別
-                self._validate_story(c, owner, data.raw_text, StoryInput.model_validate(draft['story']))  # 不默默保留失效片段
+            from .schemas import StoryInput,DraftReview
+            story=data.story if 'story' in data.model_fields_set else (StoryInput.model_validate(draft['story']) if draft['story'] is not None else None)
+            review=data.review if 'review' in data.model_fields_set else (DraftReview.model_validate(draft['review']) if draft['review'] is not None else None)
+            self._store_draft_content(c,owner,draft_id,data.raw_text,story,review)
             c.execute('UPDATE drafts SET raw_text=?,occurred_at=?,goal_id=?,person_id=?,contributions=?,revision=revision+1,updated_at=? WHERE id=? AND owner_id=?',
                       (data.raw_text, data.occurred_at.astimezone(timezone.utc).isoformat(), data.goal_id, data.person_id,
                        encoded([v.model_dump() for v in data.contributions]), self.now().isoformat(), draft_id, owner))  # 更新經歷草稿；值以參數傳入
@@ -270,6 +275,7 @@ class LifeWorld(PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, Confir
                 return cached  # 回傳先前成功結果，避免重送造成重複寫入
             require(draft['status'] == 'draft', 409, 'already_confirmed', '這份草稿已確認，不能重複計入。')  # 驗證限制：這份草稿已確認，不能重複計入。
             require(draft['revision'] == data.expected_revision, 409, 'revision_conflict', '草稿已有新版，請重新核對。')  # 驗證限制：草稿已有新版，請重新核對。
+            data=self._prepare_review_confirm(c,owner,draft,data)
             self._related(c, user, draft['goal_id'], data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
             if data.story is not None:  # 新版明確區分參與與提及
                 require(data.story_reviewed, 422, 'story_review_required', '請先核對這段故事的人物參與及提及。')  # 不將候選直接轉成正式角色

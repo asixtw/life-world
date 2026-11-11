@@ -98,3 +98,17 @@ def test_runtime_cannot_reassign_basic_data_owner_or_subject():
         for table,column in [('person_basic_details','owner_id'),('person_basic_details','person_id'),('person_employments','owner_id'),('person_employments','person_id'),('person_employments','id')]:
             c.execute('SELECT has_column_privilege(current_user,?,?,?)',('lw_core_draft.'+table,column,'UPDATE'))
             assert not c.fetchone()[0],(table,column)
+
+# 草稿核對資料沿用既有JSON欄位，驗證PG交易與SQLite契約一致。
+from test_draft_review import (
+ test_saved_review_roundtrip_and_confirm_creates_selected_fact_once,
+ test_raw_edit_preserves_review_but_invalidates_raw_candidates,
+ test_legacy_confirm_cannot_silently_drop_saved_person_candidates,
+ test_review_owner_isolation_incomplete_evidence_and_manual_preservation,
+ test_saved_review_person_revision_conflict_rolls_back_new_people,
+ test_guest_can_save_manual_review_without_person_candidates,
+)
+from test_draft_review import (
+ test_manual_candidates_survive_raw_edit_and_two_targets_remain_separate,
+ test_review_invalid_targets_and_duplicate_refs_do_not_create_drafts,
+)

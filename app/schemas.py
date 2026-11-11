@@ -179,6 +179,7 @@ class DraftCreate(WithContributions):
     goal_id: Optional[str] = Field(default=None, max_length=128)  # 設定關聯目標識別碼的型別、預設值與輸入限制
     person_id: Optional[str] = Field(default=None, max_length=128)  # 設定關聯人物識別碼的型別、預設值與輸入限制
     story: Optional[StoryInput] = None  # 保存未審閱的多人整理，舊用戶端可省略
+    review: Optional['DraftReview'] = Field(default=None,exclude_if=lambda v:v is None)  # 草稿核對資料獨立於人物是否關聯。
 
     @field_validator('raw_text')  # 將下方驗證函式綁定到指定輸入欄位
     @classmethod  # 以模型類別呼叫欄位驗證
@@ -340,12 +341,54 @@ class TargetEmploymentUpdate(Model):
     source: PersonDetailSource
 
 
+class DraftPersonCandidate(Model):
+    """可未填完的逐人草稿，與正式事實DTO分離；selected不代表已正式寫入。"""
+    model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
+    candidate_ref: str = Field(min_length=1,max_length=128)
+    target: PersonUpdateTarget
+    expected_person_revision: Optional[StrictInt] = Field(default=None,ge=1)
+    dimension: Optional[Literal['interests','food','skills','habits']] = None
+    value: str = Field(default='',max_length=160)
+    description: str = Field(default='',max_length=2000)
+    evidence_type: Optional[Literal['stated_by_person','observed_by_user','documented_source']] = None
+    source_kind: Literal['manual','raw']
+    source_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$')
+    quote: Optional[str] = Field(default=None,max_length=2000)
+    selected: StrictBool = False
+    excluded: StrictBool = False
+    needs_review: StrictBool = False
+
+    @model_validator(mode='after')
+    def distinct_decision(self):
+        if self.selected and self.excluded:raise ValueError('候選不可同時採用及排除')
+        return self
+
+
+class DraftReview(Model):
+    model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
+    summary: Optional[str] = Field(default=None,max_length=20000)
+    summary_source_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$')
+    summary_needs_review: StrictBool = False
+    tasks: List[str] = Field(default_factory=list,max_length=20)
+    person_candidates: List[DraftPersonCandidate] = Field(default_factory=list,max_length=100)
+
+    @model_validator(mode='after')
+    def unique_candidates(self):
+        refs=[p.candidate_ref for p in self.person_candidates]
+        if len(refs)!=len(set(refs)):raise ValueError('人物候選代碼不可重複')
+        if any(not t.strip() or len(t)>300 for t in self.tasks):raise ValueError('任務需有內容且最多300字')
+        return self
+
+
 class DraftDelete(Model):
     request_id: str = Field(min_length=1, max_length=128)
     expected_revision: StrictInt = Field(ge=1)
 
 
 class Confirm(WithContributions):  # 將草稿正式確認為經歷的輸入
+    review: Optional[DraftReview] = Field(default=None,exclude_if=lambda v:v is None)
+    use_saved_review: StrictBool = Field(default=False,exclude_if=lambda v:not v)
+    reviewed_summary_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$',exclude_if=lambda v:v is None)
     birthday_updates: List[TargetBirthdayUpdate] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
     employment_updates: List[TargetEmploymentUpdate] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
     pending_people: List[PendingTargetPerson] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
@@ -759,3 +802,7 @@ class PersonExperiencePatch(Model):  # 編輯、封存或恢復人物經歷；�
 
 
 PersonsCreate.model_rebuild()
+
+# DraftCreate使用前向參照，於全部DTO定義完成後明確凍結模型。
+DraftCreate.model_rebuild()
+DraftEdit.model_rebuild()

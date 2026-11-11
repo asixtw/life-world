@@ -188,7 +188,7 @@ function recordView() { // 產生原始經歷表單並帶入人物與目標上�
 } // 結束目前回呼、區塊或模組定義
 function reviewView(d) { // 產生人工核對頁，分開保存經歷與勾選人物更新
   const goal = state.world.goals.find(g => g.id === d.goal_id); // 讀取目前選定目標及其行動資料
-  return `<div class="narrow">${heading('04｜檢視並確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><details data-review-raw><summary>查看原始經歷與來源</summary><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div></details><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(ExperienceUI.summaryState(d).value)}</textarea></div>${ExperienceUI.summaryReview(d)}${state.me.status==='registered'?button('suggest',state.capabilities?.ai_available?'使用 AI 整理本篇原文':'用原文建立整理候選','secondary'):''}<p class="small muted">${state.me.status!=='registered'?'訪客請手動核對摘要；登入後才可使用 AI 整理。':state.capabilities?.ai_available?'會將本篇原文傳給已設定模型；回應仍需你編輯並確認。':'目前使用手動原文整理，尚未連接外部 AI。'}</p><div id="candidate-panel"></div><div id="ai-people-panel"></div><div id="experience-review-overview"></div><div id="experience-review-people-acceptance"></div><details data-review-people-editor><summary>修改本次人物關聯</summary>${experiencePersonField(d.person_id)}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div></details><details data-review-quantities><summary>修改活動量</summary>${contributionFields(goal, d.contributions)}</details><details data-review-tasks><summary>新增或修改後續任務（選填）</summary><div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時"></textarea></div></details><div class="callout">只有最後確認才正式保存與計分。這次依目前規則可獲得 ${state.world.policy.points_per_experience} 積分；失敗後重試不重複計分。</div><div class="button-row"><button class="primary">我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
+  return `<div class="narrow">${heading('04｜檢視並確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><details data-review-raw><summary>查看原始經歷與來源</summary><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div></details><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(ExperienceUI.summaryState(d).value)}</textarea></div>${ExperienceUI.summaryReview(d)}${state.me.status==='registered'?button('suggest',state.capabilities?.ai_available?'使用 AI 整理本篇原文':'用原文建立整理候選','secondary'):''}<p class="small muted">${state.me.status!=='registered'?'訪客請手動核對摘要；登入後才可使用 AI 整理。':state.capabilities?.ai_available?'會將本篇原文傳給已設定模型；回應仍需你編輯並確認。':'目前使用手動原文整理，尚未連接外部 AI。'}</p><div id="candidate-panel"></div><div id="ai-people-panel"></div>${d.review?.person_candidates?.length?'<div class="callout" role="status">此草稿含逐人人物補充候選；目前畫面尚未完成完整核對串接，請保留草稿，暫不能正式確認。</div>':''}<div id="experience-review-overview"></div><div id="experience-review-people-acceptance"></div><details data-review-people-editor><summary>修改本次人物關聯</summary>${experiencePersonField(d.person_id)}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div></details><details data-review-quantities><summary>修改活動量</summary>${contributionFields(goal, d.contributions)}</details><details data-review-tasks><summary>新增或修改後續任務（選填）</summary><div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時">${esc(ExperienceUI.tasksState(d).join('\n'))}</textarea></div></details><div class="callout">只有最後確認才正式保存與計分。這次依目前規則可獲得 ${state.world.policy.points_per_experience} 積分；失敗後重試不重複計分。</div><div class="button-row"><button class="primary" ${d.review?.person_candidates?.length?'disabled':''}>我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}${button('save-review-draft','保存核對草稿並離開','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function historyView() { // 列出已確認經歷與可接續草稿
   const w = state.world, filter = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 讀取目前帳號的世界資料
@@ -415,6 +415,7 @@ function guestSaveNotice() { // 只在成功保存後提醒；登入者不顯示
 async function saveDraft(form, review, destination = 'history') { // 新增或依版本修改草稿，成功後接續核對或返回
   await MediaUI.awaitReady(); // 縮圖完成才綁定素材與保存伺服器草稿。
   const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.has('calendar_time')?f.get('calendar_date')+'T'+f.get('calendar_time'):f.get('occurred_at'),form.dataset.calendarZone||state.me.timezone),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
+  const savedReview=ExperienceUI.reviewSnapshot();if(savedReview)body.review=savedReview;
   body.story=ConnectionsUI.collectEditor(form); // 草稿只保存候選，不建立正式人物連結
   if (body.person_id === '__upgrade') throw new Error('請先建立帳號後再選擇人物。'); // 依目前選項或狀態進入對應處理分支
   let result; // 保存伺服器已確認的操作結果
@@ -426,9 +427,15 @@ async function saveDraft(form, review, destination = 'history') { // 新增或�
   state.editingDraft = false; state.dirty = false; await refresh(); // 成功保存或明確導覽後清除未保存旗標
   if (review) navigate('review/' + result.id + (state.returnTo?'?return='+encodeURIComponent(state.returnTo):'')); else {toast('草稿已保存至伺服器，尚未加分。'); navigate(destination);} // 依目前選項或狀態進入對應處理分支
 } // 結束目前回呼、區塊或模組定義
+async function saveReviewDraft(destination='history') { // 核對頁可保存而不建人、計分或確認經歷。
+  const form=$('#review-form'),d=state.draft;if(!form||!d)return;
+  const f=new FormData(form),review=ExperienceUI.reviewSnapshot();
+  const result=await api('/drafts/'+d.id,{method:'PUT',body:{raw_text:d.raw_text,occurred_at:d.occurred_at,goal_id:d.goal_id,person_id:f.get('person_id')||null,contributions:contributions(form),story:ConnectionsUI.collectEditor(form),review,expected_revision:d.revision}});
+  ConnectionsUI.clearReview(d.id);state.draft=result;state.dirty=false;await refresh();navigate(destination);toast('核對草稿已保存至伺服器，尚未建立人物或計分。');
+}
 function leaveDialog(route) { // 離開前提供保存草稿、繼續編輯或明確捨棄
   state.pendingRoute = route; // 執行「離開前提供保存草稿、繼續編輯或明確捨棄」的目前處理步驟
-  dialog(`<h2 id="account-heading">離開前，留住這段內容。</h2><p class="small muted">目前有尚未保存的修改。可以保存草稿並離開、繼續編輯，或捨棄本次未保存修改。已保存到伺服器的草稿仍會保留，不會在此刪除。${$('#record-form') ? '這份原始記錄也可以先存成草稿。' : ''}</p><div class="button-row">${$('#record-form') ? button('keep-local-and-leave','保留此裝置草稿並離開','secondary')+button('save-and-leave','先存草稿並離開') : ''}${button('stay-on-form','繼續編輯','secondary')}${button('discard-and-leave','捨棄未保存修改並離開','danger')}</div>`); // 執行「離開前提供保存草稿、繼續編輯或明確捨棄」的目前處理步驟
+  dialog(`<h2 id="account-heading">離開前，留住這段內容。</h2><p class="small muted">目前有尚未保存的修改。可以保存草稿並離開、繼續編輯，或捨棄本次未保存修改。已保存到伺服器的草稿仍會保留，不會在此刪除。${$('#record-form') ? '這份原始記錄也可以先存成草稿。' : ''}</p><div class="button-row">${$('#record-form') ? button('keep-local-and-leave','保留此裝置草稿並離開','secondary') : ''}${$('#record-form')||$('#review-form')?button('save-and-leave','先存草稿並離開'):''}${button('stay-on-form','繼續編輯','secondary')}${button('discard-and-leave','捨棄未保存修改並離開','danger')}</div>`); // 執行「離開前提供保存草稿、繼續編輯或明確捨棄」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 document.addEventListener('click', event => { // 監聽點擊
   const anchor = event.target.closest('a[href^="#"]'); // 尋找使用者點選的站內 hash 連結
@@ -505,7 +512,8 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (action === 'stay-on-form') {state.pendingRoute = null; $('#account-dialog').close();} // 保留輸入並繼續編輯
     if (action === 'discard-and-leave') {await MediaUI.discard(); const route = state.pendingRoute; state.pendingRoute = null; ConnectionsUI.clearReview(state.draft?.id); $('#account-dialog').close(); navigate(route);} // 明確捨棄時不在下次核對偷偷還原修改
     if (action === 'keep-local-and-leave') {await MediaUI.keepLocal(); const route=state.pendingRoute; state.pendingRoute=null; $('#account-dialog').close(); navigate(route);}
-    if (action === 'save-and-leave') {await saveDraft($('#record-form'), false, state.pendingRoute); state.pendingRoute = null; $('#account-dialog').close();} // 先保存草稿再前往目的地
+    if(action==='save-review-draft')await saveReviewDraft();
+    if (action === 'save-and-leave') {if($('#record-form'))await saveDraft($('#record-form'),false,state.pendingRoute);else await saveReviewDraft(state.pendingRoute);state.pendingRoute=null;$('#account-dialog').close();} // 先保存草稿再前往目的地
     if (action === 'logout') {
       state.logoutClearMedia=!!$('#clear-local-media')?.checked;
       if(state.dirty){
@@ -579,6 +587,7 @@ document.addEventListener('submit', async event => { // 監聽表單提交
     if (form.id === 'record-form') await saveDraft(form, submitter?.value !== 'save'); // 依目前選項或狀態進入對應處理分支
     if (form.id === 'review-form') { // 依目前選項或狀態進入對應處理分支
       const body = {...PeopleUI.reviewPayload(form),expected_revision:state.draft.revision,summary:f.get('summary'),person_id:f.get('person_id') || null,contributions:contributions(form),tasks:String(f.get('tasks')).split('\n').map(x => x.trim()).filter(Boolean)}; // 組合使用者明確提供的 API 提交內容
+      const reviewSnapshot=ExperienceUI.reviewSnapshot();if(reviewSnapshot)body.reviewed_summary_sha256=reviewSnapshot.summary_source_sha256;
       body.story=ConnectionsUI.collectEditor(form); body.story_reviewed=f.has('story_reviewed'); // 正式角色需獨立人工接受
       if(body.story) { if(body.person_id&&!body.story.participants.some(p=>p.person_id===body.person_id)) throw new Error('主要關聯人物不在參與清單，請調整主要人物或參與者；提及者請在提及區核對。'); body.person_id=body.person_id||body.story.participants[0]?.person_id||null; body.interaction_type=f.get('story_interaction_type')||'unknown'; } // 不將原人物資訊候選誤套到另一位參與者
       const result = await api('/drafts/' + state.draft.id + '/confirm',{method:'POST',body:{...body,request_id:requestId('confirm:' + state.draft.id,body)}}); // 等待伺服器完成讀取或保存，再進入下一步

@@ -6,6 +6,8 @@
 
 同日最新協作基準：三人、沒有專職前端；[協作入口](team/README.md)與[看板](team/TASK_BOARD.md)已建立。React＋TypeScript、保留 Python／FastAPI、PostgreSQL、前後端皆 GCP 是暫定目標；當前仍為 SQLite／原生前端。早前協作文件交付只建立文件與來源快照；其後單一目標已另行實作，React／PG／部署仍未完成。
 
+目前整合候選與未完成Gate以[PR26整合報告](integration/2026-11-11/INTEGRATION_RELEASE_REPORT.md)為準：完整逐人補充與AI授權UX、Feature Store/來源失效、GuestPurger FK審查及GCP E2E仍待完成；保持Draft，不自行Merge或發布。
+
 ## 產品規則
 
 1. 確認正式貢獻單位、部分完成粒度、歷史更正及撤銷規則；目前支援使用者輸入正數，最多六位小數。

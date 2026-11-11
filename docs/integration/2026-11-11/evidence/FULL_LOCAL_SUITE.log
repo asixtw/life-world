@@ -1,15 +1,15 @@
-...................sssssss....................................ssssssssss [  9%]
-.........................s........s..................................... [ 18%]
-........................................................................ [ 27%]
-........................................................................ [ 36%]
-........................................................................ [ 45%]
-........................................................................ [ 54%]
-....................................sssssss............................. [ 63%]
-........................................................................ [ 72%]
-...................................sssssssssssssssssssss................ [ 81%]
-................ssssssssssssss...............s.......................... [ 90%]
-........................................................................ [ 99%]
-..                                                                       [100%]
+...................sssssss....................................ssssssssss [  8%]
+.........................s........s..................................... [ 17%]
+........................................................................ [ 26%]
+........................................................................ [ 35%]
+........................................................................ [ 44%]
+........................................................................ [ 53%]
+............................................sssssss..................... [ 62%]
+........................................................................ [ 71%]
+...........................................sssssssssssssssssssssssssssss [ 80%]
+................................ssssssssssssss...............s.......... [ 88%]
+........................................................................ [ 97%]
+..................                                                       [100%]
 =========================== short test summary info ============================
 SKIPPED [1] tests/ai/test_usage_isolation.py:17: 需要明確本機PG18合成副本
 SKIPPED [1] tests/ai/test_usage_isolation.py:35: 需要明確本機PG18合成副本
@@ -51,6 +51,14 @@ SKIPPED [1] tests/test_integration_confirm_targets.py:83: 需要明確本機PG18
 SKIPPED [1] tests/test_integration_confirm_targets.py:92: 需要明確本機PG18合成副本
 SKIPPED [1] tests/test_pg_integration_person_details.py:72: 需要明確本機PG18合成副本
 SKIPPED [1] tests/test_pg_integration_person_details.py:95: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:14: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:28: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:45: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:52: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:69: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:79: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:87: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:111: 需要明確本機PG18合成副本
 SKIPPED [1] tests/test_postgres_integration.py:34: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [4] tests/test_postgres_integration.py:119: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_postgres_integration.py:134: requires dedicated synthetic PostgreSQL 18 container
@@ -62,4 +70,4 @@ SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic
 SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
-732 passed, 62 skipped in 31.55s
+740 passed, 70 skipped in 30.91s
