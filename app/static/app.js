@@ -516,7 +516,7 @@ document.addEventListener('click', async event => { // 監聽點擊
     if(action==='choose-experience-person'){const root=$('[data-story-editor]');root.querySelector('#include-story').checked=true;root.querySelector('.story-editor-body').hidden=false;root.querySelector('.participant-filter')?.focus();state.dirty=true;}
     if (action === 'new-person') { // 依訪客狀態升級或新增人物
       if (state.me.status === 'guest') accountView('claim'); // 依目前選項或狀態進入對應處理分支
-      else if($('#record-form,#review-form')) {const root=$('[data-story-editor]');root.querySelector('#include-story').checked=true;root.querySelector('.story-editor-body').hidden=false;const pending=root.querySelector('[name=pending_person_enabled]');pending.checked=true;pending.closest('details').open=true;root.querySelector('[name=pending_person_name]').focus();state.dirty=true;}
+      else if($('#record-form,#review-form')) {const root=$('[data-story-editor]');if(JSON.parse(root.dataset.pendingPeople||'[]').length){toast('這份草稿含多人待建名單；多人編輯介面仍在整合中，名單保持不變。');return;}root.querySelector('#include-story').checked=true;root.querySelector('.story-editor-body').hidden=false;const pending=root.querySelector('[name=pending_person_enabled]');pending.checked=true;pending.closest('details').open=true;root.querySelector('[name=pending_person_name]').focus();state.dirty=true;}
       else PeopleUI.openPersonEditor(); // 處理前述條件不成立時的替代流程
     } // 結束目前回呼、區塊或模組定義
     if (action === 'edit-current-draft') {state.editingDraft = true; navigate('record');} // 帶回目前草稿進行修改
@@ -526,8 +526,9 @@ document.addEventListener('click', async event => { // 監聽點擊
     if(action==='google-reconcile'){if(state.googleAttempt?.challenge){const done=await reconcileGoogleTransition(state.googleAttempt);if(!done)$('#google-status').textContent='此交換尚未提交，原訪客世界保持，可重新開始驗證。';}return;}
     if (action === 'google-start') {await startGoogleLogin(event.target.closest('[data-action]').dataset.mode);return;}
     if(action==='ai-usage'){
-      const usage=await api('/ai/usage'),usd=n=>'$'+(Number(n)/1000000).toFixed(2);
-      dialog(`<h2 id="account-heading">AI 額度與收據</h2><p>本輪剩餘可預留：${usd(usage.remaining_microusd)}。已預留：${usd(usage.global_reserved_microusd)}；歷史未知費用預留：${usd(usage.historical_reserved_microusd)}。</p><p>每次模型呼叫先預留 ${usd(usage.per_call_reservation_microusd)}。預留不是實際帳單，失敗或費用未知也保留；實際帳單費用目前未知。</p><p>顯示 ${usage.receipts.length} 筆本帳號模型結果收據（最多100筆）；不包含其他使用者內容。</p>`);return;
+      const usageOwner=state.me?.owner_id,usage=await api('/ai/usage'),usd=n=>'$'+(Number(n)/1000000).toFixed(2);
+      if(state.me?.owner_id!==usageOwner)return; // 延遲回應不得把前一帳號收據顯示到切換後的帳號。
+      dialog(`<h2 id="account-heading">我的 AI 用量與收據</h2><p>本帳號共 ${esc(usage.calls)} 次預留，預留金額 ${usd(usage.reserved_microusd)}。這不是實際帳單費用。</p><p>已回報輸入 ${esc(usage.input_tokens)} Tokens、輸出 ${esc(usage.output_tokens)} Tokens；未回報的用量不代表零。費用未知或尚未回報：${esc(usage.unknown_cost_calls)} 次。</p><p>預留不因失敗或費用未知而釋放；供應商回報金額也不是最終帳單。實際帳單費用目前未知。</p><details><summary>查看本人最近 ${usage.receipts.length} 筆收據（最多100筆）</summary>${usage.receipts.map(r=>`<article class="card"><p>${esc(r.created_at)} · ${esc({candidate:'候選已回傳',failed:'未完成',reserved:'已預留，結果待核對'}[r.status]||'結果待核對')}</p><p>本次預留 ${usd(r.reserved_microusd)}；模型回報費用：${r.cost_microusd==null?'未知':usd(r.cost_microusd)}（非帳單）。</p><p class="small">收據 ${esc(r.request_id)}</p></article>`).join('')||'<p>尚無本人AI預留收據。</p>'}</details>`);return;
     }
     if(action==='memory-settings'){
       const prefs=await api('/personalization');

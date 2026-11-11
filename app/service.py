@@ -275,6 +275,8 @@ class LifeWorld(PersonDetailsMixin, PersonsMixin, PersonExperiencesMixin, Confir
                 require(data.story_reviewed, 422, 'story_review_required', '請先核對這段故事的人物參與及提及。')  # 不將候選直接轉成正式角色
                 self._validate_story(c, owner, draft['raw_text'], data.story)  # 先核對全部來源與所有權
                 require(not data.person_id or data.person_id in [p.person_id for p in data.story.participants], 422, 'primary_not_participant', '主要關聯人物必須是本次參與者；提及者請在提及區配對。')  # 避免舊主要人物欄位誤用身分
+            require(not (data.story and data.story.pending_person and (data.pending_people or data.targeted_person_updates or data.birthday_updates or data.employment_updates)),
+                    422,'ambiguous_person_updates','單人與多人待建立契約不可混用。')
             if data.story is not None and data.story.pending_person:
                 # 指紋已先保存原請求；新增人物與後續經歷、獎勵共享同一交易，任何錯誤全部回滾。
                 from .schemas import PersonCreate, StoryParticipant, StoryMention

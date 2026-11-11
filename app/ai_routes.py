@@ -8,6 +8,7 @@ from .errors import require
 
 class ConfirmedInput(BaseModel):
     model_config=ConfigDict(extra='forbid',strict=True)
+    request_id:str|None=Field(default=None,min_length=1,max_length=128,pattern=r'^[A-Za-z0-9_.:-]+$')
     consent:Literal[True]
     @field_validator('consent',mode='before')
     @classmethod
@@ -64,7 +65,7 @@ def install(app):
     @app.post('/api/experiences/{experience_id}/task-suggestions',tags=['AI drafts'])
     def task_suggestions(experience_id:str,request:Request,data:ConfirmedInput):
         who=owner(request);source=experience(who,experience_id)
-        return app.state.ai_runtime.generate(who,'tasks',{'confirmed_experience':source})
+        return app.state.ai_runtime.generate(who,'tasks',{'confirmed_experience':source},request_id=data.request_id)
 
     @app.post('/api/experiences/{experience_id}/tasks',status_code=201,tags=['AI drafts'])
     def confirm_tasks(experience_id:str,request:Request,data:TasksConfirm):
@@ -95,6 +96,6 @@ def install(app):
         with service.db.connect() as db:
             records=[dict(row) for ref in source_ids for row in db.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(ref,who)).fetchall()]
         context=build_context(facts,records,data.message,service.now().isoformat())
-        result=app.state.ai_runtime.generate(who,'simulation',{'person_id':person_id,'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message})
+        result=app.state.ai_runtime.generate(who,'simulation',{'person_id':person_id,'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message},request_id=data.request_id)
         # 一般人物卡／對話UI不暴露內部雙端標籤；只回可解釋的來源與有限行為。
         return {**result,'simulation':True,'behavior':context['behavior'],'behavior_source':'rules','source_experience_ids':source_ids,'uncertainty':'simulation_not_prediction','notice':result['notice']+' 私人模擬，不是對真人反應的預測；不寫入人物事實。'}

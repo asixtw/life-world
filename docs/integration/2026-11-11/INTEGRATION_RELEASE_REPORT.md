@@ -54,3 +54,16 @@
 - 最新完整本機API：720 PASS、52 SKIP。獨立本機PG18 suite：18 PASS。人物資料Chromium（含390/1440撤回取消/確認）：6 PASS。真Google/GCP/AI仍NOT RUN；不是整體產品完成。
 - 現有Feature Store PG表不存在，人物基本資料尚未接AI上下文；衍生特徵失效仍IN PROGRESS，不以來源狀態API代替長期記憶驗收。
 - 本輪唯讀remote核對main仍68102f230aa947a434286ba9260e1ae75f6634b0。沒有Merge、Deploy、正式Migration或GRANT。
+
+## P0追加：AI測試額度與帳號隔離（本輪實作，Alpha尚未部署）
+
+- 移除AISettings寫死US$20最高值；Alpha採明確有限總額/日額、可配置提高每日次數。隔離E2E的explicit unlimited-total模式僅停用累計限制，仍保留日額/次數/總開關/並發，from_env及PG Runtime限制目標庫及public_alpha模式。
+- 保留耐久預留、PG advisory lock、失敗/未知費用不釋放，新增可配置每process在途上限與request id去重（重送409，不冒稱可重取未保存的模型全文）。歷史預留納入有限總額，不能靠重啟歸零。
+- GET /api/ai/usage SQL以Session Owner過濾，只回本人預留/次數/Tokens/收據。全域預算/剩餘額/歷史預留不回一般API；沒有公開admin usage路由，query admin/owner_id不能擴權。內部管理監控SQL另外隔離，未新增IAM/DB授權。
+- UI只顯示「我的AI用量與收據」，預留及供應商回報均不當成實際帳單。換Owner後不顯示延遲的前帳號收據。
+- 最新完整本機suite：732 PASS、62 SKIP；AI專項36 PASS/7 PG SKIP；另以本機PG18受限Runtime執行該7項PASS。UI metadata fixture 390/1440及延遲Owner切換3 PASS。沒有呼叫真模型；不能宣稱Alpha新額度或真AI本輪E2E已PASS。
+- Alpha唯讀現況仍100% lw-public-camera-8f377fa：Owner每日100、全域1000、每次預留500000microusd、日額19000000、累計19000000、歷史1000000，舊程式未換。既有E2E缺AI批准/累計設定，不宣稱已可真呼叫。
+- [額度建議與停用/恢復程序](ai/AI_BUDGET_POLICY.md)：候選Alpha有限US$100累計、US$25/滾動24h、維持US$0.50每次預留，約50次模型預留/日，Owner500/全域5000次、每process4在途。這是待Owner決定及發布Gate的建議，未批准/未套用，不是帳單預測。
+- 測試證據：AI_POLICY_SQLITE.log / AI_POLICY_PG18.log / AI_PERSONAL_USAGE_BROWSER.log；實際非敏感設定白名單 AI_LIMITS_DEPLOYED_READ_ONLY.json。無API Key/Token/Secret。
+
+多人草稿同步追加：story.pending_people保存及Confirm解析已在SQLite/PG實測；新增3項PG後人物/草稿PG共21 PASS。舊UI保留新版名單，返回修改原文回Step1；人物瀏覽器7 PASS。完整Candidate新增/編輯/補充/差異預覽仍未完成，不能以此兼容摘要替代最終四步UX。

@@ -1,0 +1,38 @@
+{
+  "alpha": {
+    "resource": "lw-public",
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "lw-public-camera-8f377fa",
+        "tag": "alpha-guest-review",
+        "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+      }
+    ],
+    "ai_configuration_whitelist": {
+      "LIFEWORLD_AI_CALLS_APPROVED": "true",
+      "LIFEWORLD_AI_PROVIDER": "gemini",
+      "LIFEWORLD_AI_MODEL": "gemini-3.5-flash-lite",
+      "LIFEWORLD_AI_MAX_OUTPUT_TOKENS": "2000",
+      "LIFEWORLD_AI_OWNER_DAILY_CALLS": "100",
+      "LIFEWORLD_AI_GLOBAL_DAILY_CALLS": "1000",
+      "LIFEWORLD_AI_RESERVATION_MICROUSD": "500000",
+      "LIFEWORLD_AI_DAILY_BUDGET_MICROUSD": "19000000",
+      "LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD": "19000000",
+      "LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD": "1000000"
+    },
+    "new_integration_deployed": false
+  },
+  "existing_e2e": {
+    "resource": "lw-api-main-b8030-11111349",
+    "traffic": [],
+    "ai_configuration_whitelist": {
+      "LIFEWORLD_AI_PROVIDER": "gemini",
+      "LIFEWORLD_AI_MODEL": "gemini-3.5-flash-lite",
+      "LIFEWORLD_AI_MAX_OUTPUT_TOKENS": "1536",
+      "LIFEWORLD_AI_RESERVATION_MICROUSD": "500000",
+      "LIFEWORLD_AI_DAILY_BUDGET_MICROUSD": "19000000"
+    },
+    "new_integration_deployed": false
+  }
+}

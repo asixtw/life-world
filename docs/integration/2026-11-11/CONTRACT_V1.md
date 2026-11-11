@@ -31,3 +31,11 @@ person_facts/fact_sources是正式核對資訊；relationship_features/preferenc
 正式010/新增差異Migration僅在完整E2E/Alpha機器可讀Fingerprint比對後提出，先隔離PG18測試，後續授權DBA才可執行。SQLite009不假設存在PG。GuestPurger維持fail-closed，010新表/FK需逐一核對所有權與刪除契約，不能單純放寬表集合。
 
 GCP只讀已確認lw-public仍camera-8f377fa 100%；API主觸發器RequireApproval=true。服務template是最新版本，不能代表100%Revision的環境，下一步按Revision驗。UX、CodeReview、E2E、Owner明確Merge及Alpha發布授權皆未完成，不觸發正式Merge/Alpha切流。
+
+## 多人待建立草稿增量（本機整合，未部署）
+
+既有 `draft_stories.payload` 保存 `story.pending_people[]`，每項為 `{client_ref,name,relation,start?}`，不新增DB欄位。`relation` 是 interaction / participant / mention，提及必須對應本次原文Unicode位置。client_ref唯一且不依姓名合併，所有參與/提及數量含待建立者合計各不得超過100。Guest不能提交人物候選。
+
+草稿POST/PUT/GET不建人、不計分；相同版本/Owner/來源驗證沿用原交易。原文變更使提及位置失效時422並保留先前草稿版本，前端應提示重新核對，不自動猜新位置。最後Confirm可採 `story.pending_people` 或既有頂層 `pending_people`，不得同時傳兩份；也不得混用legacy `pending_person`。最後人工story_reviewed後才建人，回 `created_people` client_ref→id，同交易保存經歷/任務/事實/貢獻/獎勵，失敗整筆回滾，request_id重試不重建。
+
+現有產品編輯器補了讀取/重存的名單保護，能逐人顯示並確認；完整Candidate的新增/修改/逐項補充與差異預覽仍須後續接線。此相容保護不能視為多人UX完成或發布Gate通過。原PR22帳號交易不變。

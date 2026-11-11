@@ -63,6 +63,9 @@ from test_integration_confirm_targets import (
  test_delete_saved_draft_revision_owner_and_retry,
  test_unqualified_people_cannot_be_real_participants,
  test_existing_person_revision_failure_rolls_back_all_new_people,
+ test_multiple_pending_people_survive_saved_draft_without_creating_people,
+ test_draft_pending_people_require_registration_and_unique_refs,
+ test_pending_people_edit_source_and_ambiguous_confirm_fail_without_orphans,
 )
 
 

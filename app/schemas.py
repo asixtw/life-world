@@ -134,8 +134,14 @@ class PendingPerson(Model):
     start: Optional[StrictInt] = Field(default=None, ge=0, exclude_if=lambda v: v is None)
 
 
+class PendingTargetPerson(PendingPerson):
+    """待建立人物在單次請求中的穩定識別，不依姓名合併。"""
+    client_ref: str = Field(min_length=1, max_length=128)
+
+
 class StoryInput(Model):  # 草稿與正式人物核對共用資料
     pending_person: Optional[PendingPerson] = Field(default=None, exclude_if=lambda v: v is None)  # 只存候選；最終確認才建人
+    pending_people: List[PendingTargetPerson] = Field(default_factory=list,max_length=100,exclude_if=lambda v:not v)
     title: str = Field(default='', max_length=160)  # 可另取故事標題
     participants: List[StoryParticipant] = Field(default_factory=list, max_length=100)  # 每筆經歷最多一百位參與者
     mentions: List[StoryMention] = Field(default_factory=list, max_length=100)  # 每個原文位置獨立配對
@@ -144,6 +150,16 @@ class StoryInput(Model):  # 草稿與正式人物核對共用資料
     def distinct_links(self):  # 拒絕重複人物與重複提及位置
         ids = [p.person_id for p in self.participants]  # 取得固定人物識別碼
         spans = [(m.start, m.end) for m in self.mentions]  # 取得原文範圍
+        if self.pending_person and self.pending_people:
+            raise ValueError('單人與多人待建立契約不可混用')
+        refs=[p.client_ref for p in self.pending_people]
+        if len(refs)!=len(set(refs)):
+            raise ValueError('待建立人物代碼不可重複')
+        pending_spans=[(p.start,(p.start or 0)+len(p.name)) for p in self.pending_people if p.relation=='mention']
+        if len(ids)+sum(p.relation!='mention' for p in self.pending_people)>100 or len(spans)+len(pending_spans)>100:
+            raise ValueError('人物參與或提及總數超過上限')
+        if len(spans+pending_spans)!=len(set(spans+pending_spans)):
+            raise ValueError('待建立人物提及位置重複')
         if self.pending_person:
             pending = self.pending_person
             if pending.relation == 'mention' and ((pending.start, (pending.start or 0) + len(pending.name)) in spans or len(spans) >= 100):
@@ -239,11 +255,6 @@ class PersonDetailSource(Model):
         if self.source_kind == 'raw' and (self.evidence_type is None or not self.quote):
             raise ValueError('經歷來源須有引用與明確得知依據')
         return self
-
-
-class PendingTargetPerson(PendingPerson):
-    """待建立人物在單次請求中的穩定識別，不依姓名合併。"""
-    client_ref: str = Field(min_length=1, max_length=128)
 
 
 class PersonUpdateTarget(Model):

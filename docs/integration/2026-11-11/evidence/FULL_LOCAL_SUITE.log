@@ -1,15 +1,23 @@
-..............................................ssssssssss................ [  9%]
-.........s........s..................................................... [ 18%]
+...................sssssss....................................ssssssssss [  9%]
+.........................s........s..................................... [ 18%]
 ........................................................................ [ 27%]
-........................................................................ [ 37%]
-........................................................................ [ 46%]
-........................................................................ [ 55%]
-.................sssssss................................................ [ 65%]
-........................................................................ [ 74%]
-................ssssssssssssssssss................................ssssss [ 83%]
-ssssssss...............s................................................ [ 93%]
-....................................................                     [100%]
+........................................................................ [ 36%]
+........................................................................ [ 45%]
+........................................................................ [ 54%]
+....................................sssssss............................. [ 63%]
+........................................................................ [ 72%]
+...................................sssssssssssssssssssss................ [ 81%]
+................ssssssssssssss...............s.......................... [ 90%]
+........................................................................ [ 99%]
+..                                                                       [100%]
 =========================== short test summary info ============================
+SKIPPED [1] tests/ai/test_usage_isolation.py:17: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:35: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:47: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:63: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:75: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:99: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_ai_runtime.py:179: 需要明確本機PG18合成副本
 SKIPPED [1] tests/product/test_google_transition_pg.py:94: requires dedicated local Google transition PG18 fixture
 SKIPPED [2] tests/product/test_google_transition_pg.py:110: requires dedicated local Google transition PG18 fixture
 SKIPPED [1] tests/product/test_google_transition_pg.py:121: requires dedicated local Google transition PG18 fixture
@@ -38,8 +46,11 @@ SKIPPED [1] tests/test_integration_confirm_targets.py:27: 需要明確本機PG18
 SKIPPED [1] tests/test_integration_confirm_targets.py:36: 需要明確本機PG18合成副本
 SKIPPED [2] tests/test_integration_confirm_targets.py:50: 需要明確本機PG18合成副本
 SKIPPED [1] tests/test_integration_confirm_targets.py:61: 需要明確本機PG18合成副本
-SKIPPED [1] tests/test_pg_integration_person_details.py:69: 需要明確本機PG18合成副本
-SKIPPED [1] tests/test_pg_integration_person_details.py:92: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:70: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:83: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:92: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_pg_integration_person_details.py:72: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_pg_integration_person_details.py:95: 需要明確本機PG18合成副本
 SKIPPED [1] tests/test_postgres_integration.py:34: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [4] tests/test_postgres_integration.py:119: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_postgres_integration.py:134: requires dedicated synthetic PostgreSQL 18 container
@@ -51,4 +62,4 @@ SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic
 SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
 SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
-720 passed, 52 skipped in 30.96s
+732 passed, 62 skipped in 30.15s

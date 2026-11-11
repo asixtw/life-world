@@ -26,7 +26,8 @@ window.ExperienceUI=(()=>{
       else flow=null;
       c.state.experienceFlow=flow;return;
     }
-    const previousStep=flow?.ownerId===c.state.me.owner_id?Math.min(3,flow.currentStep):1;
+    // 從第四步選擇修改原文應回第一步；同一份record表單的局部恢復才保留原步。
+    const previousStep=flow?.ownerId===c.state.me.owner_id&&flow.currentStep<=3?flow.currentStep:1;
     flow={ownerId:c.state.me.owner_id,draftId:c.state.editingDraft?c.state.draft?.id:null,expectedRevision:c.state.draft?.revision,currentStep:1,rawText:'',occurredAt:'',goalId:null,contributions:[],personId:null,pendingPerson:null,story:null,editedSummary:'',aiConsent:false,aiCandidate:null,dirty:false,requestId:null,mediaScope:null};
     const sections=[1,2,3].map(n=>{const x=document.createElement('section');x.dataset.experienceStep=n;return x;});
     const nodes=[...form.children], goal=form.querySelector('#goal-id')?.closest('.field'),person=form.querySelector('#person-id');

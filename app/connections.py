@@ -7,10 +7,14 @@ from .security import require_registered  # 正式人物整理仍受帳號門檻
 
 class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
     def _validate_story(self, c, owner, raw, story):  # 核對人物所有權與精確來源位置
-        if story.participants or story.mentions or story.pending_person: require_registered(self._onboarded(c, owner))  # 純提及也不能繞過升級
+        if story.participants or story.mentions or story.pending_person or story.pending_people: require_registered(self._onboarded(c, owner))  # 純提及也不能繞過升級
         if story.pending_person and story.pending_person.relation == 'mention':
             p = story.pending_person
             require(p.start is not None and raw[p.start:p.start + len(p.name)] == p.name, 422, 'invalid_source_span', '新增人物的提及位置須與原文一致。')
+        for candidate in story.pending_people:
+            if candidate.relation=='mention':
+                require(candidate.start is not None and raw[candidate.start:candidate.start+len(candidate.name)]==candidate.name,
+                        422,'invalid_source_span','待新增人物的提及位置須與原文一致。')
         for p in story.participants: self._require_recordable_person(c, owner, p.person_id)  # 每位參與者都須屬於本人
         for m in story.mentions:  # 每處原文人名獨立核對
             require(0 <= m.start < m.end <= len(raw) and raw[m.start:m.end] == m.name, 422, 'invalid_source_span', '提及位置與原始文字不符，請重新選取。')  # Unicode 位移與原句完全一致

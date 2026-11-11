@@ -18,15 +18,18 @@ class ConfirmTargetsMixin:
 
     def _resolve_confirm_targets(self, c, owner, user, draft, data):
         """回傳解析後的Confirm、逐人更新及client_ref收據；所有失敗由外層交易回滾。"""
-        if not data.pending_people and not data.targeted_person_updates and not data.birthday_updates and not data.employment_updates:
+        if not (data.pending_people or (data.story and data.story.pending_people)) and not data.targeted_person_updates and not data.birthday_updates and not data.employment_updates:
             return data, [], {}
         require_registered(user)
         require(data.story_reviewed, 422, 'story_review_required', '請先核對所有人物與來源。')
         require(not data.person_updates and not (data.story and data.story.pending_person),
                 422, 'ambiguous_person_updates', '請使用單一版本的人物更新契約。')
         story = data.story.model_copy(deep=True) if data.story else StoryInput()
+        require(not (data.pending_people and story.pending_people),422,'ambiguous_person_updates','待建立人物只能使用一份已核對名單。')
+        candidates=data.pending_people or story.pending_people
+        story.pending_people=[]  # 草稿候選在此交易解析；正式故事只存人物ID與角色。
         refs = {}
-        for candidate in data.pending_people:
+        for candidate in candidates:
             require(candidate.client_ref not in refs, 422, 'duplicate_client_ref', '待建立人物代碼不可重複。')
             if candidate.relation == 'mention':
                 require(candidate.start is not None and draft['raw_text'][candidate.start:candidate.start + len(candidate.name)] == candidate.name,

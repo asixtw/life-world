@@ -89,3 +89,25 @@ def test_source_withdrawal_cancel_and_confirm_keep_history(page,width):
     assert d['birthday_history'][-1]['change_kind']=='source_withdrawn'
     ART.mkdir(parents=True,exist_ok=True)
     page.screenshot(path=str(ART/f'{width}-source-withdrawn.png'),full_page=True)
+
+
+def test_saved_multi_person_draft_roundtrip_and_confirm_do_not_drop_targets(page):
+    p,headers=seed(page)
+    pending=[{'client_ref':'p1','name':'小安','relation':'interaction'},{'client_ref':'p2','name':'小明','relation':'mention','start':8}]
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':'和小安閱讀，提到小明。','occurred_at':'2026-10-27T00:00:00Z','contributions':[],'story':{'pending_people':pending}});assert r.ok,r.text()
+    d=r.json();page.goto(BASE+'/#review/'+d['id']);page.reload()
+    expect(page.locator('.pending-people-summary')).to_contain_text('小安')
+    expect(page.locator('.pending-people-summary')).to_contain_text('僅在原文中提及')
+    collected=page.evaluate('ConnectionsUI.collectEditor(document.querySelector("#review-form"))')
+    assert collected['pending_people']==pending
+    # 返回原文後保存，名單及client_ref仍在；未確認時沒有新增人物。
+    page.get_by_role('button',name='返回修改原始草稿',exact=True).click()
+    page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
+    page.locator('[data-experience-review]').click()
+    expect(page.locator('#review-form')).to_be_visible()
+    read=page.request.get(BASE+'/api/drafts/'+d['id']).json();assert read['story']['pending_people']==pending
+    assert len(page.request.get(BASE+'/api/state').json()['people'])==1
+    page.locator('#story-reviewed').check();page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+    expect(page.locator('#review-form')).to_have_count(0)
+    world=page.request.get(BASE+'/api/state').json()
+    assert len(world['people'])==3 and len(world['experiences'])==1

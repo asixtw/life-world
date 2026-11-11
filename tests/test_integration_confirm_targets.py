@@ -65,3 +65,41 @@ def test_existing_person_revision_failure_rolls_back_all_new_people(client):
     body=confirm_payload(d,contributions=[],story_reviewed=True,story={'participants':[{'person_id':p['id'],'interacted':False}]},pending_people=[{'client_ref':'one','name':'不應留下','relation':'participant'}],targeted_person_updates=[{'target':{'person_id':p['id']},'expected_person_revision':p['revision']+1,'dimension':'food','value':'清淡','evidence_type':'observed_by_user','selected':True,'source_kind':'manual','source_revision':d['revision']}])
     assert client.post('/api/drafts/'+d['id']+'/confirm',json=body).status_code==409
     state=client.get('/api/state').json();assert len(state['people'])==1 and not state['experiences'] and state['rewards']['total']==0
+
+
+def test_multiple_pending_people_survive_saved_draft_without_creating_people(client):
+    _,g=onboard(client);register(client)
+    pending=[{'client_ref':'p1','name':'小安','relation':'interaction'},{'client_ref':'p2','name':'小明','relation':'mention','start':8}]
+    d=draft(client,g,raw_text='和小安閱讀，提到小明。',contributions=[],story={'pending_people':pending})
+    assert client.get('/api/drafts/'+d['id']).json()['story']['pending_people']==pending
+    assert not client.get('/api/state').json()['people']
+    body=confirm_payload(d,contributions=[],story=d['story'],story_reviewed=True)
+    r=client.post('/api/drafts/'+d['id']+'/confirm',json=body);assert r.status_code==201,r.text
+    assert set(r.json()['created_people'])=={'p1','p2'}
+    assert client.post('/api/drafts/'+d['id']+'/confirm',json=body).json()==r.json()
+    assert len(client.get('/api/state').json()['people'])==2
+
+
+def test_draft_pending_people_require_registration_and_unique_refs(client):
+    _,g=onboard(client)
+    payload={'raw_text':'和小安閱讀','occurred_at':'2026-10-27T00:10:00+08:00','contributions':[],'story':{'pending_people':[{'client_ref':'a','name':'小安','relation':'participant'}]}}
+    assert client.post('/api/experiences/drafts',json=payload).status_code==403
+    register(client)
+    duplicate=payload|{'story':{'pending_people':payload['story']['pending_people']*2}}
+    assert client.post('/api/experiences/drafts',json=duplicate).status_code==422
+
+
+def test_pending_people_edit_source_and_ambiguous_confirm_fail_without_orphans(client):
+    _,g=onboard(client);register(client)
+    payload={'raw_text':'小安提到小明','occurred_at':'2026-10-27T00:10:00+08:00','contributions':[],'story':{'pending_people':[{'client_ref':'mention','name':'小明','relation':'mention','start':4}]}}
+    r=client.post('/api/experiences/drafts',json=payload);assert r.status_code==201,r.text
+    d=r.json();url='/api/drafts/'+d['id']
+    # 原文變更不能悄悄保存舊位置；失敗保留先前草稿版本與候選，不建人物。
+    assert client.put(url,json=payload|{'raw_text':'沒有原先的人名','expected_revision':d['revision']}).status_code==422
+    assert client.get(url).json()['raw_text']==payload['raw_text']
+    body=confirm_payload(d,contributions=[],story=d['story'],story_reviewed=True,pending_people=[{'client_ref':'extra','name':'另一人','relation':'participant'}])
+    assert client.post(url+'/confirm',json=body).status_code==422
+    assert not client.get('/api/state').json()['people']
+    deletion={'request_id':'cancel-pending','expected_revision':d['revision']}
+    assert client.request('DELETE',url,json=deletion).status_code==200
+    assert not client.get('/api/state').json()['people']
