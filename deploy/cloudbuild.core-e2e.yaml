@@ -1,0 +1,97 @@
+# M0：8030 整合版（lw-core-e2e）映像。只建置與推送，不部署、不執行 release.py、不碰任何既有服務或正式流量。
+# 建置來源是 Prepare-CoreE2EBuild.ps1 產生的固定封裝（.tgz；只含白名單檔案與 core-e2e-source-manifest.sha256）。
+# 執行這份設定需要使用者另行核准（R4）；本檔只是設定，不代表已核准建置。
+#
+# M0 修正（F4）：
+# - 使用者只提供兩個替換值：_SOURCE_MANIFEST_SHA256（來源清單）與 _PACKAGE_SHA256（封裝檔）。
+#   Bash 腳本只經由 options.env 讀取它們（已加引號的變數），不把替換值寫進任何 Bash 程式文字，不使用 eval。
+#   Docker 的 argv 也直接使用替換值，但第一步已驗證它們都是 64 位小寫十六進位，驗證失敗整個建置就停止。
+# - tag 由建置自己產生：m0-<來源清單 SHA-256>-<Cloud Build 的 BUILD_ID>。每次建置的 BUILD_ID 都不同，
+#   所以同一秒、相同來源、同時執行的建置也不會共用 tag；lw-containers 已開啟不可覆寫的 tag（immutableTags，唯讀核對）。
+# - provenance 綁定「這次 push」得到的 digest（docker push 的輸出與本機 RepoDigests），不事後以 tag 查詢。
+# - 建置端重新驗證：上傳的封裝檔 SHA-256、來源清單、每個檔案，以及沒有清單以外的檔案。
+# Bash 腳本中的 $$ 是 Cloud Build 的跳脫寫法，執行時才變成 $。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com
+timeout: 1200s
+options:
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - 'CORE_SOURCE_SHA256=${_SOURCE_MANIFEST_SHA256}'
+    - 'CORE_PACKAGE_SHA256=${_PACKAGE_SHA256}'
+    - 'CORE_PROJECT=$PROJECT_ID'
+    - 'CORE_BUILD_ID=$BUILD_ID'
+steps:
+  - id: validate-target
+    name: ubuntu:24.04
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        set -o pipefail
+        [ "$$CORE_PROJECT" = "life-world-513506" ] || { echo 'unexpected project' >&2; exit 1; }
+        [[ "$$CORE_BUILD_ID" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]] || { echo 'invalid build id' >&2; exit 1; }
+        [[ "$$CORE_SOURCE_SHA256" =~ ^[0-9a-f]{64}$ ]] || { echo 'invalid source manifest SHA-256' >&2; exit 1; }
+        [[ "$$CORE_PACKAGE_SHA256" =~ ^[0-9a-f]{64}$ ]] || { echo 'invalid package SHA-256' >&2; exit 1; }
+        # 上傳的來源必須正好等於來源清單：清單本身的 SHA-256 相符、每個檔案相符、沒有清單以外的檔案。
+        printf '%s  %s\n' "$$CORE_SOURCE_SHA256" core-e2e-source-manifest.sha256 | sha256sum -c --quiet -
+        sha256sum -c --quiet core-e2e-source-manifest.sha256
+        # M0 修正 V4（F4）：兩份清單先各自完整產生（pipefail，產生失敗就停止），再比較；不使用 process substitution。
+        actual_list="$$(mktemp)"; expected_list="$$(mktemp)"
+        find . -type f ! -name core-e2e-source-manifest.sha256 -printf '%P\n' | LC_ALL=C sort > "$$actual_list"
+        sed -E 's/^[0-9a-f]{64}  //' core-e2e-source-manifest.sha256 | LC_ALL=C sort > "$$expected_list"
+        cmp -s "$$actual_list" "$$expected_list" || { echo 'uploaded source differs from the manifest' >&2; exit 1; }
+        grep -qF "printf 'core-e2e\n' > /etc/lifeworld/deployment-profile" deploy/Dockerfile.core-e2e
+        test -f app/deployment_profile.py
+        printf 'LW_CORE_E2E_TAG=m0-%s-%s\n' "$$CORE_SOURCE_SHA256" "$$CORE_BUILD_ID"
+  - id: verify-package
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        # 由 Cloud Build 自己的建置紀錄取得這次上傳的封裝（bucket、object、generation），重新計算 SHA-256。
+        # 任何查詢錯誤都停止；不以錯誤訊息的文字判斷結果。pipefail：讀取物件失敗時不能拿空輸入的 SHA-256 比對。
+        set -o pipefail
+        fields="$$(gcloud builds describe "$$CORE_BUILD_ID" --project=life-world-513506 --region=asia-east1 \
+          --format='value(source.storageSource.bucket,source.storageSource.object,source.storageSource.generation)')"
+        IFS=$$'\t' read -r bucket object generation <<< "$$fields"
+        [ "$$bucket" = "life-world-513506_cloudbuild" ] || { echo 'unexpected source bucket' >&2; exit 1; }
+        [[ "$$object" =~ ^source/[0-9.]+-[0-9a-f]{32}\.tgz$ ]] || { echo 'unexpected source object' >&2; exit 1; }
+        [[ "$$generation" =~ ^[0-9]+$ ]] || { echo 'unexpected source generation' >&2; exit 1; }
+        actual="$$(gcloud storage cat "gs://$$bucket/$$object#$$generation" | sha256sum | cut -d' ' -f1)"
+        [ "$$actual" = "$$CORE_PACKAGE_SHA256" ] || { echo 'uploaded package SHA-256 differs' >&2; exit 1; }
+  - id: core-e2e-image-build
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '--build-arg', 'VCS_REF=68102f230aa947a434286ba9260e1ae75f6634b0',
+           '--label', 'org.lifeworld.source-manifest-sha256=${_SOURCE_MANIFEST_SHA256}',
+           '--label', 'org.lifeworld.package-sha256=${_PACKAGE_SHA256}',
+           '--label', 'org.lifeworld.build-id=$BUILD_ID',
+           '-f', 'deploy/Dockerfile.core-e2e',
+           '-t', 'asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-core-e2e:m0-${_SOURCE_MANIFEST_SHA256}-$BUILD_ID', '.']
+  - id: core-e2e-push-and-record
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        # push 這次建置的 tag；tag 不可覆寫，已存在就失敗。digest 取自這次 push 的輸出與本機 RepoDigests，兩者必須一致。
+        set -o pipefail
+        repo="asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-core-e2e"
+        image="$$repo:m0-$$CORE_SOURCE_SHA256-$$CORE_BUILD_ID"
+        docker push "$$image" > core-e2e-push.log
+        pushed="$$(grep -oE 'digest: sha256:[0-9a-f]{64}' core-e2e-push.log | tail -1 | cut -d' ' -f2)" || pushed=''
+        [[ "$$pushed" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'push did not report a digest' >&2; exit 1; }
+        # M0 修正 V4（F4）：先取得 docker inspect 自己的完整退出碼與輸出，不經過 pipeline；
+        # 只有退出碼 0、而且 RepoDigests 正好只有一筆、等於這次 push 的 repo@digest，才輸出 provenance。
+        inspect_out="$$(mktemp)"
+        inspect_status=0
+        docker inspect --format='{{range .RepoDigests}}{{println .}}{{end}}' "$$image" > "$$inspect_out" || inspect_status=$$?
+        [ "$$inspect_status" -eq 0 ] || { echo "docker inspect failed (exit $$inspect_status)" >&2; exit 1; }
+        repo_digests="$$(sed '/^[[:space:]]*$$/d' "$$inspect_out")"
+        [ "$$repo_digests" = "$$repo@$$pushed" ] \
+          || { echo 'local RepoDigests are not exactly the pushed digest' >&2; exit 1; }
+        printf 'LW_CORE_E2E_PROVENANCE build_id=%s source_manifest_sha256=%s package_sha256=%s image=%s@%s\n' \
+          "$$CORE_BUILD_ID" "$$CORE_SOURCE_SHA256" "$$CORE_PACKAGE_SHA256" "$$repo" "$$pushed"
+substitutions:
+  _SOURCE_MANIFEST_SHA256: ''
+  _PACKAGE_SHA256: ''

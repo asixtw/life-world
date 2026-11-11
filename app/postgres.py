@@ -111,6 +111,29 @@ def translated_error(exc):
     return DomainError(503, 'database_unavailable', '資料服務暫時不可用，請保留內容並沿用原提交代碼重試。')
 
 
+class ConnectionStateError(RuntimeError):
+    """新的實體連線無法確認交易模式（M0 修正 V4，F2）。呼叫端一律關閉這條連線。
+
+    code：'unconfirmed'（初始化之前無法確認 autocommit）或 'unrestorable'（初始化之後無法回到交易模式）。"""
+
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+def _transaction_open(raw):
+    """回傳 True 代表「有交易，或無法確認」，呼叫端一律關閉這條連線。
+
+    M0 修正 V5（F2）：pg8000（鎖定 1.31.6）的 _in_transaction 是依 ReadyForQuery 交易狀態計算的 bool。
+    只有這個屬性存在、型別正好是 bool、而且明確是 False，才算「沒有交易」；
+    缺少屬性、讀取失敗、None、0、空字串或其他型別，一律視為無法確認（fail closed）。"""
+    try:
+        state = raw._in_transaction
+    except Exception:
+        return True
+    return not (type(state) is bool and state is False)
+
+
 class PostgresDatabase:
     backend = 'postgresql'
 
@@ -144,6 +167,10 @@ class PostgresDatabase:
                                           user=s.db_user, password=s.db_password, db=s.db_name)
         try:
             raw.autocommit = True
+            # M0 修正 V4（F2）：第一個 cursor 之前讀回確認真的是 autocommit，而且沒有未結束的交易；
+            # 否則初始化的 SHOW／SET 會開啟交易並把它交出去。無法確認就關閉這條連線（下方 except），絕不放入 pool。
+            if raw.autocommit is not True or _transaction_open(raw):
+                raise ConnectionStateError('unconfirmed')
             with closing(raw.cursor()) as cursor:
                 cursor.execute('SHOW server_version_num')
                 if int(cursor.fetchone()[0]) // 10000 != 18:
@@ -153,6 +180,8 @@ class PostgresDatabase:
                 cursor.execute("SET lock_timeout = '5s'")
                 cursor.execute("SET statement_timeout = '15s'")
             raw.autocommit = False
+            if raw.autocommit is not False or _transaction_open(raw):
+                raise ConnectionStateError('unrestorable')
             return raw
         except BaseException:
             raw.close()

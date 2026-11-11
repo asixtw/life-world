@@ -39,6 +39,8 @@ def test_cloud_runtime_is_fail_closed_and_hosts_are_explicit(tmp_path, monkeypat
     monkeypatch.setenv('LIFEWORLD_TRUSTED_HOSTS', 'testserver,api.example.test')
     monkeypatch.setenv('LIFEWORLD_DB_BACKEND', 'postgresql')
     monkeypatch.setenv('LIFEWORLD_DB_PASSWORD', 'synthetic-local-only')
+    monkeypatch.setenv('LIFEWORLD_DB_NAME', 'synthetic_db')  # P0：PG 的 Database／User 必須明確設定
+    monkeypatch.setenv('LIFEWORLD_DB_USER', 'synthetic_user')
     with TestClient(create_app(data_dir=tmp_path)) as client:
         assert client.get('/health').status_code == 200
         assert client.post('/api/auth/guest').status_code == 503

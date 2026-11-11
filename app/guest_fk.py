@@ -35,7 +35,12 @@ def catalog(c,backend):
     return cols,groups
 
 
-def verify_graph(groups):
+# 已審核資料表形狀對應的外鍵契約（只在 PostgreSQL 比對；內容格式與 catalog() 相同）。
+CONTRACTS={'alpha_034':'guest_fk_contract.json','unified_010':'guest_fk_contract_010.json'}
+
+
+def verify_graph(groups,shape='alpha_034'):
+    """實際外鍵必須與該形狀的契約完全相同；多一條、少一條或欄位不同都拒絕。"""
     actual=sorted([[a,list(b),c,list(d)] for a,b,c,d in groups])
-    expected=json.loads(Path(__file__).with_name('guest_fk_contract.json').read_text())
+    expected=json.loads(Path(__file__).with_name(CONTRACTS[shape]).read_text(encoding='utf-8'))
     if actual!=expected:raise ValueError('unreviewed_fk')

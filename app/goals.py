@@ -133,7 +133,7 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
             if pending:  # 先保存待處理，經歷照常確認。
                 c.execute('INSERT INTO pending_contributions(id,owner_id,goal_id,experience_id,action_id,quantity) VALUES (?,?,?,?,?,?)', (str(uuid4()), owner, goal_id, experience_id, item.action_id, item.quantity))  # 此處不發獎。
             else:  # 進行中沿用原本貢獻交易。
-                c.execute('INSERT INTO contributions VALUES (?,?,?,?,?)', (str(uuid4()), owner, experience_id, item.action_id, item.quantity))  # 實際投入由使用者確認。
+                c.execute('INSERT INTO contributions(id,owner_id,experience_id,action_id,quantity) VALUES (?,?,?,?,?)', (str(uuid4()), owner, experience_id, item.action_id, item.quantity))  # 實際投入由使用者確認。
         c.execute('UPDATE goals SET revision=revision+1 WHERE id=? AND owner_id=?', (goal_id, owner))  # 防止回顧頁忽略新保存資料。
 
     def review_goal(self, owner, goal_id, data):  # 設定舊目標、調整安排、延長或結束。
@@ -206,7 +206,7 @@ class GoalsMixin:  # 擴充既有服務，不更換技術或 owner。
             require(goal['status'] == 'active' and pending['status'] == 'pending', 409, 'pending_not_applicable', '請先延長挑戰；歷史或已處理貢獻不能再次採計。')  # 不自動恢復歷史。
             occurred = datetime.fromisoformat(pending['occurred_at']).astimezone(ZoneInfo(goal['schedule_timezone'])).date()  # 依原目標時區判定活動日期。
             require(goal['start_date'] <= occurred.isoformat() <= goal['deadline'], 422, 'contribution_out_of_range', '這段經歷不在目前挑戰期間，請保留為未採計。')  # 不把期外活動硬塞入進度。
-            c.execute('INSERT INTO contributions VALUES (?,?,?,?,?)', (str(uuid4()), owner, pending['experience_id'], pending['action_id'], data.quantity))  # 僅增加已人工確認進度。
+            c.execute('INSERT INTO contributions(id,owner_id,experience_id,action_id,quantity) VALUES (?,?,?,?,?)', (str(uuid4()), owner, pending['experience_id'], pending['action_id'], data.quantity))  # 僅增加已人工確認進度。
             c.execute("UPDATE pending_contributions SET status='accepted',accepted_quantity=?,accepted_at=? WHERE id=? AND owner_id=?", (data.quantity, self.now().isoformat(), pending_id, owner))  # 保留原數量及採計量。
             c.execute('UPDATE goals SET revision=revision+1 WHERE id=? AND owner_id=?', (goal_id, owner))  # 同步版本。
             result = self._goal(c, goal_id, owner)  # 回傳更新後的目標。

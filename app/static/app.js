@@ -25,7 +25,7 @@ const GuestLocalCleanup = (()=>{
 })();
 window.addEventListener('online',()=>GuestLocalCleanup.retry());
 window.addEventListener('focus',()=>GuestLocalCleanup.retry());
-const names = {world:'我的世界', goals:'目標花園', record:'記錄經歷', history:'經歷收藏', people:'我的關係', notes:'私人小劇場', profile:'認識你', 'goal-new':'建立目標', birth:'新的開始', welcome:'歡迎'}; // 定義主頁面顯示名稱
+const names = {world:'我的世界', goals:'目標花園', record:'記錄經歷', history:'經歷收藏', persons:'人物', 'persons-new':'新增人物', people:'我的關係', notes:'私人小劇場', profile:'認識你', 'goal-new':'建立目標', birth:'新的開始', welcome:'歡迎'}; // 定義主頁面顯示名稱
 const dayNames = ['一','二','三','四','五','六','日']; // 以週一到週日的順序顯示星期
 let renderSequence = 0; // 用本次渲染序號拒絕較舊非同步回應覆蓋畫面
 const renderControls = new Map(); // 保存切頁前各表單控制項原本的停用狀態
@@ -68,7 +68,7 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
     error.code = body?.error?.code; error.status = response.status; error.fields = body?.error?.fields; // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
     if(response.status===401 && state.me?.status==='guest') error.message+=' 訪客工作階段可能已到期或Cookie已清除；伺服器資料不會因此自動刪除，但沒有帳號時可能無法取回。';
     if (response.status === 401 && (!path.startsWith('/auth/') || path === '/auth/me')) { // 依目前選項或狀態進入對應處理分支
-      DashboardUI.clear(); state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.dirty = false; // 成功保存或明確導覽後清除未保存旗標
+      DashboardUI.clear(); CreationUI.forget(); state.me = null; state.world = null; state.csrf = ''; state.draft = null; state.dirty = false; // 成功保存或明確導覽後清除未保存旗標
       $('#account-dialog').close(); await render(); // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
     } // 結束目前回呼、區塊或模組定義
     throw error; // 執行「統一送出 API、CSRF、JSON 與連線失敗處理」的目前處理步驟
@@ -133,9 +133,9 @@ function goalCard(goal) { // 產生目標摘要卡與詳情入口
 function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').hidden=false; // 資料服務未開放也保留入口，明示降級而不是整個隱藏。
   $('.sidebar').classList.toggle('before-world',!state.me?.lumi_hatched); // 手機首次引導不顯示空白底部導覽。
-  const active = /^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
-  $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],['people','◌','關係']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
-  $('#page-label').textContent = names[route] || (route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
+  const active = /^persons/.test(route)?'persons':/^(portrayal\/|portrayal-new|character|persona)/.test(route)?'characters':/^(create|runs|run\/|story-new|story\/|play\/|stage|performance\/|portrayal-play\/|works|work\/)/.test(route)?'works':/^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
+  $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],...(PersonsUI.enabled()?[['persons','◎','人物']]:[]),['people','◌','關係'],['characters','☆','角色'],['works','▣','作品']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
+  $('#page-label').textContent = names[route] || (route.startsWith('persons')?'人物':route==='story-new'?'故事開場':route.startsWith('story/')?'故事開場':route.startsWith('play/')?'互動冒險':route==='stage'||route.startsWith('stage/')?'人物劇場':route.startsWith('performance/')?'多角色演出':route.startsWith('portrayal-new')?'從真人資料建立角色卡':route.startsWith('portrayal-play/')?'人物互動試演':route.startsWith('portrayal/')?'人物演繹':route.startsWith('create')?'建立新作品':route==='runs'?'我的生成作品':route.startsWith('run/')?'生成作品':route==='character-ai'?'AI 產生角色卡':route==='works'||route.startsWith('works?')?'作品':route.startsWith('work/')?'作品詳情':route==='persona'?'我的人設':route.startsWith('character-system/')?'系統角色':route.startsWith('character/')?'角色卡':route==='characters'?'角色卡':route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
   $('#account-button').textContent = state.me?.status==='guest' ? '訪客模式' : (state.me?.name?.slice(0,1) || '○'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function welcomeView() {
@@ -184,10 +184,20 @@ function reviewView(d) { // 產生人工核對頁，分開保存經歷與勾選�
   const goal = state.world.goals.find(g => g.id === d.goal_id); // 讀取目前選定目標及其行動資料
   return `<div class="narrow">${heading('最後，由你來確認。','原始記錄保留不變。只把你確認的內容，放進真實經歷。')}<form id="review-form" class="card"><h3>原始記錄</h3><div class="raw-source">${esc(d.raw_text)}</div><p class="record-meta">實際發生於 ${esc(time(d.occurred_at))}</p><div id="media-panel"></div><div class="field space-top"><label for="summary">確認後的摘要</label><textarea id="summary" name="summary" maxlength="20000" required>${esc(d.raw_text)}</textarea></div>${state.me.status==='registered'?button('suggest',state.capabilities?.ai_available?'使用 AI 整理本篇原文':'用原文建立整理候選','secondary'):''}<p class="small muted">${state.me.status!=='registered'?'訪客請手動核對摘要；登入後才可使用 AI 整理。':state.capabilities?.ai_available?'會將本篇原文傳給已設定模型；回應仍需你編輯並確認。':'目前使用手動原文整理，尚未連接外部 AI。'}</p><div id="candidate-panel"></div><div id="ai-people-panel"></div>${personField(d.person_id)}${ConnectionsUI.editor(d.story,'review')}<div id="people-review-fields"></div>${contributionFields(goal, d.contributions)}<div class="field"><label for="followups">想留下的下一步（選填，每行一項）</label><textarea id="followups" name="tasks" placeholder="例如：明天再練習半小時"></textarea></div><div class="callout">${goal ? '關聯目標：' + esc(goal.title) + '。' : ''}貢獻與積分將由伺服器一次保存。相同提交重試不會重複入帳。開發設定：每筆確認經歷 ${state.world.policy.points_per_experience} 分。</div><div class="button-row"><button class="primary">我已核對，確認保存</button>${button('edit-current-draft','返回修改原始草稿','secondary')}</div></form></div>`; // 組合「產生人工核對頁，分開保存經歷與勾選人物更新」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
-function historyView() { // 列出已確認經歷與可接續草稿
+function recordCard(e, typeTag = false) { // 一筆已確認的我的紀錄；typeTag＝在「全部」頁籤標示類型
+  const w = state.world; // 讀取目前帳號的世界資料
+  return `<article class="card"><div class="section-title">${typeTag ? '<span class="tag">我的紀錄</span>' : ''}<span class="tag">已由你確認</span><span class="small muted">${esc(time(e.occurred_at))}</span></div><p class="record-content">${esc(e.summary)}</p><details><summary class="small muted">查看原始紀錄</summary><div class="raw-source space-top">${esc(e.raw_text)}</div></details>${link('media-sources/'+e.draft_id,'查看此裝置的素材','text-button')}<p class="record-meta">${esc(w.goals.find(g => g.id === e.goal_id)?.title || '獨立經歷')} · ${esc(w.people.find(p => p.id === e.person_id)?.name || '未關聯人物')}<br>提交保存於 ${esc(time(e.created_at))}</p>${state.me.status==='registered'?'<button type="button" class="text-button" data-cx="manage" data-id="'+esc(e.id)+'">整理／查看交會來源</button>':''}</article>`;
+}
+async function historyPage(params) { // 紀錄頁：我的紀錄／人物經歷／全部（後兩者需要新人物系統）
+  const view = PersonsUI.enabled() && ['people', 'all'].includes(params.get('view')) ? params.get('view') : 'mine';
+  const tabs = PersonsUI.enabled() ? PersonsUI.recordTabs(view) : '';
+  if (view === 'mine') return '<div id="media-local-drafts"></div>' + historyView(tabs); // 我的紀錄：沿用原本的畫面與核對流程
+  return PersonsUI.recordsPage(view, params, tabs, {records: state.world.experiences, recordCard});
+}
+function historyView(tabs = '') { // 列出已確認經歷與可接續草稿
   const w = state.world, filter = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 讀取目前帳號的世界資料
   const experiences = filter ? w.experiences.filter(e => e.person_id === filter) : w.experiences; // 保存「experiences」供此流程接續使用
-  return `${heading('收藏每一段真實。','所有已確認的經歷，都帶著原始記錄與發生時間。',link('record','＋ 新的經歷','primary'))}${w.drafts.length && !filter ? `<section class="space-bottom"><div class="section-title"><h2>等待你的確認</h2><span class="tag">草稿不計分</span></div><div class="card">${w.drafts.map(d => `<div class="list-item"><div class="item-main"><h3>${esc(d.raw_text.slice(0,65))}</h3><p>${esc(time(d.occurred_at))} · revision ${d.revision}</p></div>${link('review/' + d.id,'繼續核對 →','text-button')}</div>`).join('')}</div></section>` : ''}<div class="button-row space-bottom">${link('private-notes','私人筆記／草稿箱','secondary')}</div><div class="stack">${experiences.length ? experiences.map(e => `<article class="card"><div class="section-title"><span class="tag">已由你確認</span><span class="small muted">${esc(time(e.occurred_at))}</span></div><p class="record-content">${esc(e.summary)}</p><details><summary class="small muted">查看原始紀錄</summary><div class="raw-source space-top">${esc(e.raw_text)}</div></details>${link('media-sources/'+e.draft_id,'查看此裝置的素材','text-button')}<p class="record-meta">${esc(w.goals.find(g => g.id === e.goal_id)?.title || '獨立經歷')} · ${esc(w.people.find(p => p.id === e.person_id)?.name || '未關聯人物')}<br>提交保存於 ${esc(time(e.created_at))}</p>${state.me.status==='registered'?'<button type="button" class="text-button" data-cx="manage" data-id="'+esc(e.id)+'">整理／查看交會來源</button>':''}</article>`).join('') : `<div class="card">${empty('這裡還沒有正式經歷。先記下一次真實行動吧。')}</div>`}</div>`; // 組合「列出已確認經歷與可接續草稿」所需的畫面或提交資料
+  return `${heading('收藏每一段真實。','所有已確認的經歷，都帶著原始記錄與發生時間。',link('record','＋ 新的經歷','primary'))}${tabs}${w.drafts.length && !filter ? `<section class="space-bottom"><div class="section-title"><h2>等待你的確認</h2><span class="tag">草稿不計分</span></div><div class="card">${w.drafts.map(d => `<div class="list-item"><div class="item-main"><h3>${esc(d.raw_text.slice(0,65))}</h3><p>${esc(time(d.occurred_at))} · revision ${d.revision}</p></div>${link('review/' + d.id,'繼續核對 →','text-button')}</div>`).join('')}</div></section>` : ''}<div class="button-row space-bottom">${link('private-notes','私人筆記／草稿箱','secondary')}</div><div class="stack">${experiences.length ? experiences.map(e => recordCard(e)).join('') : `<div class="card">${empty('這裡還沒有正式經歷。先記下一次真實行動吧。')}</div>`}</div>`; // 組合「列出已確認經歷與可接續草稿」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function notesView() { // 列出既有無人物私人草稿與筆記
   const selected = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 保存「selected」供此流程接續使用
@@ -214,6 +224,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   if (state.me && state.me.lumi_hatched && route === 'welcome') route = 'world'; // 依目前選項或狀態進入對應處理分支
   const path = route.split('?')[0]; params = new URLSearchParams(route.split('?')[1] || ''); // 從路由分離出頁面路徑
   if (path !== 'record') state.editingDraft = false; // 依目前選項或狀態進入對應處理分支
+  const previousRoute = state.route, previousY = window.scrollY; // 人物頁換頁時決定捲動位置用
   if (state.route) { PeopleUI.remember(state.route, window.scrollY); ConnectionsUI.remember(state.route, window.scrollY); } // 依目前選項或狀態進入對應處理分支
   ConnectionsUI.ensureOwner(); state.route = route; navigation(path); window.WorldAudio?.route(path); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
   let html; // 保存目前路由產生的頁面標記
@@ -232,13 +243,37 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
     html = state.draft.status === 'draft' ? reviewView(state.draft) : historyView(); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
     if(state.draft.status === 'draft') html=html.replace('<div id="people-review-fields"></div>', '<div id="people-review-fields">'+await PeopleUI.reviewExtras(state.draft.person_id)+'</div>'); // 依目前選項或狀態進入對應處理分支
   } // 結束目前回呼、區塊或模組定義
+  else if (path === 'persons') html = await PersonsUI.list(params); // Unified Person 新人物系統（需要 Schema 010）
+  else if (path === 'persons-new') html = PersonsUI.createForm();
+  else if (path.startsWith('persons-edit/')) html = await PersonsUI.editForm(decodeURIComponent(path.split('/')[1]));
+  else if (path.startsWith('persons/')) html = await PersonsUI.detail(decodeURIComponent(path.split('/')[1]), params.get('tab') || 'overview', params);
   else if (path === 'people') html = params.get('view')==='cards' ? await PeopleUI.renderPeople() : await ConnectionsUI.render(); // 交會取代星圖，收藏冊維持人物管理
   else if (path.startsWith('person/')) html = await PeopleUI.renderPerson(path.split('/')[1],params.get('tab')||'overview'); // 依目前選項或狀態進入對應處理分支
   else if (path.startsWith('source/')) html = await PeopleUI.renderEvidence(path.split('/')[1],path.split('/')[2]); // 依目前選項或狀態進入對應處理分支
   else if (path.startsWith('theater/')) html = await PeopleUI.renderTheater(path.split('/')[1],params.get('mode')||''); // 依目前選項或狀態進入對應處理分支
   else if (path.startsWith('media-sources/')) html = `<div class="narrow">${heading('此裝置的原始素材','素材未同步至其他裝置，這裡的編輯不會改動正式經歷。')}${link('history','返回經歷收藏','secondary')}<div id="media-panel"></div></div>`;
-  else if (path === 'history') html = '<div id="media-local-drafts"></div>'+historyView(); // 依目前選項或狀態進入對應處理分支
+  else if (path === 'history') html = await historyPage(params); // 依目前選項或狀態進入對應處理分支
   else if (path === 'private-notes') html = notesView(); // 依目前選項或狀態進入對應處理分支
+  else if (path === 'characters') html = await CharactersUI.list(params.get('status') || 'active'); // 角色卡（自 8445 移植）
+  else if (path.startsWith('character-system/')) html = await CharactersUI.system(decodeURIComponent(path.split('/')[1]));
+  else if (path.startsWith('character/')) html = await CharactersUI.detail(decodeURIComponent(path.split('/')[1]), params.get('v'));
+  else if (path === 'story-new' || path === 'stage' || path === 'runs') { navigate(path === 'runs' ? 'works' : path === 'story-new' ? 'create?focus=start' : 'create'); return; } // 舊的獨立入口轉到唯一的建立流程（故事開場→② 劇情起點）
+  else if (path.startsWith('story/')) html = await StoriesUI.detail(decodeURIComponent(path.split('/')[1]), params.get('v'));
+  else if (path.startsWith('play/')) html = await PlayUI.detail(decodeURIComponent(path.split('/')[1])); // F05 短篇互動（自 8445 移植）
+  else if (path === 'stage') html = await TheaterUI.builder(); // 人物劇場多角色演出（自 8445 移植）
+  else if (path.startsWith('stage/')) html = await TheaterUI.cast(decodeURIComponent(path.split('/')[1])); // 舊的演出設定：只供閱讀與找到它的演出
+  else if (path.startsWith('performance/')) html = await TheaterUI.performance(decodeURIComponent(path.split('/')[1]));
+  else if (path === 'portrayal-new') html = await PortrayalUI.pick(); // 角色卡工具：從真人資料建立角色卡（先選人物）
+  else if (path.startsWith('portrayal-new/')) html = await PortrayalUI.create(decodeURIComponent(path.split('/')[1])); // F06A 人物演繹（角色卡工具）
+  else if (path.startsWith('portrayal-play/')) html = await PortrayalUI.session(decodeURIComponent(path.split('/')[1]));
+  else if (path.startsWith('portrayal/')) html = await PortrayalUI.detail(decodeURIComponent(path.split('/')[1]), params.get('v'));
+  else if (path === 'create') html = await CreationUI.view(params); // 唯一的建立新作品流程（樹狀節點）
+  else if (path === 'runs') html = await GenerationUI.runs();
+  else if (path.startsWith('run/')) html = await GenerationUI.run(decodeURIComponent(path.split('/')[1]));
+  else if (path === 'character-ai') html = await GenerationUI.draftView();
+  else if (path === 'works') html = await WorksUI.list(); // 作品管理（自 8445 移植）
+  else if (path.startsWith('work/')) html = await WorksUI.detail(decodeURIComponent(path.split('/')[1]), params.get('v'));
+  else if (path === 'persona') html = await WorksUI.personaView(); // 我的人設與同意
   else html = await worldView(); // 處理前述條件不成立時的替代流程
   if ((path === 'record' || path.startsWith('review/')) && state.returnTo) html=link(state.returnTo,'返回人物頁','text-button')+html; // 依目前選項或狀態進入對應處理分支
   if (sequence === renderSequence) {
@@ -246,6 +281,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
     BirthUI.mount(); // 只為孵化頁綁定互動，不改寫伺服器的目標狀態。
     if(state.guestSaveNoticePending){guestSaveNotice();state.guestSaveNoticePending=false;}
     ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);
+    if (path.startsWith('persons')) window.scrollTo(0, PersonsUI.scrollTarget(previousRoute, route, previousY, window.scrollY)); // 人物頁：新頁面從頂端開始，不停在上次離開的位置
     const section=params.get('section');if(['gd-today','gd-week','gd-records'].includes(section)){document.getElementById(section)?.focus();document.getElementById(section)?.scrollIntoView({block:'start'});}
     if (state.me && path==='history') await MediaUI.renderDrafts(state.me.owner_id);
     if (state.me && $('#media-panel')) {
@@ -418,7 +454,7 @@ async function finishLogout(){
   try {await api('/auth/logout',{method:'POST',signal:revoke.signal});}
   catch(error){if(error.status!==401)throw error;} finally{clearTimeout(timer);}
   state.googleAttempt=null;state.dirty=false;state.pendingRoute=null;
-  $('#account-dialog').close();DashboardUI.clear();state.me=null;state.world=null;state.csrf='';state.draft=null;state.candidate=null;state.requests.clear();
+  $('#account-dialog').close();DashboardUI.clear();CreationUI.forget();state.me=null;state.world=null;state.csrf='';state.draft=null;state.candidate=null;state.requests.clear();
   navigate('welcome');
   if(clear&&owner){
     const controller=new AbortController();let timeout;
@@ -452,6 +488,15 @@ document.addEventListener('click', async event => { // 監聽點擊
     if(action==='entry-retry'){await retryPublicEntry();return;}
     if(action?.startsWith('entry-')){publicEntryView(action.slice(6));return;}
     if (await PeopleUI.handleClick(target)) return; // 依目前選項或狀態進入對應處理分支
+    if (await PersonsUI.handleClick(target)) return; // 新人物系統：封存與恢復
+    if (await CharactersUI.handleClick(target)) return; // 角色卡複製、封存與恢復
+    if (await WorksUI.handleClick(target)) return; // 同意、作品封存與恢復
+    if (await GenerationUI.handleClick(target)) return; // 保存 AI 草稿、恢復生成
+    if (await StoriesUI.handleClick(target)) return; // 保存故事開場
+    if (await PlayUI.handleClick(target)) return; // F05 開始冒險、保存回合、結束
+    if (await PortrayalUI.handleClick(target)) return; // F06A 保存演繹、試演來回、結束
+    if (await TheaterUI.handleClick(target)) return; // 人物劇場演出與保存
+    if (await CreationUI.handleClick(target)) return; // 建立新作品：修改節點、開始生成、保存
     if (action === 'guest') {await startGuest(); await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定
     if(action==='test-login-dialog')accountView('test-login');
@@ -523,6 +568,15 @@ document.addEventListener('submit', async event => { // 監聽表單提交
     if (await GoalsUI.submit(form)) return; // 目標建立與回顧先使用新契約。
     if (await ConnectionsUI.submit(form)) return; // 來源核對及角色更正沿用既有錯誤處理
     if (await PeopleUI.handleSubmit(form)) return; // 依目前選項或狀態進入對應處理分支
+    if (await PersonsUI.submit(form)) return; // 新人物系統：搜尋、新增、編輯、人物設定
+    if (await CharactersUI.submit(form)) return; // 角色卡改版
+    if (await WorksUI.submit(form)) return; // 人設保存
+    if (await GenerationUI.submit(form)) return; // AI 草稿與生成精靈
+    if (await StoriesUI.submit(form)) return; // F04 故事開場
+    if (await PlayUI.submit(form)) return; // F05 送出行動
+    if (await PortrayalUI.submit(form)) return; // F06A 產生演繹、改版、開始試演、送出訊息
+    if (await TheaterUI.submit(form)) return; // 人物劇場保存演出設定
+    if (await CreationUI.submit(form)) return; // 建立新作品：完成一個節點
     const f = new FormData(form); // 讀取使用者目前表單值，不直接推論人物資訊
     if (form.id === 'profile-form') {await api('/profile',{method:'PUT',body:Object.fromEntries(f)}); await refresh(); navigate('goal-new');} // 等待伺服器完成讀取或保存，再進入下一步
     if (form.id === 'record-form') await saveDraft(form, submitter?.value !== 'save'); // 依目前選項或狀態進入對應處理分支
@@ -573,6 +627,15 @@ async function start() { // 讀取既有身分後啟動畫面
   await render(); // 執行「讀取既有身分後啟動畫面」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 MediaUI.initialize({state,api,esc,toast,contributionFields,requestLogin:()=>{toast('登入後可使用辨識；原素材與手動文字會保留。');accountView('claim');}});
+PersonsUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate,dialog,closeDialog:()=>$('#account-dialog').close()}); // 新人物系統（關係視窗用共用對話框）
+CharactersUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 角色卡模組共用主程式工具
+WorksUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 人設、同意與作品管理
+GenerationUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // AI 草稿與 T1／T2 生成
+StoriesUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // F04 故事開場
+PlayUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // F05 短篇互動
+PortrayalUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // F06A 人物演繹
+TheaterUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 人物劇場
+CreationUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 建立新作品
 PeopleUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm}); // 將主程式工具注入人物模組，使兩者共用狀態
 ConnectionsUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm}); // 交會與收藏冊共用 API 及帳號資料
 document.addEventListener('click',async event=>{const target=event.target.closest('[data-cx]'); if(!target) return; target.disabled=true; try { await ConnectionsUI.click(target); } catch(error) { showError(error); } finally { if(target.isConnected) target.disabled=false; }}); // 防止來源／配對重複點擊並保留失敗內容

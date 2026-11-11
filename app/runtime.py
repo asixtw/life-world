@@ -15,6 +15,17 @@ def flag(name, default=False):
     return value.lower() == 'true'
 
 
+def require_explicit_backend(environ):
+    """伺服器模式（uvicorn --factory、python -m app）必須明確指定資料庫。
+
+    Local 8030 與 Cloud Run 一律是 PostgreSQL（Cloud SQL）；SQLite 只給明確指定的單元測試與獨立工具。
+    未設定時拒絕啟動，不會因為沒設定就默默建立或讀取本機 SQLite。
+    """
+    if environ.get('LIFEWORLD_DB_BACKEND') not in ('sqlite', 'postgresql'):
+        raise ValueError('database_backend_required: set LIFEWORLD_DB_BACKEND=postgresql (Cloud SQL), '
+                         'or LIFEWORLD_DB_BACKEND=sqlite only for explicit unit tests or isolated tools')
+
+
 @dataclass(frozen=True)
 class RuntimeSettings:
     backend: str = 'sqlite'
@@ -36,6 +47,8 @@ class RuntimeSettings:
     cloud_run: bool = False
     business_enabled: bool = True
     public_gate_closed: bool = False  # 公開候選尚缺DB／登入Gate時，只開放非敏感頁面。
+    # 010 關係來源：''＝依 backend 預設（SQLite→link_table、PG→legacy_jsonb）；Migration 010 驗收後 PG 設 link_table。
+    relation_source_store: str = ''
 
     google_client_id: str = ''  # 明確配置才啟用GIS；既有IAP部署預設不變。
     test_login_usernames: tuple = ()  # 既有授權測試帳密白名單，與Google共用Owner能力。
@@ -61,6 +74,8 @@ class RuntimeSettings:
         return bool(self.test_login_usernames) or (self.alpha_login_enabled if self.access_mode=='public_alpha' else self.password_login_enabled)
 
     def __post_init__(self):
+        if self.relation_source_store not in ('', 'legacy_jsonb', 'link_table'):
+            raise ValueError('Unknown relation source store (legacy_jsonb or link_table)')
         if self.public_gate_closed and (self.business_enabled or self.google_client_id or self.test_login_usernames):
             raise ValueError('Closed public gate cannot enable business or authentication')
         if any(not re.fullmatch(r"[a-z0-9_]{3,30}",x) for x in self.test_login_usernames):
@@ -139,8 +154,9 @@ class RuntimeSettings:
         if not re.fullmatch(r'[a-z_][a-z0-9_]{0,62}', schema):
             raise ValueError('Invalid PostgreSQL schema identifier')
         closed = flag('LIFEWORLD_PUBLIC_GATE_CLOSED',False)
-        if backend == 'postgresql' and not closed and (mode not in ('tcp', 'cloud_sql') or not password or (mode == 'cloud_sql' and not instance)):
-            raise ValueError('Incomplete PostgreSQL configuration')
+        if backend == 'postgresql' and not closed and (mode not in ('tcp', 'cloud_sql') or not password or (mode == 'cloud_sql' and not instance)
+                                                        or not os.environ.get('LIFEWORLD_DB_NAME') or not os.environ.get('LIFEWORLD_DB_USER')):
+            raise ValueError('Incomplete PostgreSQL configuration')  # Database 與 User 必須明確設定，不預設成正式庫
         origin = os.environ.get('LIFEWORLD_EXTERNAL_ORIGIN', '').rstrip('/')
         if origin:
             parsed = urlsplit(origin)
@@ -155,8 +171,8 @@ class RuntimeSettings:
         return cls(backend=backend, connection_mode=mode,
                    db_host=os.environ.get('LIFEWORLD_DB_HOST', '127.0.0.1'), db_port=port,
                    pg_tls=os.environ.get('LIFEWORLD_PG_TLS', 'auto'),
-                   db_name=os.environ.get('LIFEWORLD_DB_NAME', 'life_world_dev'), db_schema=schema,
-                   db_user=os.environ.get('LIFEWORLD_DB_USER', 'lw_app'), db_password=password,
+                   db_name=os.environ.get('LIFEWORLD_DB_NAME', ''), db_schema=schema,
+                   db_user=os.environ.get('LIFEWORLD_DB_USER', ''), db_password=password,
                    instance_connection_name=instance, pool_size=size,
                    trusted_hosts=hosts, secure_cookies=secure, external_origin=origin,
                    write_origins=tuple(x.strip() for x in os.environ.get('LIFEWORLD_WRITE_ORIGINS','').split(',') if x.strip()),
@@ -177,4 +193,5 @@ class RuntimeSettings:
                    alpha_storage_bytes=int(os.environ.get('LIFEWORLD_ALPHA_STORAGE_BYTES','100000000')),
                    alpha_writes_enabled=flag('LIFEWORLD_ALPHA_WRITES_ENABLED',True),
                    alpha_login_enabled=flag('LIFEWORLD_ALPHA_LOGIN_ENABLED',False),
-                   cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud),public_gate_closed=closed)
+                   cloud_run=cloud, business_enabled=flag('LIFEWORLD_ENABLE_BUSINESS_API', not cloud),public_gate_closed=closed,
+                   relation_source_store=os.environ.get('LIFEWORLD_RELATION_SOURCE_STORE', ''))

@@ -17,24 +17,49 @@ from .errors import DomainError, require  # 共用領域錯誤與條件檢查
 from .schemas import format_decimal  # 載入領域輸入模型或十進位格式工具
 from .security import PASSWORDS, DUMMY_HASH, digest, new_session, require_registered  # 共用密碼、工作階段與帳號權限檢查
 from .people import PeopleMixin  # 載入人物來源與互動事件服務擴充
+from .persons import PersonsMixin  # Unified Person 新人物系統（/api/persons）
+from .person_experiences import PersonExperiencesMixin  # 人物經歷（/api/person-experiences）
+from . import relation_sources  # 010 關係來源模式（預設值）
 from .connections import ConnectionsMixin  # 載入逐經歷人物角色與故事探索服務
 from .goals import GoalsMixin  # 載入單一挑戰、日期安排與人工回顧。
+from .character_cards import CharacterCardsMixin  # 角色卡（自 8445 移植）：系統角色、複製、改版、封存
+from .self_persona import SelfPersonaMixin  # Self Persona 與同意（自 8445 移植）
+from .works_center import WorksMixin  # 作品管理（自 8445 移植）
+from .generation import GenerationMixin  # 生成框架（自 8445 移植；8030 以金額上限取代次數上限）
+from .roleplay import RoleplayMixin  # T1／T2 逐段生成與恢復（自 8445 移植）
+from .stories import StoriesMixin  # F04 故事開場（自 8445 移植）
+from .play_sessions import PlaySessionsMixin  # F05 短篇互動（自 8445 移植）
+from .portrayals import PortrayalsMixin  # F06A 人物演繹（自 8445 移植）
+from .theater import TheaterMixin  # 人物劇場多角色演出（自 8445 移植）
 
 
 def uid():  # 產生不依賴名稱的固定唯一識別碼
     return str(uuid4())  # 回傳產生不依賴名稱的固定唯一識別碼的結果
 
 
+# P0（Unified Schema 010）：資源讀取使用 010 之前就存在的明確欄位；新欄位在 P1 隨 API 契約一起開放。
+OWNED_COLUMNS = {
+    'goals': 'id,owner_id,title,outcome,status,created_at,completed_at,reflection,start_date,deadline,schedule_timezone,revision,ended_at,end_reason',
+    'people': 'id,owner_id,name,role,notes,created_at,roles,tags,category,followed,revision,common_context',
+    'drafts': 'id,owner_id,goal_id,person_id,raw_text,occurred_at,contributions,status,revision,created_at,updated_at',
+    'evidence': 'id,owner_id,goal_id,filename,mime,digest,content,size,created_at',
+    'notes': 'id,owner_id,person_id,kind,title,content,created_at',
+    'tasks': 'id,owner_id,experience_id,title,done',
+}
+
+
 def encoded(value):  # 以穩定鍵序序列化 JSON，供指紋與資料保存使用
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))  # 回傳以穩定鍵序序列化 JSON，供指紋與資料保存使用的結果
 
 
-class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用既有交易與帳本。
+class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin, PersonsMixin, PersonExperiencesMixin, CharacterCardsMixin, SelfPersonaMixin, WorksMixin, StoriesMixin, PlaySessionsMixin, PortrayalsMixin, TheaterMixin, GenerationMixin, RoleplayMixin):  # 各模組共用既有交易與帳本。
     def __init__(self, db, policy, clock=None, assistant=None):  # 注入資料庫、設定、時鐘與整理提供者
         self.db = db  # 保存「self.db」供後續驗證或回傳使用
         self.policy = policy  # 保存「self.policy」供後續驗證或回傳使用
         self.clock = clock or (lambda: datetime.now(timezone.utc))  # 保存「self.clock」供後續驗證或回傳使用
         self.assistant = assistant or ManualAssistant()  # 保存「self.assistant」供後續驗證或回傳使用
+        # 010 關係來源：SQLite 結構一定含關聯表；PostgreSQL 在 Migration 010 驗收前維持舊 JSONB（create_app 可依設定覆寫）。
+        self.relation_source_store = relation_sources.default_store(getattr(db, 'backend', 'sqlite'))
 
     def now(self):  # 取得可注入測試時鐘的 UTC 時間
         return self.clock().astimezone(timezone.utc)  # 回傳取得可注入測試時鐘的 UTC 時間的結果
@@ -136,8 +161,8 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
 
     @staticmethod  # 此共用檢查不需要讀取物件狀態
     def _owned(c, table, item_id, owner):  # 限制查詢資料表並核對資源所屬帳號
-        assert table in {'goals', 'people', 'drafts', 'evidence', 'notes', 'tasks'}  # 限制動態資料表或欄位名稱為程式內白名單
-        row = c.execute('SELECT * FROM ' + table + ' WHERE id=? AND owner_id=?', (item_id, owner)).fetchone()  # 依白名單資料表、識別碼與所屬帳號查詢資源
+        columns = OWNED_COLUMNS[table]  # 限制動態資料表為程式內白名單；明確欄位避免 010 新欄位混入回應
+        row = c.execute('SELECT ' + columns + ' FROM ' + table + ' WHERE id=? AND owner_id=?', (item_id, owner)).fetchone()  # 依白名單資料表、識別碼與所屬帳號查詢資源
         require(row is not None, 404, 'not_found', '找不到可存取的資料。')  # 驗證限制：找不到可存取的資料。
         return row  # 回傳限制查詢資料表並核對資源所屬帳號的結果
 
@@ -148,12 +173,14 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
                         (owner, operation, request_id)).fetchone()  # 執行目前交易中的參數化查詢
         if row:  # 依目前條件選擇下一步處理分支
             require(row['fingerprint'] == fingerprint, 409, 'idempotency_conflict', '同一提交代碼不能用於不同內容。')  # 驗證限制：同一提交代碼不能用於不同內容。
-            return json.loads(row['response']), fingerprint  # 回傳比較請求指紋，重送時回傳先前結果的結果
+            response = json.loads(row['response'])  # 讀回先前結果
+            require(not (isinstance(response, dict) and response.get('_deleted')), 410, 'work_deleted', '這張角色卡已刪除。')  # 刪除後重送只得到「已刪除」
+            return response, fingerprint  # 回傳比較請求指紋，重送時回傳先前結果的結果
         return None, fingerprint  # 回傳比較請求指紋，重送時回傳先前結果的結果
 
     @staticmethod  # 此共用檢查不需要讀取物件狀態
     def _remember(c, owner, operation, request_id, fingerprint, response):  # 在目前交易記錄提交代碼、指紋與回應
-        c.execute('INSERT INTO requests VALUES (?,?,?,?,?)', (owner, operation, request_id, fingerprint, encoded(response)))  # 新增去重請求；值以參數傳入
+        c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)', (owner, operation, request_id, fingerprint, encoded(response)))  # 新增去重請求；值以參數傳入
 
     def _goal_base(self, c, goal_id, owner):  # 組合目標、行動與精確十進位累計
         goal = dict(self._owned(c, 'goals', goal_id, owner))  # 準備目前選定的目標資料
@@ -196,7 +223,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
                 if old is not None:return old
             self._related(c, user, data.goal_id, data.person_id, data.contributions)  # 驗證目標、人物與行動貢獻的權限及相互關聯
             draft_id, now = uid(), self.now().isoformat()  # 保存「(draft_id, now)」供後續驗證或回傳使用
-            c.execute("INSERT INTO drafts VALUES (?,?,?,?,?,?,?,'draft',1,?,?)",
+            c.execute("INSERT INTO drafts(id,owner_id,goal_id,person_id,raw_text,occurred_at,contributions,status,revision,created_at,updated_at) VALUES (?,?,?,?,?,?,?,'draft',1,?,?)",
                       (draft_id, owner, data.goal_id, data.person_id, data.raw_text,
                        data.occurred_at.astimezone(timezone.utc).isoformat(), encoded([v.model_dump() for v in data.contributions]), now, now))  # 新增經歷草稿；值以參數傳入
             self._store_draft_story(c, owner, draft_id, data.raw_text, data.story)  # 同交易保存未確認的人物整理
@@ -246,7 +273,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
 
     def _award(self, c, owner, experience_id, now):  # 新增唯一經歷積分帳目
         event_id = uid()  # 準備互動或積分事件的唯一識別碼
-        c.execute('INSERT INTO reward_ledger VALUES (?,?,?,?,?,?)',
+        c.execute('INSERT INTO reward_ledger(id,owner_id,experience_id,points,rule_version,created_at) VALUES (?,?,?,?,?,?)',
                   (event_id, owner, experience_id, self.policy.points_per_experience, self.policy.rule_version, now))  # 新增積分帳本；值以參數傳入
         return event_id  # 回傳新增唯一經歷積分帳目的結果
 
@@ -270,7 +297,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
                 self._validate_story(c, owner, draft['raw_text'], data.story)  # 先核對全部來源與所有權
                 require(not data.person_id or data.person_id in [p.person_id for p in data.story.participants], 422, 'primary_not_participant', '主要關聯人物必須是本次參與者；提及者請在提及區配對。')  # 避免舊主要人物欄位誤用身分
             experience_id, now = uid(), self.now().isoformat()  # 保存「(experience_id, now)」供後續驗證或回傳使用
-            c.execute('INSERT INTO experiences VALUES (?,?,?,?,?,?,?,?,?)',
+            c.execute('INSERT INTO experiences(id,owner_id,draft_id,goal_id,person_id,raw_text,summary,occurred_at,created_at) VALUES (?,?,?,?,?,?,?,?,?)',
                       (experience_id, owner, draft_id, draft['goal_id'], data.person_id,
                        draft['raw_text'], data.summary, draft['occurred_at'], now))  # 新增已確認經歷；值以參數傳入
             self._save_goal_contributions(c, owner, draft['goal_id'], experience_id, draft['occurred_at'], data.contributions)  # 經歷確認與待回顧貢獻分開處理。
@@ -293,13 +320,21 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
         with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             require_registered(user)  # 驗證限制：條件不成立即拒絕操作，避免部分寫入
+            fingerprint = None
+            if data.request_id:  # 帶提交代碼時防重送：同代碼同內容回傳同一筆，同代碼不同內容回 409
+                cached, fingerprint = self._cached(c, owner, 'person:create', data.request_id, data.model_dump(exclude={'request_id'}))
+                if cached:
+                    return cached
             person_id = uid()  # 準備新人物的唯一識別碼
             roles = data.roles or ([data.role] if data.role else [])  # 準備多角色清單；未提供新欄位時沿用舊角色完整文字
             c.execute('''INSERT INTO people(id,owner_id,name,role,notes,created_at,roles,tags,category,followed,common_context)
                          VALUES (?,?,?,?,?,?,?,?,?,?,?)''',
                       (person_id, owner, data.name, data.role or '、'.join(roles), data.notes, self.now().isoformat(),
                        encoded(roles), encoded(data.tags), data.category, data.followed, data.common_context))  # 原生 bool 同時適用 SQLite 與 PG。
-            return self._person(c, owner, person_id)  # 回傳建立人物並保留舊角色欄位的相容性的結果
+            result = self._person(c, owner, person_id)
+            if fingerprint:  # 與人物建立同一交易記錄回應
+                self._remember(c, owner, 'person:create', data.request_id, fingerprint, result)
+            return result  # 回傳建立人物並保留舊角色欄位的相容性的結果
 
     def upload(self, owner, goal_id, filename, mime, content):  # 驗證權限與圖片內容後保存目標佐證
         # Authorize before parsing the content, and recheck within the write transaction.
@@ -328,7 +363,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             if old:  # 依目前條件選擇下一步處理分支
                 return dict(old)  # 回傳驗證權限與圖片內容後保存目標佐證的結果
             evidence_id, now = uid(), self.now().isoformat()  # 保存「(evidence_id, now)」供後續驗證或回傳使用
-            c.execute('INSERT INTO evidence VALUES (?,?,?,?,?,?,?,?,?)',
+            c.execute('INSERT INTO evidence(id,owner_id,goal_id,filename,mime,digest,content,size,created_at) VALUES (?,?,?,?,?,?,?,?,?)',
                       (evidence_id, owner, goal_id, filename, mime, checksum, content, len(content), now))  # 新增圖片佐證；值以參數傳入
             return {'id': evidence_id, 'filename': filename, 'mime': mime, 'size': len(content), 'created_at': now}  # 回傳驗證權限與圖片內容後保存目標佐證的結果
 
@@ -353,7 +388,7 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
                 evidence = self._owned(c, 'evidence', evidence_id, owner)  # 限制查詢資料表並核對資源所屬帳號
                 require(evidence['goal_id'] == goal_id, 404, 'not_found', '找不到此目標的佐證。')  # 驗證限制：找不到此目標的佐證。
             completion_id, now = uid(), self.now().isoformat()  # 保存「(completion_id, now)」供後續驗證或回傳使用
-            c.execute('INSERT INTO completions VALUES (?,?,?,?,?,?)',
+            c.execute('INSERT INTO completions(id,owner_id,goal_id,evidence_ids,reflection,created_at) VALUES (?,?,?,?,?,?)',
                       (completion_id, owner, goal_id, encoded(data.evidence_ids), data.reflection, now))  # 新增目標完成紀錄；值以參數傳入
             c.execute("UPDATE goals SET status='completed',completed_at=?,reflection=?,revision=revision+1 WHERE id=? AND owner_id=?", (now, data.reflection, goal_id, owner))  # 成果與版本同時更新。
             c.execute("UPDATE pending_contributions SET status='unapplied' WHERE goal_id=? AND owner_id=? AND status='pending'", (goal_id, owner))  # 保留未採計歷史。
@@ -370,9 +405,9 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
             for source_id in data.source_experience_ids:  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 self._source_experience(c, owner, source_id, [data.person_id] if data.person_id else None)  # 驗證引用來源確屬此帳號及相關人物
             note_id, now = uid(), self.now().isoformat()  # 保存「(note_id, now)」供後續驗證或回傳使用
-            c.execute('INSERT INTO notes VALUES (?,?,?,?,?,?,?)', (note_id, owner, data.person_id, data.kind, data.title, data.content, now))  # 新增私人筆記；值以參數傳入
+            c.execute('INSERT INTO notes(id,owner_id,person_id,kind,title,content,created_at) VALUES (?,?,?,?,?,?,?)', (note_id, owner, data.person_id, data.kind, data.title, data.content, now))  # 新增私人筆記；值以參數傳入
             for source_id in set(data.source_experience_ids):  # 逐項處理清單中的資料，保留目前交易或查詢條件
-                c.execute('INSERT INTO note_sources VALUES (?,?)', (note_id, source_id))  # 新增私人筆記引用來源；值以參數傳入
+                c.execute('INSERT INTO note_sources(note_id,experience_id) VALUES (?,?)', (note_id, source_id))  # 新增私人筆記引用來源；值以參數傳入
             return dict(self._owned(c, 'notes', note_id, owner), source_experience_ids=data.source_experience_ids)  # 回傳保存私人準備、模擬或訊息草稿，不改正式成果的結果
 
     def edit_task(self, owner, task_id, data):  # 更新待辦，不重複增加積分或行動進度

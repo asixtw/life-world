@@ -204,3 +204,31 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
 
 修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。
+
+### 2026-11-09：MVP M0 部署設定檔 core-e2e（未提交、未部署）
+
+新增 `app/deployment_profile.py`：只有設定 `LIFEWORLD_DEPLOYMENT_PROFILE=core-e2e` 時啟用，`create_app` 第一步先核對 Database／User／Schema／連線方式／實例／標記都明確等於 `life_world_e2e`／`lw_e2e_app`／`lw_core_draft`，拒絕 SQLite、正式庫、Alpha、注入的資料庫物件及 M0 尚未開放的 AI／Google／排程／關係記憶／限流；建連後每一條新連線再核對實際身分與 PG 18.6，不符就拒絕啟動或丟棄連線。沒有設定檔時原有行為不變。另加 `deploy/Dockerfile.core-e2e`（映像固定設定檔）與只建置推送的 `deploy/cloudbuild.core-e2e.yaml`；雲端資源尚未建立，見 `deploy/README.core-e2e.md`。
+
+### 2026-11-09：MVP M0 依 Codex 審查的最小修正（未提交、未部署）
+
+F1：專用映像改以 root 擁有、唯讀的 `/etc/lifeworld/deployment-profile` 作為身分；標記存在時一定驗證，`LIFEWORLD_DEPLOYMENT_PROFILE` 設成空字串或其他值都拒絕，不再依賴可覆寫的 ENV。F2：核對身分後無法還原或讀回 autocommit=False 的連線一律關閉、不入池。F3：拒絕 `GOOGLE_APPLICATION_CREDENTIALS` 等替代 ADC 來源。F4：Cloud Build 只接受 `_TAG`／`_SOURCE_MANIFEST_SHA256`，經 `options.env` 當資料傳遞，核對上傳來源與來源清單、tag 未重複，並記錄 build ID 與 digest。F5：新增 `deploy/core-e2e-build-sources.txt` 白名單。HEALTHCHECK 改帶 Trusted Host。8030 本機腳本（F6、F7、W1）在工作樹外修正。
+
+### 2026-11-09：MVP M0 依 Codex 第二輪審查的最小修正 V3（未提交、未部署）
+
+F2：切成 autocommit 之後先讀回確認為 True 才執行身分查詢；設定失敗、讀回不符或設定靜默無效時，關閉連線、不入池，且不執行任何查詢（啟動與 pool 重新連線皆同）。F3：`HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY`、`NO_PROXY` 任何大小寫一律拒絕，環境變數名稱一律以大寫比對。F4：Cloud Build 改以 `_SOURCE_MANIFEST_SHA256`、`_PACKAGE_SHA256` 為唯一替換值；tag 由建置產生（`m0-<來源清單 SHA>-<BUILD_ID>`），刪除以錯誤訊息判斷 tag 是否存在的步驟；新增 `verify-package`，依這次建置紀錄的來源物件重新計算封裝 SHA；provenance 綁定這次 push 的 digest。F5：建置來源改為本機產生的固定 `.tgz` 封裝（工作樹外的 Prepare／Test 腳本）。F6、F7 的修正在工作樹外的 8030 本機腳本。
+
+### 2026-11-10：MVP M0 依 Codex 第三輪審查的最小修正 V4（未提交、未部署）
+
+F2：`app/postgres.py` 的基底 `_open` 在第一個 cursor 之前讀回確認 autocommit 為 True、而且驅動程式回報沒有未結束的交易，初始化完成切回交易模式後再確認；無法確認就關閉、不入池（一般 PostgreSQL 連線也適用，正常連線的初始化順序不變）。F4：Cloud Build 每個 Bash 步驟開啟 pipefail；`docker inspect` 先取得自己的退出碼，RepoDigests 必須正好只有這次 push 的 digest 才輸出 provenance；檔案清單先完整產生再比較。F5～F7 的修正在工作樹外的 8030 本機腳本（tar header 檢查、封裝內的 Cloud Build 設定與受控提交、嚴格的 ready 判定與固定的 curl 探測、真正持有的程序 handle）。
+
+### 2026-11-10：MVP M0 依 Codex 第四輪審查的最小修正 V5（未提交、未部署）
+
+F2：`app/postgres.py` 的 `_transaction_open` 改為只有驅動程式明確回報 bool False（pg8000 1.31.6 的 `_in_transaction`）才算沒有交易；缺少屬性、讀取失敗、None、0、空字串或其他型別一律在第一個 SQL 之前關閉連線、不入池。F5～F7 的修正在工作樹外的 8030 本機腳本（壓縮等級 0 的單一 gzip member 與自行解析的外框、提交期間鎖住封裝與設定檔、重複 JSON 鍵拒絕、根與中介程序結束後仍有監聽者時保留紀錄、停止程序樹每輪只列舉一次並先停父程序）。
+
+### 2026-11-10：MVP M0 依 Codex 第五輪審查的最小修正 V6（未提交、未部署）
+
+本輪只修改工作樹外的 8030 本機腳本（F6、F7），B 的程式沒有修改。F6：ready／health 的 body 依 RFC 8259 嚴格剖析，只看頂層唯一的 `status` 字串，不再轉成 PSCustomObject。F7：刪除任何一筆執行紀錄之前，都經過同一個連接埠判斷，查詢失敗不當成沒有監聽者。
+
+### 2026-11-11：Unified Person 階段（人物、人物設定、關係、人物經歷、紀錄頁）
+
+Schema 010 之上新增統一的人物功能，沒有再新增資料表、欄位或 Migration。人物列表與人物頁（總覽／人物設定／經歷／關係四個頁籤）、五區塊九欄位的人物設定（存在 `notes`，每次儲存新增一版，靠 `requests` 回執辨識）、AI 產生人物設定候選、人物關係（一對一筆、可封存恢復、來源可引用我的紀錄與人物經歷）、人物經歷（以人物為主體，性質為真實／歷史／虛構，不計積分與目標），以及紀錄頁的「我的紀錄／人物經歷／全部」三個頁籤。「說話與表達方式」上限由 1000 放寬到 2000 字。作品沒有修改。程式位置、API、驗證方式與未完成項目見 `docs/UNIFIED_PERSON_HANDOVER.md`。已部署到 `lw-api-main` 的 e2e 標籤（0% 流量，revision `lw-api-main-b8030-11111143`），沒有動正式流量、`life_world_dev` 與 Alpha。

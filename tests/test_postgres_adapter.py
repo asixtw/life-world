@@ -35,6 +35,8 @@ def test_tcp_tls_cannot_be_disabled_for_remote_address(monkeypatch):
     monkeypatch.setenv('LIFEWORLD_DB_PASSWORD','synthetic')
     monkeypatch.setenv('LIFEWORLD_DB_HOST','10.129.0.3')
     monkeypatch.setenv('LIFEWORLD_PG_TLS','disable')
+    monkeypatch.setenv('LIFEWORLD_DB_NAME','synthetic_db')  # P0：PG 的 Database／User 必須明確設定
+    monkeypatch.setenv('LIFEWORLD_DB_USER','synthetic_user')
     with pytest.raises(ValueError, match='TLS'):
         RuntimeSettings.from_env()
 

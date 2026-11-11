@@ -25,7 +25,7 @@ class AISettings:
     def __post_init__(self):
         if self.historical_reservation_microusd<0 or (self.approved and not 0<self.max_total_budget_microusd<=20_000_000-self.historical_reservation_microusd):raise ValueError('Approved AI requires cumulative US$20 hard ceiling')
         if self.max_total_budget_microusd<0 or (self.max_total_budget_microusd and self.max_total_budget_microusd<self.reservation_microusd):raise ValueError('Invalid total test budget')
-        if self.provider not in ('','gemini'):raise ValueError('Explicit supported provider required')
+        if self.provider not in ('','gemini','fake'):raise ValueError('Explicit supported provider required')  # fake：只給移植的生成引擎做開發測試，這裡的既有 AI 功能不啟用（approved 仍要求 gemini）
         if self.approved and (self.provider!='gemini' or not re.fullmatch(r'gemini-[a-z0-9][a-z0-9.\-]{0,100}',self.model) or self.reservation_microusd<=0 or self.max_budget_microusd<self.reservation_microusd):raise ValueError('Provider/model/worst-case reservation approval required')
         if not 1<=self.max_output_tokens<=2000 or not 1<=self.max_input_bytes<=24000 or not 1<=self.max_media_bytes<=2_000_000 or not 1<=self.max_owner_daily_calls<=100 or not 1<=self.max_global_calls<=1000:raise ValueError('Bounded AI quota required')
 

@@ -93,7 +93,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     profile=data; // 保存目前帳號最新人物完整頁資料
     tab=['overview','history','goals'].includes(tab)?tab:'overview'; // 僅接受人物總覽、共同經歷與合作目標三個分頁
     const p=profile.person; // 取得目前人物或日期欄位資料
-    return `<div id="person-profile" class="person-profile" data-person-id="${p.id}">${profileHead(profile,tab)}<section class="person-tab-panel">${tab==='overview'?overviewPanel(profile):tab==='history'?historyPanel(profile):goalsPanel(profile)}</section><div class="person-actions">${link(recordRoute(p),'記錄新經歷','primary')}${link('theater/'+p.id+'?return='+encodeURIComponent(location.hash.slice(1)),'開啟小劇場','secondary')}</div></div>`; // 組合「載入人物完整頁並選擇總覽、經歷或目標分頁」所需的畫面或提交資料
+    return `<div id="person-profile" class="person-profile" data-person-id="${p.id}">${profileHead(profile,tab)}<section class="person-tab-panel">${tab==='overview'?overviewPanel(profile):tab==='history'?historyPanel(profile):goalsPanel(profile)}</section><div class="person-actions">${link(recordRoute(p),'記錄新經歷','primary')}${link('theater/'+p.id+'?return='+encodeURIComponent(location.hash.slice(1)),'開啟小劇場','secondary')}${link('portrayal-new/'+p.id,'從這位人物建立角色卡','secondary')}</div></div>`; // 組合「載入人物完整頁並選擇總覽、經歷或目標分頁」所需的畫面或提交資料
   } // 結束目前回呼、區塊或模組定義
   function allExperiences(data) { return [...new Map([...data.interactions.flatMap(e=>e.experiences),...(data.stories||[])].map(e=>[e.id,e])).values()]; } // 以識別碼去重可引用的已確認經歷
   function sourceChecks(data) { return allExperiences(data).map(e=>`<label class="check-line"><input name="source_ids" type="checkbox" value="${e.id}"><span>${h(c.time(e.occurred_at))}<br>${h(e.summary)}</span></label>`).join('')||'<p class="small muted">目前沒有已確認的來源；仍可手動練習，但不能捏造人物偏好。</p>'; } // 列出可由使用者明確勾選的來源
@@ -183,7 +183,7 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
       const roles=unchanged && f.get('roles_text')===editorPerson.roles.join('、')?editorPerson.roles:tokens(f.get('roles_text')); // 文字未變更時保留舊陣列，避免把舊角色文字誤拆分
       const tags=unchanged && f.get('tags_text')===editorPerson.tags.join('、')?editorPerson.tags:tokens(f.get('tags_text')); // 文字未變更時保留舊陣列，避免把舊角色文字誤拆分
       const body={name:f.get('name'),roles,tags,category:f.get('category'),notes:f.get('notes'),common_context:f.get('common_context')}; // 組合使用者明確提供的 API 提交內容
-      const p=await c.api('/people'+(form.dataset.person?'/'+form.dataset.person:''),json(form.dataset.person?'PATCH':'POST',form.dataset.person?{...body,expected_revision:Number(form.dataset.revision)}:body)); // 等待伺服器完成讀取或保存，再進入下一步
+      const p=await c.api('/people'+(form.dataset.person?'/'+form.dataset.person:''),json(form.dataset.person?'PATCH':'POST',form.dataset.person?{...body,expected_revision:Number(form.dataset.revision)}:{...body,request_id:c.requestId('person-create',body)})); // 等待伺服器完成讀取或保存，再進入下一步；新增人物帶提交代碼，連點或重送只建立一筆
       await c.refreshKeepingForm(); document.querySelector('#account-dialog').close(); // 重新讀取伺服器確認的資料，再更新畫面
       const select=document.querySelector('#person-id'); if(select) {select.value=p.id; c.state.dirty=true; if(document.querySelector('#people-review-fields')) document.querySelector('#people-review-fields').innerHTML=await reviewExtras(p.id);} // 標記目前仍有尚未保存的修改
       c.toast('人物已保存。'); return true; // 執行「驗證並送出人物、來源、關聯、合併或私人筆記表單」的目前處理步驟

@@ -12,25 +12,42 @@ from fastapi import FastAPI, Request, UploadFile, File, Query, Form  # 建立 HT
 from starlette.concurrency import run_in_threadpool
 import asyncio
 from fastapi.exceptions import RequestValidationError  # 捕捉輸入驗證錯誤
-from fastapi.responses import FileResponse, JSONResponse, Response  # 建立 JSON、圖片與首頁回應
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response  # 建立 JSON、圖片與首頁回應
 from fastapi.staticfiles import StaticFiles  # 提供前端靜態資源
 from starlette.middleware.trustedhost import TrustedHostMiddleware  # 限制此本機服務接受的主機名稱
 
 from .config import DemoPolicy  # 載入本機開發設定
 from .db import Database  # 載入 SQLite 交易與遷移管理器
-from .runtime import RuntimeSettings
+from .runtime import RuntimeSettings, require_explicit_backend
 from .security import require_registered
 from .errors import DomainError, require  # 共用領域錯誤與條件檢查
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
+from . import character_cards  # 角色卡（自 8445 移植）
+from . import self_persona, works_center  # Self Persona、同意與作品管理（自 8445 移植）
+from . import stories as story_api  # F04 故事開場（自 8445 移植；別名避免與既有的 stories 路由函式同名）
+from . import play_sessions  # F05 短篇互動（自 8445 移植）
+from . import portrayals  # F06A 人物演繹（自 8445 移植）
+from . import theater as theater_api  # 人物劇場（自 8445 移植；別名避免與既有路由函式同名）
 from . import media
 from .auth_rate_limit import AuthRateLimiter, AlphaDatabase, AlphaBodyLimit, protection_unavailable
+from . import deployment_profile  # M0：8030 整合版連 Cloud SQL E2E 的啟動驗證
+from . import relation_sources  # 010 關係來源模式
 
 logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的紀錄器
 
 
-def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None, iap_verifier=None, google_verifier=None):  # PG factory 不執行 DDL
+def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None, iap_verifier=None, google_verifier=None, generation_provider=None,
+               task_queue=None):  # PG factory 不執行 DDL
+    # M0：有部署設定檔時，在讀取任何設定物件、建立任何資料庫物件之前先核對；沒有設定檔時回傳 None，原有行為不變。
+    profile = deployment_profile.preflight(os.environ, database=database, settings=settings)
+    if profile is None and database is None and settings is None and data_dir is None:
+        # 伺服器模式：未明確指定資料庫就拒絕啟動；只有程式內明確傳入 data_dir 的單元測試／工具才使用 SQLite。
+        require_explicit_backend(os.environ)
     settings = settings or getattr(database, 'settings', None) or RuntimeSettings.from_env()
+    if profile is not None:
+        # 以實際連線核對 Database、User、Schema、版本與標記；不符就丟出例外、拒絕啟動，不會退回 SQLite 或其他資料庫。
+        database = deployment_profile.open_guarded_database(settings, profile)
     # 尚未通過資料Gate的公開候選不掛載或啟動任何AI／建帳流程。
     if settings.public_gate_closed and (os.environ.get('LIFEWORLD_AI_CALLS_APPROVED')=='true' or os.environ.get('LIFEWORLD_AI_API_KEY') or os.environ.get('LIFEWORLD_TEST_ACCOUNT_SEED')):
         raise ValueError('Closed public gate must not mount private AI/account credentials')
@@ -42,6 +59,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         from .postgres import PostgresDatabase
         database = PostgresDatabase(settings)
     service = LifeWorld(database or Database(data_dir), policy, clock)
+    if settings.relation_source_store:  # 明確設定才覆寫預設（PG 在 Migration 010 驗收後設 link_table）
+        service.relation_source_store = settings.relation_source_store
     limiter=AuthRateLimiter(settings,service.now)
     limiter.backend=service.db.backend
     if settings.access_mode=='public_alpha':service.db=AlphaDatabase(service.db,limiter)
@@ -170,6 +189,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         response.headers['X-Frame-Options'] = 'DENY'  # 設定回應的安全或快取標頭
         if request.url.path.startswith('/api/'):  # 依目前條件選擇下一步處理分支
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
+        if request.url.path.startswith('/static/') and 'cache-control' not in response.headers:
+            response.headers['Cache-Control'] = 'no-cache'  # 部署後必須拿到新版：每次向伺服器確認（未變更回 304）
         if request.url.path == '/':  # 依目前條件選擇下一步處理分支
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
             response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"  # Blob 音訊只供使用者主動試聽，不自動播放。
@@ -275,6 +296,12 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         try:
             service.db.check_ready()
             limiter.ready(service.db)
+            if service.relation_source_store == relation_sources.LINK:
+                # 連結模式卻沒有 010 的表（Migration 未執行或權限不足）：回未就緒，不退回舊 JSONB。
+                with service.db.connect() as c:
+                    c.execute('SELECT connection_id,owner_id,experience_id,subject_experience_id,source_position FROM person_connection_experience_sources LIMIT 0')
+                    c.execute('SELECT id,owner_id,status FROM subject_experiences LIMIT 0')
+                    c.execute('SELECT subject_experience_id,owner_id,person_id,role FROM subject_experience_people LIMIT 0')
             if app.state.feature_store is not None:
                 with service.db.connect() as c:
                     c.execute('SELECT owner_id FROM relationship_features LIMIT 0')
@@ -299,6 +326,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 'registration_available':not alpha and settings.registration_enabled,
                 'media_available':app.state.ai_runtime.enabled or app.state.media_provider is not None,
                 'relationship_memory_available':app.state.feature_store is not None,
+                'relation_sources':service.relation_source_store,  # 010 關係來源模式：legacy_jsonb 或 link_table（驗收用，非機密）
+                'unified_people':service.unified_people_available(),  # 新人物系統（/api/persons）需要 Schema 010
                 'google_login_available':bool(settings.google_client_id),'ai_available':app.state.ai_runtime.enabled,
                 'ai_status':'configured_not_verified' if app.state.ai_runtime.enabled else 'not_configured','writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
@@ -407,6 +436,169 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def confirm(draft_id: str, request: Request, data: schemas.Confirm):  # 以單一交易保存經歷、貢獻、人物更新與一次積分
         return service.confirm(current(request, True)['id'], draft_id, data)  # 回傳以單一交易保存經歷、貢獻、人物更新與一次積分的結果
 
+    from .generation_routes import install as install_generation  # AI 草稿與 T1／T2 生成（自 8445 移植）
+    install_generation(app, service, current, provider=generation_provider, task_queue=task_queue)
+
+    # ---- 角色卡（2026-11-10 自 8445 移植；資料沿用 works／work_versions） ----
+    @app.get('/api/characters/system', tags=['Characters'])
+    def system_characters(request: Request):  # 系統角色目錄：任何已登入身分都可瀏覽
+        current(request)
+        return service.system_characters()
+
+    @app.get('/api/characters/system/{character_id}', tags=['Characters'])
+    def system_character(request: Request, character_id: str):
+        current(request)
+        return service.system_character(character_id)
+
+    @app.get('/api/characters', tags=['Characters'])
+    def characters(request: Request, status: Literal['active', 'archived', 'all'] = 'active'):
+        return service.characters(current(request)['id'], status)
+
+    @app.post('/api/characters', status_code=201, tags=['Characters'])
+    def create_character(request: Request, data: character_cards.CharacterCreate):  # 保存 AI 草稿或人工建立
+        return service.create_character(current(request, True)['id'], data)
+
+    @app.post('/api/characters/copy', status_code=201, tags=['Characters'])
+    def copy_character(request: Request, data: character_cards.CharacterCopy):
+        return service.copy_character(current(request, True)['id'], data)
+
+    @app.get('/api/characters/{work_id}/references', tags=['Characters'])  # 角色卡被哪些作品使用（自 8445 移植）
+    def character_references(request: Request, work_id: str):
+        return service.character_references(current(request)['id'], work_id)
+
+    @app.post('/api/characters/{work_id}/delete', tags=['Characters'])  # 沒有引用時才真正刪除；有引用請改為封存
+    def delete_character(request: Request, work_id: str, data: character_cards.CharacterDelete):
+        return service.delete_character(current(request, True)['id'], work_id, data)
+
+    @app.post('/api/characters/from-portrayal', status_code=201, tags=['Characters'])  # F06A 人物演繹轉角色卡（自 8445 移植）
+    def portrayal_to_card(request: Request, data: portrayals.PortrayalToCard):
+        return service.portrayal_to_card(current(request, True)['id'], data)
+
+    @app.get('/api/characters/{work_id}', tags=['Characters'])
+    def character(request: Request, work_id: str):
+        return service.character(current(request)['id'], work_id)
+
+    @app.get('/api/characters/{work_id}/versions/{version_no}', tags=['Characters'])
+    def character_version(request: Request, work_id: str, version_no: int):
+        return service.character_version(current(request)['id'], work_id, version_no)
+
+    @app.post('/api/characters/{work_id}/versions', status_code=201, tags=['Characters'])
+    def add_character_version(request: Request, work_id: str, data: character_cards.CharacterVersionCreate):
+        return service.add_character_version(current(request, True)['id'], work_id, data)
+
+    @app.post('/api/characters/{work_id}/status', tags=['Characters'])
+    def set_character_status(request: Request, work_id: str, data: character_cards.CharacterStatus):
+        return service.set_character_status(current(request, True)['id'], work_id, data)
+
+    # ---- Self Persona 與同意（自 8445 移植） ----
+    @app.get('/api/self-persona', tags=['Persona'])
+    def get_self_persona(request: Request):
+        provider = app.state.gen_provider
+        return service.self_persona(current(request)['id'], provider.name if provider else None)
+
+    @app.put('/api/self-persona', tags=['Persona'])
+    def put_self_persona(request: Request, data: self_persona.SelfPersonaSave):
+        return service.save_self_persona(current(request, True)['id'], data)
+
+    @app.post('/api/self-persona/consent', tags=['Persona'])
+    def self_persona_consent(request: Request, data: self_persona.ConsentUpdate):
+        provider = app.state.gen_provider  # 同意綁定實際的 AI 供應商（例如 gemini），與 8445 相同
+        return service.set_self_persona_consent(current(request, True)['id'], data, provider.name if provider else None)
+
+    # ---- F04 故事開場（自 8445 移植） ----
+    @app.post('/api/stories', status_code=201, tags=['Stories'])
+    def create_story(request: Request, data: story_api.StoryCreate):
+        return service.create_story(current(request, True)['id'], data)
+
+    @app.post('/api/stories/{work_id}/versions', status_code=201, tags=['Stories'])
+    def add_story_version(request: Request, work_id: str, data: story_api.StoryVersionCreate):
+        return service.add_story_version(current(request, True)['id'], work_id, data)
+
+    # ---- F05 短篇互動（自 8445 移植；每回合先 POST /api/ai/generate module=character_reply，確認後保存） ----
+    @app.post('/api/play/sessions', status_code=201, tags=['Play'])
+    def start_play_session(request: Request, data: play_sessions.SessionStart):
+        return service.start_session(current(request, True)['id'], data)
+
+    @app.post('/api/play/sessions/{work_id}/turns', status_code=201, tags=['Play'])
+    def save_play_turn(request: Request, work_id: str, data: play_sessions.SessionTurnSave):
+        return service.save_session_turn(current(request, True)['id'], work_id, data)
+
+    @app.post('/api/play/sessions/{work_id}/end', tags=['Play'])
+    def end_play_session(request: Request, work_id: str, data: play_sessions.SessionEnd):
+        return service.end_session(current(request, True)['id'], work_id, data)
+
+    # ---- F06A 人物演繹（自 8445 移植；先 POST /api/ai/generate module=person_portrayal 或 portrayal_reply，確認後保存） ----
+    @app.post('/api/portrayals', status_code=201, tags=['Portrayal'])
+    def create_portrayal(request: Request, data: portrayals.PortrayalCreate):
+        return service.create_portrayal(current(request, True)['id'], data)
+
+    @app.post('/api/portrayals/{work_id}/versions', status_code=201, tags=['Portrayal'])
+    def add_portrayal_version(request: Request, work_id: str, data: portrayals.PortrayalVersionCreate):
+        return service.add_portrayal_version(current(request, True)['id'], work_id, data)
+
+    @app.get('/api/portrayals/{work_id}/versions/{version_no}/snapshot', tags=['Portrayal'])
+    def portrayal_snapshot(request: Request, work_id: str, version_no: int):
+        return service.portrayal_snapshot_view(current(request)['id'], work_id, version_no)
+
+    @app.post('/api/portrayal-sessions', status_code=201, tags=['Portrayal'])
+    def start_portrayal_session(request: Request, data: portrayals.PortrayalSessionStart):
+        """D-42：舊的人物互動試演不再新建（只拒絕新建；既有試演的對話與結束照常）。新作品請用作品中心的「建立新作品」。"""
+        current(request, True)
+        raise DomainError(410, 'legacy_flow_closed', '人物互動試演已停止新建；既有的試演可以繼續閱讀與進行。新作品請到「作品」→「＋ 建立新作品」。')
+
+    @app.post('/api/portrayal-sessions/{work_id}/turns', status_code=201, tags=['Portrayal'])
+    def save_portrayal_turn(request: Request, work_id: str, data: portrayals.PortrayalTurnSave):
+        return service.save_portrayal_turn(current(request, True)['id'], work_id, data)
+
+    @app.post('/api/portrayal-sessions/{work_id}/end', tags=['Portrayal'])
+    def end_portrayal_session(request: Request, work_id: str, data: portrayals.PortrayalSessionEnd):
+        return service.end_portrayal_session(current(request, True)['id'], work_id, data)
+
+    # ---- 人物劇場：多角色演出（自 8445 移植；先保存演出設定，再 POST /api/ai/generate module=theater_performance，原樣保存） ----
+    @app.post('/api/theater/casts', status_code=201, tags=['Theater'])
+    def create_theater_cast(request: Request, data: theater_api.CastCreate):
+        return service.create_cast(current(request, True)['id'], data)
+
+    @app.post('/api/theater/casts/{work_id}/versions', status_code=201, tags=['Theater'])
+    def add_theater_cast_version(request: Request, work_id: str, data: theater_api.CastVersionCreate):
+        return service.add_cast_version(current(request, True)['id'], work_id, data)
+
+    @app.get('/api/theater/casts/{work_id}/performances', tags=['Theater'])  # 由這個設定產生的所有演出
+    def theater_cast_performances(request: Request, work_id: str):
+        return service.cast_performances(current(request)['id'], work_id)
+
+    @app.post('/api/theater/performances', status_code=201, tags=['Theater'])
+    def save_theater_performance(request: Request, data: theater_api.PerformanceSave):
+        return service.save_performance(current(request, True)['id'], data)
+
+    # ---- 作品管理（自 8445 移植；改版由各功能自己的 API 負責） ----
+    @app.get('/api/works/center', tags=['Works'])  # 作品中心：生成與作品合併後的唯一作品列表（必須在 /api/works/{work_id} 之前）
+    def work_center(request: Request, tab: Literal['active', 'completed', 'failed', 'all'] = 'all',
+                    status: Literal['active', 'archived', 'all'] = 'active', kind: str = Query('', max_length=40),
+                    limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0)):
+        return service.work_center(current(request)['id'], tab, status, kind, limit, offset)
+
+    @app.get('/api/works/center/versions', tags=['Works'])  # 作品中心：版本歷史
+    def work_history(request: Request, limit: int = Query(50, ge=1, le=200)):
+        return service.work_history(current(request)['id'], limit)
+
+    @app.get('/api/works', tags=['Works'])
+    def works(request: Request, kind: str = Query('', max_length=40), status: Literal['active', 'archived', 'all'] = 'active',
+              limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)):
+        return service.works(current(request)['id'], kind, status, limit, offset)
+
+    @app.get('/api/works/{work_id}', tags=['Works'])
+    def work(request: Request, work_id: str):
+        return service.work(current(request)['id'], work_id)
+
+    @app.get('/api/works/{work_id}/versions/{version_no}', tags=['Works'])
+    def work_version(request: Request, work_id: str, version_no: int):
+        return service.work_version(current(request)['id'], work_id, version_no)
+
+    @app.post('/api/works/{work_id}/status', tags=['Works'])
+    def set_work_status(request: Request, work_id: str, data: works_center.WorkStatus):
+        return service.set_work_status(current(request, True)['id'], work_id, data)
+
     @app.post('/api/people', status_code=201, tags=['People'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def create_person(request: Request, data: schemas.PersonCreate):  # 建立人物並保留舊角色欄位的相容性
         return service.create_person(current(request, True)['id'], data)  # 回傳建立人物並保留舊角色欄位的相容性的結果
@@ -453,6 +645,65 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     @app.post('/api/people/{person_id}/connections', status_code=201, tags=['People'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def connection(person_id: str, request: Request, data: schemas.ConnectionCreate):  # 建立兩位人物間的明確關係
         return service.create_connection(current(request, True)['id'], person_id, data)  # 回傳建立兩位人物間的明確關係的結果
+
+    @app.get('/api/persons', tags=['Persons'])  # Unified Person：搜尋、篩選與排序
+    def persons(request: Request, q: str = Query('', max_length=200), person_type: Literal['', 'real', 'fictional'] = '',
+                person_subtype: Literal['', 'historical', 'original'] = '', category: Literal['', 'business', 'life', 'learning', 'other'] = '',
+                status: Literal['active', 'archived'] = 'active', sort: Literal['recent', 'name'] = 'recent',
+                limit: int = Query(50, ge=1, le=100), offset: int = Query(0, ge=0)):
+        return service.persons_list(current(request)['id'], q, person_type, person_subtype, category, status, sort, limit, offset)
+
+    @app.post('/api/persons', status_code=201, tags=['Persons'])  # Unified Person：新增（同名可並存）
+    def create_unified_person(request: Request, data: schemas.PersonsCreate):
+        return service.create_unified_person(current(request, True)['id'], data)
+
+    @app.get('/api/persons/{person_id}', tags=['Persons'])  # 人物詳細：基本資料、人物設定、關係與經歷摘要
+    def unified_person(person_id: str, request: Request):
+        return service.unified_person(current(request)['id'], person_id)
+
+    @app.patch('/api/persons/{person_id}', tags=['Persons'])  # 編輯基本資料（revision 防覆蓋）
+    def edit_unified_person(person_id: str, request: Request, data: schemas.PersonsEdit):
+        return service.edit_unified_person(current(request, True)['id'], person_id, data)
+
+    @app.post('/api/persons/{person_id}/status', tags=['Persons'])  # 封存或恢復（不刪除）
+    def set_unified_person_status(person_id: str, request: Request, data: schemas.PersonsStatus):
+        return service.set_unified_person_status(current(request, True)['id'], person_id, data)
+
+    @app.get('/api/persons/{person_id}/connection-sources', tags=['Persons'])  # 可引用為關係來源的我的紀錄（與兩端至少一人有關）
+    def person_connection_sources(person_id: str, request: Request, other_person_id: str = Query(..., min_length=1, max_length=128)):
+        return service.connection_sources(current(request)['id'], person_id, other_person_id)
+
+    @app.put('/api/persons/{person_id}/profile', tags=['Persons'])  # 保存一版人物設定（只新增）
+    def save_unified_profile(person_id: str, request: Request, data: schemas.PersonProfileSave):
+        return service.save_unified_profile(current(request, True)['id'], person_id, data)
+
+    @app.get('/api/persons/{person_id}/experiences', tags=['Persons'])  # 人物頁「經歷」分頁：我的紀錄與人物經歷兩區
+    def person_experience_lists(person_id: str, request: Request, archived: bool = False):
+        return service.person_experience_lists(current(request)['id'], person_id, archived)
+
+    @app.get('/api/person-experiences', tags=['Persons'])  # 紀錄頁：本人帳號的全部人物經歷（archived=true 列出已封存的）
+    def person_experiences_list(request: Request, archived: bool = False, limit: int = Query(200, ge=1, le=200), offset: int = Query(0, ge=0)):
+        return service.person_experiences_list(current(request)['id'], archived, limit, offset)
+
+    @app.post('/api/person-experiences', status_code=201, tags=['Persons'])  # 新增人物經歷（不計積分、目標與互動統計）
+    def create_person_experience(request: Request, data: schemas.PersonExperienceCreate):
+        return service.create_person_experience(current(request, True)['id'], data)
+
+    @app.get('/api/person-experiences/{experience_id}', tags=['Persons'])  # 讀單一人物經歷
+    def person_experience(experience_id: str, request: Request):
+        return service.person_experience(current(request)['id'], experience_id)
+
+    @app.patch('/api/person-experiences/{experience_id}', tags=['Persons'])  # 編輯、封存或恢復（revision 防覆蓋）
+    def patch_person_experience(experience_id: str, request: Request, data: schemas.PersonExperiencePatch):
+        return service.patch_person_experience(current(request, True)['id'], experience_id, data)
+
+    @app.get('/api/connections/{connection_id}', tags=['Connections'])  # 010：讀單一關係（來源為兩個 ID 陣列）
+    def get_connection(connection_id: str, request: Request):
+        return service.get_connection(current(request)['id'], connection_id)
+
+    @app.patch('/api/connections/{connection_id}', tags=['Connections'])  # 010：編輯說明與來源（Migration 010 後開放）
+    def patch_connection(connection_id: str, request: Request, data: schemas.ConnectionPatch):
+        return service.patch_connection(current(request, True)['id'], connection_id, data)
 
     @app.patch('/api/interactions/{event_id}', tags=['People'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def edit_interaction(event_id: str, request: Request, data: schemas.InteractionEdit):  # 檢查版本後重新分類互動事件
@@ -513,8 +764,18 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     static = Path(__file__).parent / 'static'  # 準備實際 App 靜態資源目錄
     app.mount('/static', StaticFiles(directory=static), name='static')  # 執行此模組的共用工具操作
 
+    # 首頁的 JS／CSS 網址附上依內容計算的版本：首頁 no-store，部署新版後網址改變，瀏覽器不會沿用舊快取。
+    import hashlib, re as _re
+    asset_digest = hashlib.sha256()
+    for asset in sorted(static.glob('*')):
+        if asset.suffix in ('.js', '.css', '.html') and asset.is_file():
+            asset_digest.update(asset.name.encode() + b'\0' + asset.read_bytes())
+    asset_version = asset_digest.hexdigest()[:12]
+    index_html = _re.sub(r'((?:src|href)="/static/[^"?]+\.(?:js|css))"', lambda m: m.group(1) + '?v=' + asset_version + '"',
+                         (static / 'index.html').read_text(encoding='utf-8'))
+
     @app.get('/', include_in_schema=False)  # 註冊此 HTTP 路由、例外處理器或中介層
     def index():  # 提供 App 的 HTML 外殼
-        return FileResponse(static / 'index.html')  # 回傳提供 App 的 HTML 外殼的結果
+        return HTMLResponse(index_html)  # 回傳提供 App 的 HTML 外殼的結果
 
     return app  # 回傳建立 API、服務與靜態頁面入口的結果

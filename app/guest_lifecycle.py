@@ -3,6 +3,23 @@ from datetime import datetime,timedelta
 import re
 
 
+# 已審核的資料表形狀。E2E 現況（38 表）的清除收據有 owner 外鍵，會擋住清除順序，因此不在清單內。
+ALPHA_034=frozenset('''actions auth_rate_buckets completions contributions draft_stories drafts evidence experience_mentions experience_participants experience_stories experiences external_identities fact_sources goal_reviews goals guest_abandonments habit_quantity_versions interaction_events interaction_experiences interaction_people note_sources notes pending_contributions people person_connections person_facts person_goals requests reward_ledger schema_migrations sessions story_history tasks users'''.split())
+UNIFIED_010=ALPHA_034|frozenset({'ai_generations','data_consents','session_turns','works','work_versions',
+                                 'subject_experiences','subject_experience_people','person_connection_experience_sources'})
+SQLITE_ONLY=frozenset({'relationship_features','relationship_memory_preferences'})  # 009 的本機功能表，只存在於 SQLite
+KEPT_TABLES=('schema_migrations','auth_rate_buckets','guest_abandonments')  # 遷移台帳、限流、清除收據：不屬於訪客，一律保留
+
+
+def reviewed_shape(names,backend):
+    """回傳已審核的形狀代號；任何其他形狀（含 E2E 現況或多出未審核的表）一律拒絕，不刪除任何資料。"""
+    names=set(names)
+    if backend=='sqlite':names-=SQLITE_ONLY
+    for key,shape in (('alpha_034',ALPHA_034),('unified_010',UNIFIED_010)):
+        if names==shape:return key
+    raise ValueError('unreviewed_table')
+
+
 def abandon(c,owner,now):
     row=c.execute('SELECT status FROM users WHERE id=?',(owner,)).fetchone()
     if not row or row['status']!='guest':raise ValueError('registered_owner_forbidden')
@@ -57,11 +74,10 @@ class GuestPurger:
                 if not user or user['status']!='guest' or c.execute('SELECT owner_id FROM external_identities WHERE owner_id=?',(owner,)).fetchone():raise ValueError('owner_changed')
                 from .guest_fk import catalog,verify_graph
                 cols,groups=catalog(c,self.db.backend);names=list(cols)
-                if self.db.backend=='postgresql':verify_graph(groups)
+                shape=reviewed_shape(names,self.db.backend)  # 先核對資料表形狀，再依形狀核對外鍵契約
+                if self.db.backend=='postgresql':verify_graph(groups,shape)
                 edges=[(ch,col,p,target) for ch,columns,p,targets in groups for col,target in zip(columns,targets)]
-                expected=set('actions auth_rate_buckets completions contributions draft_stories drafts evidence experience_mentions experience_participants experience_stories experiences fact_sources goal_reviews goals habit_quantity_versions interaction_events interaction_experiences interaction_people note_sources notes pending_contributions people person_connections person_facts person_goals requests reward_ledger schema_migrations sessions story_history tasks users external_identities guest_abandonments'.split())
-                if set(names)!=expected:raise ValueError('unreviewed_table')
-                names=[n for n in names if n not in ('schema_migrations','auth_rate_buckets','guest_abandonments')]
+                names=[n for n in names if n not in KEPT_TABLES]
                 scope={n:'owner_id=?' for n in names if 'owner_id' in cols[n]};scope['users']='id=?'
                 pending=set(names)-set(scope)
                 while pending:

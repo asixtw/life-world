@@ -146,3 +146,33 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 ## 2026-11-09 Main 整合 Stage2 隔離回歸
 
 [完整收據與範圍](testing/main-consolidation-stage2-2026-11-09/README.md)：SQLite 512 passed／17 PG-only skipped；隔離PG18.6模式529 passed；Node13 passed；Chromium39案例覆蓋（原跨日skip已補測PASS）；發布政策24 passed；真ffmpeg短／長音訊解碼PASS。僅測試契約／工具／文件變更，沒有更動產品限額或正式流量。Merge仍待CI隔離與Owner明確授權，未Build／部署。
+
+## 2026-11-09 MVP M0：部署設定檔 core-e2e（未提交、未部署）
+
+命令：`python -m pytest -q -p no:cacheprovider tests --ignore=tests/product/test_google_verifier.py --ignore=tests/product/test_staging_iap_config.py`（本機沿用的 Python 環境缺 `google-auth`、`cryptography`，這兩個檔案無法收集）。修改前：476 passed、12 failed、17 skipped、12 errors；修改後：548 passed（新增72）、12 failed、17 skipped、12 errors，失敗與錯誤清單與修改前逐項相同（皆為既有環境問題，與本變更無關）。新增測試以替身連線驗證拒絕條件，另在暫存副本把 `app/main.py` 換回原版，確認13項 `create_app` 案例會失敗。沒有連任何真實資料庫、沒有建置映像、沒有部署；E2E 連線**尚未驗證**。
+
+## 2026-11-09 MVP M0：Codex 審查後的最小修正（未提交、未部署）
+
+同一命令與排除條件：修改後 604 passed（M0 新增測試共128項）、12 failed、17 skipped、12 errors；失敗與錯誤清單與修改前基線逐項相同（google 18、cp950 5、chmod 1）。M0 測試另含以本機 Git Bash 模擬 Cloud Build 替換值的負向案例（命令替換、引號、換行、空白、非法名稱、重複 tag），沒有執行 Cloud Build。8030 本機腳本另有42項替身程序與合成資料測試（工作樹外）。E2E 連線、Docker 建置與 Cloud Run 啟動仍**尚未驗證**。
+
+## 2026-11-09 MVP M0：Codex 第二輪審查後的最小修正 V3（未提交、未部署）
+
+同一命令與排除條件：修改後 644 passed（M0 測試共168項：設定檔128、建置設定36、來源白名單4）、12 failed、17 skipped、12 errors；失敗與錯誤清單與修改前基線逐項相同（google 18、cp950 5、chmod 1）。新增的負向案例：autocommit 設定靜默無效或拋錯時身分查詢次數為 0（啟動與重新連線）；任何大小寫的 HTTP／HTTPS／ALL／NO_PROXY 與空值 ADC 覆寫都拒絕；Cloud Build 以本機 Git Bash 與替身 gcloud／docker 模擬：同一秒相同來源的兩次建置 tag 不同、認證錯誤含 not found 不被當成成功、權限不足、讀取來源物件失敗（即使替換值是空輸入的 SHA-256）、封裝被修改、來源 bucket 不符、provenance 使用這次 push 的 digest。設定審查環境常見的 `CLOUDSDK_CONFIG` 與代理變數時，M0 測試同樣全數通過。沒有執行 Cloud Build、沒有建置映像。8030 本機腳本另有123項替身程序與合成資料測試（工作樹外）。E2E 連線、Docker 建置與 Cloud Run 啟動仍**尚未驗證**。
+
+## 2026-11-10 MVP M0：Codex 第三輪審查後的最小修正 V4（未提交、未部署）
+
+同一命令與排除條件：修改後 658 passed（M0 測試共183項：設定檔134、建置設定45、來源白名單4）、13 failed、17 skipped、12 errors。其中 24 項與修改前基線逐項相同（google 18、cp950 5、chmod 1）；多出的 1 項 `tests/test_public_release_acceptance.py::test_public_password_core_journey_and_owner_isolation` 是時段相依：執行時是台北時間 00 點多，測試建立「今天 09:00（+08:00）」的經歷被判為未來（`future_event`，422）。只把服務時鐘固定在同日台北 10:00 重跑即通過，該測試只使用 SQLite，與本次修改無關。新增的負向案例：基底 `_open` 第一次設定 autocommit 靜默無效時不送出任何 SQL（啟動與 pool 用盡後重連）；`docker inspect` 印出正確 digest 但以 42 結束、沒有輸出、錯誤 digest、多個 digest 都不輸出 provenance；`find`／`sort` 失敗時 validate-target 停止。設定審查環境常見的 `CLOUDSDK_CONFIG` 與代理變數時，M0 測試同樣全數通過。8030 本機腳本另有182項替身程序與合成資料測試（工作樹外）。沒有執行 Cloud Build；E2E 連線、Docker 建置與 Cloud Run 啟動仍**尚未驗證**。
+
+## 2026-11-10 MVP M0：Codex 第四輪審查後的最小修正 V5（未提交、未部署）
+
+同一命令與排除條件：修改後 675 passed（M0 測試共200項：設定檔151、建置設定45、來源白名單4）、13 failed、17 skipped、12 errors。扣除已知的時段相依案例 `tests/test_public_release_acceptance.py::test_public_password_core_journey_and_owner_isolation`（執行時台北時間 01:36，建立「今天 09:00」的經歷被判為未來；只固定服務時鐘在同日 10:00 重跑即通過，與 M0 無關）之後，其餘 24 項與修改前基線逐項相同（排序清單 SHA-256 `145753f8b53e018b73a470987b3626242b939edbe0803e34cfe73330e5361a59`）。新增的負向案例：交易狀態屬性缺少、讀取失敗、None、0、空字串、字串 False、1 時，啟動與 pool 用盡後重連都在第一個 SQL 之前關閉；鎖定的 pg8000 1.31.6 對 I／T／E 狀態回報 bool False／True／True。設定審查環境常見的 `CLOUDSDK_CONFIG` 與代理變數時，M0 測試同樣全數通過。8030 本機腳本另有202項替身程序與合成資料測試（工作樹外）。沒有執行 Cloud Build、沒有上傳；E2E 連線、Docker 建置與 Cloud Run 啟動仍**尚未驗證**。
+
+## 2026-11-10 MVP M0：Codex 第五輪審查後的最小修正 V6（未提交、未部署）
+
+本輪 B 的程式與測試都沒有修改。同一命令與排除條件：675 passed（M0 測試 200 項）、13 failed、17 skipped、12 errors；扣除已知的時段相依案例（執行時台北時間 02:06；固定服務時鐘在同日 10:00 重跑即通過）之後，其餘 24 項與修改前基線逐項相同（排序清單 SHA-256 `145753f8b53e018b73a470987b3626242b939edbe0803e34cfe73330e5361a59`）。8030 本機腳本有 231 項替身程序與合成資料測試（工作樹外）。沒有執行 Cloud Build；E2E 連線、Docker 建置與 Cloud Run 啟動仍**尚未驗證**。
+
+## 2026-11-11 Unified Person 階段
+
+正式驗收（PostgreSQL）：Local 8030 → Cloud Run `lw-api-main` e2e 標籤（revision `lw-api-main-b8030-11111143`）→ Cloud SQL `life_world_e2e`，全部使用 `persons_ui_` 開頭的合成帳號。API：`tests/test_persons_cloudsql_e2e.py`、`test_person_relations_cloudsql_e2e.py`、`test_relation_sources_cloudsql_e2e.py`、`test_person_experiences_cloudsql_e2e.py`、`test_person_experiences_records_cloudsql_e2e.py` 共 7 passed、1 skipped（略過的是關係來源的舊正向案例，已由人物經歷與紀錄頁兩個測試涵蓋），共 428 個 HTTP 請求。Chrome：`browser_tests/test_persons_ui.py`、`test_persons_relations_ui.py`、`test_persons_navigation_ui.py`、`test_persons_experiences_ui.py`、`test_records_page_ui.py` 共 5 passed。這一輪沒有重跑 `test_person_profile_ai_cloudsql_e2e.py`（會呼叫付費的 AI 服務；AI 模組在這一輪沒有修改）。
+
+本機輔助檢查（SQLite，不算驗收）：`python -m pytest -q -p no:cacheprovider tests`，901 passed、7 failed、26 skipped、12 errors。失敗與錯誤清單和這個階段開始前相同，都不在人物功能內：`tests/product/test_google_exchange.py` 11 項與 `tests/product/test_gcp139_return.py` 1 項（errors，本機環境缺 Google 驗證套件）、`tests/test_provider_independent_login.py` 3 項、`tests/test_staging_tag_origin.py` 3 項、`tests/test_model_eval.py` 1 項。執行全套請用 `PYTHONUTF8=1`，不要用 `PYTHONIOENCODING`。

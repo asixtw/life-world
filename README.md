@@ -30,11 +30,13 @@ Jerry 的資料庫交接：[完整 Table Schema／31 表資料字典](docs/DATAB
 
 **最新完整流程 Wireframe：[開啟原型](collaboration/flow-wireframe/index.html)／[操作說明](collaboration/flow-wireframe/README.md)。**原型獨立呈現目前及規劃流程，全部使用虛構資料；錄音、辨識與夜間明示模擬，與實際 App 分開。習慣調整及本輪驗收見[交付紀錄](docs/HABIT_WIREFRAME_ACCEPTANCE.md)。
 
+> **2026-11-10 起：** Local 8030 是唯一的開發網站，一律連 Cloud SQL `life_world_e2e`（`lw_e2e_app`／`lw_core_draft`／PostgreSQL 18.6），用 `C:\LifeWorld_project\LifeWorld-STARTUP\Start-8030.ps1` 啟動，網址 `https://lw-core-compare.localhost:8030/`。Cloud Run（lw-public）連 `life_world_alpha`。伺服器模式沒有設定 `LIFEWORLD_DB_BACKEND` 會拒絕啟動，不會默默改用 SQLite；PG 也必須明確設定 `LIFEWORLD_DB_NAME`／`LIFEWORLD_DB_USER`。下面的 SQLite 指令只給明確指定的單元測試與隔離工具，不能當成產品功能測試或 PostgreSQL 驗收。
+
 在這個 `LifeWorld_App` 資料夾開啟終端機：
 
 ```bash
-# 本次環境已建立 .venv 並安裝套件，直接執行：
-.venv/bin/python -m app
+# 隔離工具（明確指定 SQLite）：
+LIFEWORLD_DB_BACKEND=sqlite .venv/bin/python -m app
 ```
 
 瀏覽器開啟 **http://127.0.0.1:8000**。macOS 也可雙擊 `run.command`。
@@ -43,7 +45,7 @@ Jerry 的資料庫交接：[完整 Table Schema／31 表資料字典](docs/DATAB
 
 ```bash
 python3 scripts/setup.py
-.venv/bin/python -m app
+LIFEWORLD_DB_BACKEND=sqlite .venv/bin/python -m app
 ```
 
 目前支援 Python 3.9 以上；新環境建議使用仍受維護的 Python 版本。`setup.py` 會在專案內建立 `.venv` 並安裝鎖定的依賴，需要下載套件；環境讓 `requirements.lock` 成為唯一來源，基礎 Python 被移除時會重建 `.venv`，不在鎖定檔內的套件也會被移除，手動裝進 `.venv` 的套件不會保留。可用 `python scripts/setup.py --check`（以 `.venv` 的 Python 執行）確認環境與鎖定一致。
@@ -51,7 +53,7 @@ python3 scripts/setup.py
 另選埠號或資料位置：
 
 ```bash
-LIFEWORLD_DATA_DIR=/你的/私有資料夾 .venv/bin/python -m uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8010
+LIFEWORLD_DB_BACKEND=sqlite LIFEWORLD_DATA_DIR=/你的/私有資料夾 .venv/bin/python -m uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8010
 ```
 
 環境變數不會自動從 `.env` 讀取。服務預設僅監聽本機，這個版本不是公開部署的正式產品。
@@ -90,8 +92,8 @@ v0.4 本輪實測：137 項後端、19 項 Chromium 通過；完整命令、跨�
 # API、資料庫、交易與邊界測試
 .venv/bin/python -m pytest -q
 
-# 瀏覽器測試：先在另一個終端機啟動隔離測試資料的服務
-LIFEWORLD_DATA_DIR=/tmp/lifeworld-browser-test .venv/bin/python -m uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8001
+# 瀏覽器測試（隔離工具，不是產品驗收；產品畫面驗收在 Local 8030）：先在另一個終端機啟動隔離測試資料的服務
+LIFEWORLD_DB_BACKEND=sqlite LIFEWORLD_DATA_DIR=/tmp/lifeworld-browser-test .venv/bin/python -m uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8001
 
 # 安裝 Chromium（目前這台電腦已存在）
 .venv/bin/python -m playwright install chromium

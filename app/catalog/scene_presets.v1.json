@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "items": [
+    {"id": "daily-chat", "title": "日常聊天", "description": "一個平常的下午，大家在熟悉的地方閒聊近況，話題慢慢聊到最近發生的一件小事。"},
+    {"id": "ask-advice", "title": "請教問題", "description": "有人帶著一個卡住很久的問題來請教，希望在今天結束前找到下一步。"},
+    {"id": "disagreement", "title": "意見衝突", "description": "大家對同一件事的做法意見分歧，必須在會議結束前取得共識。"},
+    {"id": "business-visit", "title": "拜訪客戶", "description": "明天上午要拜訪一位重要客戶，大家在出發前討論提案、可能的提問與應對方式。"},
+    {"id": "shared-memory", "title": "共同回憶", "description": "多年後再次相聚，大家聊起一段一起經歷過的往事，各自記得的細節並不相同。"},
+    {"id": "travel-day", "title": "旅行途中", "description": "旅行的第二天，原本的行程因為天氣臨時取消，大家要決定接下來的安排。"},
+    {"id": "tk-red-cliff", "title": "赤壁前夕：聯盟與風險", "description": "建安十三年交戰前夕，各方代表聚在一起討論聯盟框架與風險；結果未知。（虛構詮釋，不代表史實）"},
+    {"id": "tk-grain", "title": "糧運與撤軍協商", "description": "一場虛構的後勤危機：糧運中斷，前線必須在撤軍與堅守之間做出選擇。"},
+    {"id": "int-ceasefire", "title": "停火與議程", "description": "各方代表在一場假設的停火會議中，討論議程的先後順序與彼此的底線。（虛構設定）"},
+    {"id": "int-shipping", "title": "航運安全與查核", "description": "一場假設的海上安全會議，各方討論航運查核的方式與互信的建立。（虛構設定）"},
+    {"id": "ph-success", "title": "成功與自由", "description": "幾位不同時代的思想人物在一場虛構的圓桌上，討論成功與自由的意義。"},
+    {"id": "ph-promise", "title": "承諾、責任與選擇", "description": "一個人面臨守住承諾與追求新機會的兩難，身邊的人各自給出不同的看法。（虛構情境，不構成建議）"}
+  ]
+}

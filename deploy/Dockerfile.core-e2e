@@ -1,0 +1,28 @@
+# M0：8030 整合版（lw-core-e2e）專用映像。內容與 Dockerfile.api 相同，另外只有兩處：
+# 1. 以 root 建立唯讀的映像標記 /etc/lifeworld/deployment-profile（core-e2e）。runtime UID 10001 與 Cloud Run 的環境變數都無法移除或改寫它，
+#    app/deployment_profile.py 看到標記就一定核對 life_world_e2e／lw_e2e_app／lw_core_draft／PG 18.6／E2E 標記，不符就拒絕啟動。
+# 2. HEALTHCHECK 以 LIFEWORLD_TRUSTED_HOSTS 的第一個主機名稱作為 Host，避免被 TrustedHostMiddleware 擋下。
+# 修改 Dockerfile.api 時要同步這個檔案；tests/test_core_e2e_build_config.py 會檢查兩者只差這些地方。
+FROM python:3.12-slim AS dependencies
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PIP_NO_CACHE_DIR=1
+COPY requirements.api.lock /tmp/requirements.api.lock
+RUN python -m venv /opt/venv && /opt/venv/bin/pip install -r /tmp/requirements.api.lock
+
+FROM python:3.12-slim AS runtime
+ARG VCS_REF=local-uncommitted
+LABEL org.opencontainers.image.source="https://github.com/asixtw/life-world" \
+      org.opencontainers.image.revision=$VCS_REF
+ENV PATH=/opt/venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+    LIFEWORLD_DB_BACKEND=postgresql LIFEWORLD_DATA_DIR=/tmp/lifeworld PORT=8080
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN groupadd --gid 10001 lifeworld && useradd --uid 10001 --gid 10001 --no-create-home lifeworld
+RUN mkdir -p /etc/lifeworld && printf 'core-e2e\n' > /etc/lifeworld/deployment-profile && chown root:root /etc/lifeworld /etc/lifeworld/deployment-profile && chmod 0755 /etc/lifeworld && chmod 0444 /etc/lifeworld/deployment-profile
+COPY --from=dependencies /opt/venv /opt/venv
+WORKDIR /srv/lifeworld
+# allowlist COPY：資料、測試、Git、工具、環境檔均不進入 runtime layer。
+COPY --chown=10001:10001 app/ ./app/
+USER 10001:10001
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import os,urllib.request as r; h=os.environ.get('LIFEWORLD_TRUSTED_HOSTS','127.0.0.1').split(',')[0].strip(); r.urlopen(r.Request('http://127.0.0.1:'+os.environ.get('PORT','8080')+'/health',headers={'Host':h}),timeout=3)"
+CMD ["python", "-m", "app.serve"]

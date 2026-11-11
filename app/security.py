@@ -18,7 +18,7 @@ def digest(token):  # 將工作階段代碼雜湊後再用於資料庫查詢
 def new_session(connection, owner_id, now, policy):  # 產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊
     token = secrets.token_urlsafe(32)  # 準備隨機登入工作階段代碼
     csrf = secrets.token_urlsafe(32)  # 準備寫入請求的 CSRF 驗證代碼
-    connection.execute('INSERT INTO sessions VALUES (?,?,?,?,?)',
+    connection.execute('INSERT INTO sessions(token_hash,owner_id,csrf_token,expires_at,created_at) VALUES (?,?,?,?,?)',
                        (digest(token), owner_id, csrf, (now + timedelta(hours=policy.session_hours)).isoformat(), now.isoformat()))  # 新增登入工作階段；值以參數傳入
     return token, csrf  # 回傳產生隨機工作階段及 CSRF 代碼，資料庫僅存工作階段雜湊的結果
 

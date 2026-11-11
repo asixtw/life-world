@@ -1,0 +1,82 @@
+/* 角色卡（自 8445 移植）：列表格線、詳情與版本清單、編輯表單 */
+.char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.char-card { display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; min-width: 0; }
+.char-card:hover, .char-card:focus-visible { outline: 2px solid var(--green, #2f6b4f); outline-offset: 2px; }
+.char-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.char-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.char-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 16px; align-items: start; margin-bottom: 16px; }
+.char-fields { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+.char-fields dt { color: var(--muted, #6b7468); }
+.char-fields dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.char-versions { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.char-versions li { display: grid; gap: 2px; }
+.char-version-active { font-weight: 700; }
+.char-checks { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.person-tabs.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } /* 新人物詳細頁：總覽、人物設定、經歷、關係排成一列 */
+@media (max-width: 520px) { .person-tabs.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .char-layout { grid-template-columns: minmax(0, 1fr); }
+  .char-fields { grid-template-columns: minmax(0, 1fr); }
+}
+/* 作品管理 */
+.works-item { color: inherit; text-decoration: none; }
+.works-filter { align-items: center; margin-bottom: 12px; }
+.works-json { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; font-size: 13px; }
+/* AI 生成 */
+.gen-checks { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.gen-segments { margin: 12px 0 0; padding-left: 22px; display: grid; gap: 10px; }
+.gen-seg p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gen-seg em { display: block; color: var(--muted, #6b7468); }
+.gen-seg-me strong { color: var(--green, #2f6b4f); }
+.gen-error { border-left: 4px solid #b5533c; }
+/* F04 故事開場 */
+.story-opening { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
+.story-choices { padding-left: 22px; display: grid; gap: 10px; }
+.story-choices p { margin: 4px 0 0; }
+
+/* F05 短篇互動 */
+.play-turns { list-style: none; padding: 0; display: grid; gap: 12px; }
+.play-turn p { margin: 6px 0; overflow-wrap: anywhere; }
+.play-line { line-height: 1.7; }
+.play-choice { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; cursor: pointer; }
+.play-choice input { margin-top: 4px; }
+
+/* 人物劇場多角色演出 */
+.stage-pick { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-bottom: 1px solid rgba(127,127,127,.15); }
+.stage-pick select { max-width: 120px; }
+.stage-lines { padding-left: 22px; display: grid; gap: 8px; line-height: 1.7; }
+.stage-lines li { overflow-wrap: anywhere; }
+.stage-narrator { font-style: italic; opacity: .85; }
+
+/* 作品中心與建立新作品（樹狀節點；⑦ 桌面在右側、手機在底部） */
+.works-tabs { flex-wrap: wrap; gap: 8px; }
+.create-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+.create-tree { display: grid; gap: 10px; }
+.create-head { display: flex; width: 100%; align-items: center; gap: 10px; flex-wrap: wrap; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font: inherit; }
+.create-summary { flex: 1 1 160px; overflow-wrap: anywhere; }
+.create-current { border-left: 4px solid var(--green); }
+.create-sub { border-top: 1px dashed rgba(127,127,127,.25); padding-top: 6px; }
+.create-start { position: sticky; top: 16px; }
+.create-module { font-weight: 700; margin: 8px 0; }
+@media (max-width: 900px) {
+  .create-layout { grid-template-columns: minmax(0, 1fr); }
+  .create-start { position: sticky; top: auto; bottom: 0; z-index: 5; box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
+  .create-start-details:not([open]) + .create-module { margin-top: 0; }
+}
+/* 人物列表卡片：整張卡片可點（延伸「編輯／查看」連結的點擊範圍），封存／恢復按鈕浮在上層、不會觸發換頁 */
+.persons-list-card { position: relative; cursor: pointer; }
+.persons-list-card .persons-card-open::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.persons-list-card button { position: relative; z-index: 1; }
+.persons-list-card:focus-within { outline: 2px solid var(--green, #2f6b4f); outline-offset: 2px; }
+.persons-list-card .persons-card-open:focus-visible { outline: none; }
+/* 人物頁「經歷」分頁：我的紀錄與人物經歷兩區；人物經歷對話框的參與人物與日期欄位 */
+.person-exp-block + .person-exp-block { margin-top: 28px; }
+.person-exp-card h3 { margin: 0; }
+.person-exp-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.person-exp-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.tag.person-exp-chip { display: inline-flex; align-items: center; gap: 6px; font-size: .92rem; padding: 4px 6px 4px 12px; text-transform: none; letter-spacing: 0; }
+.tag.person-exp-chip .small { font-size: .78rem; }  /* 姓名比類型醒目 */
+.person-exp-chip button { padding: 0 4px; min-height: 0; line-height: 1; }
+.person-exp-date input { width: 5.5em; }
+/* 紀錄頁的頁籤（我的紀錄／人物經歷／全部）：與人物頁的頁籤同一種外觀，下方留間距 */
+.record-tabs { margin-bottom: 20px; }

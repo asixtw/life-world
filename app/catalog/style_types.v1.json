@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "items": [
+    {"id": "scifi", "label": "科幻", "prompt_fragment": "以科幻的語氣與氛圍呈現：可以有未來科技、太空或科學想像的元素。"},
+    {"id": "adventure", "label": "冒險", "prompt_fragment": "以冒險的語氣與節奏呈現：重視行動、探索與意外的轉折。"},
+    {"id": "realistic", "label": "寫實", "prompt_fragment": "以寫實的語氣呈現：貼近日常邏輯與真實的反應，不誇張。"},
+    {"id": "everyday", "label": "生活化", "prompt_fragment": "以生活化的語氣呈現：輕鬆、自然、像日常對話。"},
+    {"id": "workplace", "label": "職場", "prompt_fragment": "以職場劇的語氣與節奏呈現：專業、有分寸、重視利害關係。（若要的是職場情境，請寫在場景背景。）"},
+    {"id": "idol_drama", "label": "偶像劇", "prompt_fragment": "以偶像劇的語氣呈現：情感鮮明、對白有戲劇張力。"},
+    {"id": "fairy_tale", "label": "童話", "prompt_fragment": "以童話的語氣呈現：溫暖、純真、帶有寓意。"},
+    {"id": "fantasy", "label": "奇幻", "prompt_fragment": "以奇幻的語氣與氛圍呈現：可以有魔法或超自然的元素。"},
+    {"id": "mystery", "label": "懸疑", "prompt_fragment": "以懸疑的語氣與節奏呈現：保留線索與緊張感，不急著揭曉。"},
+    {"id": "historical", "label": "歷史", "prompt_fragment": "以歷史劇的語氣呈現：用詞與氛圍貼近時代感；虛構情節不代表史實。"},
+    {"id": "comedy", "label": "喜劇", "prompt_fragment": "以喜劇的語氣呈現：輕快、幽默，但不違背人物的人格。"}
+  ]
+}
