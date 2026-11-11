@@ -46,3 +46,11 @@
 
 - 最小DML提案補驗：先重現table-level UPDATE允許Owner改派的負向紅燈，改為欄位UPDATE後16 PASS；Owner/person_id/id不可改，History不能UPDATE/DELETE。只改本機marker副本，正式GRANT仍待審查。
 - 完整套件最新718 PASS、49 SKIP；其後僅追加1項PG專用負向測試及本機fixture欄位授權修改，16項PG套件已涵蓋該變更。
+
+## 來源撤回增量驗收
+
+- 生日與指定任職新增明確source-withdrawal API及詳情頁二次確認。原值、quote、confirmed_at與舊版本保留，僅source_status/revision/updated_at更新、追加source_withdrawn歷史。
+- 正常/未確認/跨Owner/CSRF/版本/同request不同payload/重試/再次撤回無變更皆測試。注入收據失敗時目前值、History及request收據一併回滾；PG受限欄位DML不擴大。
+- 最新完整本機API：720 PASS、52 SKIP。獨立本機PG18 suite：18 PASS。人物資料Chromium（含390/1440撤回取消/確認）：6 PASS。真Google/GCP/AI仍NOT RUN；不是整體產品完成。
+- 現有Feature Store PG表不存在，人物基本資料尚未接AI上下文；衍生特徵失效仍IN PROGRESS，不以來源狀態API代替長期記憶驗收。
+- 本輪唯讀remote核對main仍68102f230aa947a434286ba9260e1ae75f6634b0。沒有Merge、Deploy、正式Migration或GRANT。

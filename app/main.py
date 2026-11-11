@@ -506,6 +506,14 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     def update_employment(person_id: str, employment_id: str, request: Request, data: schemas.EmploymentPatch):
         return service.write_person_details(current(request, True)['id'], person_id, data, 'employment', employment_id)
 
+    @app.post('/api/people/{person_id}/basic-details/source-withdrawal', tags=['People'])
+    def withdraw_birthday_source(person_id: str, request: Request, data: schemas.PersonDetailSourceWithdrawal):
+        return service.withdraw_person_detail_source(current(request, True)['id'], person_id, data, 'birthday')
+
+    @app.post('/api/people/{person_id}/employments/{employment_id}/source-withdrawal', tags=['People'])
+    def withdraw_employment_source(person_id: str, employment_id: str, request: Request, data: schemas.PersonDetailSourceWithdrawal):
+        return service.withdraw_person_detail_source(current(request, True)['id'], person_id, data, 'employment', employment_id)
+
     @app.post('/api/people', status_code=201, tags=['People'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def create_person(request: Request, data: schemas.PersonCreate):  # 建立人物並保留舊角色欄位的相容性
         return service.create_person(current(request, True)['id'], data)  # 回傳建立人物並保留舊角色欄位的相容性的結果

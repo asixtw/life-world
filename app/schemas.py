@@ -303,6 +303,12 @@ class EmploymentPatch(Model):
     source: PersonDetailSource
 
 
+class PersonDetailSourceWithdrawal(Model):
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=1)
+    confirmed: StrictBool
+
+
 class TargetBirthdayUpdate(Model):
     target: PersonUpdateTarget
     expected_revision: StrictInt = Field(ge=0)

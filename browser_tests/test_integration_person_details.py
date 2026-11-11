@@ -69,3 +69,23 @@ def test_saved_draft_delete_only_clears_its_media_scope(page):
     assert page.request.get(BASE+'/api/drafts/'+d['id']).status==404
     present=page.evaluate('''async keys=>await new Promise((resolve,reject)=>{const r=indexedDB.open('lifeworld-media-local',1);r.onsuccess=()=>{const db=r.result,tx=db.transaction('workspaces','readonly'),store=tx.objectStore('workspaces'),results=[];for(const k of keys){const q=store.get(k);q.onsuccess=()=>results.push([k,!!q.result]);}tx.oncomplete=()=>{db.close();resolve(Object.fromEntries(results));};tx.onerror=reject;};})''',keys)
     assert not present[keys[0]] and present[keys[1]] and present[keys[2]]
+
+
+@pytest.mark.parametrize('width',[390,1440])
+def test_source_withdrawal_cancel_and_confirm_keep_history(page,width):
+    page.set_viewport_size({'width':width,'height':950})
+    p,headers=seed(page);prefix=BASE+'/api/people/'+p['id']
+    r=page.request.patch(prefix+'/basic-details',headers=headers,data={'request_id':uuid4().hex,'expected_revision':0,'confirmed':True,'value':{'birth_month':4,'birth_day':12},'source':{'source_kind':'manual'}});assert r.ok,r.text()
+    page.goto(BASE+'/#persons/'+p['id']);page.reload()
+    page.get_by_role('button',name='撤回這筆資訊的來源',exact=True).click()
+    page.get_by_role('button',name='保留來源',exact=True).click()
+    assert page.request.get(prefix+'/details').json()['birthday']['source_status']=='active'
+    page.get_by_role('button',name='撤回這筆資訊的來源',exact=True).click()
+    page.get_by_role('button',name='確認撤回來源',exact=True).click()
+    expect(page.locator('#account-dialog')).not_to_be_visible()
+    expect(page.locator('.person-basic-panel')).to_contain_text('來源已撤回，待核對')
+    d=page.request.get(prefix+'/details').json()
+    assert d['birthday']['birth_month']==4 and len(d['birthday_history'])==2
+    assert d['birthday_history'][-1]['change_kind']=='source_withdrawn'
+    ART.mkdir(parents=True,exist_ok=True)
+    page.screenshot(path=str(ART/f'{width}-source-withdrawn.png'),full_page=True)

@@ -89,3 +89,45 @@ def test_employment_patch_cannot_clear_both_fields(client):
     assert r.status_code==422
     d=client.get('/api/people/'+p+'/details').json()
     assert d['employments'][0]['company_name']=='組織' and len(d['employment_history'])==1
+
+
+def test_basic_source_withdrawal_preserves_values_history_and_retry(client,app):
+    p=person(client);prefix='/api/people/'+p
+    birthday=client.patch(prefix+'/basic-details',json={'request_id':'b-source','expected_revision':0,'confirmed':True,'value':{'birth_month':2,'birth_day':29},'source':{'source_kind':'manual'}}).json()
+    job=client.post(prefix+'/employments',json={'request_id':'j-source','confirmed':True,'value':{'company_name':'組織甲'},'source':{'source_kind':'manual'}}).json()
+    for path,revision in [(prefix+'/basic-details/source-withdrawal',birthday['revision']),(prefix+'/employments/'+job['id']+'/source-withdrawal',job['revision'])]:
+        body={'request_id':'withdraw','expected_revision':revision,'confirmed':True}
+        assert client.post(path,json=body|{'confirmed':False}).status_code==422
+        with TestClient(app) as other:
+            onboard(other);register(other,'source_other_'+str(revision)+('b' if 'basic-details' in path else 'j'))
+            assert other.post(path,json=body).status_code==404
+        r=client.post(path,json=body);assert r.status_code==200,r.text
+        assert r.json()['source_status']=='withdrawn'
+        assert client.post(path,json=body).json()==r.json()
+        assert client.post(path,json=body|{'request_id':'stale'}).status_code==409
+    details=client.get(prefix+'/details').json()
+    assert details['birthday']['birth_month']==2 and details['birthday']['revision']==2
+    assert details['employments'][0]['company_name']=='組織甲'
+    for history in [details['birthday_history'],details['employment_history']]:
+        assert len(history)==2 and history[-1]['change_kind']=='source_withdrawn'
+        assert history[0]['source_status']=='active' and history[-1]['source_status']=='withdrawn'
+
+
+def test_source_withdrawal_csrf_conflict_and_transaction_rollback(client,app,monkeypatch):
+    from app.errors import DomainError
+    p=person(client);prefix='/api/people/'+p
+    assert client.patch(prefix+'/basic-details',json={'request_id':'birthday','expected_revision':0,'confirmed':True,'value':{'birth_month':4,'birth_day':12},'source':{'source_kind':'manual'}}).status_code==200
+    url=prefix+'/basic-details/source-withdrawal';body={'request_id':'withdraw-atomic','expected_revision':1,'confirmed':True}
+    assert client.post(url,json=body,headers={'X-CSRF-Token':'invalid'}).status_code==403
+    def fail_receipt(*args,**kwargs):
+        raise DomainError(503,'synthetic_receipt_failure','合成收據失敗')
+    with monkeypatch.context() as m:
+        m.setattr(app.state.service,'_remember',fail_receipt)
+        assert client.post(url,json=body).status_code==503
+    d=client.get(prefix+'/details').json()
+    assert d['birthday']['revision']==1 and d['birthday']['source_status']=='active' and len(d['birthday_history'])==1
+    assert client.post(url,json=body).status_code==200
+    assert client.post(url,json=body|{'expected_revision':2}).status_code==409
+    # 已撤回後另一次明確確認為無變更，不增加歷史或自行恢復來源。
+    assert client.post(url,json=body|{'request_id':'already-withdrawn','expected_revision':2}).status_code==200
+    assert len(client.get(prefix+'/details').json()['birthday_history'])==2

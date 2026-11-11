@@ -114,6 +114,37 @@ class PersonDetailsMixin:
             self._remember(c,owner,operation,data.request_id,fingerprint,result)
             return result
 
+    def withdraw_person_detail_source(self,owner,pid,data,kind,employment_id=None):
+        """只撤回指定目前值的來源；保留原值/舊版本，不替使用者判斷其他資料或刪除經歷。"""
+        with self.db.connect(write=True,owner=owner) as c:
+            self._details_person(c,owner,pid,True)
+            require(data.confirmed,422,'confirmation_required','請先確認撤回這筆人物資訊的來源。')
+            operation='person-details:withdraw:'+kind+':'+pid+(':'+employment_id if employment_id else '')
+            cached,fingerprint=self._cached(c,owner,operation,data.request_id,data.model_dump(mode='json'))
+            if cached:return cached
+            if kind=='birthday':
+                current=self._birthday_current(c,owner,pid)
+            else:
+                row=c.execute('SELECT * FROM person_employments WHERE id=? AND person_id=? AND owner_id=?',(employment_id,pid,owner)).fetchone()
+                current=dict(row) if row else None
+            require(current is not None,404,'not_found','找不到可撤回來源的人物資料。')
+            require(current['revision']==data.expected_revision,409,'revision_conflict','人物資料已有新版，請重新核對。')
+            if current['source_status']!='withdrawn':
+                now=self.now().isoformat()
+                current.update(source_status='withdrawn',revision=current['revision']+1,updated_at=now)
+                table='person_basic_details' if kind=='birthday' else 'person_employments'
+                key='person_id' if kind=='birthday' else 'id'
+                c.execute('UPDATE '+table+' SET source_status=?,revision=?,updated_at=? WHERE '+key+'=? AND owner_id=?',
+                          ('withdrawn',current['revision'],now,pid if kind=='birthday' else employment_id,owner))
+                # History append-only；source_withdrawn版保留原始quote/confirmed_at，不冒稱重新核對過內容。
+                history={k:v for k,v in current.items() if k not in ('id','created_at','updated_at')}
+                history.update(id=uid(),change_kind='source_withdrawn',recorded_at=now)
+                if kind=='employment':history['employment_id']=employment_id
+                history_table='person_basic_detail_history' if kind=='birthday' else 'person_employment_history'
+                c.execute('INSERT INTO '+history_table+'('+','.join(history)+') VALUES ('+','.join('?' for _ in history)+')',tuple(history.values()))
+            self._remember(c,owner,operation,data.request_id,fingerprint,current)
+            return current
+
     def _apply_person_basic_candidates(self,c,owner,draft,data,refs,experience_id):
         """Confirm已建經歷後套用各人已核對的基本資料；任何失敗一併回滾獎勵/人物/經歷。"""
         linked=set()

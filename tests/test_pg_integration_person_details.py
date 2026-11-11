@@ -36,6 +36,8 @@ from test_person_basic_api import (
  test_confirm_two_new_people_basic_data_and_retry,
  test_confirm_late_basic_conflict_rolls_back_all_rows,
  test_employment_patch_cannot_clear_both_fields,
+ test_basic_source_withdrawal_preserves_values_history_and_retry,
+ test_source_withdrawal_csrf_conflict_and_transaction_rollback,
 )
 
 
