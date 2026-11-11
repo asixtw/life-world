@@ -56,3 +56,49 @@ def test_existing_world_switch_and_local_cleanup_are_owner_scoped(page,lost_resp
     remaining=page.evaluate('''async()=>new Promise(resolve=>{const q=indexedDB.open('lifeworld-media-local',1);q.onsuccess=()=>{const db=q.result,r=db.transaction('workspaces').objectStore('workspaces').getAllKeys();r.onsuccess=()=>{db.close();resolve(r.result);};};})''')
     assert me['owner_id']+':sentinel' in remaining and 'unrelated-owner:sentinel' in remaining
     target_context.close()
+
+@pytest.mark.parametrize('width',[390,1440])
+def test_step3_upgrade_unlocks_people_without_changing_choice_or_form(page,width):
+    page.set_viewport_size({'width':width,'height':950})
+    me,g,h=world(page,'第三步保留世界')
+    page.goto(BASE+'/#record');page.locator('#raw-text').fill('尚未保存，沒有關聯人物。')
+    page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('[data-experience-next]').click();page.locator('[name^="quantity-"]').first.fill('2')
+    page.locator('[data-experience-next]').click()
+    page.evaluate('window.originalRecordForm=document.querySelector("#record-form");window.originalRaw=document.querySelector("#raw-text")')
+    sdk(page,'step3-'+uuid.uuid4().hex)
+    page.locator('#account-button').click();page.get_by_role('button',name='保存目前世界',exact=True).click();page.locator('#fixture-google').click()
+    expect(page.locator('#account-dialog')).not_to_be_visible()
+    expect(page.locator('[data-experience-step="3"] [data-story-editor]')).to_be_visible()
+    expect(page.locator('#include-story')).not_to_be_checked()
+    assert page.evaluate('window.originalRecordForm===document.querySelector("#record-form")&&window.originalRaw===document.querySelector("#raw-text")')
+    expect(page.locator('#raw-text')).to_have_value('尚未保存，沒有關聯人物。')
+    expect(page.locator('[name^="quantity-"]').first).to_have_value('2')
+    assert page.request.get(BASE+'/api/auth/me').json()['owner_id']==me['owner_id']
+    from pathlib import Path
+    art=Path(__file__).resolve().parents[1]/'docs/integration/2026-11-11/screenshots'
+    art.mkdir(parents=True,exist_ok=True)
+    page.screenshot(path=str(art/f'{width}-step3-upgrade-unlocked.png'),full_page=True)
+    page.locator('[data-experience-review]').click()
+    expect(page.locator('#review-form')).to_be_visible()
+    expect(page.locator('#review-form [name=summary]')).to_have_value('尚未保存，沒有關聯人物。')
+
+
+def test_step3_upgrade_cancel_and_rejected_exchange_preserve_inputs(page):
+    me,g,h=world(page,'取消保留第三步');page.goto(BASE+'/#record')
+    page.locator('#raw-text').fill('取消或失敗仍保留這段內容。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
+    sdk(page,'reject-step3-'+uuid.uuid4().hex)
+    page.locator('#account-button').click();page.get_by_role('button',name='保存目前世界',exact=True).click()
+    page.locator('[data-action="google-cancel"]').click()
+    expect(page.locator('#raw-text')).to_have_value('取消或失敗仍保留這段內容。')
+    expect(page.locator('[data-experience-step="3"]')).to_be_visible()
+    # 明示錯誤Token，不把GIS替身測試當成真Google驗證。
+    page.locator('[data-action="google-start"]').click()
+    expect(page.locator('#fixture-google')).to_be_visible()
+    page.evaluate("window.fixtureGIS.callback({credential:'invalid-fixture'})")
+    expect(page.locator('#dialog-error')).to_contain_text('拒絕')
+    after=page.request.get(BASE+'/api/auth/me').json()
+    assert after['owner_id']==me['owner_id'] and after['status']=='guest'
+    expect(page.locator('#raw-text')).to_have_value('取消或失敗仍保留這段內容。')
+    expect(page.locator('[data-experience-step="3"][data-guest-locked="true"]')).to_be_visible()

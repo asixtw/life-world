@@ -193,7 +193,7 @@ function reviewView(d) { // 產生人工核對頁，分開保存經歷與勾選�
 function historyView() { // 列出已確認經歷與可接續草稿
   const w = state.world, filter = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 讀取目前帳號的世界資料
   const experiences = filter ? w.experiences.filter(e => e.person_id === filter) : w.experiences; // 保存「experiences」供此流程接續使用
-  return `${heading('收藏每一段真實。','所有已確認的經歷，都帶著原始記錄與發生時間。',link('record','＋ 新的經歷','primary'))}${w.drafts.length && !filter ? `<section class="space-bottom"><div class="section-title"><h2>等待你的確認</h2><span class="tag">草稿不計分</span></div><div class="card">${w.drafts.map(d => `<div class="list-item"><div class="item-main"><h3>${esc(d.raw_text.slice(0,65))}</h3><p>${esc(time(d.occurred_at))} · revision ${d.revision}</p></div>${link('review/' + d.id,'繼續核對 →','text-button')}</div>`).join('')}</div></section>` : ''}<div class="button-row space-bottom">${link('private-notes','私人筆記／草稿箱','secondary')}</div><div class="stack">${experiences.length ? experiences.map(e => `<article class="card"><div class="section-title"><span class="tag">已由你確認</span><span class="small muted">${esc(time(e.occurred_at))}</span></div><p class="record-content">${esc(e.summary)}</p><details><summary class="small muted">查看原始紀錄</summary><div class="raw-source space-top">${esc(e.raw_text)}</div></details>${link('media-sources/'+e.draft_id,'查看此裝置的素材','text-button')}<p class="record-meta">${esc(w.goals.find(g => g.id === e.goal_id)?.title || '獨立經歷')} · ${esc(w.people.find(p => p.id === e.person_id)?.name || '未關聯人物')}<br>提交保存於 ${esc(time(e.created_at))}</p>${state.me.status==='registered'?'<button type="button" class="text-button" data-cx="manage" data-id="'+esc(e.id)+'">整理／查看交會來源</button>':''}</article>`).join('') : `<div class="card">${empty('這裡還沒有正式經歷。先記下一次真實行動吧。')}</div>`}</div>`; // 組合「列出已確認經歷與可接續草稿」所需的畫面或提交資料
+  return `${heading('收藏每一段真實。','所有已確認的經歷，都帶著原始記錄與發生時間。',link('record','＋ 新的經歷','primary'))}${w.drafts.length && !filter ? `<section class="space-bottom"><div class="section-title"><h2>等待你的確認</h2><span class="tag">草稿不計分</span></div><div class="card">${w.drafts.map(d => `<div class="list-item"><div class="item-main"><h3>${esc(d.raw_text.slice(0,65))}</h3><p>${esc(time(d.occurred_at))} · revision ${d.revision}</p></div>${link('review/' + d.id,'繼續核對 →','text-button')}<button type="button" class="text-button" data-action="delete-saved-draft" data-id="${esc(d.id)}">刪除草稿</button></div>`).join('')}</div></section>` : ''}<div class="button-row space-bottom">${link('private-notes','私人筆記／草稿箱','secondary')}<button type="button" class="text-button" data-action="retry-draft-media-cleanup">重試已刪草稿的本機素材清理</button></div><div class="stack">${experiences.length ? experiences.map(e => `<article class="card"><div class="section-title"><span class="tag">已由你確認</span><span class="small muted">${esc(time(e.occurred_at))}</span></div><p class="record-content">${esc(e.summary)}</p><details><summary class="small muted">查看原始紀錄</summary><div class="raw-source space-top">${esc(e.raw_text)}</div></details>${link('media-sources/'+e.draft_id,'查看此裝置的素材','text-button')}<p class="record-meta">${esc(w.goals.find(g => g.id === e.goal_id)?.title || '獨立經歷')} · ${esc(w.people.find(p => p.id === e.person_id)?.name || '未關聯人物')}<br>提交保存於 ${esc(time(e.created_at))}</p>${state.me.status==='registered'?'<button type="button" class="text-button" data-cx="manage" data-id="'+esc(e.id)+'">整理／查看交會來源</button>':''}</article>`).join('') : `<div class="card">${empty('這裡還沒有正式經歷。先記下一次真實行動吧。')}</div>`}</div>`; // 組合「列出已確認經歷與可接續草稿」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
 function notesView() { // 列出既有無人物私人草稿與筆記
   const selected = new URLSearchParams(location.hash.split('?')[1] || '').get('person'); // 保存「selected」供此流程接續使用
@@ -238,6 +238,10 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
     html = state.draft.status === 'draft' ? reviewView(state.draft) : historyView(); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
     if(state.draft.status === 'draft') html=html.replace('<div id="people-review-fields"></div>', '<div id="people-review-fields">'+await PeopleUI.reviewExtras(state.draft.person_id)+'</div>'); // 依目前選項或狀態進入對應處理分支
   } // 結束目前回呼、區塊或模組定義
+  else if (path === 'persons') html = await PersonsUI.list(params);
+  else if (path === 'persons-new') html = PersonsUI.createForm();
+  else if (path.startsWith('persons-edit/')) html = await PersonsUI.editForm(path.split('/')[1]);
+  else if (path.startsWith('persons/')) html = await PeopleUI.renderPerson(path.split('/')[1],params.get('tab')||'overview');
   else if (path === 'people') html = params.get('view')==='cards' ? await PeopleUI.renderPeople() : await ConnectionsUI.render(); // 交會取代星圖，收藏冊維持人物管理
   else if (path.startsWith('person/')) html = await PeopleUI.renderPerson(path.split('/')[1],params.get('tab')||'overview'); // 依目前選項或狀態進入對應處理分支
   else if (path.startsWith('source/')) html = await PeopleUI.renderEvidence(path.split('/')[1],path.split('/')[2]); // 依目前選項或狀態進入對應處理分支
@@ -324,7 +328,7 @@ async function completeGoogleTransition(attempt,me,receipt) {
   state.csrf=me.csrf_token;state.me=me;state.googleUncertain=false;
   if(sameOwner){
     // 不重新render或navigate：完整保留目前路由、未保存欄位、媒體及草稿狀態。
-    await refresh();navigation(state.route);state.googleAttempt=null;$('#account-dialog').close();toast('已保存目前世界，原本進度與尚未完成的表單都保留。');return;
+    await refresh();ExperienceUI.refreshCapabilities();navigation(state.route);state.googleAttempt=null;$('#account-dialog').close();toast('已保存目前世界，原本進度與尚未完成的表單都保留。');return;
   }
   lockRenderControls();state.world=null;state.draft=null;state.candidate=null;state.aiPeople=[];state.requests.clear();DashboardUI.clear();
   await refresh();state.googleAttempt=null;$('#account-dialog').close();navigate(state.me.lumi_hatched?'world':'profile');
@@ -488,6 +492,8 @@ document.addEventListener('click', async event => { // 監聽點擊
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
     if(action==='entry-retry'){await retryPublicEntry();return;}
     if(action?.startsWith('entry-')){publicEntryView(action.slice(6));return;}
+    if (await DraftsUI.handleClick(action,target)) return;
+    if (await PersonDetailsUI.handleClick(action,target)) return;
     if (await PeopleUI.handleClick(target)) return; // 依目前選項或狀態進入對應處理分支
     if (action === 'guest') {await startGuest(); await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定
@@ -563,6 +569,8 @@ document.addEventListener('submit', async event => { // 監聽表單提交
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
     if (await GoalsUI.submit(form)) return; // 目標建立與回顧先使用新契約。
     if (await ConnectionsUI.submit(form)) return; // 來源核對及角色更正沿用既有錯誤處理
+    if (await PersonDetailsUI.handleSubmit(form)) return;
+    if (await PersonsUI.handleSubmit(form)) return;
     if (await PeopleUI.handleSubmit(form)) return; // 依目前選項或狀態進入對應處理分支
     const f = new FormData(form); // 讀取使用者目前表單值，不直接推論人物資訊
     if (form.id === 'profile-form') {await api('/profile',{method:'PUT',body:Object.fromEntries(f)}); await refresh(); navigate('goal-new');} // 等待伺服器完成讀取或保存，再進入下一步
@@ -612,11 +620,15 @@ async function start() { // 讀取既有身分後啟動畫面
   try {await refresh();} // 重新讀取伺服器確認的資料，再更新畫面
   catch (error) {if (error.status !== 401) showError(error);} // 顯示失敗原因，讓使用者保留內容並重試
   await GuestLocalCleanup.retry();
+  await DraftsUI.retryLocalCleanup();
   await render(); // 執行「讀取既有身分後啟動畫面」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
-ExperienceUI.initialize({state,toast});
+ExperienceUI.initialize({state,toast,personControls:story=>experiencePersonField()+ConnectionsUI.editor(story,'record')});
 MediaUI.initialize({state,api,esc,toast,contributionFields,requestLogin:()=>{toast('登入後可使用辨識；原素材與手動文字會保留。');accountView('claim');}});
-PeopleUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm}); // 將主程式工具注入人物模組，使兩者共用狀態
+PeopleUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm});
+PersonsUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId:()=>newId(),refresh,render,navigate});
+PersonDetailsUI.initialize({state,api,esc,link,dialog,requestId:()=>newId(),render,toast});
+DraftsUI.initialize({state,api,esc,dialog,newId,refresh,render,toast}); // 將主程式工具注入人物模組，使兩者共用狀態
 ConnectionsUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm}); // 交會與收藏冊共用 API 及帳號資料
 document.addEventListener('click',async event=>{const target=event.target.closest('[data-cx]'); if(!target) return; target.disabled=true; try { await ConnectionsUI.click(target); } catch(error) { showError(error); } finally { if(target.isConnected) target.disabled=false; }}); // 防止來源／配對重複點擊並保留失敗內容
 document.addEventListener('keydown', event => {if(event.target.matches('[data-person]') && ['Enter',' '].includes(event.key)) {event.preventDefault(); event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}); // 監聽鍵盤操作，讓星點支援 Enter 與空白鍵

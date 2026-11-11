@@ -93,7 +93,8 @@ window.PeopleUI = (() => { // 封裝人物模組，避免內部狀態污染全�
     profile=data; // 保存目前帳號最新人物完整頁資料
     tab=['overview','history','goals'].includes(tab)?tab:'overview'; // 僅接受人物總覽、共同經歷與合作目標三個分頁
     const p=profile.person; // 取得目前人物或日期欄位資料
-    return `<div id="person-profile" class="person-profile" data-person-id="${p.id}">${profileHead(profile,tab)}<section class="person-tab-panel">${tab==='overview'?overviewPanel(profile):tab==='history'?historyPanel(profile):goalsPanel(profile)}</section><div class="person-actions">${link(recordRoute(p),'記錄新經歷','primary')}${link('theater/'+p.id+'?return='+encodeURIComponent(location.hash.slice(1)),'開啟小劇場','secondary')}</div></div>`; // 組合「載入人物完整頁並選擇總覽、經歷或目標分頁」所需的畫面或提交資料
+    const basicDetails=tab==='overview'&&window.PersonDetailsUI?await PersonDetailsUI.view(personId):''; // 在原總覽內呈現，避免另接一張頁面或重複固定操作列。
+    return `<div id="person-profile" class="person-profile" data-person-id="${p.id}">${profileHead(profile,tab)}<section class="person-tab-panel">${basicDetails}${tab==='overview'?overviewPanel(profile):tab==='history'?historyPanel(profile):goalsPanel(profile)}</section><div class="person-actions">${link(recordRoute(p),'記錄新經歷','primary')}${link('theater/'+p.id+'?return='+encodeURIComponent(location.hash.slice(1)),'開啟小劇場','secondary')}</div></div>`; // 組合「載入人物完整頁並選擇總覽、經歷或目標分頁」所需的畫面或提交資料
   } // 結束目前回呼、區塊或模組定義
   function allExperiences(data) { return [...new Map([...data.interactions.flatMap(e=>e.experiences),...(data.stories||[])].map(e=>[e.id,e])).values()]; } // 以識別碼去重可引用的已確認經歷
   function sourceChecks(data) { return allExperiences(data).map(e=>`<label class="check-line"><input name="source_ids" type="checkbox" value="${e.id}"><span>${h(c.time(e.occurred_at))}<br>${h(e.summary)}</span></label>`).join('')||'<p class="small muted">目前沒有已確認的來源；仍可手動練習，但不能捏造人物偏好。</p>'; } // 列出可由使用者明確勾選的來源

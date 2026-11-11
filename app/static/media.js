@@ -267,6 +267,16 @@ const MediaUI = (() => {
     try {await storage(nextKey,{items:session.items,fields:session.fields,serverRevision}); await storage(oldKey,undefined,true); sessions.delete(oldKey); session.key=nextKey; session.serverRevision=serverRevision; sessions.set(nextKey,session);}
     catch {throw new Error('文字草稿已到伺服器，但本機素材未完成連結。請保留此頁，勿重複建立草稿。');}
   }
+  async function clearDraft(owner, draftId) {
+    // 僅用已收到刪除成功收據的精確scope；不得以前綴清除其他草稿或Owner。
+    const key=owner+':draft:'+draftId,session=sessions.get(key);
+    if(session)session.invalidated=true;
+    if(active?.key===key){stopRecording(true);cancelRequests(active);}
+    await pending;
+    await storage(key,undefined,true);
+    sessions.delete(key);
+    if(active?.key===key){active=null;releaseURLs();}
+  }
   async function clearOwner(owner,{signal}={}) { // 僅在使用者勾選後清本owner本機素材，不刪伺服器或其他owner。
     for(const session of sessions.values())if(session.owner===owner)session.invalidated=true;
     if(active?.owner===owner){stopRecording(true);cancelRequests(active);}
@@ -343,5 +353,5 @@ const MediaUI = (() => {
     window.addEventListener('beforeunload',event=>{if(recorder||recordingSession){event.preventDefault();event.returnValue='';}});
   }
   async function awaitReady(){await Promise.all([...photoJobs]);}
-  return {awaitReady,initialize,clearOwner,mount,capture,leave,bindDraft,discard,renderDrafts,keepLocal};
+  return {awaitReady,initialize,clearDraft,clearOwner,mount,capture,leave,bindDraft,discard,renderDrafts,keepLocal};
 })();

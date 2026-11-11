@@ -78,3 +78,14 @@ def test_confirm_late_basic_conflict_rolls_back_all_rows(client):
     with client.app.state.service.db.connect() as c:
         for table in ['person_basic_details','person_basic_detail_history','person_employments','person_employment_history']:
             assert c.execute('SELECT count(*) FROM '+table).fetchone()[0]==0
+
+
+def test_employment_patch_cannot_clear_both_fields(client):
+    p=person(client);url='/api/people/'+p+'/employments'
+    r=client.post(url,json={'request_id':'one-company','confirmed':True,'value':{'company_name':'組織'},'source':{'source_kind':'manual'}});assert r.status_code==201
+    job=r.json()
+    body={'request_id':'clear','expected_revision':1,'confirmed':True,'value':{'company_name':''},'source':{'source_kind':'manual'}}
+    r=client.patch(url+'/'+job['id'],json=body)
+    assert r.status_code==422
+    d=client.get('/api/people/'+p+'/details').json()
+    assert d['employments'][0]['company_name']=='組織' and len(d['employment_history'])==1

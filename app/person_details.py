@@ -1,5 +1,6 @@
 """人物生日與任職的結構化服務；與Confirm共用連線，歷史不可因新值被刪除。"""
 from uuid import uuid4
+from pydantic import ValidationError
 from .errors import require
 from .schemas import BirthdayValue, EmploymentValue
 
@@ -71,7 +72,11 @@ class PersonDetailsMixin:
         require((current['revision'] if current else 0)==expected_revision,409,'revision_conflict','任職已有新版，請重新載入。')
         merged={k:current[k] for k in WORK_FIELDS} if current else {}
         merged.update(value.model_dump(exclude_unset=True,mode='json'))
-        validated=EmploymentValue.model_validate(merged).model_dump(mode='json')
+        try:
+            validated=EmploymentValue.model_validate(merged).model_dump(mode='json')
+        except ValidationError:
+            # PATCH只帶部分欄位，須合併舊值後驗證；錯誤回422且不洩漏人物內容。
+            require(False,422,'invalid_employment','任職至少填公司或職稱，且結束日期不得早於開始日期。')
         now=self.now().isoformat();record={'id':employment_id or uid(),'person_id':pid,'owner_id':owner,**validated,
             **self._details_source(c,owner,source,experience_id),'confirmed_at':now,
             'revision':(current['revision'] if current else 0)+1,'created_at':current['created_at'] if current else now,'updated_at':now}

@@ -1,0 +1,78 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_step3_upgrade_unlocks_people_without_changing_choice_or_form[390] ____
+browser_tests/test_google_world_transition.py:71: in test_step3_upgrade_unlocks_people_without_changing_choice_or_form
+    expect(page.locator('[data-experience-step="3"] [data-story-editor]')).to_be_visible()
+E   AssertionError: Locator expected to be visible
+E   Actual value: - complementary:
+E     - navigation "主要導覽":
+E       - link "世界":
+E         - /url: "#world"
+E       - link "目標":
+E         - /url: "#goals"
+E       - link "紀錄":
+E         - /url: "#history"
+E       - link "關係":
+E         - /url: "#people"
+E   - main:
+E     - text: 我的小小宇宙 ／ 記錄經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 第
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "把這一刻，記下來。" [level=1]
+E     - paragraph: 今天的小事、昨天的努力，都值得有一個位置。
+E     - status: 3 / 4 · 記錄經歷 → 目標活動數量 → 人物關聯 → 檢視並確認
+E     - heading "人物關聯" [level=2]
+E     - paragraph: 本次不關聯人物。訪客可繼續確認文字與目標活動量，不會呼叫 AI。
+E     - button "上一步"
+E     - button "檢視並確認 →"
+E     - button "保存草稿並離開"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status: 已保存目前世界，原本進度與尚未完成的表單都保留。
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for locator("[data-experience-step=\"3\"] [data-story-editor]")
+___ test_step3_upgrade_unlocks_people_without_changing_choice_or_form[1440] ____
+browser_tests/test_google_world_transition.py:71: in test_step3_upgrade_unlocks_people_without_changing_choice_or_form
+    expect(page.locator('[data-experience-step="3"] [data-story-editor]')).to_be_visible()
+E   AssertionError: Locator expected to be visible
+E   Actual value: - complementary:
+E     - link "Life World 首頁":
+E       - /url: "#world"
+E       - text: ✳ Life World 讓努力，有一個家。
+E     - navigation "主要導覽":
+E       - link "世界":
+E         - /url: "#world"
+E       - link "目標":
+E         - /url: "#goals"
+E       - link "紀錄":
+E         - /url: "#history"
+E       - link "關係":
+E         - /url: "#people"
+E     - text: Life World 測試版 你的世界，從真實的一小步開始。
+E   - main:
+E     - text: 我的小小宇宙 ／ 記錄經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 第
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "把這一刻，記下來。" [level=1]
+E     - paragraph: 今天的小事、昨天的努力，都值得有一個位置。
+E     - status: 3 / 4 · 記錄經歷 → 目標活動數量 → 人物關聯 → 檢視並確認
+E     - heading "人物關聯" [level=2]
+E     - paragraph: 本次不關聯人物。訪客可繼續確認文字與目標活動量，不會呼叫 AI。
+E     - button "上一步"
+E     - button "檢視並確認 →"
+E     - button "保存草稿並離開"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status: 已保存目前世界，原本進度與尚未完成的表單都保留。
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for locator("[data-experience-step=\"3\"] [data-story-editor]")
+=========================== short test summary info ============================
+FAILED browser_tests/test_google_world_transition.py::test_step3_upgrade_unlocks_people_without_changing_choice_or_form[390]
+FAILED browser_tests/test_google_world_transition.py::test_step3_upgrade_unlocks_people_without_changing_choice_or_form[1440]
+2 failed, 5 deselected in 11.57s

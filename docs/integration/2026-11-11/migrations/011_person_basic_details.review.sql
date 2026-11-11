@@ -1,4 +1,4 @@
--- REVIEW ONLY / NOT RUN：根據邏輯契約與Jerry010候選，尚未經兩庫即時Snapshot驗證。
+-- REVIEW ONLY / GCP NOT RUN：兩庫唯讀Snapshot已比對；僅本機合成PG18副本試跑成功。
 -- 不由Runtime執行。不重跑010，不DROP/TRUNCATE，不授權。實體名稱、版號、收據待審查凍結。
 BEGIN;
 DO $gate$

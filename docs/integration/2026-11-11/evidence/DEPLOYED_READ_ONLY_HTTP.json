@@ -1,0 +1,80 @@
+[
+  {
+    "environment": "e2e",
+    "path": "/health",
+    "http_status": "200",
+    "body": {
+      "status": "ok"
+    },
+    "error": null
+  },
+  {
+    "environment": "e2e",
+    "path": "/ready",
+    "http_status": "200",
+    "body": {
+      "status": "ready"
+    },
+    "error": null
+  },
+  {
+    "environment": "e2e",
+    "path": "/api/capabilities",
+    "http_status": "200",
+    "body": {
+      "access_mode": "legacy",
+      "accounts_available": true,
+      "password_login_available": true,
+      "registration_available": true,
+      "media_available": false,
+      "relationship_memory_available": false,
+      "relation_sources": "link_table",
+      "unified_people": true,
+      "google_login_available": false,
+      "ai_available": false,
+      "ai_status": "not_configured",
+      "writes_available": true,
+      "points": "accumulation_only",
+      "redemption_available": false
+    },
+    "error": null
+  },
+  {
+    "environment": "alpha",
+    "path": "/health",
+    "http_status": "200",
+    "body": {
+      "status": "ok"
+    },
+    "error": null
+  },
+  {
+    "environment": "alpha",
+    "path": "/ready",
+    "http_status": "200",
+    "body": {
+      "status": "ready"
+    },
+    "error": null
+  },
+  {
+    "environment": "alpha",
+    "path": "/api/capabilities",
+    "http_status": "200",
+    "body": {
+      "access_mode": "public_alpha",
+      "accounts_available": true,
+      "password_login_available": true,
+      "registration_available": false,
+      "media_available": true,
+      "relationship_memory_available": false,
+      "google_login_available": true,
+      "ai_available": true,
+      "ai_status": "configured_not_verified",
+      "writes_available": true,
+      "points": "accumulation_only",
+      "redemption_available": false
+    },
+    "error": null
+  }
+]

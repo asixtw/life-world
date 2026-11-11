@@ -37,7 +37,7 @@ window.ExperienceUI=(()=>{
       else if(!node.classList.contains('button-row'))sections[0].append(node);
       else node.remove();
     }
-    if(c.state.me.status==='guest')sections[2].innerHTML='<p>本次不關聯人物。訪客可繼續確認文字與目標活動量，不會呼叫 AI。</p>';
+    if(c.state.me.status==='guest'){sections[2].dataset.guestLocked='true';sections[2].innerHTML='<p>本次不關聯人物。訪客可繼續確認文字與目標活動量，不會呼叫 AI。</p>';}
     form.dataset.experienceFlow='true';form.append(...sections);
     form.insertAdjacentHTML('afterbegin','<p id="experience-progress" class="small muted" role="status"></p><h2 id="experience-step-title" tabindex="-1"></h2>');
     form.insertAdjacentHTML('beforeend','<div class="button-row space-top"><button type="button" class="secondary" data-experience-prev>上一步</button><button type="button" class="primary" data-experience-next>下一步</button><button class="primary" name="intent" value="review" data-experience-review>檢視並確認 →</button><button class="text-button" name="intent" value="save">保存草稿並離開</button></div>');
@@ -51,5 +51,14 @@ window.ExperienceUI=(()=>{
     };
     c.state.experienceFlow=flow;show(previousStep);capture();
   }
-  return {initialize,mount,capture,getState:()=>flow};
+  function refreshCapabilities(){
+    // 同Owner升級只替換已鎖住的人物區；保留表單、原文、媒體、步驟與未選人物的狀態。
+    if(!flow||flow.ownerId!==c.state.me?.owner_id||c.state.me.status!=='registered')return;
+    const section=document.querySelector('[data-experience-step="3"][data-guest-locked="true"]');
+    if(!section)return;
+    section.innerHTML=c.personControls(flow.story);
+    delete section.dataset.guestLocked;
+    window.ConnectionsUI.hydrateEditors();
+  }
+  return {initialize,mount,capture,refreshCapabilities,getState:()=>flow};
 })();
