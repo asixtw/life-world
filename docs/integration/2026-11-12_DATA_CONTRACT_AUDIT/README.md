@@ -117,3 +117,5 @@ Owner需決定：資料容器/時間粒度/貢獻/提及映射；S07來源路由
 ### 後續 QA 修正
 
 已在整合分支關閉前述九項設定PUT入口（main原無此路由），保留歷史資料與讀取。詳細紅綠燈及完整本機測試見[發布報告](../2026-11-11/INTEGRATION_RELEASE_REPORT.md#6-未核准角色設定入口隔離qa)。原始稽核發現保留，非宣稱已發布Alpha。
+
+來源失效後續QA：已修復交會available=false後仍被記憶讀取的案例，User/Context及人物來源投影皆排除；僅SQLite實測，不代表全部背景來源/授權/PG完成。詳[發布報告](../2026-11-11/INTEGRATION_RELEASE_REPORT.md)。

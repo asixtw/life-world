@@ -6,7 +6,7 @@
 
 `relationship_memory.py`有有限SQLite特徵骨架、明示摘要偏好、讀取時規則快照及profile_version；離線測試涵蓋偏好跨Session、Owner隔離及部分人物事實來源撤回。`training_opt_in`固定false，不等於訓練功能或授權。
 
-**完整來源失效尚未驗收**：records讀取未有背景來源撤回的統一過濾；人物事實可來自提及，不能據有效source數自動稱confirmed_interaction。背景purpose/Provider/欄位/來源版本同意、事件觸發/排程、衝突/削弱/歷史與快取失效尚需Gate B審查。現有測試不證明user/context不重用撤回來源。人物基本資料011不會自動補此能力。
+**完整來源失效尚未驗收**：2026-11-12 QA已排除available=false的交會來源，涵蓋User/Context記錄與Person/Relationship證據，SQLite撤回/恢復與保留正式資料測試通過；這仍不是全種類來源/版本/快取的統一失效機制。人物事實可來自提及，不能據有效source數自動稱confirmed_interaction。背景purpose/Provider/欄位/來源版本同意、事件觸發/排程、衝突/削弱/歷史與快取失效尚需Gate B審查。新增測試證明上述交會撤回案例不重用來源，未涵蓋所有背景來源類型或並行撤回競態。人物基本資料011不會自動補此能力。
 
 `GET/PUT/DELETE /api/personalization`依Session Owner及寫入CSRF處理偏好；偏好enabled不能冒充完整背景AI授權。草稿AI的獨立可撤回同意不涵蓋背景分析。未確認草稿、模擬與未授權第三人資料不得進正式特徵或訓練集；模型輸出也不得回寫真人正式事實。
 

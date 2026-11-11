@@ -109,3 +109,9 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 新Python服務使用8197（保留原8196服務）；`/ready`=200，實際OpenAPI無角色設定寫入路由、保留本人`/api/profile`。六個瀏覽器模組同第2節命令、改URL為`http://127.0.0.1:8197`：**79 PASS**（122.79秒），320/390/1440、四步、逐人補充、草稿、原子確認、回讀、隔離與重送。收據[ROLE_BOUNDARY_PG_BROWSER.log](ROLE_BOUNDARY_PG_BROWSER.log)；最新受限SQL回讀更新[evidence/BASIC_UI_PG_READBACK.json](evidence/BASIC_UI_PG_READBACK.json)。畫面沒有產品變更，不重複提交相同情境截圖，沿用第3節畫面；此輪通過不等於Owner UX核准。
 
 真Google／Gemini、GCP映像與Migration、實機Safari/Android、正式發布仍 **NOT RUN**。Gate A/B/C/D狀態不變。
+
+### 來源撤回 QA（有限修正）
+
+新增紅燈測試重現：交會available=false後，FeatureStore仍由experiences重建User/Context及人物來源特徵。現已在記錄查詢與人物事實來源投影排除此類撤回來源；正式經歷、獎勵及人物事實不刪除。測試包含持久快照不再含撤回ID、明確恢復後重新可用、原經歷與獎勵各一筆、人物正式事實保留。
+
+完整本機SQLite/Node **767 PASS、87 SKIP**（31.56秒），收據[MEMORY_WITHDRAWAL_TESTS.log](MEMORY_WITHDRAWAL_TESTS.log)；比前次增加1測試與2個專用PG入口案例的SKIP，不把SKIP當PASS。這項修正尚未跑PG Feature Store（快照缺表，未核准Migration）、真Gemini或瀏覽器，均NOT RUN。旗標及正式設定未啟用/改動。來源用途同意、提及誤當互動、並行撤回/快取/版本傳播仍未閉環，Gate B不通過。

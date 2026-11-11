@@ -32,11 +32,25 @@ class FeatureStore:
         if not pref['enabled']:return {'enabled':False,'features':[],'training_opt_in':False}
         with self.db.connect() as c:
             self.service._onboarded(c,owner)
-            records=[dict(r) for r in c.execute('SELECT id,summary,occurred_at FROM experiences WHERE owner_id=? ORDER BY occurred_at DESC,id DESC LIMIT 100',(owner,)).fetchall()]
+            # 撤回交會派生來源不刪正式經歷，但不可繞道一般經歷重新納入記憶。
+            records=[dict(r) for r in c.execute('''SELECT x.id,x.summary,x.occurred_at FROM experiences x
+                WHERE x.owner_id=? AND NOT EXISTS (
+                    SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id
+                    AND s.owner_id=x.owner_id AND s.available=FALSE)
+                ORDER BY x.occurred_at DESC,x.id DESC LIMIT 100''',(owner,)).fetchall()]
         facts=[]
         if person:
             overview=self.service.person_overview(owner,person)
-            facts=[{'fact_id':f['id'],'value':f['value'],'source_experience_ids':[s['id'] for s in f['sources']]} for group in overview['facts'].values() for f in group if f['status']=='confirmed' and f['sources']]
+            with self.db.connect() as c:
+                for group in overview['facts'].values():
+                    for f in group:
+                        if f['status']!='confirmed':continue
+                        # 人物事實保留原始證據；記憶用途另驗來源可用性，不修改正式事實。
+                        refs=[source['id'] for source in f['sources'] if c.execute('''SELECT 1 FROM experiences x
+                            WHERE x.id=? AND x.owner_id=? AND NOT EXISTS (
+                                SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id
+                                AND s.owner_id=x.owner_id AND s.available=FALSE)''',(source['id'],owner)).fetchone()]
+                        if refs:facts.append({'fact_id':f['id'],'value':f['value'],'source_experience_ids':refs})
         # 四類都是有限情境，禁止把觀察議題當成絕對人格；矛盾資訊不選邊。
         refs=sorted({r['id'] for r in records});candidate=[]
         def add(kind,subject,key,value,sources,status):
