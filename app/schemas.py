@@ -127,7 +127,15 @@ class StoryMention(Model):  # 尚未配對或已人工指定的原文提及
     person_id: Optional[str] = Field(default=None, min_length=1, max_length=128)  # 只有使用者選定才保存人物身分
 
 
+class PendingPerson(Model):
+    """待確認人物，不在草稿階段建立正式紀錄。"""
+    name: str = Field(min_length=1, max_length=100)
+    relation: Literal['participant', 'interaction', 'mention']
+    start: Optional[StrictInt] = Field(default=None, ge=0, exclude_if=lambda v: v is None)
+
+
 class StoryInput(Model):  # 草稿與正式人物核對共用資料
+    pending_person: Optional[PendingPerson] = Field(default=None, exclude_if=lambda v: v is None)  # 只存候選；最終確認才建人
     title: str = Field(default='', max_length=160)  # 可另取故事標題
     participants: List[StoryParticipant] = Field(default_factory=list, max_length=100)  # 每筆經歷最多一百位參與者
     mentions: List[StoryMention] = Field(default_factory=list, max_length=100)  # 每個原文位置獨立配對
@@ -136,6 +144,12 @@ class StoryInput(Model):  # 草稿與正式人物核對共用資料
     def distinct_links(self):  # 拒絕重複人物與重複提及位置
         ids = [p.person_id for p in self.participants]  # 取得固定人物識別碼
         spans = [(m.start, m.end) for m in self.mentions]  # 取得原文範圍
+        if self.pending_person:
+            pending = self.pending_person
+            if pending.relation == 'mention' and ((pending.start, (pending.start or 0) + len(pending.name)) in spans or len(spans) >= 100):
+                raise ValueError('新增人物的提及位置不能重複或超過上限')
+            if pending.relation != 'mention' and len(ids) >= 100:
+                raise ValueError('參與人物已達上限')
         if len(ids) != len(set(ids)) or len(spans) != len(set(spans)):  # 重複輸入不能默默覆寫
             raise ValueError('參與者與提及位置不可重複')  # 讓介面要求人工修正
         return self  # 回傳唯一且合法的角色資料

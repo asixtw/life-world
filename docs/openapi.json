@@ -3597,6 +3597,45 @@
         ],
         "title": "PendingAccept"
       },
+      "PendingPerson": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "participant",
+              "interaction",
+              "mention"
+            ],
+            "title": "Relation"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "relation"
+        ],
+        "title": "PendingPerson",
+        "description": "待確認人物，不在草稿階段建立正式紀錄。"
+      },
       "PersonCreate": {
         "properties": {
           "name": {
@@ -3987,6 +4026,16 @@
       },
       "StoryInput": {
         "properties": {
+          "pending_person": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PendingPerson"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "title": {
             "type": "string",
             "maxLength": 160,

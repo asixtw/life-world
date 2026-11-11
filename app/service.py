@@ -269,6 +269,18 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
                 require(data.story_reviewed, 422, 'story_review_required', '請先核對這段故事的人物參與及提及。')  # 不將候選直接轉成正式角色
                 self._validate_story(c, owner, draft['raw_text'], data.story)  # 先核對全部來源與所有權
                 require(not data.person_id or data.person_id in [p.person_id for p in data.story.participants], 422, 'primary_not_participant', '主要關聯人物必須是本次參與者；提及者請在提及區配對。')  # 避免舊主要人物欄位誤用身分
+            if data.story is not None and data.story.pending_person:
+                # 指紋已先保存原請求；新增人物與後續經歷、獎勵共享同一交易，任何錯誤全部回滾。
+                from .schemas import PersonCreate, StoryParticipant, StoryMention
+                pending = data.story.pending_person
+                person = self._create_person(c, owner, PersonCreate(name=pending.name))
+                story = data.story.model_copy(deep=True)
+                story.pending_person = None
+                if pending.relation == 'mention':
+                    story.mentions.append(StoryMention(name=pending.name, start=pending.start, end=pending.start + len(pending.name), person_id=person['id']))
+                else:
+                    story.participants.append(StoryParticipant(person_id=person['id'], interacted=pending.relation == 'interaction'))
+                data = data.model_copy(update={'story': story, 'person_id': data.person_id or (person['id'] if pending.relation != 'mention' else None)})
             experience_id, now = uid(), self.now().isoformat()  # 保存「(experience_id, now)」供後續驗證或回傳使用
             c.execute('INSERT INTO experiences VALUES (?,?,?,?,?,?,?,?,?)',
                       (experience_id, owner, draft_id, draft['goal_id'], data.person_id,
@@ -293,13 +305,17 @@ class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin):  # 各模組共用�
         with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             user = self._onboarded(c, owner)  # 準備目前帳號及其身分資料
             require_registered(user)  # 驗證限制：條件不成立即拒絕操作，避免部分寫入
-            person_id = uid()  # 準備新人物的唯一識別碼
-            roles = data.roles or ([data.role] if data.role else [])  # 準備多角色清單；未提供新欄位時沿用舊角色完整文字
-            c.execute('''INSERT INTO people(id,owner_id,name,role,notes,created_at,roles,tags,category,followed,common_context)
-                         VALUES (?,?,?,?,?,?,?,?,?,?,?)''',
-                      (person_id, owner, data.name, data.role or '、'.join(roles), data.notes, self.now().isoformat(),
-                       encoded(roles), encoded(data.tags), data.category, data.followed, data.common_context))  # 原生 bool 同時適用 SQLite 與 PG。
-            return self._person(c, owner, person_id)  # 回傳建立人物並保留舊角色欄位的相容性的結果
+            return self._create_person(c, owner, data)
+
+    def _create_person(self, c, owner, data):
+        """在呼叫者的交易內建立人物，不開第二個連線。"""
+        person_id = uid()  # 準備新人物的唯一識別碼
+        roles = data.roles or ([data.role] if data.role else [])  # 準備多角色清單；未提供新欄位時沿用舊角色完整文字
+        c.execute('''INSERT INTO people(id,owner_id,name,role,notes,created_at,roles,tags,category,followed,common_context)
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?)''',
+                  (person_id, owner, data.name, data.role or '、'.join(roles), data.notes, self.now().isoformat(),
+                   encoded(roles), encoded(data.tags), data.category, data.followed, data.common_context))  # 原生 bool 同時適用 SQLite 與 PG。
+        return self._person(c, owner, person_id)  # 回傳建立人物並保留舊角色欄位的相容性的結果
 
     def upload(self, owner, goal_id, filename, mime, content):  # 驗證權限與圖片內容後保存目標佐證
         # Authorize before parsing the content, and recheck within the write transaction.

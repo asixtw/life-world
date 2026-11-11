@@ -1,0 +1,28 @@
+{
+  "status": "Gate A / NOT APPROVED",
+  "baseline": "23f89720331c119b01ab514c1971a21ceef4018e",
+  "full_suite": {
+    "passed": 90,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 96.26
+  },
+  "additional_mapping": {
+    "passed": 12,
+    "deselected": 32,
+    "seconds": 7.59
+  },
+  "completion_screenshot_repeat": {
+    "passed": 2,
+    "not_counted_twice": true
+  },
+  "unique_test_pass": 102,
+  "screenshots": 32,
+  "formal_api_db_changes": false,
+  "gate_b_c": "BLOCKED / NOT COMPLETE",
+  "source_sha256": {
+    "demo.js": "680f0143510d49d02721fd01ea7437df4fb1bc7f1855cf2801caf2b28f3bc861",
+    "tests/test_supplement.py": "1fbcabf7b2d5896db909c5badd3ac6ed2794f44ba3d0d6377e032369928f8460",
+    "tests/test_review_revision.py": "efaaf624f003385d45a6be538cbe780501f02e93a7717ecd74c5d8dd57794bbd"
+  }
+}

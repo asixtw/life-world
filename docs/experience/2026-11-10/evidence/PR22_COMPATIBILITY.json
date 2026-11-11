@@ -1,0 +1,27 @@
+[
+  {
+    "path": "app/schemas.py",
+    "merge_file_exit": 0,
+    "conflict": false
+  },
+  {
+    "path": "app/static/app.js",
+    "merge_file_exit": 0,
+    "conflict": false
+  },
+  {
+    "path": "docs/API.md",
+    "merge_file_exit": 0,
+    "conflict": false
+  },
+  {
+    "path": "docs/SPEC_INDEX.md",
+    "merge_file_exit": 0,
+    "conflict": false
+  },
+  {
+    "path": "docs/openapi.json",
+    "merge_file_exit": 0,
+    "conflict": false
+  }
+]

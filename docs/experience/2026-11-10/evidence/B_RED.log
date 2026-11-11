@@ -1,0 +1,20 @@
+FF..F                                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_plain_goal_and_empty_review_never_enter_connections ___________
+tests/test_people_connections_visibility.py:22: in test_plain_goal_and_empty_review_never_enter_connections
+    assert client.get('/api/connections?involvement=legacy').json()['total'] == 0
+E   assert 1 == 0
+________________ test_person_pending_pagination_focus_and_owner ________________
+tests/test_people_connections_visibility.py:35: in test_person_pending_pagination_focus_and_owner
+    assert all(x['total'] == 2 for x in pages)
+E   assert False
+E    +  where False = all(<generator object test_person_pending_pagination_focus_and_owner.<locals>.<genexpr> at 0x10d466330>)
+___________ test_human_review_routes_roles_without_reaward[mention] ____________
+tests/test_people_connections_visibility.py:61: in test_human_review_routes_roles_without_reaward
+    assert client.get('/api/connections').json()['total'] == (role != 'mention')
+E   AssertionError: assert 1 == ('mention' != 'mention')
+=========================== short test summary info ============================
+FAILED tests/test_people_connections_visibility.py::test_plain_goal_and_empty_review_never_enter_connections
+FAILED tests/test_people_connections_visibility.py::test_person_pending_pagination_focus_and_owner
+FAILED tests/test_people_connections_visibility.py::test_human_review_routes_roles_without_reaward[mention]
+3 failed, 2 passed in 0.46s

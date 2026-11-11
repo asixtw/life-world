@@ -1,0 +1,18 @@
+{
+  "status": "Changes Requested / NOT APPROVED",
+  "tests": 58,
+  "failed": 0,
+  "skipped": 0,
+  "red_failed": 2,
+  "viewports": [
+    390,
+    1440
+  ],
+  "product_api_changed": false,
+  "gate_b_c": "NOT COMPLETE",
+  "source_sha256": {
+    "demo.js": "dfd024e61be65c47c9bce14a63ea897509f58c769fb3d26802da4021d81fafd0",
+    "tests/test_candidate.py": "e014534a4223d51df510794eed7dc34bf6e39cd9d7a110eeb6f542d139553af5",
+    "tests/test_review_revision.py": "5422e4afb5413f067b39d7ac58e9cc3d2a11a986c6adb5686ebc76906b21f28c"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "design_version": "UX v0.3 Candidate",
+  "owner_decision": "Changes Requested",
+  "approved": false,
+  "product_code_baseline": "7013894b868f1d50c3a2704977b20d500891ce35",
+  "product_app_diff": [],
+  "demo_test_results": "26 passed",
+  "viewports": [
+    390,
+    1440
+  ],
+  "base_screenshots": 74,
+  "all_screenshots": 76,
+  "session_source": "DESIGN_FIXTURE_ONLY; real Google NOT RUN",
+  "api_calls": 0,
+  "external_network_calls": 0,
+  "production_db_queries": 0,
+  "deployments": 0,
+  "reference_sha256": {
+    "Life_World_Experience_Wireframe_Overview_v0.2.png": "ec3e0446aa6748fc824f4f3ada5cf9b6aa2b3484ed0109d421946b48a4a66d4d",
+    "PR24_Current_390_Step3.png": "919438c28c8914b6b2b0de7d7625c704d0d5aa6afa9f3d55aa10b4bb6920697e",
+    "Life_World_Experience_Wireframe_v0.2.html": "4f36def5d20d645c97e17682601eaf0f7f693e16d17bd9202bf3c8c89913f89f",
+    "PR24_Current_1440_Step4.png": "1b725b49fdd7a6a99c1699d634ca1fb142e9163b2b070433475c950ef50e7066",
+    "Life_World_Experience_UX_v0.3_設計核准關卡_2026-11-10.md": "9c18fb90ab7a90074d9811924deee1a4c947a66180d0b5bc1f5dc31cf72166af"
+  },
+  "tested_source_sha256": {
+    "index.html": "91b6709262515af8a73a4aad8c27a45c7c59146d2e3cd8d68750c12067ea84d0",
+    "demo.css": "91b0df0d6e594c4f997b3573c39bad4c832fea82f082b9437a5d1759907ec25c",
+    "demo.js": "e874936777afe47990346c55d95cfb679b8309d847dbfb42c1f789c2b4f2b0c1",
+    "tests/test_candidate.py": "39ce570a4212bde012dea232a3ec8a764995f246da8afd4310ec386360c16052"
+  },
+  "screenshot_capture": "Full-page for base screens; real viewport for native dialog, overflow has separate bottom image"
+}
