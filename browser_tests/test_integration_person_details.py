@@ -111,3 +111,137 @@ def test_saved_multi_person_draft_roundtrip_and_confirm_do_not_drop_targets(page
     expect(page.locator('#review-form')).to_have_count(0)
     world=page.request.get(BASE+'/api/state').json()
     assert len(world['people'])==3 and len(world['experiences'])==1
+
+
+@pytest.mark.parametrize('changed',[False,True])
+def test_manual_summary_survives_return_and_requires_review_when_raw_changes(page,changed):
+    p,headers=seed(page)
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':'今天閱讀了一章。','occurred_at':'2026-10-27T00:00:00Z','contributions':[]});assert r.ok
+    d=r.json();page.goto(BASE+'/#review/'+d['id']);page.reload()
+    page.locator('#summary').fill('這是我手動整理的摘要。')
+    page.get_by_role('button',name='返回修改原始草稿',exact=True).click()
+    if changed:page.locator('#raw-text').fill('今天閱讀了兩章，仍有問題待釐清。')
+    page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click();page.locator('[data-experience-review]').click()
+    expect(page.locator('#summary')).to_have_value('這是我手動整理的摘要。')
+    review=page.locator('[data-summary-source-review]')
+    if changed:
+        expect(review).to_be_visible()
+        expect(review).not_to_be_checked()
+        page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+        assert not page.request.get(BASE+'/api/state').json()['experiences']
+        review.check()
+        # 重核對後只返回查看、不再改原文，不應重新索取同一次核對。
+        page.get_by_role('button',name='返回修改原始草稿',exact=True).click()
+        page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click();page.locator('[data-experience-review]').click()
+        expect(page.locator('[data-summary-source-review]')).to_have_count(0)
+        expect(page.locator('#summary')).to_have_value('這是我手動整理的摘要。')
+    else:expect(review).to_have_count(0)
+    page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+    expect(page.locator('#review-form')).to_have_count(0)
+    result=page.request.get(BASE+'/api/state').json()['experiences']
+    assert len(result)==1 and result[0]['summary']=='這是我手動整理的摘要。'
+
+
+
+def test_unsaved_summary_does_not_leak_into_another_draft(page):
+    p,headers=seed(page)
+    def create(text):
+        r=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':text,'occurred_at':'2026-10-27T00:00:00Z','contributions':[]});assert r.ok;return r.json()
+    first=create('第一份原文');second=create('第二份不同原文')
+    page.goto(BASE+'/#review/'+first['id']);page.reload();page.locator('#summary').fill('只屬於第一份的摘要')
+    page.locator('#nav').get_by_role('link',name='紀錄',exact=True).click()
+    page.get_by_role('button',name='捨棄未保存修改並離開',exact=True).click()
+    page.locator('a[href="#review/'+second['id']+'"]').click()
+    expect(page.locator('#summary')).to_have_value('第二份不同原文')
+    expect(page.locator('[data-summary-source-review]')).to_have_count(0)
+
+
+@pytest.mark.parametrize('width',[320,390,1440])
+def test_two_pending_people_can_be_added_with_independent_roles_before_confirm(page,width):
+    page.set_viewport_size({'width':width,'height':950})
+    p,headers=seed(page);page.goto(BASE+'/#record');page.reload()
+    page.locator('#raw-text').fill('和小安閱讀，提到小明。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
+    page.get_by_role('button',name='＋ 新增人物',exact=True).click();page.locator('#pending-person-name').fill('小安');page.locator('#pending-person-relation').select_option('interaction')
+    page.get_by_role('button',name='再加入一位人物',exact=True).click()
+    rows=page.locator('[data-pending-target]');expect(rows).to_have_count(2)
+    rows.nth(1).locator('[data-target-name]').fill('小明')
+    page.locator('[data-experience-review]').click()
+    expect(page.locator('#notice')).to_contain_text('稱呼與角色')
+    expect(page.locator('[data-experience-step="3"]')).to_be_visible()
+    assert not page.request.get(BASE+'/api/state').json()['drafts']
+    rows.nth(1).locator('[data-target-role]').select_option('mention');rows.nth(1).locator('[data-target-start]').select_option('8')
+    page.get_by_role('button',name='再加入一位人物',exact=True).click()
+    expect(rows).to_have_count(3);rows.nth(2).get_by_role('button',name='移除這位待建人物',exact=True).click();expect(rows).to_have_count(2)
+    expect(rows.nth(0).locator('[data-target-name]')).to_have_value('小安')
+    expect(rows.nth(1).locator('[data-target-name]')).to_have_value('小明')
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    ART.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(ART/f'{width}-step3-two-pending.png'),full_page=True)
+    assert len(page.request.get(BASE+'/api/state').json()['people'])==1
+    page.locator('[data-experience-review]').click();expect(page.locator('#review-form')).to_be_visible()
+    pending=page.request.get(BASE+'/api/drafts/'+page.evaluate('state.draft.id')).json()['story']['pending_people']
+    assert [x['relation'] for x in pending]==['interaction','mention'] and len({x['client_ref'] for x in pending})==2
+    page.locator('#story-reviewed').check()
+    page.route('**/api/drafts/*/confirm',lambda route:route.fulfill(status=503,json={'error':{'code':'synthetic_failure','message':'合成確認失敗'}}))
+    page.get_by_role('button',name='我已核對，確認保存',exact=True).click()
+    expect(page.locator('#notice')).to_contain_text('合成確認失敗')
+    expect(rows).to_have_count(2)
+    assert len(page.request.get(BASE+'/api/state').json()['people'])==1
+    page.unroute('**/api/drafts/*/confirm')
+    page.get_by_role('button',name='我已核對，確認保存',exact=True).click();expect(page.locator('#review-form')).to_have_count(0)
+    world=page.request.get(BASE+'/api/state').json();assert len(world['people'])==3 and len(world['experiences'])==1
+    for name,count in [('小安',1),('小明',0)]:
+        person=next(x for x in world['people'] if x['name']==name)
+        assert page.request.get(BASE+'/api/people/'+person['id']+'/overview').json()['stats']['interactions']==count
+
+
+@pytest.mark.parametrize('related',[False,True])
+def test_partial_multi_person_local_draft_survives_leaving_and_new_page(page,related):
+    p,h=seed(page);page.goto(BASE+'/#record');page.reload()
+    page.locator('#raw-text').fill('尚未完成的人物草稿。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
+    page.get_by_role('button',name='＋ 新增人物',exact=True).click();page.locator('#pending-person-name').fill('待建甲')
+    page.get_by_role('button',name='再加入一位人物',exact=True).click();page.locator('[data-pending-target]').nth(1).locator('[data-target-name]').fill('待建乙')
+    refs=page.locator('[data-pending-target]').evaluate_all('(rows)=>rows.map(r=>r.dataset.clientRef)')
+    if not related:page.locator('#include-story').uncheck()
+    page.locator('#nav').get_by_role('link',name='世界',exact=True).click();page.get_by_role('button',name='保留此裝置草稿並離開',exact=True).click()
+    expect(page.locator('#world-relationships')).to_be_visible()
+    restored=page.context.new_page()
+    try:
+        restored.goto(BASE+'/#record');expect(restored.locator('#raw-text')).to_have_value('尚未完成的人物草稿。')
+        restored.locator('[data-experience-next]').click();restored.locator('[data-experience-next]').click()
+        rows=restored.locator('[data-pending-target]');expect(rows).to_have_count(2)
+        assert rows.evaluate_all('(rows)=>rows.map(r=>r.dataset.clientRef)')==refs
+        assert restored.locator('#include-story').is_checked()==related
+        expect(rows.nth(0).locator('[data-target-name]')).to_have_value('待建甲')
+        expect(rows.nth(1).locator('[data-target-name]')).to_have_value('待建乙')
+        expect(rows.nth(1).locator('[data-target-role]')).to_have_value('')
+        assert len(restored.request.get(BASE+'/api/state').json()['people'])==1
+    finally:restored.close()
+
+
+@pytest.mark.parametrize('width',[320,390])
+def test_mobile_record_focus_has_explicit_exit_and_restores_navigation(page,width):
+    page.set_viewport_size({'width':width,'height':950});p,h=seed(page);page.goto(BASE+'/#record');page.reload()
+    expect(page.locator('#nav')).not_to_be_visible()
+    page.locator('#raw-text').fill('手機專注記錄，不遺失內容。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.get_by_role('button',name='離開記錄',exact=True).click();expect(page.locator('#account-dialog')).to_contain_text('尚未保存')
+    page.get_by_role('button',name='繼續編輯',exact=True).click();expect(page.locator('#raw-text')).to_have_value('手機專注記錄，不遺失內容。')
+    page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click();page.locator('[data-experience-review]').click()
+    expect(page.locator('#review-form')).to_be_visible();expect(page.locator('#nav')).not_to_be_visible()
+    d=page.evaluate('state.draft.id')
+    page.get_by_role('button',name='離開記錄',exact=True).click()
+    expect(page.locator('#nav')).to_be_visible();assert page.request.get(BASE+'/api/drafts/'+d).ok
+
+
+def test_pending_person_capacity_refuses_extra_without_losing_existing_names(page):
+    p,h=seed(page)
+    pending=[{'client_ref':'capacity-'+str(i),'name':'待建'+str(i),'relation':'participant'} for i in range(100)]
+    r=page.request.post(BASE+'/api/experiences/drafts',headers=h,data={'raw_text':'容量合成測試','occurred_at':'2026-10-27T00:00:00Z','contributions':[],'story':{'pending_people':pending}});assert r.ok
+    d=r.json();page.goto(BASE+'/#review/'+d['id']);page.reload()
+    expect(page.locator('[data-pending-target]')).to_have_count(100)
+    page.get_by_role('button',name='＋ 新增人物',exact=True).click()
+    expect(page.locator('#notice')).to_contain_text('最多100位待建人物')
+    expect(page.locator('[data-pending-target]')).to_have_count(100)
+    assert len(page.request.get(BASE+'/api/drafts/'+d['id']).json()['story']['pending_people'])==100
+    assert len(page.request.get(BASE+'/api/state').json()['people'])==1

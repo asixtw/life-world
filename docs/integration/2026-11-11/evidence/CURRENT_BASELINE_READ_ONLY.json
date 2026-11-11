@@ -1,0 +1,14 @@
+{
+  "observed_at_utc": "2026-11-11T09:54:55.960574+00:00",
+  "main_sha": "68102f230aa947a434286ba9260e1ae75f6634b0",
+  "alpha_service": "lw-public",
+  "latest_ready_revision": "lw-public-camera-8f377fa",
+  "traffic": [
+    {
+      "revision": "lw-public-camera-8f377fa",
+      "percent": 100
+    }
+  ],
+  "read_only": true,
+  "environment_secrets_read_into_receipt": false
+}

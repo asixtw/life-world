@@ -699,3 +699,8 @@ dialog::backdrop{
 footer{
   color:#68725f
 } /* 設定頁尾文字、間距與手機底部避讓 */
+
+/* UX v0.3：手機四步專注記錄；表單有明確離開入口，不以隱藏導覽困住使用者。 */
+@media(max-width:680px){
+  body.experience-focus .sidebar{display:none;}
+}

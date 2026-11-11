@@ -45,6 +45,7 @@ const MediaUI = (() => {
     if (!active || active.readOnly) return;
     const form = document.querySelector('#record-form');
     if (!form) return;
+    window.ConnectionsUI?.persistPendingDraftState?.(form); // 收集動態多人卡片，再由既有Owner scope保存。
     active.fields = [...form.querySelectorAll('input,textarea,select')]
       .filter(node => node.type !== 'file' && !node.closest('#media-panel'))
       .map(node => ({id: node.id, name: node.name, value: node.value, checked: node.checked, type: node.type}));
@@ -64,6 +65,7 @@ const MediaUI = (() => {
       if (field.type === 'checkbox' || field.type === 'radio') node.checked = field.checked;
       else node.value = field.value;
     }
+    window.ConnectionsUI?.restorePendingDraftState?.(form); // 原文及hidden快照還原後才重建人物卡片。
   }
   function releaseURLs() { for (const url of urls) URL.revokeObjectURL(url); urls.clear(); }
   function fileURL(blob) { const url = URL.createObjectURL(blob); urls.add(url); return url; }
