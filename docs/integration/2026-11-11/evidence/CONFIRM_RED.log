@@ -1,0 +1,19 @@
+F.F                                                                      [100%]
+=================================== FAILURES ===================================
+__________ test_targeted_confirm_creates_people_and_facts_atomically ___________
+tests/test_integration_confirm_targets.py:15: in test_targeted_confirm_creates_people_and_facts_atomically
+    assert r.status_code==201,r.text
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["pending_people","targeted_person_updates"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+_______________ test_delete_saved_draft_revision_owner_and_retry _______________
+tests/test_integration_confirm_targets.py:42: in test_delete_saved_draft_revision_owner_and_retry
+    assert other.request('DELETE',url,json=body).status_code==404
+E   AssertionError: assert 405 == 404
+E    +  where 405 = <Response [405 Method Not Allowed]>.status_code
+E    +    where <Response [405 Method Not Allowed]> = request('DELETE', '/api/drafts/9ca0a31a-12bf-4321-ac91-aae9d89a721e', json={'expected_revision': 1, 'request_id': 'delete-owned'})
+E    +      where request = <starlette.testclient.TestClient object at 0x7fcdd85083a0>.request
+=========================== short test summary info ============================
+FAILED tests/test_integration_confirm_targets.py::test_targeted_confirm_creates_people_and_facts_atomically
+FAILED tests/test_integration_confirm_targets.py::test_delete_saved_draft_revision_owner_and_retry
+2 failed, 1 passed in 0.35s

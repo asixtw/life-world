@@ -28,9 +28,9 @@ def setup(tmp_path):
     app=create_app(data_dir=tmp_path/'isolated-google',settings=RuntimeSettings(google_client_id=CLIENT_ID,password_login_enabled=False,registration_enabled=False),google_verifier=verifier,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
     # 只在本fixture新建且可丟棄的DB初始化新表；未寫入app/migrations。
     with app.state.service.db.connect(write=True) as c:
-        c.execute("CREATE TABLE external_identities(provider TEXT NOT NULL,issuer TEXT NOT NULL,subject TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL,PRIMARY KEY(provider,issuer,subject))")
+        c.execute("CREATE TABLE IF NOT EXISTS external_identities(provider TEXT NOT NULL,issuer TEXT NOT NULL,subject TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL,PRIMARY KEY(provider,issuer,subject))")
     with app.state.service.db.connect(write=True) as c:
-        c.execute("CREATE TABLE guest_abandonments(owner_id TEXT PRIMARY KEY,abandoned_at TEXT NOT NULL,purge_after TEXT NOT NULL,status TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,last_error_code TEXT,completed_at TEXT,media_state TEXT NOT NULL DEFAULT 'pending',media_attempts INTEGER NOT NULL DEFAULT 0)")
+        c.execute("CREATE TABLE IF NOT EXISTS guest_abandonments(owner_id TEXT PRIMARY KEY,abandoned_at TEXT NOT NULL,purge_after TEXT NOT NULL,status TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,last_error_code TEXT,completed_at TEXT,media_state TEXT NOT NULL DEFAULT 'pending',media_attempts INTEGER NOT NULL DEFAULT 0)")
     return app,verifier
 
 

@@ -11,10 +11,10 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
         if story.pending_person and story.pending_person.relation == 'mention':
             p = story.pending_person
             require(p.start is not None and raw[p.start:p.start + len(p.name)] == p.name, 422, 'invalid_source_span', '新增人物的提及位置須與原文一致。')
-        for p in story.participants: self._owned(c, 'people', p.person_id, owner)  # 每位參與者都須屬於本人
+        for p in story.participants: self._require_recordable_person(c, owner, p.person_id)  # 每位參與者都須屬於本人
         for m in story.mentions:  # 每處原文人名獨立核對
             require(0 <= m.start < m.end <= len(raw) and raw[m.start:m.end] == m.name, 422, 'invalid_source_span', '提及位置與原始文字不符，請重新選取。')  # Unicode 位移與原句完全一致
-            if m.person_id: self._owned(c, 'people', m.person_id, owner)  # 正式配對必須是可存取人物
+            if m.person_id: self._require_recordable_person(c, owner, m.person_id, mention=True)  # 正式配對必須是可存取人物
 
     def _store_draft_story(self, c, owner, draft_id, raw, story):  # 在原草稿交易內保存尚未確認資料
         if story is None:  # 明確不整理人物時移除草稿延伸，不影響原文

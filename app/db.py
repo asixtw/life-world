@@ -17,7 +17,7 @@ class Database:  # 管理 SQLite 遷移與每次操作的交易連線
             for path in sorted((Path(__file__).parent / 'migrations').glob('*.sql')):  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 if not connection.execute('SELECT 1 FROM schema_migrations WHERE version=?', (path.name,)).fetchone():  # 查詢已套用遷移版本；值以參數傳入
                     connection.executescript('BEGIN IMMEDIATE;\n' + path.read_text(encoding='utf-8') +
-                                             "\nINSERT INTO schema_migrations VALUES ('" + path.name + "');\nCOMMIT;")  # 在同一寫入交易套用專案內的 SQL 遷移並記錄版本；檔名由專案提供
+                                             "\nINSERT INTO schema_migrations(version) VALUES ('" + path.name + "');\nCOMMIT;")  # 在同一寫入交易套用專案內的 SQL 遷移並記錄版本；檔名由專案提供
         finally:  # 不論成功或失敗都執行必要清理
             connection.close()  # 關閉已使用完畢的資源
         self.path.chmod(0o600)  # 將檔案權限限制為目前使用者可讀寫

@@ -21,6 +21,7 @@ from .db import Database  # 載入 SQLite 交易與遷移管理器
 from .runtime import RuntimeSettings
 from .security import require_registered
 from .errors import DomainError, require  # 共用領域錯誤與條件檢查
+from . import relation_sources
 from . import schemas  # 載入此模組需要的相依工具
 from .service import LifeWorld  # 載入負責原子交易的領域服務
 from . import media
@@ -74,6 +75,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         import json
         from .test_account import provision
         provision(service,settings,json.loads(os.environ['LIFEWORLD_TEST_ACCOUNT_SEED']))
+    if settings.relation_source_store:
+        if settings.relation_source_store not in ('legacy_jsonb','link_table'):
+            raise ValueError('Unknown relation source store')
+        service.relation_source_store = settings.relation_source_store
     app.state.service = service  # 保存「app.state.service」供後續驗證或回傳使用
     app.state.media_provider = None  # 未選供應商時不假裝辨識成功，也不接觸正式資料。
     from .ai_routes import install as install_ai_routes
@@ -279,6 +284,12 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             return JSONResponse({'status':'unavailable','reason':'release_gates_pending'},status_code=503,headers={'Cache-Control':'no-store'})
         try:
             service.db.check_ready()
+            if service.relation_source_store == relation_sources.LINK:
+                # 明確啟用010時，缺必要表/權限即未就緒，禁止退回另一份來源權威。
+                with service.db.connect() as c:
+                    c.execute('SELECT connection_id,owner_id,experience_id,subject_experience_id,source_position FROM person_connection_experience_sources LIMIT 0')
+                    c.execute('SELECT id,owner_id,status FROM subject_experiences LIMIT 0')
+                    c.execute('SELECT subject_experience_id,owner_id,person_id,role FROM subject_experience_people LIMIT 0')
             limiter.ready(service.db)
             if app.state.feature_store is not None:
                 with service.db.connect() as c:
@@ -304,6 +315,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 'registration_available':not alpha and settings.registration_enabled,
                 'media_available':app.state.ai_runtime.enabled or app.state.media_provider is not None,
                 'relationship_memory_available':app.state.feature_store is not None,
+                'relation_sources':service.relation_source_store, 'unified_people':service.unified_people_available(),
                 'google_login_available':bool(settings.google_client_id),'ai_available':app.state.ai_runtime.enabled,
                 'ai_status':'configured_not_verified' if app.state.ai_runtime.enabled else 'not_configured','writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
@@ -408,9 +420,91 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             return app.state.ai_runtime.generate(who,'experience',{'raw_text':source['raw_text']})
         return service.suggest(who,draft_id)  # 未啟用模型時仍明示原文候選。
 
+    @app.delete('/api/drafts/{draft_id}', tags=['Experiences'])
+    def delete_saved_draft(draft_id: str, request: Request, data: schemas.DraftDelete):
+        """刪除已保存草稿與捨棄本機修改分開，沿用寫入CSRF/Owner驗證。"""
+        return service.delete_draft(current(request, True)['id'], draft_id, data)
+
     @app.post('/api/drafts/{draft_id}/confirm', status_code=201, tags=['Experiences'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def confirm(draft_id: str, request: Request, data: schemas.Confirm):  # 以單一交易保存經歷、貢獻、人物更新與一次積分
         return service.confirm(current(request, True)['id'], draft_id, data)  # 回傳以單一交易保存經歷、貢獻、人物更新與一次積分的結果
+
+    @app.get('/api/persons', tags=['Persons'])  # Unified Person：搜尋、篩選與排序
+    def persons(request: Request, q: str = Query('', max_length=200), person_type: Literal['', 'real', 'fictional'] = '',
+                person_subtype: Literal['', 'historical', 'original'] = '', category: Literal['', 'business', 'life', 'learning', 'other'] = '',
+                status: Literal['active', 'archived'] = 'active', sort: Literal['recent', 'name'] = 'recent',
+                limit: int = Query(50, ge=1, le=100), offset: int = Query(0, ge=0)):
+        return service.persons_list(current(request)['id'], q, person_type, person_subtype, category, status, sort, limit, offset)
+
+    @app.post('/api/persons', status_code=201, tags=['Persons'])  # Unified Person：新增（同名可並存）
+    def create_unified_person(request: Request, data: schemas.PersonsCreate):
+        return service.create_unified_person(current(request, True)['id'], data)
+
+    @app.get('/api/persons/{person_id}', tags=['Persons'])  # 人物詳細：基本資料、人物設定、關係與經歷摘要
+    def unified_person(person_id: str, request: Request):
+        return service.unified_person(current(request)['id'], person_id)
+
+    @app.patch('/api/persons/{person_id}', tags=['Persons'])  # 編輯基本資料（revision 防覆蓋）
+    def edit_unified_person(person_id: str, request: Request, data: schemas.PersonsEdit):
+        return service.edit_unified_person(current(request, True)['id'], person_id, data)
+
+    @app.post('/api/persons/{person_id}/status', tags=['Persons'])  # 封存或恢復（不刪除）
+    def set_unified_person_status(person_id: str, request: Request, data: schemas.PersonsStatus):
+        return service.set_unified_person_status(current(request, True)['id'], person_id, data)
+
+    @app.get('/api/persons/{person_id}/connection-sources', tags=['Persons'])  # 可引用為關係來源的我的紀錄（與兩端至少一人有關）
+    def person_connection_sources(person_id: str, request: Request, other_person_id: str = Query(..., min_length=1, max_length=128)):
+        return service.connection_sources(current(request)['id'], person_id, other_person_id)
+
+    @app.put('/api/persons/{person_id}/profile', tags=['Persons'])  # 保存一版人物設定（只新增）
+    def save_unified_profile(person_id: str, request: Request, data: schemas.PersonProfileSave):
+        return service.save_unified_profile(current(request, True)['id'], person_id, data)
+
+    @app.get('/api/persons/{person_id}/experiences', tags=['Persons'])  # 人物頁「經歷」分頁：我的紀錄與人物經歷兩區
+    def person_experience_lists(person_id: str, request: Request, archived: bool = False):
+        return service.person_experience_lists(current(request)['id'], person_id, archived)
+
+    @app.get('/api/person-experiences', tags=['Persons'])  # 紀錄頁：本人帳號的全部人物經歷（archived=true 列出已封存的）
+    def person_experiences_list(request: Request, archived: bool = False, limit: int = Query(200, ge=1, le=200), offset: int = Query(0, ge=0)):
+        return service.person_experiences_list(current(request)['id'], archived, limit, offset)
+
+    @app.post('/api/person-experiences', status_code=201, tags=['Persons'])  # 新增人物經歷（不計積分、目標與互動統計）
+    def create_person_experience(request: Request, data: schemas.PersonExperienceCreate):
+        return service.create_person_experience(current(request, True)['id'], data)
+
+    @app.get('/api/person-experiences/{experience_id}', tags=['Persons'])  # 讀單一人物經歷
+    def person_experience(experience_id: str, request: Request):
+        return service.person_experience(current(request)['id'], experience_id)
+
+    @app.patch('/api/person-experiences/{experience_id}', tags=['Persons'])  # 編輯、封存或恢復（revision 防覆蓋）
+    def patch_person_experience(experience_id: str, request: Request, data: schemas.PersonExperiencePatch):
+        return service.patch_person_experience(current(request, True)['id'], experience_id, data)
+
+
+    @app.get('/api/connections/{connection_id}', tags=['Connections'])  # 010：讀單一關係（來源為兩個 ID 陣列）
+    def get_connection(connection_id: str, request: Request):
+        return service.get_connection(current(request)['id'], connection_id)
+
+    @app.patch('/api/connections/{connection_id}', tags=['Connections'])  # 010：編輯說明與來源（Migration 010 後開放）
+    def patch_connection(connection_id: str, request: Request, data: schemas.ConnectionPatch):
+        return service.patch_connection(current(request, True)['id'], connection_id, data)
+
+
+    @app.get('/api/people/{person_id}/details', tags=['People'])
+    def person_basic_details(person_id: str, request: Request):
+        return service.person_details(current(request)['id'], person_id)
+
+    @app.patch('/api/people/{person_id}/basic-details', tags=['People'])
+    def update_basic_details(person_id: str, request: Request, data: schemas.BirthdayWrite):
+        return service.write_person_details(current(request, True)['id'], person_id, data, 'birthday')
+
+    @app.post('/api/people/{person_id}/employments', status_code=201, tags=['People'])
+    def create_employment(person_id: str, request: Request, data: schemas.EmploymentCreate):
+        return service.write_person_details(current(request, True)['id'], person_id, data, 'employment')
+
+    @app.patch('/api/people/{person_id}/employments/{employment_id}', tags=['People'])
+    def update_employment(person_id: str, employment_id: str, request: Request, data: schemas.EmploymentPatch):
+        return service.write_person_details(current(request, True)['id'], person_id, data, 'employment', employment_id)
 
     @app.post('/api/people', status_code=201, tags=['People'])  # 註冊此 HTTP 路由、例外處理器或中介層
     def create_person(request: Request, data: schemas.PersonCreate):  # 建立人物並保留舊角色欄位的相容性
