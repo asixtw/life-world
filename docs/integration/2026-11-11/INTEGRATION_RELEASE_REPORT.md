@@ -129,3 +129,18 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 阻擋發生於資料/媒體刪除前；維持Beta專用DB/維護身分與精確表/FK契約，不放寬網站Runtime。尚須獨立審查：新增表的Owner控制父節點、雙向跨Owner參照、歷史與來源刪除次序、非產品角色相容表的處理、維護帳號逐表最小權限、14天/升級/重試與崩潰恢復。不能只把29組FK加入JSON或把34表改46表便宣稱可清除。未修改Worker/白名單、未執行任何清除或GCP操作。
 
 同次唯讀遠端查核：main仍`68102f230aa947a434286ba9260e1ae75f6634b0`、PR分支仍`3f9d12b`，PR正式reviews為空（不代表Code Review通過）。Gate A UX已送Owner審查；等待回覆不自動核准。其餘發布Gate維持NO-GO。
+
+## 7. Owner Gate A 補證與人工帳密入口（2026-11-12）
+
+Owner暫不核准Gate A，要求現有設計的真實三尺寸完整證據與可親自登入的本機入口。已交付[驗收畫廊/完成狀態表](../2026-11-12_GATE_A/README.md)、320/390/1440共30張流程畫面、3份互動錄影，以及4張正常帳密登入/人工路徑畫面。抽屜採實際viewport截圖、長內容另有捲動證據；不是Demo或正式Alpha。
+
+最小修正僅人物卡狀態：全部已核對後不再顯示「有待核對」，改顯示採用/排除數。產品Commit `56c979989a5afca4a013f93ae85ca06e2026743f`；擷取方式Commit `037d118c4b023dca2124254ad78b53a5b887cd9c`，App tree相同`cc1a2dc1144925051f50a95adb3c29dd5045c20c`。未重新設計或新增正式功能。
+
+- 完整SQLite/Node：770 PASS、87 SKIP（35.67秒），[API_NODE.log](../2026-11-12_GATE_A/API_NODE.log)。
+- UI→API→受限本機PG18核心：82 PASS（171.88秒），[CORE_BROWSER.log](../2026-11-12_GATE_A/CORE_BROWSER.log)。三尺寸影片由UI填入四維候選、生日、任職，保存草稿/重整、逐人來源核對、採用/排除、正式Confirm與人物詳情回讀；實際Confirm payload重送不重複計分/建人。
+- 最終viewport重擷取3 PASS（46.74秒），與上述3個錄影案例重疊，不加總成85項不同測試。每份影片經Chromium載入/跳播檢查，收據置同目錄。
+- 既有本機帳號`basic_0566fc0249a4`從正常「登入我的世界」表單已驗成功；密碼只在對話交付，不進文件/日誌。沒有另建登入系統或後門。人工等效路徑完成新增人物、月日生日、任職、逐項採用/排除、Confirm、同Owner登出/重登；缺CSRF寫入403、無登入讀取401。[MANUAL_ACCESS_RESULT.json](../2026-11-12_GATE_A/MANUAL_ACCESS_RESULT.json)。
+
+Owner網址 **http://127.0.0.1:8198/**；登入後`/#record`。服務固定合成日期2026-10-27；既有目標/人物可重用，只寫入localhost:57518同名但獨立marker PG副本。人工驗收期間不再跑TRUNCATE fixture，不重設此庫。Google能力未開，本輪不以模擬OAuth替代。
+
+Gate A仍待Owner親自核准。真Google/Gemini、GCP、實機及Gate B/C/D未自動通過；沒有Migration、Build、Deploy或正式DB修改。

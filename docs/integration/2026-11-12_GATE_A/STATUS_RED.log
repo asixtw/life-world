@@ -1,0 +1,16 @@
+F
+=================================== FAILURES ===================================
+________________ test_gate_a_full_flow_video_and_readback[320] _________________
+browser_tests/test_gate_a_evidence.py:96: in test_gate_a_full_flow_video_and_readback
+    expect(page.locator('[data-experience-preview="existing:'+person['id']+'"]')).to_contain_text('已核對：採用 5 項／排除 1 項')
+E   AssertionError: Locator expected to contain text '已核對：採用 5 項／排除 1 項'
+E   Actual value: 人物小安既有人物實際參與並直接互動有待核對的資訊變更 · 查看本次關聯與保存範圍 › 
+E   Call log:
+E     - Expect "to_contain_text" with timeout 5000ms
+E     - waiting for locator("[data-experience-preview=\"existing:ec2aec53-8c47-4d61-b4cf-a91d8a5369a4\"]")
+E       14 × locator resolved to <button type="button" class="card experience-person-preview" data-experience-preview="existing:ec2aec53-8c47-4d61-b4cf-a91d8a5369a4">…</button>
+E          - unexpected value "人物小安既有人物實際參與並直接互動有待核對的資訊變更 · 查看本次關聯與保存範圍 ›"
+=========================== short test summary info ============================
+FAILED browser_tests/test_gate_a_evidence.py::test_gate_a_full_flow_video_and_readback[320]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 20.59s

@@ -1,0 +1,27 @@
+{
+  "width": 320,
+  "source_commit": "037d118c4b023dca2124254ad78b53a5b887cd9c",
+  "database_scope": "isolated_local_pg18",
+  "new_people_before_confirm": 0,
+  "people_after": 2,
+  "experience_count": 1,
+  "reward_count": 1,
+  "goal_progress": "0.5",
+  "four_dimensions": {
+    "adopted": [
+      "interests",
+      "skills",
+      "habits"
+    ],
+    "excluded": [
+      "food"
+    ]
+  },
+  "birthday_year": null,
+  "employment_people": 2,
+  "duplicate_confirm_same_receipt": true,
+  "javascript_errors": [],
+  "ai_post_requests": [],
+  "real_google": "NOT RUN",
+  "real_gemini": "NOT RUN"
+}
