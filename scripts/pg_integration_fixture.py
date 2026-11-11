@@ -131,6 +131,7 @@ def grant_candidate_permissions():
     with closing(connect(DB)) as raw,closing(raw.cursor()) as c:
         c.execute('SET ROLE '+OWNER)
         c.execute('GRANT DELETE ON '+SCHEMA+'.drafts TO '+APP)
+        c.execute('GRANT UPDATE(revoked_at) ON '+SCHEMA+'.data_consents TO '+APP)  # 僅本機提案，正式環境未GRANT。
         # UPDATE只允許服務實際變更的值/來源/版本；Owner、subject、主鍵及created_at不可重派。
         common=['source_kind','source_experience_id','evidence_type','source_quote','source_status','confirmed_at','revision','updated_at']
         for table,values in [('person_basic_details',['birth_year','birth_month','birth_day']),('person_employments',['company_name','job_title','employment_status','valid_from','valid_to'])]:

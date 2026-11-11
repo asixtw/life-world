@@ -151,9 +151,9 @@ class AIRuntime:
         elif operation=='media':prompt['system']+='音訊須按時間順序完整逐字轉錄，逐句換行；即使同一句重複出現，每一次仍須完整寫出，禁止去重、摘要、省略或補寫；沒有語音時回傳[無可辨識語音]。忠實擷取可辨識文字；不確定內容明示未知；名片逐行列姓名、公司、職稱、聯絡方式，不猜測。回傳 {"text":"待校對文字"}。'
         else:prompt['system']+='原文可能是零碎語音、口頭禪、錯字或中英夾雜。整理為自然清楚的繁體中文摘要，保留原意、重要人物與事件；刪除贅詞，不能補造時間、地點、動機或確定性。矛盾及不確定之處仍須保留，必要時明示待釐清。回傳 {"summary":"待編輯摘要","tasks":["可選後續任務"],"people":[]}；人物候選只在原文有明確人物及生活偏好／技能／習慣時提出，格式為 {"person_name":"原文明示名稱","dimension":"interests|food|skills|habits","value":"簡短內容","evidence_type":"stated_by_person|observed_by_user|documented_source","source_quote":"原文逐字引文"}。source_quote必須是原文完整子字串，value也必須直接取自source_quote；不可猜測代稱指誰、人格或敏感特質，沒有明確依據就回空people。每項任務不超過300字，提出具體可執行的下一步（動作與產出／時間）；不要建議「確認是否記錄」或僅複述已完成事項。資訊不足時回空tasks，不猜測承諾。'
         if inline_media:prompt['inline_media']=inline_media
-        # 記憶開啟後只讀經來源重驗的有限特徵；模擬輸出永遠不是特徵來源。
+        # 草稿摘要只授權本篇原文，不因背景記憶開關而擴大資料範圍。模擬輸出永遠不是特徵來源。
         import os
-        if operation!='media' and os.environ.get('LIFEWORLD_RELATIONSHIP_MEMORY_ENABLED','false')=='true':
+        if operation not in ('media','experience') and os.environ.get('LIFEWORLD_RELATIONSHIP_MEMORY_ENABLED','false')=='true':
             from .relationship_memory import FeatureStore
             prompt['case']={**case,'personalization_memory':FeatureStore(self.service).context(owner,case.get('person_id'))}
             require(len(json.dumps(prompt['case'],ensure_ascii=False).encode())<=self.settings.max_input_bytes,413,'ai_input_too_large','有效記憶與本次資料超過容量；請縮小所選來源。')

@@ -417,6 +417,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             app.state.ai_runtime.authorize(who)
             source=service.draft(who,draft_id)
             require(source['status']=='draft',409,'already_confirmed','這份草稿已經確認。')
+            app.state.draft_ai_consent.require(who)  # 授權檢查在預留額度與傳送原文之前。
             return app.state.ai_runtime.generate(who,'experience',{'raw_text':source['raw_text']},request_id=request.headers.get('Idempotency-Key'))
         return service.suggest(who,draft_id)  # 未啟用模型時仍明示原文候選。
 

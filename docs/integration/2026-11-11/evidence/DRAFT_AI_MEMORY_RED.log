@@ -1,0 +1,9 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_raw_draft_grant_does_not_send_background_memory _____________
+tests/ai/test_draft_ai_consent.py:82: in test_raw_draft_grant_does_not_send_background_memory
+    assert not memory and p.calls[0]['case']=={'raw_text':d['raw_text']}
+E   AssertionError: assert (not ['called'])
+=========================== short test summary info ============================
+FAILED tests/ai/test_draft_ai_consent.py::test_raw_draft_grant_does_not_send_background_memory
+1 failed in 0.11s

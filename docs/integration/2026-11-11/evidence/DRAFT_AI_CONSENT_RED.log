@@ -1,0 +1,49 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+__ test_no_consent_no_provider_or_reservation_and_repeat_grant_is_one_record ___
+tests/ai/test_draft_ai_consent.py:18: in test_no_consent_no_provider_or_reservation_and_repeat_grant_is_one_record
+    assert denied.status_code==403 and denied.json()['error']['code']=='draft_ai_consent_required'
+E   assert (200 == 403)
+E    +  where 200 = <Response [200 OK]>.status_code
+___ test_provider_change_requires_new_disclosure_and_revokes_previous_record ___
+tests/ai/test_draft_ai_consent.py:31: in test_provider_change_requires_new_disclosure_and_revokes_previous_record
+    old=c.get('/api/ai/draft-consent').json();grant(c)
+                                              ^^^^^^^^
+tests/ai/test_draft_ai_consent.py:9: in grant
+    policy=c.get('/api/ai/draft-consent');assert policy.status_code==200,policy.text
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_______ test_revocation_when_ai_off_and_old_request_retry_cannot_regrant _______
+tests/ai/test_draft_ai_consent.py:42: in test_revocation_when_ai_off_and_old_request_retry_cannot_regrant
+    app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime;policy=c.get('/api/ai/draft-consent').json();grant(c)
+                                                                                                            ^^^^^^^^
+tests/ai/test_draft_ai_consent.py:9: in grant
+    policy=c.get('/api/ai/draft-consent');assert policy.status_code==200,policy.text
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+__________ test_owner_guest_csrf_and_explicit_confirmation_boundaries __________
+tests/ai/test_draft_ai_consent.py:53: in test_owner_guest_csrf_and_explicit_confirmation_boundaries
+    app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime;grant(c)
+                                                               ^^^^^^^^
+tests/ai/test_draft_ai_consent.py:9: in grant
+    policy=c.get('/api/ai/draft-consent');assert policy.status_code==200,policy.text
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________ test_background_consent_does_not_authorize_unconfirmed_draft _________
+tests/ai/test_draft_ai_consent.py:69: in test_background_consent_does_not_authorize_unconfirmed_draft
+    assert not c.get('/api/ai/draft-consent').json()['granted']
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'granted'
+=========================== short test summary info ============================
+FAILED tests/ai/test_draft_ai_consent.py::test_no_consent_no_provider_or_reservation_and_repeat_grant_is_one_record
+FAILED tests/ai/test_draft_ai_consent.py::test_provider_change_requires_new_disclosure_and_revokes_previous_record
+FAILED tests/ai/test_draft_ai_consent.py::test_revocation_when_ai_off_and_old_request_retry_cannot_regrant
+FAILED tests/ai/test_draft_ai_consent.py::test_owner_guest_csrf_and_explicit_confirmation_boundaries
+FAILED tests/ai/test_draft_ai_consent.py::test_background_consent_does_not_authorize_unconfirmed_draft
+5 failed in 0.36s

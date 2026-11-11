@@ -106,6 +106,8 @@ def test_concurrent_same_request_and_http_retry_do_not_double_charge(prepared):
     assert len(p.calls)==1 and runtime.usage(me['owner_id'])['calls']==1
     from conftest import draft
     d=draft(c,g)
+    from conftest import grant_draft_ai_consent as grant
+    grant(c)
     url='/api/drafts/'+d['id']+'/suggest';headers={'Idempotency-Key':'http-same'}
     assert c.post(url,headers=headers).status_code==200
     r=c.post(url,headers=headers)

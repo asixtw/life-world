@@ -4,6 +4,7 @@ from uuid import uuid4
 from fastapi import Request
 from pydantic import BaseModel,ConfigDict,Field,field_validator
 from .ai_runtime import AIRuntime
+from .ai_draft_consent import DraftAIConsent
 from .errors import require
 
 class ConfirmedInput(BaseModel):
@@ -15,6 +16,18 @@ class ConfirmedInput(BaseModel):
     def explicit_consent(cls,value):
         if value is not True:raise ValueError('請明確同意傳送所選來源給模型')
         return value
+
+class DraftConsentGrant(BaseModel):
+    model_config=ConfigDict(extra='forbid',strict=True)
+    request_id:str=Field(min_length=1,max_length=128,pattern=r'^[A-Za-z0-9_.:-]+$')
+    policy_fingerprint:str=Field(pattern=r'^[0-9a-f]{64}$')
+    confirmed:Literal[True]
+    @field_validator('confirmed',mode='before')
+    @classmethod
+    def explicit_confirmation(cls,value):
+        if value is not True:raise ValueError('請明確同意所列提供者與草稿範圍')
+        return value
+
 
 class DialogueTurn(BaseModel):
     """歷史只接受有限對話內容，不能注入system角色或任意技術欄位。"""
@@ -48,6 +61,7 @@ class TasksConfirm(BaseModel):
 def install(app):
     """不啟用 Provider、不讀 key；只有 backend 環境批准才組裝真實 Adapter。"""
     service=app.state.service;app.state.ai_runtime=AIRuntime(service)
+    app.state.draft_ai_consent=DraftAIConsent(service,lambda:app.state.ai_runtime)
     def owner(request):
         return service.session(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),True)[0]['id']
     def experience(who,experience_id):
@@ -56,6 +70,19 @@ def install(app):
             row=c.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(experience_id,who)).fetchone()
             require(row is not None,404,'not_found','找不到可存取的經歷。')
             return dict(row)
+
+    @app.get('/api/ai/draft-consent',tags=['AI drafts'])
+    def draft_consent(request:Request):
+        who=service.session(request.cookies.get('lw_session'))[0]['id']
+        return app.state.draft_ai_consent.metadata(who)
+
+    @app.post('/api/ai/draft-consent',tags=['AI drafts'])
+    def grant_draft_consent(request:Request,data:DraftConsentGrant):
+        return app.state.draft_ai_consent.grant(owner(request),data)
+
+    @app.delete('/api/ai/draft-consent',tags=['AI drafts'])
+    def revoke_draft_consent(request:Request):
+        return app.state.draft_ai_consent.revoke(owner(request))
 
     @app.get('/api/ai/usage',tags=['AI drafts'])
     def ai_usage(request:Request):

@@ -26,3 +26,30 @@ from test_usage_isolation import (
  test_concurrent_same_request_and_http_retry_do_not_double_charge,
 )
 from test_ai_runtime import test_concurrent_reservations_do_not_overrun_global_daily_cap
+
+from test_draft_ai_consent import (
+ test_no_consent_no_provider_or_reservation_and_repeat_grant_is_one_record,
+ test_provider_change_requires_new_disclosure_and_revokes_previous_record,
+ test_revocation_when_ai_off_and_old_request_retry_cannot_regrant,
+ test_owner_guest_csrf_and_explicit_confirmation_boundaries,
+ test_background_consent_does_not_authorize_unconfirmed_draft,
+ test_raw_draft_grant_does_not_send_background_memory,
+)
+
+
+def test_draft_consent_without_revocation_privilege_is_unavailable(prepared):
+    from contextlib import closing
+    from scripts.pg_integration_fixture import connect,DB,OWNER,APP,grant_candidate_permissions
+    app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime
+    with closing(connect(DB)) as raw,closing(raw.cursor()) as db:
+        db.execute('SET ROLE '+OWNER);db.execute('REVOKE UPDATE(revoked_at) ON lw_core_draft.data_consents FROM '+APP)
+    try:
+        policy=c.get('/api/ai/draft-consent').json()
+        assert policy['available'] is False and policy['reason']=='consent_permission_missing'
+        assert policy['consent_status']=='unavailable' and policy['has_consent'] is None
+        r=c.post('/api/ai/draft-consent',json={'request_id':'blocked-consent','policy_fingerprint':policy['policy_fingerprint'],'confirmed':True});assert r.status_code==503
+        assert not p.calls
+    finally:grant_candidate_permissions()
+    with closing(connect(DB,runtime=True)) as raw,closing(raw.cursor()) as db:
+        for column in ['owner_id','subject','purpose','provider_scope','source_scope','consent_version','granted_at']:
+            db.execute("SELECT has_column_privilege(current_user,'lw_core_draft.data_consents',?,'UPDATE')",(column,));assert not db.fetchone()[0],column

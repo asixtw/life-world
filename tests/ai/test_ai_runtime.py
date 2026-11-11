@@ -70,6 +70,8 @@ def test_guest_cannot_consume_ai_budget(tmp_path):
 
 def test_http_candidate_edit_confirm_and_followup_idempotence(prepared):
     app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime
+    from conftest import grant_draft_ai_consent as grant
+    grant(c)  # 本測試明確選用草稿AI，不以其他用途授權替代。
     d=draft(c,g)
     candidate=c.post('/api/drafts/'+d['id']+'/suggest');assert candidate.status_code==200,candidate.text
     assert c.get('/api/state').json()['experiences']==[]
@@ -132,6 +134,8 @@ def test_usage_receipt_records_only_bounded_metadata(prepared):
 def test_invalid_ai_result_preserves_manual_confirm_and_readback(prepared):
     """模型失敗後仍能人工確認；候選/失敗本身不改進度或獎勵。"""
     app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime
+    from conftest import grant_draft_ai_consent as grant
+    grant(c)
     d=draft(c,g);before=c.get('/api/state').json();p.text='not JSON'
     failed=c.post('/api/drafts/'+d['id']+'/suggest')
     assert failed.status_code==502 and failed.json()['error']['code']=='ai_invalid_candidate'

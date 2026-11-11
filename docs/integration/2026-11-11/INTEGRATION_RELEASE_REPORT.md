@@ -1,19 +1,19 @@
 # Integration Release Report｜進行中／NO-GO
 
-2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準9b0592c；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
+2026-11-11。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準7bd852f；本報告與新增UI變更的精確Head/Tree以PR更新收據為準。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret或Alpha切流。
 
 ## 最新驗證（不可加總為單一套件）
 
 | 範圍 | 實際結果／證據 |
 |---|---|
-| 完整本機API及Node suite | **741 PASS、71 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
-| 本輪工作流/精簡人物/用量/世界交換Chromium（同次） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
+| 完整本機API及Node suite | **747 PASS、78 SKIP**；evidence/FULL_LOCAL_SUITE.log。專用PG案例在此跳過，並非全綠 |
+| 前一UI階段工作流/精簡人物/用量/世界交換Chromium（同次；本輪授權UI未驗） | **66 PASS**（27工作流/預覽＋18草稿/補充＋10精簡選擇＋3用量＋8 GIS替身）；evidence/COMPACT_PEOPLE_BROWSER.log |
 | 最後重複提示文字調整後 | **6 PASS**（三尺寸選擇及補充完整確認），COMPACT_PEOPLE_COPY_BROWSER.log；不與66加總 |
 | 人物候選版本衝突／確認503重試 | 追加分開執行 **1 PASS／2 PASS**；CANDIDATE_VERSION_BROWSER.log、CANDIDATE_RETRY_BROWSER.log，不與本次66重複加總 |
 | 320/390/1440、長內容/大字/焦點、100人容量 | 已含在上述66項同次執行；WORKFLOW_320_BROWSER.log是早期單項收據 |
 | Google世界交換Chromium | 本次66項內含 **8 PASS**；明示GIS替身，非真Google。GOOGLE_TRANSITION_BROWSER.log另為前次單獨收據 |
-| 受限本機PG18人物/草稿/AI | **37 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
-| AI專項 | evidence/AI_POLICY_SQLITE.log：36 PASS/7 PG SKIP；AI_POLICY_PG18.log：另行7 PASS |
+| 受限本機PG18人物/草稿/AI | **44 PASS**；evidence/WORKFLOW_PG18.log，只在marker合成副本，不連CloudSQL |
+| 草稿AI授權專項（本輪） | SQLite **6 PASS**；缺撤回權限的PG額外 **1 PASS**，不與完整套件加總；DRAFT_AI_CONSENT_SCOPE.log、DRAFT_AI_CONSENT_PERMISSION.log |
 | 本人AI用量Chromium | evidence/AI_PERSONAL_USAGE_BROWSER.log：3 PASS；metadata fixture，不是真模型 |
 | 真Google、新GCP整合Revision、真AI/媒體Provider、Safari | **NOT RUN（本輪）** |
 
@@ -117,5 +117,17 @@ LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json pyt
 - 既有人物提及與未配對稱呼都需選原文精確位置，不默認第一處同名；同一人物既參與又被提及的舊資料分別保留，不改歷史事實。其他原文稱呼與故事標題預設收合。第三步四維補充仍沿用前一階段，不新增AI或正式欄位。
 - StoryInput／DraftReview／Confirm契約、Owner及最終交易規則不變；experience_people.js只負責視圖及canonical資料投影，沒有寫入API。第四步修改區與來源管理目前仍用原編輯器，不擅自替換其契約。
 - 本機人物行資料以穩定row key保留未完成角色、來源及Owner；沿用既有Media scope。回退至9b0592c可讀伺服器標準草稿，但舊UI不能自動恢復新workflow_existing_people的本機未保存選擇；正式發布前需相容reader/匯出方案，原始素材不自動刪除。Alpha未寫此本機格式。
-- 最新main唯讀核對仍68102f230aa947a434286ba9260e1ae75f6634b0。66項Chromium套件含10項新選擇契約：三種人物類型、來源、同人雙角色、Owner隔離、未完成恢復、320/390/1440及基本鍵盤。最後僅重複提示文字調整後重跑6項；API/Node仍741 PASS/71 SKIP。PG37是同一後端上一階段的實際收據，本輪無後端變更，不宣稱重跑GCP。
+- 最新main唯讀核對仍68102f230aa947a434286ba9260e1ae75f6634b0。66項Chromium套件含10項新選擇契約：三種人物類型、來源、同人雙角色、Owner隔離、未完成恢復、320/390/1440及基本鍵盤。最後僅重複提示文字調整後重跑6項；當時API/Node為741 PASS/71 SKIP。PG37是同一後端上一階段的實際收據，本輪無後端變更，不宣稱重跑GCP。
 - [精簡選擇契約](COMPACT_PEOPLE_CONTRACT.md)、[390px](screenshots/390-compact-person-selection.png)、[1440px](screenshots/1440-compact-person-selection.png)。整體UX、Review、GCP E2E及發布Gate不變。
+
+
+## 草稿AI授權後端（本輪，未發布）
+
+- 沿用既有data_consents，不新增Schema或另一份同意狀態。提供Owner限定GET/POST/DELETE /api/ai/draft-consent；策略綁提供者/模型/真實或替身/用途/來源範圍。嚴格confirmed=true、CSRF、Owner交易鎖、唯一active索引與request_id收據；撤回後舊請求409，不重新授權，保留同意歷史。
+- enabled的/suggest在預留與Provider之前檢查本用途有效同意。背景同意不涵蓋草稿。experience操作不再因背景FeatureStore開關偷偷附帶其他記憶；只送本篇原文與固定指令，摘要/任務/人物資訊仍為待人工核對候選。
+- 實際PG測試發現source_scope的既有CHECK要求JSON物件，已依快照/PG驗證修正，沒有放寬CHECK。44項受限PG套件含6項授權/隔離/Provider變更/撤回/背景範圍測試，以及1項撤回權限缺口驗證；最新狀態欄位另單項重驗通過。
+- Alpha原快照Runtime僅SELECT/INSERT，無revoked_at UPDATE；本機marker副本測試提議的UPDATE(revoked_at)，Owner/用途/來源等其他欄位仍不可UPDATE。正式GCP未GRANT。後端缺撤回能力時停用本用途，不假稱沒有既存同意或允許無法撤回的授權。
+- [契約](ai/DRAFT_AI_CONSENT_CONTRACT.md)、[欄位GRANT審查稿](migrations/DRAFT_AI_CONSENT_COLUMN_GRANT.review.sql)。不是正式套用指令，不新增Migration receipt，不改Schema/Owner/IAM。
+- **前端仍未完成**：單一手動/AI選擇、首次告知、有效同意重用、撤回與失敗狀態待接。現有已配置AI的舊按鈕未經新授權會403，不能宣稱功能可用或發布；目前Alpha舊Runtime完全未變。本輪沒有真模型呼叫或新模型費用。
+
+- 測試授權helper已放tests/conftest.py，避免獨立執行RC測試時依賴AI子目錄匯入；RC＋草稿授權獨立命令11 PASS，DRAFT_AI_CONSENT_HELPER.log，不與完整套件重複加總。
