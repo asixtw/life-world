@@ -1,0 +1,8 @@
+[
+  {
+    "name": "lw-pg-staging-trial",
+    "connectionName": "life-world-513506:asia-east1:lw-pg-staging-trial",
+    "databaseVersion": "POSTGRES_18",
+    "region": "asia-east1"
+  }
+]

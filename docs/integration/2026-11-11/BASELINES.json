@@ -1,0 +1,27 @@
+{
+  "main": {
+    "ref": "origin/main",
+    "commit": "68102f230aa947a434286ba9260e1ae75f6634b0",
+    "tree": "5aab2af2392c7fa61159d5cea02770f86bcd8877"
+  },
+  "PR22": {
+    "ref": "origin/pr22-integration",
+    "commit": "2f81508c948801b6d4c1f6b3f03bc77b432ac90e",
+    "tree": "5ddfd7ee80c5f6560934bc080533d8cd94da5a99"
+  },
+  "PR24": {
+    "ref": "origin/pr24-integration",
+    "commit": "4278da5b88043c2765279c8626a140d503d5c328",
+    "tree": "fe02a66c12ebe0b73949325711a09353033427af"
+  },
+  "PR25": {
+    "ref": "origin/pr25-integration",
+    "commit": "0661e7066ec5eda62588d5f14dd5377303e20f01",
+    "tree": "b826fd8d4c08ed994b125aacace04455da630e5a"
+  },
+  "Jerry": {
+    "ref": "origin/jerry_unified_person",
+    "commit": "21ac5eff795d0bf3081af8ed34e5c82dfbaaabca",
+    "tree": "08f3cae403cf6c0df0231496877b84e9f136a2ce"
+  }
+}

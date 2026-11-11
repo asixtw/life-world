@@ -1,0 +1,66 @@
+[
+  {
+    "id": "6ffa2066-8edd-4406-9f3f-31f967da57dc",
+    "name": "lw-api-main",
+    "repositoryEventConfig": {
+      "push": {
+        "branch": "^main$"
+      },
+      "repository": "projects/life-world-513506/locations/asia-east1/connections/lw-github/repositories/asixtw-life-world",
+      "repositoryType": "GITHUB"
+    },
+    "includedFiles": [
+      "app/**",
+      "tests/**",
+      "scripts/**",
+      "deploy/Dockerfile.api",
+      "deploy/cloudbuild.api.yaml",
+      "deploy/postgres/**",
+      "deploy/tests/**",
+      "deploy/release.py",
+      "requirements*",
+      "pyproject.toml",
+      ".dockerignore",
+      "docs/database/schema-2026-11-02/*.sql"
+    ],
+    "filename": "deploy/cloudbuild.api.yaml",
+    "serviceAccount": "projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com",
+    "approvalConfig": {
+      "approvalRequired": true
+    }
+  },
+  {
+    "id": "711e7258-2725-4007-a555-0f0100b77dbc",
+    "name": "lw-web-main",
+    "repositoryEventConfig": {
+      "push": {
+        "branch": "^main$"
+      },
+      "repository": "projects/life-world-513506/locations/asia-east1/connections/lw-github/repositories/asixtw-life-world",
+      "repositoryType": "GITHUB"
+    },
+    "includedFiles": [
+      "collaboration/ui-kit/Dockerfile",
+      "collaboration/ui-kit/.dockerignore",
+      "collaboration/ui-kit/cloud-nginx.conf",
+      "collaboration/ui-kit/package.json",
+      "collaboration/ui-kit/pnpm-lock.yaml",
+      "collaboration/ui-kit/pnpm-workspace.yaml",
+      "collaboration/ui-kit/index.html",
+      "collaboration/ui-kit/tsconfig.json",
+      "collaboration/ui-kit/vite.config.ts",
+      "collaboration/ui-kit/src/**",
+      "collaboration/ui-kit/public/**",
+      "collaboration/ui-kit/assets/**",
+      "collaboration/ui-kit/content/**",
+      "collaboration/ui-kit/evaluation/**",
+      "collaboration/ui-kit/tests/**",
+      "collaboration/ui-kit/tools/**",
+      "deploy/cloudbuild.web.yaml",
+      "deploy/release.py",
+      "deploy/tests/test_release.py"
+    ],
+    "filename": "deploy/cloudbuild.web.yaml",
+    "serviceAccount": "projects/life-world-513506/serviceAccounts/lw-build-main@life-world-513506.iam.gserviceaccount.com"
+  }
+]
