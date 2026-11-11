@@ -146,3 +146,24 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 ## 2026-11-09 Main 整合 Stage2 隔離回歸
 
 [完整收據與範圍](testing/main-consolidation-stage2-2026-11-09/README.md)：SQLite 512 passed／17 PG-only skipped；隔離PG18.6模式529 passed；Node13 passed；Chromium39案例覆蓋（原跨日skip已補測PASS）；發布政策24 passed；真ffmpeg短／長音訊解碼PASS。僅測試契約／工具／文件變更，沒有更動產品限額或正式流量。Merge仍待CI隔離與Owner明確授權，未Build／部署。
+
+## 2026-11-09｜最新 main 的 pool 清理／shutdown 隔離驗證
+
+基底68102f2；新增18個合成案例，先重現8 failed，再修補為完整530 passed／17 PG skipped。獨立定點重跑18 passed。真PG／Cloud SQL／TLS／瀏覽器未驗。詳見[修補與驗證界線](testing/POOL_SHUTDOWN_REVIEW_20261109.md)。
+
+## 2026-11-09 音訊／孵化生命週期增量
+
+以 main 68102f2 為基準，實際前端 JS 的 Node 22 案：舊版 8 通過／14 失敗，修正後 22 通過；pytest wrapper 2 通過。修復 pending 播放取消、前後景清理、重試／重疊與重複 mount；18 採用素材 hash／FFmpeg 解碼通過。原生瀏覽器與人工聽審未在此版本執行，未部署。[完整範圍與證據](art/AUDIO_LIFECYCLE_20261109.md)。
+
+合流後同版完整回歸：532 passed／17 PG skipped，另24項發布Mock通過；[合流範圍與未驗項](testing/CORE_AUDIO_INTEGRATION_20261109.md)。
+
+## 2026-11-09 隔離 pool 生命週期後續
+
+基於 66fd8d4，4 個新增合成案例先紅後綠；修補 Connector 重複清理、關閉後初始化與開啟後准入檢查。pool 定點 22 passed；完整 pytest 536 passed、17 PG skipped、13 既有 warnings。active borrower 不等待的語義保留，真 PG／Cloud SQL／Windows 未驗。詳見 [pool 審查](testing/POOL_SHUTDOWN_REVIEW_20261109.md)。未推送、部署或修改原工作樹。
+
+同日 provider 責任移交延伸：4 個新增紅燈後，改為最後 opener 接手 Connector 清理，避免 connect/close 重疊且不等待網路。最新 pool 26 passed；完整 540 passed、17 PG skipped、13 既有 warnings（44.67 秒）。前述 536 是中間版本，不是最新候選結果。
+
+
+### 2026-11-09 整合證據補充（取代上文「最新」的時間性敘述）
+
+完整整合版離線回歸為 **549 passed、17 PG skipped、13 warnings**。上文540屬歷史pool階段結果。OSSANG先前專用PG18執行17必測全通過，但該次整體542 passed、2 failed、13 Node skipped，且早於最後整合；不能當成本head完整Windows回歸。新core在Windows實機記憶體載入的constructor及6個CLI拒絕probe已通過，僅證明fail-closed路徑，不是Windows全功能或ACL驗收。詳見 `CORE_SAFETY_INTEGRATION_20261109.md`（位於 docs/testing）。三線完整驗收仍未完成。

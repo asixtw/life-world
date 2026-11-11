@@ -218,7 +218,10 @@ def test_snapshot_evidence_is_required_fresh_and_bound_to_plan(defect):
     elif defect=='missing_raw_hash': del source['sha256']
     elif defect=='wrong_content': source['content_sha256']='0'*64
     elif defect=='plan_changed': p['service']['metadata']['synthetic_change']='after export'
-    elif defect=='captured_at_refreshed': p['captured_at']=datetime.now(timezone.utc).isoformat()
+    elif defect=='captured_at_refreshed':
+        # A second wall-clock read can be identical on Windows. Mutate deterministically.
+        p['captured_at']=(datetime.fromisoformat(evidence['started_at'])+timedelta(microseconds=1)).isoformat()
+        assert p['captured_at'] != evidence['started_at']
     with pytest.raises(e2e.SafetyError): e2e.validate_plan(p)
 
 

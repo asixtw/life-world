@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: 預設不播；已保存偏好在第一次手勢前也不自動播
+ok 1 - 預設不播；已保存偏好在第一次手勢前也不自動播
+  ---
+  duration_ms: 4.311878
+  type: 'test'
+  ...
+# Subtest: 關閉音效立即停止所有在播音效，音樂不受影響
+ok 2 - 關閉音效立即停止所有在播音效，音樂不受影響
+  ---
+  duration_ms: 1.12939
+  type: 'test'
+  ...
+# Subtest: 音效 pending 後停用，晚到成功不可留下聲音
+ok 3 - 音效 pending 後停用，晚到成功不可留下聲音
+  ---
+  duration_ms: 0.969438
+  type: 'test'
+  ...
+# Subtest: 音樂 pending 後停用，晚到成功不可留下聲音
+ok 4 - 音樂 pending 後停用，晚到成功不可留下聲音
+  ---
+  duration_ms: 0.710018
+  type: 'test'
+  ...
+# Subtest: 路由切換停止舊 BGM，舊 Promise 不影響新場景
+ok 5 - 路由切換停止舊 BGM，舊 Promise 不影響新場景
+  ---
+  duration_ms: 0.79741
+  type: 'test'
+  ...
+# Subtest: 自動播放拒絕後，下次手勢可重試同場景
+ok 6 - 自動播放拒絕後，下次手勢可重試同場景
+  ---
+  duration_ms: 1.272054
+  type: 'test'
+  ...
+# Subtest: 重複手勢或路由不建立重疊 BGM
+ok 7 - 重複手勢或路由不建立重疊 BGM
+  ---
+  duration_ms: 3.091822
+  type: 'test'
+  ...
+# Subtest: 背景頁停所有音軌，回前景只恢復目前場景 BGM
+ok 8 - 背景頁停所有音軌，回前景只恢復目前場景 BGM
+  ---
+  duration_ms: 0.976449
+  type: 'test'
+  ...
+# Subtest: pagehide 清理，pageshow 不重播音效也不繞過使用者停用
+ok 9 - pagehide 清理，pageshow 不重播音效也不繞過使用者停用
+  ---
+  duration_ms: 0.872243
+  type: 'test'
+  ...
+# Subtest: 返回頁面只恢復一條 BGM，重複可見事件不重疊
+ok 10 - 返回頁面只恢復一條 BGM，重複可見事件不重疊
+  ---
+  duration_ms: 0.915768
+  type: 'test'
+  ...
+# Subtest: 新場景 BGM 缺失時停止舊場景，保留無聲退路
+ok 11 - 新場景 BGM 缺失時停止舊場景，保留無聲退路
+  ---
+  duration_ms: 0.719222
+  type: 'test'
+  ...
+# Subtest: 素材撤銷立即停止已播與 pending 音軌
+ok 12 - 素材撤銷立即停止已播與 pending 音軌
+  ---
+  duration_ms: 0.649798
+  type: 'test'
+  ...
+# Subtest: 非核准、外站與不合法 manifest 不可播放且不拋例外
+ok 13 - 非核准、外站與不合法 manifest 不可播放且不拋例外
+  ---
+  duration_ms: 0.703208
+  type: 'test'
+  ...
+# Subtest: 自然結束與媒體錯誤都釋放音訊來源
+ok 14 - 自然結束與媒體錯誤都釋放音訊來源
+  ---
+  duration_ms: 0.766103
+  type: 'test'
+  ...
+# Subtest: 快速連點音效有並發上限，停用後全部釋放
+ok 15 - 快速連點音效有並發上限，停用後全部釋放
+  ---
+  duration_ms: 2.694605
+  type: 'test'
+  ...
+# Subtest: 播放／建構失敗不拋到產品操作
+ok 16 - 播放／建構失敗不拋到產品操作
+  ---
+  duration_ms: 0.653123
+  type: 'test'
+  ...
+# Subtest: 成功回執保留去重，偏好儲存不包含 owner 或回執
+ok 17 - 成功回執保留去重，偏好儲存不包含 owner 或回執
+  ---
+  duration_ms: 1.324843
+  type: 'test'
+  ...
+# Subtest: 三次明確輸入、動畫鎖與最終聲音：reduced=false
+ok 18 - 三次明確輸入、動畫鎖與最終聲音：reduced=false
+  ---
+  duration_ms: 2.943439
+  type: 'test'
+  ...
+# Subtest: 三次明確輸入、動畫鎖與最終聲音：reduced=true
+ok 19 - 三次明確輸入、動畫鎖與最終聲音：reduced=true
+  ---
+  duration_ms: 0.73092
+  type: 'test'
+  ...
+# Subtest: 相同 DOM 重複 mount 不重綁、不重複播孵化聲或移動焦點
+ok 20 - 相同 DOM 重複 mount 不重綁、不重複播孵化聲或移動焦點
+  ---
+  duration_ms: 0.721075
+  type: 'test'
+  ...
+# Subtest: 離開孵化頁後，舊計時器不可揭露、移焦或播放
+ok 21 - 離開孵化頁後，舊計時器不可揭露、移焦或播放
+  ---
+  duration_ms: 0.681175
+  type: 'test'
+  ...
+# Subtest: 既有顯示保留可讀狀態、三階段按鈕與美術 fallback 標記
+ok 22 - 既有顯示保留可讀狀態、三階段按鈕與美術 fallback 標記
+  ---
+  duration_ms: 0.925482
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 126.969771

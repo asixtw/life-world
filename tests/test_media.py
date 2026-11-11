@@ -63,7 +63,7 @@ def test_unconfigured_provider_is_an_explicit_failure(client):
     ('screenshot', 'image/png', image_bytes(), 'screen.png'),
     ('card', 'image/png', image_bytes(), 'card.png'),
     ('audio', 'audio/wav', audio_bytes(), 'voice.wav'),
-])
+], ids=['image-png', 'screenshot-png', 'card-png', 'audio-wav'])
 def test_recognition_never_changes_domain_data(app, client, kind, mime, content, name):
     onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     before = client.get('/api/state').json()
@@ -89,7 +89,7 @@ def test_recognition_never_changes_domain_data(app, client, kind, mime, content,
     ('image', 'image/png', b'x' * 4097, 'large.png', 413),
     ('card', 'audio/wav', audio_bytes(), 'voice.wav', 415),
     ('invalid', 'image/png', image_bytes(), 'image.png', 422),
-])
+], ids=['empty-image', 'invalid-image-bytes', 'unsupported-svg', 'path-traversal-name', 'invalid-audio-bytes', 'oversized-image', 'card-audio-mismatch', 'invalid-kind'])
 def test_reject_invalid_material_without_calling_provider(app, client, kind, mime, content, name, status):
     onboard(client); register(client)  # 辨識功能改為registered；其他輸入/副作用斷言不變。
     app.state.media_provider = Provider()
