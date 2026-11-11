@@ -101,3 +101,11 @@ Python環境`/private/tmp/lw-integration-venv`，Node v24.11.0；本機PG18.0結
 新增2項紅燈測試先證實原入口回200／仍在OpenAPI，移除註冊後通過。本人`/api/profile`與基本人物編輯保留。完整本機SQLite／Node套件 **766 PASS、85 SKIP**（31.73秒）；85項專用PostgreSQL環境測試未在此命令執行，不能宣稱PG全綠。此修改未重跑瀏覽器或GCP，均NOT RUN；前述人物閉環PG證據屬前一功能版本。命令同第2節完整套件，收據[ROLE_PROFILE_BOUNDARY_TESTS.log](ROLE_PROFILE_BOUNDARY_TESTS.log)。
 
 僅關閉新整合帶入的未核准HTTP寫入入口；歷史notes、requests、GET資料、DTO與領域相容方法皆保留。回復應用程式提交會重新開放入口，故不將回復此提交作為核准發布策略。維持Draft／NO-GO。
+
+### 最新隔離 PG／Chromium 補驗
+
+測試產品Commit `f2d721da27c8b55bfb2ed485b690226377d48809`，App tree `0ae29a63989f0b81279c8e9a30512dcaa031e97f`。受限Runtime `lw_e2e_app`／本機PG18.0 marker副本（不是GCP）執行API **53 PASS**（6.30秒），包含本輪新增的2項入口隔離測試。命令：`LIFEWORLD_INTEGRATION_PG_CONFIG=<私密本機設定路徑> python -m pytest tests/test_pg_integration_person_details.py tests/ai/test_pg_ai_usage.py -q --tb=short`。收據[ROLE_BOUNDARY_PG_API.log](ROLE_BOUNDARY_PG_API.log)。API fixture只重設已核對marker的本機合成副本，與瀏覽器測試依序執行。
+
+新Python服務使用8197（保留原8196服務）；`/ready`=200，實際OpenAPI無角色設定寫入路由、保留本人`/api/profile`。六個瀏覽器模組同第2節命令、改URL為`http://127.0.0.1:8197`：**79 PASS**（122.79秒），320/390/1440、四步、逐人補充、草稿、原子確認、回讀、隔離與重送。收據[ROLE_BOUNDARY_PG_BROWSER.log](ROLE_BOUNDARY_PG_BROWSER.log)；最新受限SQL回讀更新[evidence/BASIC_UI_PG_READBACK.json](evidence/BASIC_UI_PG_READBACK.json)。畫面沒有產品變更，不重複提交相同情境截圖，沿用第3節畫面；此輪通過不等於Owner UX核准。
+
+真Google／Gemini、GCP映像與Migration、實機Safari/Android、正式發布仍 **NOT RUN**。Gate A/B/C/D狀態不變。

@@ -125,3 +125,9 @@ from test_draft_basic_review import (
  test_existing_employment_partial_patch_and_late_birthday_conflict_are_atomic,
  test_basic_existing_job_cannot_target_other_person_and_empty_birthday_requires_explicit_clear,
 )
+
+# 正式HTTP入口隔離亦在受限PG Runtime核對；不只靠SQLite或靜態路由搜尋。
+from test_role_profile_boundary import (
+ test_role_profile_write_not_registered,
+ test_role_profile_absent_from_openapi,
+)
