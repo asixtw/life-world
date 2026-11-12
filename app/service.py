@@ -27,6 +27,10 @@ from .self_persona import SelfPersonaMixin  # Self Persona 與同意（自 8445 
 from .works_center import WorksMixin  # 作品管理（自 8445 移植）
 from .generation import GenerationMixin  # 生成框架（自 8445 移植；8030 以金額上限取代次數上限）
 from .roleplay import RoleplayMixin  # T1／T2 逐段生成與恢復（自 8445 移植）
+from .work_export import WorkExportMixin  # 作品匯出成可離線開啟的 HTML
+from .story_series import StorySeriesMixin  # 多章節作品：續寫、檢查點、採納
+from .interactive_layer import InteractiveLayerMixin  # 互動層：作品完成後產生線索、關鍵抉擇、另外的結局與番外
+from .turn_game import TurnGameMixin  # 回合制互動作品：規劃、每位同行者的反應、結局門檻
 from .stories import StoriesMixin  # F04 故事開場（自 8445 移植）
 from .play_sessions import PlaySessionsMixin  # F05 短篇互動（自 8445 移植）
 from .portrayals import PortrayalsMixin  # F06A 人物演繹（自 8445 移植）
@@ -52,7 +56,7 @@ def encoded(value):  # 以穩定鍵序序列化 JSON，供指紋與資料保存�
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))  # 回傳以穩定鍵序序列化 JSON，供指紋與資料保存使用的結果
 
 
-class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin, PersonsMixin, PersonExperiencesMixin, CharacterCardsMixin, SelfPersonaMixin, WorksMixin, StoriesMixin, PlaySessionsMixin, PortrayalsMixin, TheaterMixin, GenerationMixin, RoleplayMixin):  # 各模組共用既有交易與帳本。
+class LifeWorld(GoalsMixin, ConnectionsMixin, PeopleMixin, PersonsMixin, PersonExperiencesMixin, CharacterCardsMixin, SelfPersonaMixin, WorksMixin, StoriesMixin, PlaySessionsMixin, PortrayalsMixin, TheaterMixin, GenerationMixin, RoleplayMixin, WorkExportMixin, StorySeriesMixin, InteractiveLayerMixin, TurnGameMixin):  # 各模組共用既有交易與帳本。
     def __init__(self, db, policy, clock=None, assistant=None):  # 注入資料庫、設定、時鐘與整理提供者
         self.db = db  # 保存「self.db」供後續驗證或回傳使用
         self.policy = policy  # 保存「self.policy」供後續驗證或回傳使用

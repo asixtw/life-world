@@ -11,6 +11,7 @@ from dataclasses import dataclass  # 宣告模組與 Prompt 版本
 from datetime import timedelta  # 計算滾動 24 小時額度
 import hashlib  # 請求指紋與 Prompt 雜湊
 import json  # 解析 Provider 文字輸出
+import logging  # 結算時意外的例外只記錄類型
 from uuid import uuid4  # 生成紀錄識別碼
 
 from pydantic import ValidationError  # 結構化輸出驗證失敗
@@ -20,6 +21,8 @@ from .ai_text import TextRequest  # Provider 中立請求
 from .errors import DomainError, require  # 固定領域錯誤
 from .gen_schemas import SESSION_MAX_TURNS, CharacterCardDraft, ReplyContent, ReplyContentV2, ReplyContentV3, StoryOpeningContent  # 角色卡、故事開場與互動回合的輸出結構
 from .security import require_registered  # 正式私人作品生成只限 registered
+
+logger = logging.getLogger(__name__)
 
 
 def encoded(value):  # 與既有服務一致的穩定 JSON
@@ -468,6 +471,25 @@ NOTICES = {'fake': '測試用假回應：這不是 AI 生成的內容，只用�
            'live': 'AI 候選內容：尚未保存，請自行檢查與修改；角色為虛構設定，不代表真實人物或事實。'}
 
 
+# 2026-11-12 外部檢驗發現：GET /api/ai/generations/{id} 原本把原稿整份回給本人，作品頁拿掉的劇透從這裡仍讀得到。
+# 這些模組的原稿只給伺服器組成作品與匯出用，讀回生成紀錄時 output 回 null（狀態、用量與輸入照舊；資料庫裡的原稿不變）：
+# - game_plan：四種結局的文字。game_reaction：每一站的反應、願望與最後一句話。interactive_layer：抉擇、線索、另外的結局與番外。
+# 依模組代號（不依 Prompt 版本）判斷，舊版本的紀錄也一樣。前端沒有讀這條路由；角色卡草稿等其他模組照舊回 output。
+HIDDEN_OUTPUT_MODULES = ('game_plan', 'game_reaction', 'interactive_layer')
+# 這些模組的原稿只拿掉會劇透的欄位，其他照舊：規劃裡只給單一人物的底牌（和作品頁的 public_plan 相同）。
+PRIVATE_OUTPUT_FIELDS = {'roleplay_plan': ('private_notes',)}
+
+
+def public_output(module, output):
+    """讀回生成紀錄時給本人看的原稿：依模組拿掉會劇透的內容（見 HIDDEN_OUTPUT_MODULES、PRIVATE_OUTPUT_FIELDS）。"""
+    if output is None or module in HIDDEN_OUTPUT_MODULES:
+        return None
+    hidden = PRIVATE_OUTPUT_FIELDS.get(module)
+    if hidden and isinstance(output, dict):
+        return {key: value for key, value in output.items() if key not in hidden}
+    return output
+
+
 def generation_source_deleted(row):
     """角色刪除保留生成稽核欄位，input_json 只留刪除標記。"""
     return json.loads(row['input_json']).get('_deleted') is True
@@ -520,8 +542,12 @@ class GenerationMixin:
         """寫交易內完成去重、並行與額度檢查，並新增 running 預留；不呼叫 Provider。"""
         return self.ai_reserve(owner, MODULES[data.module], data.input.model_dump(mode='json'), data.request_id, provider, settings)
 
-    def ai_reserve(self, owner, module, input_data, request_id, provider, settings, *, resolve=None):
+    def ai_reserve(self, owner, module, input_data, request_id, provider, settings, *, resolve=None, shortcut=None):
         """ai_prepare 的共用本體；排程生成（module.background）也走這裡，以共用去重與用量紀錄。
+
+        shortcut：呼叫端自己的捷徑，函式（參數是目前的交易），在「同一個提交代碼的生成紀錄」查過之後、resolve 之前執行。
+        回傳 None 就照常預留；回傳其他值就直接把它當成這次的結果（不預留、不占額度，交易照常提交，所以捷徑裡寫的回執會留下）。
+        例：回合制互動作品接手別的請求已結算的結果（app/turn_game.py）。
 
         background 模組（P1 生成作品中心）：
         - 不套用每日次數上限（第六版：有 Provider 額度就使用）；Provider 回報的額度不足由排程延後重試。
@@ -531,7 +557,7 @@ class GenerationMixin:
         background = getattr(module, 'background', False)
         max_output_tokens = getattr(module, 'max_output_tokens', None) or settings.max_output_tokens
         timeout_seconds = getattr(module, 'timeout_seconds', None) or settings.timeout_seconds
-        fingerprint = hashlib.sha256(encoded({'module': module.id, 'input': input_data}).encode()).hexdigest()
+        fingerprint = self.ai_fingerprint(module.id, input_data)
         with self.db.connect(write=True, owner=owner) as c:
             self._ai_user(c, owner)
             now = self.now()
@@ -542,6 +568,10 @@ class GenerationMixin:
             if row:
                 require(row['fingerprint'] == fingerprint, 409, 'idempotency_conflict', '同一提交代碼不能用於不同內容。')
                 return {'replay': dict(row)}
+            if shortcut is not None:
+                early = shortcut(c)
+                if early is not None:
+                    return early
             # 模組在同一交易內讀取所需來源（故事開場讀取指定角色卡版本）；找不到時不預留、不占額度。
             stored_input, prompt_payload = (resolve or module.resolve)(self, c, owner, input_data)
             ts = self._ts()
@@ -561,6 +591,12 @@ class GenerationMixin:
             prepared = self._insert_reservation(c, owner, module, request_id, fingerprint, provider, now, stored_input, prompt_payload,
                                                 max_output_tokens, timeout_seconds)
             return {**prepared, 'budget': budget} if budget else prepared
+
+    @staticmethod
+    def ai_fingerprint(module_id, input_data):
+        """同一個提交代碼的內容指紋（模組＋輸入）。ai_reserve 用它判斷重送是不是同一份內容；
+        回合制作品在不預留的捷徑上（作品已完成）也用它檢查代碼有沒有綁在別件作品（app/turn_game.py）。"""
+        return hashlib.sha256(encoded({'module': module_id, 'input': input_data}).encode()).hexdigest()
 
     def _ai_budget_reserve(self, c, owner, provider, module_id, now):
         """每次真實呼叫前預留金額（Fake 不計費）；滾動 24 小時預留總額超過每日上限就停止，測試期總額另外檢查。
@@ -678,13 +714,18 @@ class GenerationMixin:
         from datetime import datetime
         return datetime.fromisoformat(value) if value else None
 
-    def ai_finish(self, owner, prepared, provider, result, failure, latency_ms):
+    def ai_finish(self, owner, prepared, provider, result, failure, latency_ms, http_status=None):
         """結算預留紀錄；解析失敗視為 invalid_output、行動矛盾視為 action_inconsistent，都不把不合格輸出當候選。
 
         以預留當時的 Prompt 版本解析：生成途中即使作用版本改變，也不會用另一版的 Schema 判定。
+        http_status：供應商失敗時回的 HTTP 狀態（沒有就是 None），只用來判斷預留要不要退回。
         """
         module = MODULE_VERSIONS.get(prepared.get('prompt_version')) or MODULES[prepared['module']]
         cost = self._ai_cost(provider, result)  # 8030：依實際 Token 計價
+        # 2026-11-12：供應商明確拒絕（429 額度／速率、503 服務過載）而且沒有回報用量 → 這次請求在處理前就被擋下，不會產生費用，
+        # 預留全數退回、生成紀錄的費用記為 0。逾時、連線中斷與其他錯誤仍然不知道供應商有沒有計算，維持原樣（預留保留 24 小時）。
+        # 原因：Gemini 過載時失敗很多，原本每次失敗佔住一筆預留，實際花費很少也會撞到每日上限。
+        rejected = provider.kind == 'live' and result is None and failure is not None and http_status in REJECTED_WITHOUT_CHARGE
         if cost is not None and result.cost_microusd is None:
             from dataclasses import replace
             result = replace(result, cost_microusd=cost)
@@ -694,6 +735,12 @@ class GenerationMixin:
                 output = module.parse(result.text, prepared['input'])
             except DomainError as exc:
                 failure, guard = exc.code, getattr(exc, 'guard', None)
+            except Exception as exc:
+                # 2026-11-12 外部檢驗發現：模組整理輸出時意外拋出的例外（例如超大整數造成的 OverflowError）原本一路拋出，
+                # 下面的結算來不及做：生成紀錄停在 running、用量不結算、API 回 500。不論哪個模組，一律當作輸出不合格，
+                # 讓紀錄一定離開 running、用量照常結算。日誌只記例外類型，不記內容（可能含模型輸出）。
+                logger.error('generation output parse failed unexpectedly (%s)', type(exc).__name__)
+                failure = 'invalid_output'
         now = self.now().isoformat()
         with self.db.connect(write=True, owner=owner) as c:
             prior = c.execute('SELECT input_json FROM ai_generations WHERE id=? AND owner_id=?',
@@ -727,8 +774,9 @@ class GenerationMixin:
                           (failure, result.model_version, result.input_tokens, result.output_tokens, cost_status, result.cost_microusd,
                            latency_ms, result.provider_request_id, now, prepared['generation_id'], owner))
             else:
-                # 真實 Provider 失敗時不宣稱沒有費用；取消或逾時無法撤銷已發生的供應商費用。
-                c.execute("UPDATE ai_generations SET status='failed',error_code=?,latency_ms=?,finished_at=? "
+                # 真實 Provider 失敗時不宣稱沒有費用；取消或逾時無法撤銷已發生的供應商費用。只有供應商明確拒絕（rejected）才記為 0。
+                known = ",cost_status='known',cost_microusd=0" if rejected else ''
+                c.execute(f"UPDATE ai_generations SET status='failed',error_code=?,latency_ms=?,finished_at=?{known} "
                           "WHERE id=? AND owner_id=? AND status='running'",
                           (failure, latency_ms, now, prepared['generation_id'], owner))
             if cost is not None:
@@ -736,7 +784,8 @@ class GenerationMixin:
                 c.execute("UPDATE ai_generations SET cost_status='known',cost_microusd=?,input_tokens=?,output_tokens=? "
                           "WHERE id=? AND owner_id=? AND status<>'running' AND cost_status='unknown'",
                           (cost, result.input_tokens, result.output_tokens, prepared['generation_id'], owner))
-            self._ai_budget_settle(c, owner, prepared, cost)  # 成功或失敗只要知道實際用量就結算；用量未知時保留預留額 24 小時（同一次生成只結算一次）
+            # 成功或失敗只要知道實際用量就結算；供應商明確拒絕時以 0 結算（預留全數退回）；其餘用量未知的保留預留額 24 小時（同一次生成只結算一次）
+            self._ai_budget_settle(c, owner, prepared, 0 if rejected else cost)
             row = c.execute('SELECT * FROM ai_generations WHERE id=? AND owner_id=?', (prepared['generation_id'], owner)).fetchone()
         return self._generation_response(row)
 
@@ -766,16 +815,21 @@ class GenerationMixin:
         return self._generation_response(row)
 
     def generation(self, owner, generation_id):
-        """讀回單次生成的輸入、原稿與狀態（含失敗），只限本人。"""
+        """讀回單次生成的輸入、原稿與狀態（含失敗），只限本人。會劇透的模組不回原稿或拿掉劇透的欄位（public_output）。"""
         with self.db.connect() as c:
             self._ai_user(c, owner)
             row = c.execute('SELECT * FROM ai_generations WHERE id=? AND owner_id=?', (generation_id, owner)).fetchone()
             require(row is not None, 404, 'not_found', '找不到可存取的資料。')
+            output = json.loads(row['output_json']) if row['output_json'] and not generation_source_deleted(row) else None
             result = {'generation': self._generation_meta(row), 'input': json.loads(row['input_json']),
-                      'output': json.loads(row['output_json']) if row['output_json'] and not generation_source_deleted(row) else None,
+                      'output': public_output(row['module'], output),
                       'applied': False,
                       'notice': MODULE_NOTICES.get(row['module'], NOTICES)[row['provider_kind']]}
             return result
+
+
+# 供應商在處理前就拒絕、不會產生費用的 HTTP 狀態：429（額度／速率）、503（服務過載）。其他狀態不在這裡，預留照舊保留。
+REJECTED_WITHOUT_CHARGE = (429, 503)
 
 
 async def call_provider(provider, request, timeout, executor):

@@ -1,5 +1,5 @@
 # 2026-11-10 自 8445（life-world-react-integrated/app/environment.py）原樣移植。
-"""排程生成的環境白名單：環境代號固定對應資料庫、Schema、資料庫標記與 Cloud Tasks Queue。
+"""排程生成的環境白名單：環境代號固定對應資料庫、Schema、資料庫標記、Cloud Tasks Queue 與作品檔案的 bucket。
 
 Local E2E、Alpha 與正式環境使用不同的 Cloud SQL 資料庫，必須互相隔離：
 - 對應關係寫在程式內，不由環境變數或 Task 內容決定；設定與白名單不一致時，排程生成不啟用。
@@ -13,12 +13,13 @@ import sys  # 診斷紀錄寫到 stdout，由 Cloud Run 解析成結構化日誌
 
 ENVIRONMENTS = {
     'e2e': {'backend': 'postgresql', 'database': 'life_world_e2e', 'schema': 'lw_core_draft',
-            'marker': 'LIFEWORLD_E2E_SYNTHETIC_ONLY_v1', 'queue': 'lw-roleplay-e2e', 'worker_host_prefix': 'e2e---lw-api-main-'},
+            'marker': 'LIFEWORLD_E2E_SYNTHETIC_ONLY_v1', 'queue': 'lw-roleplay-e2e', 'worker_host_prefix': 'e2e---lw-api-main-',
+            'works_bucket': 'lw-works-e2e-513506'},  # 作品檔案（匯出的 HTML、之後的圖片）只能寫進這個環境自己的 bucket
     'alpha': {'backend': 'postgresql', 'database': 'life_world_alpha', 'schema': None, 'marker': None,
-              'queue': 'lw-roleplay-alpha', 'worker_host_prefix': None},
+              'queue': 'lw-roleplay-alpha', 'worker_host_prefix': None, 'works_bucket': None},  # Alpha 還沒有 bucket：匯出不開放
     # 只供隔離自動測試（SQLite＋記憶體佇列）；雲端設定不可使用。
     'local-test': {'backend': 'sqlite', 'database': 'lifeworld.sqlite3', 'schema': 'main', 'marker': None,
-                   'queue': 'memory', 'worker_host_prefix': None},
+                   'queue': 'memory', 'worker_host_prefix': None, 'works_bucket': 'memory'},
 }
 ROLEPLAY_TABLES = ('data_consents', 'session_turns')  # 008a 建立的資料表；不存在時拒絕執行（例如 Migration 尚未套用）
 

@@ -28,6 +28,19 @@
 .gen-seg p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .gen-seg em { display: block; color: var(--muted, #6b7468); }
 .gen-seg-me strong { color: var(--green, #2f6b4f); }
+/* 作品頁的區別（2026-11-12）：個人用顏色（依陣容順序 1～6）、團體用名稱旁的陣營標籤、關鍵情節用幕名列（轉折另有樣式）。 */
+.gen-seg[class*="gen-c"] { padding-left: 10px; border-left: 3px solid var(--who, transparent); }
+.gen-seg[class*="gen-c"] > strong { color: var(--who); }
+.gen-c1 { --who: #2f6b4f; } .gen-c2 { --who: #a04a1c; } .gen-c3 { --who: #2b5d8a; }
+.gen-c4 { --who: #7a3f8c; } .gen-c5 { --who: #806010; } .gen-c6 { --who: #a13c5a; }
+.gen-side { margin-left: 6px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--who, #c9cfc4); color: var(--who, inherit); font-size: 12px; font-weight: 400; }
+.gen-seg em { font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif; }
+.gen-beat { list-style: none; margin: 14px 0 2px -22px; padding: 6px 0 4px; border-bottom: 1px solid #d9ded4; font-weight: 700; letter-spacing: .04em; }
+.gen-kind { display: inline-block; min-width: 1.6em; margin-right: 8px; padding: 0 5px; border-radius: 4px; background: #e9ede4; text-align: center; font-size: 13px; }
+.gen-beat-turn { border-bottom: 2px solid #a04a1c; color: #a04a1c; }
+.gen-beat-turn .gen-kind { background: #a04a1c; color: #fff; }
+.gen-genre { padding: 1px 8px; border-radius: 999px; background: #e9ede4; font-size: 12px; }
+.gen-teaser { margin-top: 14px; border-left: 4px solid #a04a1c; }
 .gen-error { border-left: 4px solid #b5533c; }
 /* F04 故事開場 */
 .story-opening { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
@@ -60,6 +73,12 @@
 .create-sub { border-top: 1px dashed rgba(127,127,127,.25); padding-top: 6px; }
 .create-start { position: sticky; top: 16px; }
 .create-module { font-weight: 700; margin: 8px 0; }
+/* 建立新作品最上面的「玩法」（看的故事／玩的遊戲）：兩個原生的單選按鈕。共用的 input 樣式會把輸入框拉成整列寬、44px 高，
+   單選按鈕在這裡改回一般大小；整列（含說明）都在 label 裡，手機上好按。只影響這一塊，其他單選按鈕不變。 */
+.create-mode fieldset { margin: 0; }
+.create-mode .play-choice { min-height: 44px; align-items: center; }
+.create-mode input[type=radio] { flex: none; width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0; accent-color: var(--green, #2f6b4f); }
+.create-mode > p { margin-bottom: 0; }
 @media (max-width: 900px) {
   .create-layout { grid-template-columns: minmax(0, 1fr); }
   .create-start { position: sticky; top: auto; bottom: 0; z-index: 5; box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
@@ -82,3 +101,8 @@
 .person-exp-date input { width: 5.5em; }
 /* 紀錄頁的頁籤（我的紀錄／人物經歷／全部）：與人物頁的頁籤同一種外觀，下方留間距 */
 .record-tabs { margin-bottom: 20px; }
+/* 在這裡玩：匯出的作品放在這一頁的沙箱 iframe 裡（作品頁的互動版、互動遊戲頁）。高度佔大半個畫面，內容在裡面自己捲動。 */
+.inline-player { margin-top: 16px; }
+.inline-player[hidden] { display: none; }
+.inline-player-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 8px; }
+.inline-player-frame { display: block; width: 100%; height: min(88vh, 960px); min-height: 520px; border: 1px solid #d9ded4; border-radius: 12px; background: #fbfaf6; }

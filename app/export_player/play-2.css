@@ -1,0 +1,178 @@
+/* Life World 離線播放器 play-2（互動版）的樣式。
+   前半段是 reader-3 的樣式，逐條原樣帶過來：人物顏色、陣營標籤、幕名與起承轉合、三種字體都和閱讀版一致。
+   每個播放器各自是完整的一份（不在匯出時拼接）：之後閱讀版換新版本，已經匯出與之後匯出的互動版都不受影響。
+   tests/test_work_export.py 會檢查 reader-3 的每一條規則都在這裡。
+   後半段（「互動版」之後）是這個播放器自己的：逐段揭開、選視角、限次偷看真心話、線索、關鍵抉擇與結局、結尾卡、下方的逐段按鈕列。 */
+:root{--bg:#fbfaf6;--fg:#23261f;--muted:#6b7468;--line:#e2e0d6;--accent:#2f6b4f;--card:#ffffff;--turn:#c0281f;--c1:#1f5fa8;--c2:#8a5a00;--c3:#b02a78;--c4:#0b7468;--c5:#7a3fa3;--c6:#436f10;--size:18px;--sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--serif:"Noto Serif TC","Noto Serif CJK TC","Source Han Serif TC","Songti TC","PMingLiU","MingLiU",serif}
+html[data-theme=dark]{--bg:#171915;--fg:#e9e7df;--muted:#a3aa9d;--line:#33372f;--accent:#8fd0ae;--card:#1f221c;--turn:#ff8a7a;--c1:#7cc0ff;--c2:#f0c060;--c3:#ff8fc7;--c4:#6fd6c4;--c5:#c9a0ff;--c6:#a6dd6a}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]){--bg:#171915;--fg:#e9e7df;--muted:#a3aa9d;--line:#33372f;--accent:#8fd0ae;--card:#1f221c;--turn:#ff8a7a;--c1:#7cc0ff;--c2:#f0c060;--c3:#ff8fc7;--c4:#6fd6c4;--c5:#c9a0ff;--c6:#a6dd6a}}
+html[data-size=s]{--size:16px}
+html[data-size=l]{--size:21px}
+html[data-size=xl]{--size:24px}
+[data-c="1"]{--c:var(--c1)}
+[data-c="2"]{--c:var(--c2)}
+[data-c="3"]{--c:var(--c3)}
+[data-c="4"]{--c:var(--c4)}
+[data-c="5"]{--c:var(--c5)}
+[data-c="6"]{--c:var(--c6)}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0 auto;padding:32px 20px 64px;max-width:760px;color:var(--fg);font:var(--size)/1.9 var(--sans);overflow-wrap:anywhere}
+h1{margin:4px 0 12px;font-size:1.7em;line-height:1.35}
+h2,h3,h4{margin:0;font-size:1em}
+p{margin:0}
+.lw-genre,.lw-label,.lw-side,.lw-kind{display:inline-block;padding:0 .6em;border:1px solid var(--line);border-radius:999px;font-family:var(--sans);font-size:.76em;font-style:normal;font-weight:400;line-height:1.7;letter-spacing:.04em;vertical-align:.08em}
+.lw-kicker{color:var(--muted);font-size:.78em;letter-spacing:.12em}
+.lw-tags{margin:6px 0 0;font-size:.78em}
+.lw-genre{border-color:var(--accent);color:var(--accent);font-size:1em}
+.lw-kicker .lw-genre{margin-left:.9em}
+.lw-premise{color:var(--muted)}
+.lw-label{margin-right:.7em;border-color:var(--accent);color:var(--accent)}
+.lw-meta{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 16px;margin:20px 0 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:.86em}
+.lw-meta dt{color:var(--muted)}
+.lw-meta dd{margin:0;white-space:pre-wrap}
+.lw-name{color:var(--c,inherit);font-weight:600}
+.lw-group-name{font-weight:600}
+.lw-tools{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.lw-tools[hidden]{display:none}
+.lw-tools button{padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);font:inherit;font-size:.78em;cursor:pointer}
+.lw-tools button[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
+.lw-tools button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lw-toc{margin:28px 0 0;padding:16px 20px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.lw-toc h2{color:var(--muted);font-size:.86em;letter-spacing:.12em}
+.lw-toc ol{margin:8px 0 0;padding:0;list-style:none}
+.lw-toc a{color:var(--accent);text-decoration:none}
+.lw-toc a:hover,.lw-toc a:focus-visible{text-decoration:underline}
+.lw-chapter+.lw-chapter{margin-top:72px;padding-top:28px;border-top:1px solid var(--line)}
+.lw-chapter-title{margin:44px 0 8px;font-size:1.35em;line-height:1.4}
+.lw-scene{margin:8px 0 0;color:var(--muted);font-size:.86em;white-space:pre-wrap}
+.lw-beat{margin:44px 0 0}
+.lw-beat-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;color:var(--accent);letter-spacing:.08em}
+.lw-beat-name{color:var(--fg);font-size:1.12em;letter-spacing:.02em}
+.lw-kind{border-color:currentColor;border-radius:4px}
+.lw-beat-turn .lw-beat-title{padding-bottom:6px;border-bottom:2px solid var(--turn);color:var(--turn)}
+.lw-beat-turn .lw-kind{border-color:var(--turn);background:var(--turn);color:var(--bg);font-weight:600}
+.lw-turn-mark{margin-left:auto;font-size:.78em;font-weight:400;letter-spacing:.3em}
+.lw-goal{color:var(--muted);font-size:.86em}
+.lw-seg{margin:22px 0 0;padding:0 0 0 16px;border-left:3px solid var(--c,var(--line))}
+.lw-who{color:var(--c,var(--accent));font-weight:600}
+.lw-side{margin-left:.6em;color:var(--muted);font-size:.72em}
+.lw-stage{color:var(--muted);font-size:.82em;font-style:italic}
+.lw-action{color:var(--muted);font-family:var(--serif)}
+.lw-line{font-weight:500;white-space:pre-wrap}
+html[data-stage=off] .lw-stage,html[data-stage=off] .lw-goal{display:none}
+.lw-chapter[data-form=narrative] .lw-seg{padding-left:14px;border-left-width:2px}
+.lw-chapter[data-form=narrative] .lw-action{color:inherit}
+.lw-chapter[data-form=narrative] .lw-who{margin-right:.5em;font-size:.86em}
+.lw-teaser{margin:56px 0 0;padding:18px 20px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;background:var(--card)}
+.lw-teaser-label{color:var(--accent);font-size:.78em;font-weight:600;letter-spacing:.2em}
+.lw-teaser-text{margin:4px 0 0;font-family:var(--serif);font-size:1.08em}
+.lw-foot{margin:64px 0 0;padding:16px 0 0;border-top:1px solid var(--line);color:var(--muted);font-size:.78em}
+@media print{.lw-tools{display:none}body{max-width:none;padding:0}.lw-seg,.lw-teaser{break-inside:avoid}.lw-beat-title{break-after:avoid}.lw-chapter{break-before:page}.lw-chapter:first-of-type{break-before:auto}}
+/* ---- 互動版 ----
+   .lw-wait：逐段模式下還沒揭開的段落、幕、章、抉擇與結尾卡，以及當下不該出現的靜態區塊，由程式加上。只在螢幕上隱藏，列印時整篇都印得出來。
+   .lw-entry：開始之前的「你要以誰的視角入局」。每位人物的按鈕用他的顏色。
+   .lw-xray：真心話（每一段之後那位人物的情緒、立場、目標）。預設不顯示；那一段被打開（.lw-open：自己視角的，或花一次偷看的）才顯示。
+   .lw-peek：別人的真心話上的「偷看」按鈕，由程式加上；次數用完就按不動。
+   .lw-clue：線索詞。程式啟動後才是可以點的（role=button）：不顯眼的點狀底線；找到之後換成強調色。.lw-clue-note 是點了才出現的提示。
+   .lw-seen：同一個人的線索都找到時出現的「你看穿了他的底牌」。
+   .lw-choice：關鍵抉擇。.lw-choice-list／.lw-endings 是靜態的（沒有程式、全部顯示、列印）；.lw-choice-play 是程式做的按鈕與結局卡。
+   .lw-dim：人物篩選時其他人的段落。只變淡、不隱藏，上下文還看得到。
+   .lw-secrets／.lw-epilogues／.lw-endings：底牌、番外、另外兩個結局。原生的收合區塊，沒有程式也不會自己展開。
+   .lw-nav：逐段的按鈕列，貼在畫面下方（手機上拇指按得到）；按鈕高度至少 48px。 */
+[hidden]{display:none!important}
+@media screen{.lw-wait{display:none!important}}
+.lw-hint{margin:14px 0 0;color:var(--muted);font-size:.78em}
+.lw-tools button{min-height:40px}
+.lw-meta .lw-name[role=button]{border-bottom:1px dashed currentColor;cursor:pointer}
+.lw-meta .lw-name[role=button]:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.lw-meta .lw-name[aria-pressed=true]{padding:1px .6em;border:0;border-radius:999px;background:var(--c,var(--accent));color:var(--bg)}
+.lw-beat,.lw-chapter,.lw-choice,.lw-end{scroll-margin-top:16px}
+.lw-seg{transition:opacity .2s}
+.lw-seg.lw-dim{opacity:.3}
+.lw-new,.lw-ending-card,.lw-seen,.lw-clue-note,html[data-mode=step] .lw-choice{animation:lw-in .3s ease-out}
+@keyframes lw-in{from{opacity:0;transform:translateY(10px)}}
+.lw-entry{margin:20px 0 0;padding:16px 20px;border:1px solid var(--accent);border-radius:12px;background:var(--card)}
+.lw-entry-title{font-size:1.05em}
+.lw-entry-note{margin:4px 0 0;color:var(--muted);font-size:.78em}
+.lw-entry-options{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 0}
+.lw-entry button[data-c]{border-color:var(--c);color:var(--c);font-weight:600}
+.lw-entry button[aria-pressed=true]{border-color:var(--c,var(--accent));background:var(--c,var(--accent));color:var(--bg)}
+.lw-xray{display:none;flex-wrap:wrap;gap:0 16px;margin:10px 0 0;padding:6px 12px;border:1px dashed var(--c,var(--line));border-radius:10px;color:var(--muted);font-family:var(--sans);font-size:.78em;font-style:normal;font-weight:400}
+.lw-seg.lw-open .lw-xray{display:flex}
+.lw-xray-label{color:var(--c,var(--accent));font-weight:600;letter-spacing:.14em}
+.lw-xray-key{margin-right:.5em;color:var(--fg);font-weight:600}
+.lw-peek{display:block;min-height:40px;margin:10px 0 0;padding:4px 14px;border:1px dashed var(--c,var(--line));border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-family:var(--sans);font-size:.78em;font-style:normal;font-weight:400;cursor:pointer}
+.lw-peek[aria-disabled=true]{border-color:var(--line);opacity:.6;cursor:default}
+.lw-clue[role=button]{border-bottom:1px dotted var(--muted);cursor:pointer}
+.lw-clue[role=button]:hover{border-bottom-color:var(--accent)}
+.lw-clue[role=button]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.lw-clue.lw-found{border-bottom:2px solid var(--accent);color:var(--accent);cursor:default}
+.lw-clue-note{margin:10px 0 0;padding:6px 12px;border-left:3px solid var(--accent);border-radius:0 10px 10px 0;background:var(--card);color:var(--fg);font-family:var(--sans);font-size:.82em;font-style:normal;font-weight:400}
+.lw-seen{margin:10px 0 0;padding:12px 16px;border:1px solid var(--c,var(--accent));border-radius:12px;background:var(--card);font-style:normal}
+.lw-seen-title{color:var(--c,var(--accent));font-family:var(--sans);font-size:.82em;font-weight:600;letter-spacing:.06em}
+.lw-seen-text{margin:2px 0 0;color:var(--fg);font-family:var(--serif);font-weight:400;white-space:pre-wrap}
+.lw-choice{margin:44px 0 0;padding:18px 20px;border:2px solid var(--turn);border-radius:12px;background:var(--card)}
+.lw-choice:focus{outline:none}
+.lw-choice-kicker{color:var(--turn);font-size:.78em;font-weight:600;letter-spacing:.2em}
+.lw-choice-actor{margin:2px 0 0;color:var(--muted);font-size:.82em}
+.lw-choice-question{margin:6px 0 0;font-family:var(--serif);font-size:1.12em;font-weight:600}
+.lw-choice-list{margin:10px 0 0;padding:0 0 0 1.5em}
+.lw-choice-static{margin:8px 0 0;color:var(--muted);font-size:.78em}
+.lw-choice-options{display:flex;flex-direction:column;gap:10px;margin:14px 0 0}
+.lw-choice-lock{margin:10px 0 0;color:var(--turn);font-size:.82em;font-weight:600}
+.lw-choice-back{margin:12px 0 0}
+.lw-endings-seen{margin:10px 0 0;color:var(--muted);font-size:.78em}
+.lw-ending-card{margin:16px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.lw-ending{margin:12px 0 0;padding:0 0 0 14px;border-left:3px solid var(--accent)}
+.lw-ending[data-kind=bad]{border-left-color:var(--turn)}
+.lw-ending-card .lw-ending{margin:0}
+.lw-ending-kind{color:var(--accent);font-size:.78em;font-weight:600;letter-spacing:.2em}
+.lw-ending[data-kind=bad] .lw-ending-kind{color:var(--turn)}
+.lw-ending-pick{color:var(--muted);font-size:.82em}
+.lw-ending-text{margin:4px 0 0;font-family:var(--serif);white-space:pre-wrap}
+.lw-end{margin:56px 0 0}
+.lw-end>*+*{margin-top:20px}
+.lw-end .lw-teaser{margin-top:0}
+.lw-end .lw-end-kind+.lw-teaser{margin-top:12px}
+.lw-end-kind{width:max-content;max-width:100%;padding:2px 14px;border-radius:999px;background:var(--accent);color:var(--bg);font-size:.82em;font-weight:600;letter-spacing:.3em}
+.lw-secrets,.lw-pick,.lw-known,.lw-epilogues,.lw-endings{padding:14px 20px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.lw-endings{margin:12px 0 0;background:var(--bg)}
+.lw-secrets summary,.lw-epilogues summary,.lw-endings summary{padding:8px 0;color:var(--accent);font-weight:600;cursor:pointer}
+.lw-secrets summary:focus-visible,.lw-epilogues summary:focus-visible,.lw-endings summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.lw-secrets-note{color:var(--muted);font-size:.78em}
+.lw-secrets-chapter{margin:16px 0 0;color:var(--muted);font-size:.86em;letter-spacing:.08em}
+.lw-secret-list{margin:0;padding:0;list-style:none}
+.lw-secret{margin:12px 0 0;padding:0 0 0 14px;border-left:3px solid var(--c,var(--line))}
+.lw-secret .lw-name{display:block;font-size:.86em}
+.lw-secret-text{font-family:var(--serif);white-space:pre-wrap}
+.lw-known-title{color:var(--accent);font-size:.86em;font-weight:600}
+.lw-known-chapter{display:block;color:var(--muted);font-size:.72em}
+.lw-pick-title{font-size:1em}
+.lw-pick-options{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 0}
+.lw-pick-result{margin:10px 0 0;color:var(--accent);font-weight:600}
+.lw-pick-more{margin:14px 0 0}
+.lw-pick-more-title{color:var(--muted);font-size:.78em;letter-spacing:.2em}
+.lw-epilogue{margin:12px 0 0;padding:0 0 0 14px;border-left:3px solid var(--accent)}
+.lw-epilogue-chapter{color:var(--muted);font-size:.72em}
+.lw-epilogue-side{color:var(--accent);font-size:.82em;font-weight:600}
+.lw-epilogue-text{font-family:var(--serif);white-space:pre-wrap}
+.lw-ask{padding:14px 20px;border-left:4px solid var(--accent);font-family:var(--serif);font-size:1.08em}
+.lw-end-seen{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.lw-end-seen .lw-endings-seen{margin:0}
+.lw-nav{position:sticky;bottom:0;z-index:1;display:flex;align-items:center;gap:10px;margin:40px -20px 0;padding:12px 20px;border-top:1px solid var(--line);background:var(--bg)}
+.lw-nav-mid{flex:1;min-width:0;text-align:center}
+.lw-progress{color:var(--muted);font-size:.82em}
+.lw-status{color:var(--muted);font-size:.72em;line-height:1.5}
+.lw-nav button,.lw-pick button,.lw-again button,.lw-entry button,.lw-choice-play button,.lw-end-seen button{min-height:48px;padding:8px 22px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);font:inherit;font-size:.86em;cursor:pointer}
+.lw-nav .lw-go,.lw-pick button[aria-pressed=true],.lw-option[aria-pressed=true]{border-color:var(--accent);background:var(--accent);color:var(--bg);font-weight:600}
+.lw-choice-play .lw-option{border-radius:14px;text-align:left;line-height:1.6}
+.lw-option[aria-disabled=true]{opacity:.5;cursor:default}
+.lw-option[aria-pressed=true][aria-disabled=true]{opacity:1}
+.lw-option.lw-locked{border-style:dashed}
+.lw-nav [data-play=start]{flex:1}
+.lw-nav button[aria-disabled=true]{opacity:.45;cursor:default}
+.lw-nav button:focus-visible,.lw-pick button:focus-visible,.lw-again button:focus-visible,.lw-entry button:focus-visible,.lw-choice-play button:focus-visible,.lw-end-seen button:focus-visible,.lw-peek:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:480px){.lw-nav button{padding:8px 16px}.lw-choice{padding:16px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.lw-seg{transition:none}.lw-new,.lw-ending-card,.lw-seen,.lw-clue-note,html[data-mode=step] .lw-choice{animation:none}}
+@media print{.lw-nav,.lw-hint,.lw-entry,.lw-pick,.lw-again,.lw-peek,.lw-choice-play,.lw-end-kind,.lw-end-seen,.lw-known{display:none!important}.lw-seg.lw-dim{opacity:1}.lw-secret,.lw-choice,.lw-ending,.lw-epilogue{break-inside:avoid}.lw-clue{border:0!important;color:inherit!important}}

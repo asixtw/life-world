@@ -17,10 +17,13 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
+from . import interactive_layer  # 互動層：作品完成後多呼叫一次模型（匯入時登錄生成模組）
 from . import portrayal  # noqa: F401（匯入時把 F06A 的兩個生成模組登錄到共用端點）
 from . import person_profile_ai  # noqa: F401（第三階段：AI 產生人物設定）
 from . import roleplay
+from . import story_series  # 多章節作品：續寫、採納
 from . import theater  # noqa: F401（匯入時把人物劇場的演出模組登錄到共用端點）
+from . import turn_game  # 回合制互動作品：/api/games 的三條路由（匯入時登錄規劃與角色反應兩個生成模組）
 from .ai_config import AiSettings
 from .ai_providers import build_provider
 from .ai_text import ProviderFailure
@@ -84,19 +87,64 @@ def install(app, service, current, settings=None, provider=None, task_queue=None
         prepared = await run_in_threadpool(service.ai_prepare, user['id'], data, provider_now, settings)
         if 'replay' in prepared:
             return service.ai_replay(prepared['replay'])
-        started, result, failure, pending = time.monotonic(), None, None, None
+        started, result, failure, pending, http_status = time.monotonic(), None, None, None, None
         try:
             result, failure, pending = await call_provider(provider_now, prepared['request'], settings.timeout_seconds, executor)
         except ProviderFailure as exc:
-            failure, result = exc.code, exc.result
+            failure, result, http_status = exc.code, exc.result, exc.http_status
         except Exception as exc:
             logger.error('AI provider failed (%s)', type(exc).__name__)  # 只記錄例外類型，不記錄內容或金鑰
             failure = 'provider_error'
         latency = int((time.monotonic() - started) * 1000)
         try:
-            return await run_in_threadpool(service.ai_finish, user['id'], prepared, provider_now, result, failure, latency)
+            return await run_in_threadpool(service.ai_finish, user['id'], prepared, provider_now, result, failure, latency, http_status)
         finally:  # 逾時（HTTP 回 504）後 Gemini 才回來：失敗已寫入，晚到的用量另外補記與結算
             watch_late_usage(service, executor, user['id'], prepared, provider_now, pending)
+
+    @app.post('/api/works/{work_id}/interactive', status_code=201, tags=['Works'])
+    async def work_interactive(work_id: str, request: Request, data: interactive_layer.InteractiveRequest):
+        """替已完成的作品產生互動層（線索、關鍵抉擇、另外兩個結局、各陣營的番外、給讀者的提問）。
+
+        一次模型呼叫，流程與 /api/ai/generate 相同：預留（含每日金額上限）→ 交易外呼叫 Provider（總時限）→ 結算；
+        成功後替作品新增一個版本（201）。作品已經有互動層就直接回 200，不預留、不呼叫模型，也不需要 Provider。
+        模型失敗或輸出不合格時回對應的錯誤，作品不變；同一個 request_id 重送不會再呼叫模型（回同一個結果或同一個錯誤）。
+        回應只有「有沒有」與數量：線索、結局與番外的文字會劇透，只在匯出互動版時使用。
+        """
+        user = await run_in_threadpool(current, request, True)
+        owner = user['id']
+        existing = await run_in_threadpool(service.interactive_state, owner, work_id)  # 同時檢查：本人、生成作品、已完成
+        if existing is not None:
+            return JSONResponse({'interactive': existing}, status_code=200)
+        provider_now = provider_or_503()
+        prepared = await run_in_threadpool(service.interactive_reserve, owner, work_id, data.request_id, provider_now, settings)
+        if 'existing' in prepared:  # 兩個請求幾乎同時送出，另一個已經存好
+            return JSONResponse({'interactive': prepared['existing']}, status_code=200)
+        if 'unapplied' in prepared:
+            # 另一個請求剛結算完、還沒存進作品：直接存那一筆，不再呼叫模型、不再計費（2026-11-12 外部檢驗；存是冪等的）
+            generation_id = prepared['unapplied']
+        elif 'replay' in prepared:
+            # 這個提交代碼已經呼叫過模型：失敗或還在進行就回同一個錯誤；成功但還沒存進作品（上次中斷在兩步之間）就接著存
+            generation_id = service.ai_replay(prepared['replay'])['generation']['id']
+        else:
+            started, result, failure, pending, http_status = time.monotonic(), None, None, None, None
+            try:
+                result, failure, pending = await call_provider(provider_now, prepared['request'], settings.timeout_seconds, executor)
+            except ProviderFailure as exc:
+                failure, result, http_status = exc.code, exc.result, exc.http_status
+            except Exception as exc:
+                logger.error('AI provider failed (%s)', type(exc).__name__)  # 只記錄例外類型，不記錄內容或金鑰
+                failure = 'provider_error'
+            latency = int((time.monotonic() - started) * 1000)
+            try:  # 失敗時這裡拋出對應的錯誤：作品不變
+                finished = await run_in_threadpool(service.ai_finish, owner, prepared, provider_now, result, failure, latency, http_status)
+            finally:  # 逾時後模型才回來：失敗已寫入，晚到的用量另外補記與結算
+                watch_late_usage(service, executor, owner, prepared, provider_now, pending)
+            generation_id = finished['generation']['id']
+        summary, created = await run_in_threadpool(service.interactive_apply, owner, work_id, generation_id)
+        return JSONResponse({'interactive': summary}, status_code=201 if created else 200)
+
+    # 回合制互動作品（/api/games）：建立（規劃）、逐位生成同行者的反應、讀取進度；共用這裡的 Provider、設定與執行緒池
+    turn_game.install(app, service, current, settings, executor, provider_or_503)
 
     @app.get('/api/ai/generations/{generation_id}', tags=['AI'])
     def ai_generation(generation_id: str, request: Request):
@@ -122,6 +170,30 @@ def install(app, service, current, settings=None, provider=None, task_queue=None
         # 作品已建立（排隊中）；沿用同一個 request_id 重送即可再次排入（同名 Task 不會重複）。
         await enqueue(user['id'], result['id'], message='作品已建立，但排程暫時無法加入。請再按一次「開始生成」。')
         return result
+
+    @app.post('/api/series', status_code=201, tags=['Series'])
+    def series_open(request: Request, data: story_series.SeriesOpen):
+        """把一件已完成的作品開成多章節作品（它是第 1 章）；已經開過就回那一部。"""
+        return service.open_series(current(request, True)['id'], data)
+
+    @app.get('/api/series/{series_id}', tags=['Series'])
+    def series_detail(series_id: str, request: Request):
+        return service.series_detail(current(request)['id'], series_id)
+
+    @app.post('/api/series/{series_id}/episodes', status_code=201, tags=['Series'])
+    async def series_episode(series_id: str, request: Request, data: story_series.EpisodeStart):
+        """續寫下一章：建立草稿作品並排入第 0 段；之後和一般作品一樣逐段生成。"""
+        user = await run_in_threadpool(current, request, True)
+        provider_now = provider_or_503()
+        await require_environment()
+        result = await run_in_threadpool(service.start_series_episode, user['id'], series_id, data, provider_now.name)
+        await enqueue(user['id'], result['id'], message='這一章已建立，但排程暫時無法加入。請再按一次。')
+        return result
+
+    @app.post('/api/series/{series_id}/episodes/{work_id}/adopt', tags=['Series'])
+    def series_adopt(series_id: str, work_id: str, request: Request, data: story_series.EpisodeAdopt):
+        """採納一份草稿成為主線的下一章。"""
+        return service.adopt_series_episode(current(request, True)['id'], series_id, work_id, data)
 
     @app.get('/api/roleplay/styles', tags=['Roleplay'])
     def roleplay_styles(request: Request):

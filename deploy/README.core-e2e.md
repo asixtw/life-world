@@ -70,7 +70,7 @@ R4 只能以 `Submit-CoreE2EBuild.ps1` 上傳這個固定封裝與它內含的 C
 
 **共用 CA（W1）：** 沿用既有、已信任的本機 CA，不建立新的 Root，也不修改 8445 的 Caddy 設定。啟動前確認 CA 的四個檔案完整；設定驗證改用一次性的隔離儲存目錄；啟動後確認 root 與 intermediate 沒有改變，而且只多出 `lw-core-compare.localhost` 自己的 leaf 憑證。Windows 上兩個 Caddy 同時初始化的檔案鎖風險：**NOT VERIFIED**。
 
-## 作品檔案用的 Cloud Storage（2026-11-11 建立，尚未接上程式）
+## 作品檔案用的 Cloud Storage（2026-11-11 建立）
 
 使用者在 2026-11-11 核准新增一個 bucket 與它的讀寫權限，用途是存放作品的檔案（之後的圖片素材、匯出的 HTML／ZIP）。作品的結構與檔案清單仍然放在 Cloud SQL。
 
@@ -87,7 +87,7 @@ R4 只能以 `Submit-CoreE2EBuild.ps1` 上傳這個固定封裝與它內含的 C
 - 服務帳號可以新增和讀取物件，不能刪除也不能覆寫。寫入要用「不存在才建立」的條件，檔名用內容雜湊；同名物件再上傳會被拒絕。
 - `lw-api-runtime` 是 `lw-api-main` 所有 revision 共用的服務帳號，不只是 e2e 標籤。
 - 專案擁有者、編輯者、檢視者的預設繫結是 Cloud Storage 自動建立的，沒有另外調整。
-- 還沒做的：程式還沒有讀寫這個 bucket，部署腳本也還沒有把 bucket 名稱交給服務；服務帳號的權限還沒有實際用過。
+- 程式由環境變數 `LIFEWORLD_WORKS_BUCKET` 得到 bucket 名稱（`Deploy-8030-E2E.ps1` 會設定），而且必須等於 `app/environment.py` 白名單裡這個環境的 `works_bucket`；不一致時匯出不開放，`/api/capabilities` 的 `work_export_available` 是 false。物件路徑是 `works/{擁有者}/{作品}/{內容雜湊}.html`。
 - Alpha（`lw-public`，服務帳號 `lw-public-runtime`）沒有對應的 bucket，要用時另外核准、另外建立。
 
 ## 尚未完成（需要使用者逐項核准）

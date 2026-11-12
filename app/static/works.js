@@ -3,7 +3,8 @@
 window.WorksUI = (() => {
   let c;
   const PAGE = 20;
-  const KINDS = {character_card: '角色卡', self_persona: '我的人設', generated_work: '生成作品', roleplay_session: '自動演出',
+  // 種類的標籤。現在建立得出來的三種用「玩法」的說法（和建立頁第一步的選項一致）：看的故事、它的多章節版本、玩的遊戲；其他舊種類照原本的名稱
+  const KINDS = {character_card: '角色卡', self_persona: '我的人設', generated_work: '看的故事', story_series: '看的故事・多章節', turn_game: '玩的遊戲', roleplay_session: '自動演出',
     story_opening: '故事開場', story_session: '互動冒險', person_portrayal: '人物演繹', portrayal_session: '人物互動試演',
     theater_cast: '演出設定', theater_performance: '劇場演出'};
   const PERSONA_FIELDS = [ // [欄位, 標籤, 上限, 必填, 多行]
@@ -65,7 +66,7 @@ window.WorksUI = (() => {
 
   const TABS = [['active', '進行中'], ['completed', '已完成'], ['failed', '失敗／待恢復'], ['all', '全部作品'], ['versions', '版本歷史']];
   const PHASE_LABEL = {active: '進行中', completed: '已完成', failed: '失敗／待恢復'};
-  const PAGES = {generated_work: 'run', roleplay_session: 'run', story_opening: 'story', story_session: 'play', person_portrayal: 'portrayal',
+  const PAGES = {generated_work: 'run', story_series: 'series', turn_game: 'game', roleplay_session: 'run', story_opening: 'story', story_session: 'play', person_portrayal: 'portrayal',
     portrayal_session: 'portrayal-play', theater_cast: 'stage', theater_performance: 'performance'};
   const VERSIONED = ['story_opening', 'person_portrayal']; // 這兩種作品頁可以直接讀指定版本；其他作品的指定版本在作品詳情（版本與封存）讀
   const open = (kind, id, version) => version
@@ -99,7 +100,9 @@ window.WorksUI = (() => {
         ${offset + PAGE < result.total ? c.link(route({offset: String(offset + PAGE)}), '下一頁') : ''}</div>`;
       body = `${items ? `<div class="stack">${items}</div>` : c.empty(status === 'archived' ? '沒有已封存的作品。' : tab === 'all' ? '還沒有作品。按「＋ 建立新作品」開始。' : '這個分類目前沒有作品。')}${pager}`;
     }
-    return `${c.heading('作品', '生成是建立作品的過程，作品是生成後的成果；進行中的作品打開後可以繼續，失敗的可以恢復。', c.link('create', '＋ 建立新作品', 'primary'))}
+    // 只有一個建立入口：玩法（看的故事／玩的遊戲）到建立頁的第一步再選，不在這裡分成兩顆按鈕
+    return `${c.heading('作品', '生成是建立作品的過程，作品是生成後的成果；進行中的作品打開後可以繼續，失敗的可以恢復。',
+        c.link('create', '＋ 建立新作品', 'primary'))}
       <nav class="button-row works-tabs" aria-label="作品分類">${tabs}</nav>
       ${tab !== 'versions' ? `<div class="button-row works-filter">${kind ? `<span class="small muted">只看：${h(KINDS[kind] || kind)}</span>${c.link(route({kind: ''}).replace(/&?kind=[^&]*/, ''), '顯示全部種類', 'text-button')}` : ''}
         ${c.link(route({status: status === 'archived' ? 'active' : 'archived'}), status === 'archived' ? '查看使用中' : '查看已封存', 'text-button')}</div>` : ''}
@@ -127,7 +130,7 @@ window.WorksUI = (() => {
     const actions = [];
     if (work.kind === 'character_card') actions.push(c.link('character/' + encodeURIComponent(work.id), '在角色卡頁編輯', 'primary'));
     const PAGES = {story_opening: 'story', story_session: 'play', person_portrayal: 'portrayal', portrayal_session: 'portrayal-play',
-      theater_cast: 'stage', theater_performance: 'performance', generated_work: 'run', roleplay_session: 'run'};
+      theater_cast: 'stage', theater_performance: 'performance', generated_work: 'run', roleplay_session: 'run', turn_game: 'game'};
     if (PAGES[work.kind]) actions.push(c.link(PAGES[work.kind] + '/' + encodeURIComponent(work.id), '開啟', 'primary'));
     if (work.kind === 'self_persona') actions.push(c.link('persona?from=works', '在「我的設定」編輯', 'primary'));
     else actions.push(c.button('work-status', work.status === 'archived' ? '恢復' : '封存', 'secondary',

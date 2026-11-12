@@ -410,3 +410,47 @@ def test_settlement_records_cost_above_reservation(tmp_path, monkeypatch):
         ready(c, 'over_reservation')
         assert c.post('/api/ai/generate', json=DRAFT).status_code == 201
         assert sorted(r['reservation_microusd'] for r in ledger(c)) == [40, 60], '帳上是實際費用 100（預留 60＋補記 40）'
+
+
+# ---- 2026-11-12 外部檢驗：模組整理輸出時意外拋出的例外（不是 DomainError）也要讓生成紀錄離開 running ----
+def test_an_unexpected_error_in_a_module_parser_is_settled_as_invalid_output(tmp_path, monkeypatch, caplog):
+    """原本 ai_finish 只接 DomainError：模組的 parse 拋出其他例外時一路拋出，紀錄停在 running、帳本不結算，API 回 500。
+    現在當作 invalid_output（502）：紀錄是 failed／invalid_output，已知用量照常記帳與結算；日誌只記例外類型，不記內容。"""
+    import logging
+    from app.generation import GenerationModule
+    priced(monkeypatch)
+
+    def broken(self, text, input_data):
+        raise RuntimeError('〔不該出現在日誌的內容〕')
+
+    monkeypatch.setattr(GenerationModule, 'parse', broken)  # 角色卡模組沿用共用的 parse
+    app = make_client(tmp_path, LiveFakeWithUsage()).app
+    with caplog.at_level(logging.ERROR, logger='app.generation'), TestClient(app, raise_server_exceptions=False) as c:
+        ready(c, 'parse_crash')
+        first = c.post('/api/ai/generate', json=DRAFT)
+        assert (first.status_code, first.json()['error']['code']) == (502, 'invalid_output'), first.text
+        assert generations(c) == [{'status': 'failed', 'error_code': 'invalid_output', 'cost_status': 'known', 'cost_microusd': 100,
+                                   'input_tokens': 1000, 'output_tokens': 200}], '紀錄離開 running，用量照常記下'
+        rows = ledger(c)
+        assert sorted(r['reservation_microusd'] for r in rows) == [-900, 1000], '預留依實際用量結算'
+        again = c.post('/api/ai/generate', json=DRAFT)
+        assert (again.status_code, again.json()['error']['code']) == (502, 'invalid_output'), '同一 request_id 重送：回同一個錯誤'
+        assert ledger(c) == rows and len(generations(c)) == 1, '重送不重複預留、不重複結算'
+    assert 'RuntimeError' in caplog.text and '〔不該出現在日誌的內容〕' not in caplog.text, '日誌只記例外類型'
+
+
+def test_reading_back_a_character_card_draft_still_returns_its_output(client):
+    """GET /api/ai/generations/{id}：會劇透的模組（遊戲的規劃與反應、互動層、規劃的底牌）不回原稿（另見 test_turn_game、
+    test_interactive_layer）；其他模組照舊回 output，例如角色卡草稿。只限本人，別人一律 404。"""
+    ready(client, 'readback_owner')
+    draft = client.post('/api/ai/generate', json=DRAFT)
+    assert draft.status_code == 201, draft.text
+    shown = client.get(f"/api/ai/generations/{draft.json()['generation']['id']}")
+    assert shown.status_code == 200, shown.text
+    assert shown.json()['output'] == draft.json()['output'] and shown.json()['output']['name'] == '驗證失敗', '角色卡草稿的原稿照舊'
+    assert {key: shown.json()['input'][key] for key in DRAFT['input']} == DRAFT['input'], '輸入照舊（保存時含輸入模型的預設欄位）'
+    assert shown.json()['generation'] == draft.json()['generation']
+    other = TestClient(client.app)
+    ready(other, 'readback_other')
+    missing = other.get(f"/api/ai/generations/{draft.json()['generation']['id']}")
+    assert missing.status_code == 404 and missing.json()['error']['code'] == 'not_found', '別人的生成紀錄一律 404'

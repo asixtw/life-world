@@ -61,7 +61,9 @@ async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與�
   let response; // 保存待讀取的伺服器回應
   try { response = await fetch('/api' + path, {...options, headers, credentials:'same-origin', cache:'no-store'}); } // 以同來源 Cookie 送出請求，停用 API 快取
   catch { throw new Error('目前無法連線。請保留內容，連線恢復後再送出；尚未確認保存成功。'); } // 顯示失敗原因，讓使用者保留內容並重試
-  const body = response.status === 204 ? null : await response.json(); // 無內容回應不解析 JSON，其他回應讀取本文
+  let body; // 無內容回應不解析 JSON，其他回應讀取本文
+  try { body = response.status === 204 ? null : await response.json(); }
+  catch { throw new Error('伺服器暫時沒有回應，請稍後再試；尚未確認保存成功。'); } // 代理或伺服器偶爾回傳空白或不是 JSON 的內容：不把解析錯誤直接顯示給使用者
   if (!response.ok) {
     if(response.status===429){const seconds=Number(response.headers.get('Retry-After'));if(Number.isFinite(seconds)&&seconds>0&&body?.error)body.error.message+=` 約 ${Math.ceil(seconds/60)} 分鐘後再試。`;} // 依目前選項或狀態進入對應處理分支
     const error = new Error(body?.error?.message || '操作未完成，請重試。'); // 建立包含代碼、狀態與欄位資訊的錯誤
@@ -133,9 +135,9 @@ function goalCard(goal) { // 產生目標摘要卡與詳情入口
 function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').hidden=false; // 資料服務未開放也保留入口，明示降級而不是整個隱藏。
   $('.sidebar').classList.toggle('before-world',!state.me?.lumi_hatched); // 手機首次引導不顯示空白底部導覽。
-  const active = PersonsUI.enabled()&&/^persona([?]|$)/.test(route)?'persons':/^persons/.test(route)?'persons':/^(portrayal\/|portrayal-new|character|persona)/.test(route)?'characters':/^(create|runs|run\/|story-new|story\/|play\/|stage|performance\/|portrayal-play\/|works|work\/)/.test(route)?'works':/^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
+  const active = PersonsUI.enabled()&&/^persona([?]|$)/.test(route)?'persons':/^persons/.test(route)?'persons':/^(portrayal\/|portrayal-new|character|persona)/.test(route)?'characters':/^(create|runs|run\/|series\/|game-new|game\/|story-new|story\/|play\/|stage|performance\/|portrayal-play\/|works|work\/)/.test(route)?'works':/^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
   $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],...(PersonsUI.enabled()?[['persons','◎','人物']]:[]),...PersonsUI.legacyNav(),['works','▣','作品']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
-  $('#page-label').textContent = names[route] || (route.startsWith('persons')?'人物':route==='story-new'?'故事開場':route.startsWith('story/')?'故事開場':route.startsWith('play/')?'互動冒險':route==='stage'||route.startsWith('stage/')?'人物劇場':route.startsWith('performance/')?'多角色演出':route.startsWith('portrayal-new')?'從真人資料建立角色卡':route.startsWith('portrayal-play/')?'人物互動試演':route.startsWith('portrayal/')?'人物演繹':route.startsWith('create')?'建立新作品':route==='runs'?'我的生成作品':route.startsWith('run/')?'生成作品':route==='character-ai'?'AI 產生角色卡':route==='works'||route.startsWith('works?')?'作品':route.startsWith('work/')?'作品詳情':route==='persona'?'我的人設':route.startsWith('character-system/')?'系統角色':route.startsWith('character/')?'角色卡':route==='characters'?'角色卡':route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
+  $('#page-label').textContent = names[route] || (route.startsWith('persons')?'人物':route==='story-new'?'故事開場':route.startsWith('story/')?'故事開場':route.startsWith('play/')?'互動冒險':route==='stage'||route.startsWith('stage/')?'人物劇場':route.startsWith('performance/')?'多角色演出':route.startsWith('portrayal-new')?'從真人資料建立角色卡':route.startsWith('portrayal-play/')?'人物互動試演':route.startsWith('portrayal/')?'人物演繹':route.startsWith('create')?'建立新作品':route==='runs'?'我的生成作品':route.startsWith('series/')?'作品總覽':route.startsWith('game/')?'玩的遊戲':route.startsWith('run/')?'生成作品':route==='character-ai'?'AI 產生角色卡':route==='works'||route.startsWith('works?')?'作品':route.startsWith('work/')?'作品詳情':route==='persona'?'我的人設':route.startsWith('character-system/')?'系統角色':route.startsWith('character/')?'角色卡':route==='characters'?'角色卡':route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
   $('#account-button').textContent = state.me?.status==='guest' ? '訪客模式' : (state.me?.name?.slice(0,1) || '○'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function welcomeView() {
@@ -221,6 +223,8 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
     route = 'person/' + params.get('person') + '?tab=history'; history.replaceState(null, '', '#' + route); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
   } else if (route.split('?')[0] === 'notes') { // 依目前選項或狀態進入對應處理分支
     route = params.get('person') ? 'theater/' + params.get('person') : 'private-notes'; history.replaceState(null, '', '#' + route); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
+  } else if (route.split('?')[0] === 'game-new') { // 舊的「＋ 互動遊戲」入口：建立只留一個入口，就地換成建立頁並預選「玩的遊戲」
+    route = 'create?mode=game'; history.replaceState(null, '', '#' + route); // 舊連結不會壞；不多留一筆瀏覽紀錄，按上一頁不會被彈回來
   } // 結束目前回呼、區塊或模組定義
   if (!state.me) route = 'welcome'; // 依目前選項或狀態進入對應處理分支
   else if (!state.me.lumi_hatched && !['profile','goal-new'].includes(route)) route = state.me.bio ? 'goal-new' : 'profile'; // 依目前選項或狀態進入對應處理分支
@@ -273,6 +277,8 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   else if (path === 'create') html = await CreationUI.view(params); // 唯一的建立新作品流程（樹狀節點）
   else if (path === 'runs') html = await GenerationUI.runs();
   else if (path.startsWith('run/')) html = await GenerationUI.run(decodeURIComponent(path.split('/')[1]));
+  else if (path.startsWith('series/')) html = await SeriesUI.view(decodeURIComponent(path.split('/')[1])); // 多章節作品的作品總覽：章節、草稿、續寫
+  else if (path.startsWith('game/')) html = await GameUI.view(decodeURIComponent(path.split('/')[1])); // 玩的遊戲：準備進度；準備好之後在這裡玩或下載
   else if (path === 'character-ai') html = await GenerationUI.draftView();
   else if (path === 'works') html = await WorksUI.list(); // 作品管理（自 8445 移植）
   else if (path.startsWith('work/')) html = await WorksUI.detail(decodeURIComponent(path.split('/')[1]), params.get('v'));
@@ -494,12 +500,14 @@ document.addEventListener('click', async event => { // 監聽點擊
     if (await PersonsUI.handleClick(target)) return; // 新人物系統：封存與恢復
     if (await CharactersUI.handleClick(target)) return; // 角色卡複製、封存與恢復
     if (await WorksUI.handleClick(target)) return; // 同意、作品封存與恢復
+    if (await SeriesUI.handleClick(target)) return; // 多章節作品：開始續寫、採納、捨棄草稿
+    if (await GameUI.handleClick(target)) return; // 玩的遊戲：準備失敗時的「再試一次」（在這裡玩與下載由 GenerationUI 處理）
     if (await GenerationUI.handleClick(target)) return; // 保存 AI 草稿、恢復生成
     if (await StoriesUI.handleClick(target)) return; // 保存故事開場
     if (await PlayUI.handleClick(target)) return; // F05 開始冒險、保存回合、結束
     if (await PortrayalUI.handleClick(target)) return; // F06A 保存演繹、試演來回、結束
     if (await TheaterUI.handleClick(target)) return; // 人物劇場演出與保存
-    if (await CreationUI.handleClick(target)) return; // 建立新作品：修改節點、開始生成、保存
+    if (await CreationUI.handleClick(target)) return; // 建立新作品：選玩法、修改節點、開始生成（看的故事或玩的遊戲）
     if (action === 'guest') {await startGuest(); await refresh(); navigate('profile');} // 開始訪客旅程
     if (action === 'account') accountView(); // 開啟帳號設定
     if(action==='test-login-dialog')accountView('test-login');
@@ -575,6 +583,7 @@ document.addEventListener('submit', async event => { // 監聽表單提交
     if (await PersonsUI.submit(form)) return; // 新人物系統：搜尋、新增、編輯、人物設定
     if (await CharactersUI.submit(form)) return; // 角色卡改版
     if (await WorksUI.submit(form)) return; // 人設保存
+    if (await SeriesUI.submit(form)) return; // 多章節作品：續寫下一章
     if (await GenerationUI.submit(form)) return; // AI 草稿與生成精靈
     if (await StoriesUI.submit(form)) return; // F04 故事開場
     if (await PlayUI.submit(form)) return; // F05 送出行動
@@ -635,6 +644,8 @@ PersonsUI.initialize({state,api,esc,link,button,heading,empty,time,toast,request
 CharactersUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 角色卡模組共用主程式工具
 WorksUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 人設、同意與作品管理
 GenerationUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // AI 草稿與 T1／T2 生成
+SeriesUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 多章節作品的作品總覽
+GameUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // 玩的遊戲的查看頁（建立在 CreationUI）
 StoriesUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // F04 故事開場
 PlayUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // F05 短篇互動
 PortrayalUI.initialize({state,api,esc,link,button,heading,empty,time,toast,requestId,render,navigate}); // F06A 人物演繹

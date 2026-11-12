@@ -33,12 +33,13 @@ from . import media
 from .auth_rate_limit import AuthRateLimiter, AlphaDatabase, AlphaBodyLimit, protection_unavailable
 from . import deployment_profile  # M0：8030 整合版連 Cloud SQL E2E 的啟動驗證
 from . import relation_sources  # 010 關係來源模式
+from .work_export import VIEW_PATH as EXPORT_VIEW_PATH  # 站內直接看匯出作品的路由：唯一可以被同源頁面框住的回應
 
 logger = logging.getLogger(__name__)  # 準備只記錄錯誤類型與路徑的紀錄器
 
 
 def create_app(data_dir=None, policy=None, clock=None, database=None, settings=None, iap_verifier=None, google_verifier=None, generation_provider=None,
-               task_queue=None):  # PG factory 不執行 DDL
+               task_queue=None, work_storage=None):  # PG factory 不執行 DDL
     # M0：有部署設定檔時，在讀取任何設定物件、建立任何資料庫物件之前先核對；沒有設定檔時回傳 None，原有行為不變。
     profile = deployment_profile.preflight(os.environ, database=database, settings=settings)
     if profile is None and database is None and settings is None and data_dir is None:
@@ -186,7 +187,10 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
         response = await call_next(request)  # 保存「response」供後續驗證或回傳使用
         response.headers['X-Content-Type-Options'] = 'nosniff'  # 設定回應的安全或快取標頭
         response.headers['Referrer-Policy'] = 'same-origin'  # 設定回應的安全或快取標頭
-        response.headers['X-Frame-Options'] = 'DENY'  # 設定回應的安全或快取標頭
+        # 一律不准被框住；唯一的例外是「站內直接看匯出的作品」那一條路由成功的回應——本站的頁面要把它放進 iframe（同源才可以）。
+        # 那一條回應的 CSP 另外帶著 frame-ancestors 'self' 與 sandbox（見 app/work_export.py 的 view_csp）；失敗的回應照樣是 DENY。
+        embeddable = request.method == 'GET' and response.status_code == 200 and EXPORT_VIEW_PATH.fullmatch(request.url.path)
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN' if embeddable else 'DENY'  # 設定回應的安全或快取標頭
         if request.url.path.startswith('/api/'):  # 依目前條件選擇下一步處理分支
             response.headers['Cache-Control'] = 'no-store'  # 設定回應的安全或快取標頭
         if request.url.path.startswith('/static/') and 'cache-control' not in response.headers:
@@ -199,7 +203,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
             csp=response.headers['Content-Security-Policy']
             csp=csp.replace("script-src 'self'","script-src 'self' https://accounts.google.com/gsi/client").replace("style-src 'self'","style-src 'self' 'sha256-RU4sU0AaS8IBGZx8XrGt/pa9A5SLA3dQszGeqT5L3Kw=' https://accounts.google.com/gsi/style").replace("connect-src 'self'","connect-src 'self' https://accounts.google.com/gsi/")
-            response.headers['Content-Security-Policy']=csp+"; frame-src https://accounts.google.com/gsi/"
+            response.headers['Content-Security-Policy']=csp+"; frame-src 'self' https://accounts.google.com/gsi/"  # 'self'：站內直接玩互動作品用同源的 iframe（那條回應自己限制只能被同源框住）
             response.headers['Cross-Origin-Opener-Policy']='same-origin-allow-popups'
         return response  # 回傳檢查寫入來源並加入安全與快取標頭的結果
 
@@ -328,6 +332,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                 'relationship_memory_available':app.state.feature_store is not None,
                 'relation_sources':service.relation_source_store,  # 010 關係來源模式：legacy_jsonb 或 link_table（驗收用，非機密）
                 'unified_people':service.unified_people_available(),  # 新人物系統（/api/persons）需要 Schema 010
+                'work_export_available':app.state.work_storage is not None,  # 作品可以匯出成 HTML 下載（需要這個環境的物件儲存）
                 'google_login_available':bool(settings.google_client_id),'ai_available':app.state.ai_runtime.enabled,
                 'ai_status':'configured_not_verified' if app.state.ai_runtime.enabled else 'not_configured','writes_available':settings.alpha_writes_enabled if alpha else True,
                 'points':'accumulation_only','redemption_available':False}
@@ -438,6 +443,11 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     from .generation_routes import install as install_generation  # AI 草稿與 T1／T2 生成（自 8445 移植）
     install_generation(app, service, current, provider=generation_provider, task_queue=task_queue)
+    # 作品匯出成離線 HTML：檔案放在這個環境自己的 bucket；沒有設定（或設定與環境不符）時 work_storage 是 None，匯出不開放。
+    from .object_storage import build_storage
+    from .work_export import install as install_work_export
+    app.state.work_storage = work_storage if work_storage is not None else build_storage()
+    install_work_export(app, service, current)
 
     # ---- 角色卡（2026-11-10 自 8445 移植；資料沿用 works／work_versions） ----
     @app.get('/api/characters/system', tags=['Characters'])

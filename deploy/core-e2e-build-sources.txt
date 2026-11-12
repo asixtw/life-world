@@ -26,6 +26,12 @@ app/db.py
 app/deployment_profile.py
 app/environment.py
 app/errors.py
+app/export_player/play-2.css
+app/export_player/play-2.js
+app/export_player/reader-3.css
+app/export_player/reader-3.js
+app/export_player/route-1.css
+app/export_player/route-1.js
 app/external_auth.py
 app/gen_schemas.py
 app/generation.py
@@ -38,6 +44,7 @@ app/guest_fk_contract_010.json
 app/guest_lifecycle.py
 app/guest_maintenance.py
 app/iap.py
+app/interactive_layer.py
 app/main.py
 app/media.py
 app/migrations/001_initial.sql
@@ -50,6 +57,7 @@ app/migrations/007_generated_works.sql
 app/migrations/008_roleplay_core.sql
 app/migrations/009_relationship_memory.sql
 app/migrations/010_unified_schema.sql
+app/object_storage.py
 app/people.py
 app/person_experiences.py
 app/person_profile_ai.py
@@ -99,6 +107,7 @@ app/static/connections.css
 app/static/connections.js
 app/static/creation.js
 app/static/dashboard.js
+app/static/game.js
 app/static/generation.js
 app/static/goals.css
 app/static/goals.js
@@ -114,6 +123,7 @@ app/static/relationships.js
 app/static/schedule-bridge.js
 app/static/schedule-model.js
 app/static/schedule-view.js
+app/static/series.js
 app/static/stories.js
 app/static/styles.css
 app/static/theater.js
@@ -121,9 +131,13 @@ app/static/tokens.css
 app/static/works.js
 app/step_queue.py
 app/stories.py
+app/story_continuity.py
+app/story_series.py
 app/task_queue.py
 app/test_account.py
 app/theater.py
+app/turn_game.py
+app/work_export.py
 app/works_center.py
 deploy/Dockerfile.core-e2e
 deploy/cloudbuild.core-e2e.yaml

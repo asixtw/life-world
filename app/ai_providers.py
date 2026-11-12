@@ -47,6 +47,12 @@ class FakeProvider:
             return self._roleplay_plan(payload)
         if payload.get('module') == 'roleplay_segment':
             return self._roleplay_segment(payload)
+        if payload.get('module') == 'interactive_layer':
+            return self._interactive_layer(payload)
+        if payload.get('module') == 'game_plan':
+            return self._game_plan(payload)
+        if payload.get('module') == 'game_reaction':
+            return self._game_reaction(payload)
         data = payload.get('input', {})
         name = str(data.get('name', '')).strip() or '未命名角色'
         if '#fake-slow' in name:
@@ -134,6 +140,118 @@ class FakeProvider:
         if '#fake-bad-speaker' in scene and turn_no == 1:
             segment['speaker_id'] = 'someone-else'  # 發言歸屬錯誤，驗證伺服器拒絕並重新生成同一段
         return TextResult(text=json.dumps(segment, ensure_ascii=False), input_tokens=None, output_tokens=None, cost_microusd=None,
+                          provider_request_id=None, model_version=self.model)
+
+    def _interactive_layer(self, payload):
+        """互動層假回應：只依送來的故事組出確定性的結果，文字都標示測試用。
+
+        - 抉擇：做決定的人是抉擇點之前最後一位說話的人；三個選項（真結局、行得通但比較差、弄巧成拙各一），另外兩個各有一段結局。
+        - 線索：每一個底牌，從抉擇點（含）以前、那位人物自己的第一段取開頭的幾個字——一定是原文裡真的有的詞。
+        - 番外：每個陣營一則。提問：一句。
+        開場白含 #fake-layer-fail／#fake-layer-invalid 時模擬故障或格式錯誤（場景描述會被假規劃寫進開場白）。
+        """
+        premise = str(payload.get('story', {}).get('premise', ''))
+        if '#fake-layer-fail' in premise:
+            raise ProviderFailure('provider_error')
+        if self.delay_ms:
+            time.sleep(self.delay_ms / 1000)
+        after = payload.get('decision_after_beat')
+        segments = payload.get('segments') or []
+        before = [item for item in segments if after is None or (item.get('beat_no') is not None and item['beat_no'] <= after)]
+        ids = {str(member.get('name')): member.get('id') for member in payload.get('cast', [])}
+        decision = {'actor': '', 'question': '', 'options': []}  # 沒有抉擇點（只有一幕）：不給抉擇
+        if after is not None and before:
+            actor = str(before[-1].get('speaker'))
+            decision = {'actor': ids.get(actor, ''), 'question': FAKE_MARK + f'第 {after} 幕之後，{actor[:20]}該怎麼做？',
+                        'options': [{'label': FAKE_MARK + '照原本的打算', 'kind': 'true', 'ending': ''},
+                                    {'label': FAKE_MARK + '先退一步', 'kind': 'plain', 'ending': FAKE_MARK + f'{actor[:20]}先退一步，事情勉強過關，卻少了原本的收穫。'},
+                                    {'label': FAKE_MARK + '硬碰硬', 'kind': 'bad', 'ending': FAKE_MARK + f'{actor[:20]}硬碰硬，結果事與願違。'}]}
+        clues = []
+        for secret in payload.get('secrets') or []:
+            own = next((item for item in before if item.get('speaker') == secret.get('name') and (item.get('line') or item.get('action'))), None)
+            if own is None:
+                continue
+            field = 'line' if own.get('line') else 'action'
+            text = str(own[field])
+            phrase = (text[len(FAKE_MARK):] if text.startswith(FAKE_MARK) else text).strip()[:6].strip()  # 原文裡連續的一小段
+            if len(phrase) >= 2:
+                clues.append({'turn_no': own.get('turn_no'), 'field': field, 'phrase': phrase, 'hint': FAKE_MARK + '這裡有點不對勁？',
+                              'secret_of': secret.get('id')})
+        layer = {'decision': decision, 'clues': clues[:3],
+                 'epilogues': [{'side': side.get('name'), 'text': FAKE_MARK + f'{str(side.get("name"))[:20]}這一方在事情結束後私下碰面。'}
+                               for side in payload.get('sides') or []],
+                 'question': FAKE_MARK + '換作是你，會怎麼選？'}
+        text = '{"decision":' if '#fake-layer-invalid' in premise else json.dumps(layer, ensure_ascii=False)  # 截斷的 JSON：驗證伺服器拒絕
+        return TextResult(text=text, input_tokens=None, output_tokens=None, cost_microusd=None,
+                          provider_request_id=None, model_version=self.model)
+
+    # 回合制互動作品（行程）的假規劃：(名稱, 描述, x, y, 停留, 開門與打烊（相對於出發時間的分鐘數；None 是整天開放）, 標籤)。
+    # 位置分散、營業時間有早有晚、停留長短不同：時限內走得完三站以上，但走不完全部。
+    GAME_PLACES = (('早市', '天亮就開的市場，接近中午收攤。', 3, 6, 45, (-120, 180), ['吃', '市場']),
+                   ('半山茶屋', '半山腰的老屋，出發兩小時後才開門。', 7, 4, 45, (120, 540), ['休息']),
+                   ('舊鐵道步道', '沿著舊鐵道走的步道，沒有遮蔭。', 8, 8, 75, None, ['散步', '拍照']),
+                   ('玻璃工坊', '可以自己動手做的工坊，只開下午三個小時。', 2, 2, 90, (300, 480), ['手作']),
+                   ('岬角瞭望台', '路程不近的瞭望台，傍晚前關門。', 10, 5, 60, (60, 510), ['風景', '拍照']),
+                   ('老書店', '木地板會響的書店，接近中午才開。', 5, 8, 45, (180, 660), ['逛街', '書']))
+    GAME_DELTAS = (2, -1, 1, 0, -2, 1, 2, -1)  # 假的喜好：依「第幾位同行者、第幾站」取用，每個人有高有低、彼此不同
+
+    def _game_plan(self, payload):
+        """回合制互動作品的規劃假回應：固定六站（GAME_PLACES），營業時間跟著出發時間移動；文字都標示測試用。
+
+        使用者寫的說明會寫進開場白（之後角色反應的假回應看得到）。說明含 #fake-fail／#fake-plan-invalid 時模擬故障或格式錯誤。
+        """
+        request = payload.get('request', {})
+        description = str(request.get('description', ''))
+        if '#fake-fail' in description:
+            raise ProviderFailure('provider_error')
+        if self.delay_ms:
+            time.sleep(self.delay_ms / 1000)
+        hour, minute = (int(part) for part in str(request.get('start_time') or '08:00').split(':'))
+        start = hour * 60 + minute
+
+        def clock(offset):  # 相對於出發時間的分鐘數 → 'HH:MM'，夾在同一天之內
+            minutes = max(0, min(1440, start + offset))
+            return f'{minutes // 60:02d}:{minutes % 60:02d}'
+
+        places = [{'name': name, 'text': FAKE_MARK + text, 'x': x, 'y': y, 'stay': stay,
+                   'open': clock(hours[0]) if hours else '00:00', 'close': clock(hours[1]) if hours else '24:00', 'tags': tags}
+                  for name, text, x, y, stay, hours, tags in self.GAME_PLACES]
+        plan = {'title': FAKE_MARK + '一日行程', 'premise': FAKE_MARK + description[:100], 'meter_label': '滿意',
+                'home_text': FAKE_MARK + f'從{str(request.get("start_place", ""))[:20]}出發，時間到之前要回到這裡。',
+                'places': places,
+                'endings': {key: {'title': FAKE_MARK + title, 'text': FAKE_MARK + text} for key, title, text in (
+                    ('perfect', '完美', '每個人都盡興，回程的路上沒有人想說再見。'), ('great', '開心', '這一天過得很開心，大家約好下次再來。'),
+                    ('ok', '普通', '有人盡興，有人還好，回程的路上各自看著窗外。'), ('poor', '可惜', '氣氛不太對，回程的路上很安靜。'))}}
+        text = '{"title":' if '#fake-plan-invalid' in description else json.dumps(plan, ensure_ascii=False)  # 截斷的 JSON：驗證伺服器拒絕
+        return TextResult(text=text, input_tokens=None, output_tokens=None, cost_microusd=None,
+                          provider_request_id=None, model_version=self.model)
+
+    def _game_reaction(self, payload):
+        """回合制互動作品的角色反應假回應：每一站一個喜好（GAME_DELTAS）與三種態度下的反應，另有願望與最後一句話；文字都標示測試用。
+
+        只用送來的名稱組句，不引用人物設定的內容。開場白含 #fake-reaction-fail／#fake-reaction-invalid 時模擬故障或格式錯誤
+        （使用者寫的說明會被假規劃寫進開場白）。
+        """
+        premise = str(payload.get('game', {}).get('premise', ''))
+        if '#fake-reaction-fail' in premise:
+            raise ProviderFailure('provider_error')
+        if self.delay_ms:
+            time.sleep(self.delay_ms / 1000)
+        you = payload.get('you', {})
+        name = str((you.get('persona') or {}).get('name') or you.get('id'))[:10]
+        digits = re.sub(r'\D', '', str(you.get('id')))
+        shift = (int(digits) - 1) * 3 if digits else 0  # 每位同行者從不同的位置開始取用，喜好才會不一樣
+        places = []
+        for index, place in enumerate(payload.get('places') or []):
+            spot = str(place.get('name'))[:8]
+            places.append({'id': place.get('id'), 'delta': self.GAME_DELTAS[(index + shift) % len(self.GAME_DELTAS)],
+                           'low': FAKE_MARK + f'{name}在{spot}不太說話。', 'mid': FAKE_MARK + f'{name}在{spot}四處看看。',
+                           'high': FAKE_MARK + f'{name}在{spot}主動帶路。'})
+        reaction = {'places': places, 'wish': FAKE_MARK + f'{name}想找個地方坐下來。',
+                    'farewell': {'low': FAKE_MARK + f'{name}：「我先走了。」', 'mid': FAKE_MARK + f'{name}：「今天謝謝你。」',
+                                 'high': FAKE_MARK + f'{name}：「下次再一起來！」'}}
+        text = '{"places":' if '#fake-reaction-invalid' in premise else json.dumps(reaction, ensure_ascii=False)  # 截斷的 JSON
+        return TextResult(text=text, input_tokens=None, output_tokens=None, cost_microusd=None,
                           provider_request_id=None, model_version=self.model)
 
     def _story(self, payload):

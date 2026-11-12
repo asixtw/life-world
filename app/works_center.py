@@ -1,6 +1,7 @@
 """作品管理（2026-11-10 自 8445 的 app/works.py 移植）：列表（種類、狀態、分頁）、詳情、版本讀取、封存與恢復。
 
-- 讀取 8445 已存的所有種類（角色卡、人設、生成作品、互動紀錄等），內容原樣回傳，不轉換。
+- 讀取 8445 已存的所有種類（角色卡、人設、生成作品、互動紀錄等），內容原樣回傳，不轉換；
+  只有回合制互動作品與生成作品依種類拿掉劇透與內部參照（public_content，2026-11-12 起）。資料庫裡的內容不變。
 - 改版由各功能自己的 API 負責（角色卡、人設），這裡不提供通用改版，避免繞過各自的規則。
 - 「我的人設」不能在這裡封存：一人一份使用中的人設，由人設頁管理。
 """
@@ -15,7 +16,9 @@ from .schemas import Model
 STATUS_LOCKED_KINDS = ('self_persona',)
 # 作品中心只列「生成後的成果」；角色卡與我的人設是人物來源，在「角色」管理（2026-11-10 作品中心合併）
 # 不列入：角色卡、我的人設、演出設定（theater_cast）、人物演繹工具（person_portrayal，在「角色」建立為角色卡）
-CREATION_KINDS = ('generated_work', 'roleplay_session', 'story_opening', 'story_session', 'portrayal_session', 'theater_performance')
+CREATION_KINDS = ('generated_work', 'roleplay_session', 'story_opening', 'story_session', 'portrayal_session', 'theater_performance',
+                  'story_series',  # 多章節作品：一部持續續寫的作品，它的每一章是各自的生成作品
+                  'turn_game')  # 回合制互動作品：規劃一次、每位同行者各生成一次，全部完成才能玩（app/turn_game.py）
 PHASES = ('active', 'completed', 'failed')
 RUN_PHASES = {'queued': 'active', 'running': 'active', 'completed': 'completed', 'failed': 'failed'}
 
@@ -26,8 +29,10 @@ def work_phase(kind, content):
         return RUN_PHASES.get((content.get('run') or {}).get('status'), 'active')
     if kind in ('story_session', 'portrayal_session'):
         return 'completed' if content.get('status') == 'ended' else 'active'
-    if kind == 'theater_cast':
-        return 'active'  # 演出設定：可以繼續演出
+    if kind in ('theater_cast', 'story_series'):
+        return 'active'  # 演出設定可以繼續演出；多章節作品可以繼續續寫
+    if kind == 'turn_game':  # 還有同行者的反應沒生成（building）算進行中；ready 才算已完成（可以玩與匯出）
+        return 'completed' if (content.get('build') or {}).get('status') == 'ready' else 'active'
     return 'completed'
 
 
@@ -54,7 +59,48 @@ def work_summary(kind, content, saved=0):
         progress = {'done': len(content.get('turns') or []), 'total': 6}
     elif kind in ('theater_cast', 'theater_performance'):
         people = [member.get('name') for member in content.get('cast') or []]
+    elif kind == 'story_series':  # 進度是已定稿的章數；沒有預定的總章數
+        people = [member.get('name') for member in content.get('cast') or []]
+        progress = {'done': len(content.get('episodes') or []), 'total': None}
+    elif kind == 'turn_game':  # 人物是同行者；進度是生成的步數（規劃一步＋每位同行者一步）
+        people = [member.get('name') for member in content.get('cast') or []]
+        build = content.get('build') or {}
+        done = len(build.get('done') or [])
+        progress = {'done': done, 'total': done + len(build.get('pending') or [])}
     return [name for name in people if name], progress
+
+
+def public_content(kind, content):
+    """通用作品路由（作品詳情、版本詳情、封存／恢復的回應）回給本人的內容：依作品種類拿掉會劇透的內容與內部參照。
+
+    2026-11-12 外部檢驗發現：這幾條路由原本回整份內容，本人在作品頁就讀得到底牌、互動層、遊戲的反應與結局，以及人物設定的參照。
+    - turn_game：只回和 GET /api/games/{id} 同等級的公開欄位（turn_game.game_public）。
+    - generated_work：規劃拿掉只給單一人物的底牌（plan.private_notes），內容拿掉互動層（interactive：抉擇、線索、結局與番外）；
+      其他欄位原樣，包括 meta（多章節作品的 meta.continuity、meta.series 由畫面與雲端驗收讀取）。8445 的舊內容沒有這兩個欄位就原樣。
+    - roleplay_session（8445 的舊種類）：和 generated_work 相同。2026-11-12 第二次外部檢驗發現：舊作品經相容路由恢復生成後，
+      規劃同樣會帶著底牌。
+    - 其他種類原樣回傳。
+    已經投影過的內容再投影一次結果相同（封存回執裡保存的就是投影後的內容）。
+    只改回應，不改資料庫：生成、匯出（app/work_export.py）與各功能自己的路由仍讀完整內容。
+    """
+    if kind == 'turn_game':
+        from .turn_game import game_public  # 在函式裡匯入（和 work_summary 相同）：這個模組載入時不依賴各種作品的生成模組
+        return game_public(content)
+    if kind in ('generated_work', 'roleplay_session') and isinstance(content, dict):
+        from .roleplay import public_plan
+        shown = {key: value for key, value in content.items() if key != 'interactive'}
+        if isinstance(shown.get('plan'), dict):
+            shown['plan'] = public_plan(shown['plan'])
+        return shown
+    return content
+
+
+def public_detail(detail):
+    """作品詳情（含 version.content）依種類投影；其他欄位（狀態、版本號、revision、時間）原樣。用在讀回保存過的回執。"""
+    version = detail.get('version') if isinstance(detail, dict) else None
+    if isinstance(version, dict) and 'content' in version:
+        return {**detail, 'version': {**version, 'content': public_content(detail.get('kind'), version['content'])}}
+    return detail
 
 
 class WorkStatus(Model):  # 封存或恢復；不刪除任何版本
@@ -74,6 +120,7 @@ class WorksMixin:
 
     @staticmethod
     def _work_version(c, owner, work_id, version_no):
+        """一個版本的完整內容（不投影）：給服務內部使用；要回給前端時先經過 public_content。"""
         row = c.execute('SELECT * FROM work_versions WHERE work_id=? AND owner_id=? AND version_no=?', (work_id, owner, version_no)).fetchone()
         require(row is not None, 404, 'not_found', '找不到指定的作品版本。')
         return {'work_id': row['work_id'], 'version_no': row['version_no'], 'parent_version': row['parent_version'], 'origin': row['origin'],
@@ -81,9 +128,11 @@ class WorksMixin:
                 'created_at': row['created_at']}
 
     def _work_detail(self, c, owner, work_id):
+        """作品詳情（回給前端）：目前版本的內容依種類投影（public_content）。各功能建立或改版後的回應也用這一份。"""
         work = dict(self._work_row(c, owner, work_id))
         work.pop('owner_id')
-        work['version'] = self._work_version(c, owner, work_id, work['current_version'])
+        version = self._work_version(c, owner, work_id, work['current_version'])
+        work['version'] = {**version, 'content': public_content(work['kind'], version['content'])}
         work['versions'] = [dict(row) for row in c.execute(
             'SELECT version_no,parent_version,origin,content_schema,generation_id,created_at FROM work_versions '
             'WHERE work_id=? AND owner_id=? ORDER BY version_no DESC', (work_id, owner)).fetchall()]
@@ -109,19 +158,22 @@ class WorksMixin:
             return self._work_detail(c, owner, work_id)
 
     def work_version(self, owner, work_id, version_no):
+        """版本詳情（回給前端）：內容依種類投影，和作品詳情相同。"""
         with self.db.connect() as c:
             self._owned_user(c, owner)
-            self._work_row(c, owner, work_id)
-            return self._work_version(c, owner, work_id, version_no)
+            work = self._work_row(c, owner, work_id)
+            version = self._work_version(c, owner, work_id, version_no)
+            return {**version, 'content': public_content(work['kind'], version['content'])}
 
     def set_work_status(self, owner, work_id, data):
-        """封存或恢復；不刪除任何版本或原稿。"""
+        """封存或恢復；不刪除任何版本或原稿。回應（與保存的回執）是投影過的作品詳情，重送也不會讀到完整內容。"""
         operation = 'work:status:' + work_id  # 與 8445 相同的回執名稱
         with self.db.connect(write=True, owner=owner) as c:
             self._card_user(c, owner)
             cached, fingerprint = self._cached(c, owner, operation, data.request_id, data.model_dump(mode='json'))
             if cached:
-                return cached
+                # 2026-11-12 第二次外部檢驗發現：修正之前保存的回執裡是完整內容；讀出時也套用公開規則（新回執本來就是投影過的，結果相同）
+                return public_detail(cached)
             work = self._work_row(c, owner, work_id)
             require(work['kind'] not in STATUS_LOCKED_KINDS, 409, 'status_not_supported', '「我的人設」由人設頁管理，不能在這裡封存。')
             self._revision(work, data.expected_revision)
