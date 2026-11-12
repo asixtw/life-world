@@ -390,7 +390,9 @@ class Publisher:
             return
         # 先取得身分權杖，缺權限時在建立候選或修改服務前即停止。
         initial = self.get()
-        if initial.get('invokerIamDisabled'):
+        # web 在 2026-11-05 依免費網址教學改成公開存取，Jerry 2026-11-12 確認保留，所以 web 公開不阻擋發布；
+        # API 連 alpha 資料庫，仍必須驗證才能呼叫，被改成公開就停止。
+        if initial.get('invokerIamDisabled') and self.component != 'web':
             raise ReleaseError('Authenticated invocation must remain enabled')
         self.cloud.gcloud('auth', 'print-identity-token', '--audiences=' + initial['uri'], '--quiet')
         published = False

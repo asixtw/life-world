@@ -353,6 +353,22 @@ class ReleaseExecution(unittest.TestCase):
         self.execute(publisher)
         self.assertFalse(any(x[:2] == ('run', 'deploy') for x in publisher.cloud.commands))
 
+    def test_public_web_service_is_still_released(self):
+        """2026-11-05 web 依免費網址教學改成公開存取（Jerry 2026-11-12 確認保留）；web 公開不阻擋發布。"""
+        publisher = FakePublisher()
+        publisher.state['invokerIamDisabled'] = True
+        self.execute(publisher)
+        self.assertEqual(positive(release.snapshot_traffic(publisher.state)), [(publisher.revision, 100)])
+
+    def test_public_api_service_is_refused_before_any_deploy(self):
+        """API 仍必須驗證才能呼叫；被改成公開時不部署、不切流量。"""
+        publisher = FakePublisher(component='api')
+        publisher.state['invokerIamDisabled'] = True
+        with self.assertRaisesRegex(release.ReleaseError, 'Authenticated invocation must remain enabled'):
+            self.execute(publisher)
+        self.assertFalse(any(x[:2] == ('run', 'deploy') for x in publisher.cloud.commands))
+        self.assertEqual(positive(release.snapshot_traffic(publisher.state)), [('old', 100)])
+
     def test_api_release_promotes_an_alpha_candidate_even_when_the_template_is_e2e(self):
         publisher = FakePublisher(component='api')
         set_env(publisher.state['template'], 'LIFEWORLD_DB_NAME', 'life_world_e2e')  # 本機 e2e 部署留下的範本

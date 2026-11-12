@@ -83,6 +83,8 @@ lw-web-main是新的指定服務目標，Cloud Run不會因此把既有lw-web-st
 
 YAML維持沒有allow-unauthenticated、no-invoker-iam-check或IAM policy命令，也沒有新增Invoker授權。Cloud Run預設執行Invoker IAM檢查，使用者後續在Console維持Require authentication，不授allUsers／allAuthenticatedUsers；既有服務的IAM不由本管線改寫。[官方私人／公開存取機制](https://docs.cloud.google.com/run/docs/authenticating/public)
 
+2026-11-12 更新：lw-web-main 在 2026-11-05 依免費網址教學改成公開存取（Console／gcloud 手動設定，YAML 仍不含公開參數），Jerry 確認保留。`release.py` 對 web 不再因公開存取而阻擋發布；API 仍必須驗證，公開就停止。
+
 使用者已提供以下完成狀態，本輪沿用，不冒充GCP實查：
 
 | 主體／資源 | 已完成前置（使用者提供） |

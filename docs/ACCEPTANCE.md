@@ -212,3 +212,7 @@ NOT RUN：Cloud Build、Cloud Run 部署、真實 alpha 的 011 與權限套用�
 ## 2026-11-12 · release.py 改為發布 alpha
 
 `deploy/tests/test_release.py`：30 OK（新增只接受 alpha、範本漂移不再阻擋、部署參數照正式設定、dev 正式設定在部署前拒絕、候選設定不一致不切流量；修改前 6 項錯誤）。`tests/test_api_build_config.py`＋`deploy/tests/test_web_main.py`：14 passed。唯讀預檢對真實服務：新版 `PREFLIGHT_OK`（main 的舊版 `RELEASE_BLOCKED`）；以真實正式 revision 乾跑部署參數，與手動部署 `lw-api-main-alpha-11122230` 的設定一致。NOT RUN：經 main 觸發的實際 Step 8。
+
+## 2026-11-12 · web 發布允許公開存取
+
+`deploy/tests/test_release.py`：32 OK（新增 web 公開仍可發布、API 公開在部署前拒絕；修改前 web 那一項錯誤）。`tests/test_api_build_config.py`＋`deploy/tests/test_web_main.py`：14 passed。唯讀預檢 api、web 都是 `PREFLIGHT_OK`。NOT RUN：經 main 觸發的 web 實際發布。

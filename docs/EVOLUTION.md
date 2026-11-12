@@ -258,3 +258,7 @@ Jerry 確認環境規則：本機連 Cloud SQL `life_world_e2e`，Cloud Run 連 
 ## 2026-11-12 · main 的 API 自動發布改為 alpha
 
 `deploy/release.py` 的正式設定改為 `life_world_alpha`／`lw_alpha_app`，拒絕 dev 與 e2e；候選改照正式 revision 的完整設定部署，不再沿用服務範本（本機 e2e 部署會把範本換成 e2e 設定，11-05 起因此一直被擋）。先前已手動把 `lw-api-main` 100% 流量切到 alpha 版本，之後 main 的推送由 Step 8 自動發布。
+
+## 2026-11-12 · web 自動發布允許公開存取
+
+合併 `2bcf3ff` 後 web 建置 `ad6c953a` 在發布步驟被擋：`lw-web-main` 在 11-05 依免費網址教學改成公開存取，而 `release.py` 要求必須驗證。web 程式在那之後沒有修改，線上已是最新版。Jerry 確認保留公開：`release.py` 對 web 不再阻擋，API 仍必須驗證。
