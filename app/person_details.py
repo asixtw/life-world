@@ -21,7 +21,7 @@ class PersonDetailsMixin:
             require(row['status']=='active',409,'person_archived','封存人物不可修改基本資料。')
         return row
 
-    def _details_source(self,c,owner,source,experience_id=None):
+    def _details_source(self,c,owner,pid,source,experience_id=None):
         """自行記錄不造經歷；raw必須是本Owner有效原文，確認交易可綁剛建立的經歷。"""
         sid=source.source_experience_id
         if source.source_kind=='raw' and experience_id:
@@ -30,7 +30,7 @@ class PersonDetailsMixin:
         if source.source_kind=='raw':
             require(sid is not None,422,'source_required','原文來源須指定正式經歷。')
         if sid:
-            row=self._source_experience(c,owner,sid)
+            row=self._source_experience(c,owner,sid,[pid],allow_confirmed_mentions=True)
             story=c.execute('SELECT available FROM experience_stories WHERE experience_id=? AND owner_id=?',(sid,owner)).fetchone()
             require(story is not None and bool(story['available']),409,'source_unavailable','來源已撤回，請重新核對。')
             if source.source_kind=='raw':
@@ -48,7 +48,7 @@ class PersonDetailsMixin:
         actual=current['revision'] if current else 0
         require(actual==expected_revision,409,'revision_conflict','生日已有新版，請重新載入。')
         now=self.now().isoformat();record={'person_id':pid,'owner_id':owner,**value.model_dump(),
-            **self._details_source(c,owner,source,experience_id),'confirmed_at':now,'revision':actual+1,'updated_at':now}
+            **self._details_source(c,owner,pid,source,experience_id),'confirmed_at':now,'revision':actual+1,'updated_at':now}
         if current:
             fields=(*BIRTH_FIELDS,*SOURCE_FIELDS,'confirmed_at','revision','updated_at')
             c.execute('UPDATE person_basic_details SET '+','.join(k+'=?' for k in fields)+' WHERE person_id=? AND owner_id=?',
@@ -78,7 +78,7 @@ class PersonDetailsMixin:
             # PATCH只帶部分欄位，須合併舊值後驗證；錯誤回422且不洩漏人物內容。
             require(False,422,'invalid_employment','任職至少填公司或職稱，且結束日期不得早於開始日期。')
         now=self.now().isoformat();record={'id':employment_id or uid(),'person_id':pid,'owner_id':owner,**validated,
-            **self._details_source(c,owner,source,experience_id),'confirmed_at':now,
+            **self._details_source(c,owner,pid,source,experience_id),'confirmed_at':now,
             'revision':(current['revision'] if current else 0)+1,'created_at':current['created_at'] if current else now,'updated_at':now}
         if current:
             fields=(*WORK_FIELDS,*SOURCE_FIELDS,'confirmed_at','revision','updated_at')
@@ -91,12 +91,25 @@ class PersonDetailsMixin:
         c.execute('INSERT INTO person_employment_history('+','.join(history)+') VALUES ('+','.join('?' for _ in history)+')',tuple(history.values()))
         return record
 
+    def _effective_detail_source(self,c,owner,value):
+        """只投影目前來源用途狀態，不修改原值、revision或append-only History。"""
+        if value is None:return None
+        value=dict(value);recorded=value['source_status'];available=recorded=='active'
+        sid=value.get('source_experience_id')
+        if sid:
+            story=c.execute('SELECT available FROM experience_stories WHERE experience_id=? AND owner_id=?',(sid,owner)).fetchone()
+            available=available and story is not None and bool(story['available'])
+        value['recorded_source_status']=recorded
+        value['source_available']=available
+        value['source_status']='active' if available else 'withdrawn'
+        return value
+
     def person_details(self,owner,pid):
         with self.db.connect() as c:
             self._details_person(c,owner,pid)
-            return {'person':self._person(c,owner,pid),'birthday':self._birthday_current(c,owner,pid),
+            return {'person':self._person(c,owner,pid),'birthday':self._effective_detail_source(c,owner,self._birthday_current(c,owner,pid)),
                 'birthday_history':[dict(r) for r in c.execute('SELECT * FROM person_basic_detail_history WHERE person_id=? AND owner_id=? ORDER BY revision',(pid,owner))],
-                'employments':[dict(r) for r in c.execute('SELECT * FROM person_employments WHERE person_id=? AND owner_id=? ORDER BY created_at,id',(pid,owner))],
+                'employments':[self._effective_detail_source(c,owner,r) for r in c.execute('SELECT * FROM person_employments WHERE person_id=? AND owner_id=? ORDER BY created_at,id',(pid,owner))],
                 'employment_history':[dict(r) for r in c.execute('SELECT * FROM person_employment_history WHERE person_id=? AND owner_id=? ORDER BY employment_id,revision',(pid,owner))]}
 
     def write_person_details(self,owner,pid,data,kind,employment_id=None):

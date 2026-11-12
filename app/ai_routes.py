@@ -113,16 +113,5 @@ def install(app):
     @app.post('/api/people/{person_id}/simulation',tags=['AI drafts'])
     def simulation(person_id:str,request:Request,data:SimulationInput):
         who=owner(request);app.state.ai_runtime.authorize(who)
-        overview=service.person_overview(who,person_id)
-        available={fact['id']:fact for group in overview['facts'].values() for fact in group if fact['status']=='confirmed' and fact['sources']}
-        require(all(f in available for f in data.fact_ids),422,'confirmed_sources_required','只可使用本人已確認且仍有來源的人物資訊。')
-        facts=[{'fact_id':f,'value':available[f]['value'],'source_experience_ids':[s['id'] for s in available[f]['sources']]} for f in dict.fromkeys(data.fact_ids)]
-        from .relationship_engine import build_context
-        source_ids=sorted({ref for fact in facts for ref in fact['source_experience_ids']})
-        # 來源摘要必須再次限定Owner，內部提示每次重算，撤回／刪除即不沿用。
-        with service.db.connect() as db:
-            records=[dict(row) for ref in source_ids for row in db.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(ref,who)).fetchall()]
-        context=build_context(facts,records,data.message,service.now().isoformat())
-        result=app.state.ai_runtime.generate(who,'simulation',{'person_id':person_id,'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message},request_id=data.request_id)
-        # 一般人物卡／對話UI不暴露內部雙端標籤；只回可解釋的來源與有限行為。
-        return {**result,'simulation':True,'behavior':context['behavior'],'behavior_source':'rules','source_experience_ids':source_ids,'uncertainty':'simulation_not_prediction','notice':result['notice']+' 私人模擬，不是對真人反應的預測；不寫入人物事實。'}
+        # 發布範圍未核准人物角色演出，必須在讀取來源及模型外呼之前後端封鎖。
+        require(False,422,'simulation_not_released','人物 AI 模擬尚未開放；私人筆記仍可使用。')
