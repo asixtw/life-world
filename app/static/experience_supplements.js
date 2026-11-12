@@ -6,7 +6,7 @@ window.PersonSupplementsUI=(()=>{
   const evidence={stated_by_person:'人物本人告知',observed_by_user:'我觀察到',documented_source:'文件記載'};
   const esc=x=>c.esc(x);
   function initialize(context){c=context;}
-  function current(){const f=c.getFlow();return f?.ownerId===c.state.me?.owner_id&&c.state.me.status==='registered'?f:null;}
+  function current(){const f=c.getFlow();return f&&c.state.me?.status==='registered'&&f.ownerId===c.state.me.owner_id?f:null;}
   function keyOf(x){return x.target.person_id?'existing:'+x.target.person_id:'pending:'+x.target.client_ref;}
   function field(key,label,input){return `<label class="field">${label}${input}</label>`;}
   function options(values,value){return '<option value="">請選擇</option>'+Object.entries(values).map(([k,v])=>`<option value="${k}" ${value===k?'selected':''}>${esc(v)}</option>`).join('');}

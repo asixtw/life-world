@@ -42,6 +42,8 @@ def test_moment_tabs_keep_text_media_and_time_feedback(page,width):
 
 
 def test_category_change_preserves_visible_unadded_input_and_can_add_next(page):
+    old=os.environ.get('LIFEWORLD_SUPPLEMENT_OLD_SCRIPT')
+    if old:page.route('**/static/experience_supplements.js',lambda route:route.fulfill(path=old,content_type='application/javascript'))  # 明示舊元件紅燈，不用於驗收。
     person=start(page);page.locator('#raw-text').fill('人物資訊由我核對。');set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
     page.get_by_role('button',name='選擇既有人物',exact=True).click();page.locator('[data-workflow-pick="'+person['id']+'"]').click();page.locator('[data-workflow-role]').select_option('interaction')
@@ -78,3 +80,11 @@ def test_manual_media_text_returns_to_text_tab_without_provider_call(page):
     expect(page.locator('#raw-text')).to_have_value('原文\n\n合成校對文字')
     assert requests==[]
     page.get_by_role('tab',name='拍照／影像',exact=True).click();expect(page.locator('.media-item')).to_have_count(1)
+
+
+def test_anonymous_login_form_does_not_enter_person_supplement_scope(page):
+    """真人入口不能靠API預置身分才沒有例外；此案例不送登入或新增資料。"""
+    errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto(BASE);page.get_by_role('button',name='登入我的世界',exact=True).click()
+    page.locator('#username').fill('synthetic_entry');page.locator('#password').fill('synthetic-entry-not-submitted')
+    assert errors==[]
