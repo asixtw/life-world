@@ -1,0 +1,18 @@
+{
+  "revision": "lw-public-intro-850e03c",
+  "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:2677d80daca3313651ddbdb1c12015dc0cc026d392a4a4a8f784da6d9cdff905",
+  "ready": true,
+  "effective_runtime_unchanged": true,
+  "template_annotations_unchanged": true,
+  "ingress_and_maxscale_unchanged": true,
+  "traffic_unchanged": true,
+  "traffic": [
+    {
+      "percent": 100,
+      "revisionName": "lw-public-pr26-icons-421e9b9",
+      "tag": "alpha-guest-review",
+      "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+    }
+  ],
+  "effective_spec_without_image_sha256": "79af7475504d17dd176baae61deace673d574b0ed9979e0be24b79cbce586842"
+}

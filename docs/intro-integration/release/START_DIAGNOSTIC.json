@@ -1,0 +1,34 @@
+[
+  {
+    "width": 320,
+    "before": {
+      "ready": "interactive",
+      "phase": "welcome",
+      "sceneParent": "",
+      "stepText": ""
+    },
+    "after": {
+      "ready": "interactive",
+      "phase": "welcome",
+      "sceneParent": "welcome-copy",
+      "stepText": ""
+    },
+    "errors": []
+  },
+  {
+    "width": 390,
+    "before": {
+      "ready": "interactive",
+      "phase": "welcome",
+      "sceneParent": "",
+      "stepText": ""
+    },
+    "after": {
+      "ready": "complete",
+      "phase": "story",
+      "sceneParent": "experience-copy",
+      "stepText": "輕觸第一下，留下一段經歷"
+    },
+    "errors": []
+  }
+]

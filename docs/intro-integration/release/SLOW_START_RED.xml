@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="16.279" timestamp="2026-11-13T04:10:16.874113+08:00" hostname="MacBook-Pro.local"><testcase classname="browser_tests.test_intro_entry" name="test_slow_script_load_does_not_accept_a_lost_first_click[320]" time="5.659"><failure message="AssertionError: Locator expected to be disabled&#10;Actual value: enabled &#10;Call log:&#10;  - Expect &quot;to_be_disabled&quot; with timeout 5000ms&#10;  - waiting for locator(&quot;#start&quot;)&#10;    14 × locator resolved to &lt;button id=&quot;start&quot; data-action=&quot;start&quot; class=&quot;lw-button lw-primary&quot;&gt;…&lt;/button&gt;&#10;       - unexpected value &quot;enabled&quot;">browser_tests/test_intro_entry.py:151: in test_slow_script_load_does_not_accept_a_lost_first_click
+    expect(page.locator('#start')).to_be_disabled()
+E   AssertionError: Locator expected to be disabled
+E   Actual value: enabled 
+E   Call log:
+E     - Expect "to_be_disabled" with timeout 5000ms
+E     - waiting for locator("#start")
+E       14 × locator resolved to &lt;button id="start" data-action="start" class="lw-button lw-primary"&gt;…&lt;/button&gt;
+E          - unexpected value "enabled"</failure></testcase><testcase classname="browser_tests.test_intro_entry" name="test_slow_script_load_does_not_accept_a_lost_first_click[390]" time="5.263"><failure message="AssertionError: Locator expected to be disabled&#10;Actual value: enabled &#10;Call log:&#10;  - Expect &quot;to_be_disabled&quot; with timeout 5000ms&#10;  - waiting for locator(&quot;#start&quot;)&#10;    14 × locator resolved to &lt;button id=&quot;start&quot; data-action=&quot;start&quot; class=&quot;lw-button lw-primary&quot;&gt;…&lt;/button&gt;&#10;       - unexpected value &quot;enabled&quot;">browser_tests/test_intro_entry.py:151: in test_slow_script_load_does_not_accept_a_lost_first_click
+    expect(page.locator('#start')).to_be_disabled()
+E   AssertionError: Locator expected to be disabled
+E   Actual value: enabled 
+E   Call log:
+E     - Expect "to_be_disabled" with timeout 5000ms
+E     - waiting for locator("#start")
+E       14 × locator resolved to &lt;button id="start" data-action="start" class="lw-button lw-primary"&gt;…&lt;/button&gt;
+E          - unexpected value "enabled"</failure></testcase><testcase classname="browser_tests.test_intro_entry" name="test_slow_script_load_does_not_accept_a_lost_first_click[1440]" time="5.303"><failure message="AssertionError: Locator expected to be disabled&#10;Actual value: enabled &#10;Call log:&#10;  - Expect &quot;to_be_disabled&quot; with timeout 5000ms&#10;  - waiting for locator(&quot;#start&quot;)&#10;    14 × locator resolved to &lt;button id=&quot;start&quot; data-action=&quot;start&quot; class=&quot;lw-button lw-primary&quot;&gt;…&lt;/button&gt;&#10;       - unexpected value &quot;enabled&quot;">browser_tests/test_intro_entry.py:151: in test_slow_script_load_does_not_accept_a_lost_first_click
+    expect(page.locator('#start')).to_be_disabled()
+E   AssertionError: Locator expected to be disabled
+E   Actual value: enabled 
+E   Call log:
+E     - Expect "to_be_disabled" with timeout 5000ms
+E     - waiting for locator("#start")
+E       14 × locator resolved to &lt;button id="start" data-action="start" class="lw-button lw-primary"&gt;…&lt;/button&gt;
+E          - unexpected value "enabled"</failure></testcase></testsuite></testsuites>

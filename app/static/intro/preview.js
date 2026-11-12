@@ -279,4 +279,7 @@
     } catch { /* 設定錯誤不影響獨立導覽。 */ }
   }
   render();
+  // 手機初始化會移動場景；完成排版及事件綁定後才開放，避免下載中的第一擊落空。
+  root.querySelectorAll('[data-intro-initial]').forEach(control=>{control.disabled=false;});
+  root.dataset.ready='true';root.setAttribute('aria-busy','false');
 })();

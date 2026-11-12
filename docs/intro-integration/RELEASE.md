@@ -28,3 +28,9 @@ Owner最新指示「ok 幫我做到部署」，本批提交、Push、Build、同
 ## 發布前驗收
 
 現役基底移植後：後端與發布白名單 **53 PASS／0 FAIL／0 SKIP**，瀏覽器及Guest／正式孵化 **18 PASS／0 FAIL／0 SKIP**，即將用於雲端的唯讀HTTP／瀏覽器檢查先在本機 **4 PASS／0 FAIL／0 SKIP**。收據：[後端](RELEASE_BACKEND_FINAL.xml)／[瀏覽器](RELEASE_BROWSER.xml)／[唯讀檢查](release/LIVE_TEST_LOCAL.xml)。初版02cab305上的驗收另留存，未用作421e9b95發布證明。
+
+## 候選發現與同批修正
+
+850e03c的Cloud Build與零流量Deploy皆成功，設定讀回完全符合預期；HTTP／全部素材逐byte校驗亦通過。隨後應用程式瀏覽器驗收出現 **2 PASS／2 FAIL**，失敗限320／390手機首次開始：程式尚在下載、畫面先呈現可點按鈕，場景初始化重排時第一次操作落空。此時未切正式流量，僅review tag在候選。
+
+[原始失敗XML](release/CANDIDATE_LIVE.xml)／[載入診斷](release/START_DIAGNOSTIC.json)保留；沒有把它當成通過。新增三尺寸「阻擋preview.js下載」測試，先 **3 FAIL**，修正為初始化後才啟用開始／跳過／聲音控制，再 **3 PASS**。本次必要修正仍限已授權介紹功能，未改正式產品流程；修正後以新提交／新Build建立候選，不重送任何失敗的雲端寫入（先前雲端寫入均成功，無結果不明）。正式流量保留421e9b95，直到修正後候選完整通過。

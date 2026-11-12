@@ -139,3 +139,22 @@ def test_keyboard_and_200_percent_text_remain_usable(page):
     page.locator('#welcome-copy [data-action=skip]').focus();page.keyboard.press('Enter')
     page.locator('#product-entry').focus();page.keyboard.press('Enter')
     expect(page.locator('[data-action=guest]')).to_be_visible()
+
+
+@pytest.mark.parametrize('width',[320,390,1440])
+def test_slow_script_load_does_not_accept_a_lost_first_click(page,width):
+    """延後主程式，模擬手機首次下載；準備好之前不可接受會落空的操作。"""
+    page.set_viewport_size({'width':width,'height':1000});held=[]
+    page.route('**/intro/preview.js',lambda route:held.append(route))
+    with page.expect_request('**/intro/preview.js'):
+        page.goto(URL+'/intro',wait_until='commit')
+    expect(page.locator('#start')).to_be_disabled()
+    expect(page.locator('#welcome-copy [data-action=skip]')).to_be_disabled()
+    expect(page.locator('#music-toggle')).to_be_disabled()
+    assert len(held)==1
+    held[0].continue_()
+    expect(page.locator('#start')).to_be_enabled()
+    expect(page.locator('.lw-preview')).to_have_attribute('data-ready','true')
+    page.locator('#start').click()
+    expect(page.locator('.lw-preview')).to_have_attribute('data-phase','story')
+    expect(page.locator('#advance')).to_be_visible()

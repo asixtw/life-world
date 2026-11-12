@@ -3,7 +3,7 @@
   "source": "LifeWorld_Design_Language_v1/collaboration/onboarding-preview",
   "product_base": "421e9b95c21a4abd1059f3c235545649e12ca830",
   "status": "reviewed_release_payload",
-  "source_index_sha256": "ede446cfb754dba8df3953bc6a8fc494c5d850bced42545319559fec1fb57321",
+  "source_index_sha256": "598e9be8cb45fe407a59a8c4fc021d8fd8435e79305ac75e674d73ca13bae8ed",
   "copied": [
     {
       "path": "assets/art/v1/egg-deep-512.png",
@@ -115,16 +115,16 @@
     },
     {
       "path": "preview.js",
-      "source_sha256": "0c9ed73465d1c4fcc3bf603810ce1c3055f4c06bcdd52148567d94e4e0b863f0",
-      "sha256": "16b1f800fcf1361f96fb224680a3fba1dcc0f48db9be56bc153e2bee847e4e8a",
-      "bytes": 15581
+      "source_sha256": "63b1075b464a4ca19ac76d2de2e36ef06863159e16284dafd986e07cceb79001",
+      "sha256": "c1ad8228aef9c14524dd65908946977cb02314dfe74633c08d61e3c9d3ccd0bd",
+      "bytes": 15859
     }
   ],
   "generated": [
     {
       "path": "index.html",
-      "sha256": "428cd0aa7faebd646d80b3e3a484c10d7b58dc4ddf0b08eac21ca25f83780f11",
-      "bytes": 11747
+      "sha256": "f34eeca0185b114490a7b9b86dda843dbc56749359a1c998d598fc4b8e55ebfe",
+      "bytes": 11876
     },
     {
       "path": "config.js",

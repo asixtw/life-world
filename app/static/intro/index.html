@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="/static/intro/integration.css">
 </head>
 <body style="margin:0">
-<div class="lw-preview" data-phase="welcome" data-stage="0" data-busy="false">
+<div class="lw-preview" data-phase="welcome" data-stage="0" data-busy="false" aria-busy="true">
   <header class="lw-header">
     <a class="lw-brand" href="#" aria-label="Life World 首頁" data-action="restart">
       <svg viewBox="0 0 36 40" aria-hidden="true"><path d="M18 12C7 12 5 22 6 29c1 11 23 11 24 0 1-7-2-17-12-17Z" fill="currentColor" opacity=".18"/><path d="M18 16C7 15 8 5 9 4c9-1 11 7 9 12Zm1 0C19 5 29 3 31 4c0 9-6 13-12 12Z" fill="currentColor"/></svg>
@@ -31,8 +31,8 @@
         <summary aria-label="開啟聲音設定"><span aria-hidden="true">♫</span><span>聲音</span><span class="lw-audio-dot" aria-hidden="true"></span></summary>
         <div class="lw-audio-panel">
           <p>依你的喜好，讓世界有聲音。</p>
-          <label>背景音樂<input id="music-toggle" type="checkbox" role="switch"></label>
-          <label>互動音效<input id="sfx-toggle" type="checkbox" role="switch"></label>
+          <label>背景音樂<input id="music-toggle" data-intro-initial disabled type="checkbox" role="switch"></label>
+          <label>互動音效<input id="sfx-toggle" data-intro-initial disabled type="checkbox" role="switch"></label>
           <small>預設靜音；兩個開關各自獨立。</small>
         </div>
       </details>
@@ -48,8 +48,8 @@
           <h1 id="welcome-title">把真實的努力，<br>與重要的人，<br><em>留在自己的世界。</em></h1>
           <p class="lw-intro">記下經歷，讓 AI 幫你整理，最後由你決定留下什麼。<br class="lw-desktop-break">讓成長有跡可循，也讓人與人的連結被記得。</p>
           <div class="lw-welcome-actions">
-            <button class="lw-button lw-primary" id="start" data-action="start">敲開故事，認識 Life World <span aria-hidden="true">↗</span></button>
-            <button class="lw-link" data-action="skip">直接看重點 <span aria-hidden="true">→</span></button>
+            <button class="lw-button lw-primary" id="start" data-action="start" data-intro-initial disabled>敲開故事，認識 Life World <span aria-hidden="true">↗</span></button>
+            <button class="lw-link" data-action="skip" data-intro-initial disabled>直接看重點 <span aria-hidden="true">→</span></button>
           </div>
           <p class="lw-micro">照自己的步調體驗・不用註冊，不需輸入資料</p>
         </div>
