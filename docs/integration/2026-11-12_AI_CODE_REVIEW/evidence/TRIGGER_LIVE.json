@@ -1,0 +1,29 @@
+{
+  "approvalConfig": {
+    "approvalRequired": true
+  },
+  "filename": "deploy/cloudbuild.api.yaml",
+  "id": "6ffa2066-8edd-4406-9f3f-31f967da57dc",
+  "includedFiles": [
+    "app/**",
+    "tests/**",
+    "scripts/**",
+    "deploy/Dockerfile.api",
+    "deploy/cloudbuild.api.yaml",
+    "deploy/postgres/**",
+    "deploy/tests/**",
+    "deploy/release.py",
+    "requirements*",
+    "pyproject.toml",
+    ".dockerignore",
+    "docs/database/schema-2026-11-02/*.sql"
+  ],
+  "name": "lw-api-main",
+  "repositoryEventConfig": {
+    "push": {
+      "branch": "^main$"
+    },
+    "repository": "projects/life-world-513506/locations/asia-east1/connections/lw-github/repositories/asixtw-life-world",
+    "repositoryType": "GITHUB"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "base": "f3f4c9f5a9a0833d5966e427d9c9a33c85b45731",
+  "A": "fe1b68416844d01b75f420d6e072e2f1fa9361a8",
+  "B": "eae607c32980d2a2d31b9bdbde35eda34254b1c1",
+  "C": "commit containing SUBMISSION_RECORD.md",
+  "product_app_tree": "b100c9ad03860391b8094001b79ae654e12f8901",
+  "F5_strict_xfail_count": 2,
+  "F5_tables_created": false
+}

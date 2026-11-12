@@ -1,0 +1,15 @@
+{
+  "base_head": "f3f4c9f5a9a0833d5966e427d9c9a33c85b45731",
+  "committed": false,
+  "pushed": false,
+  "original_probes_sha256": "14cac59c0e684949fd66faf8397365d999d380f6c4afc83d4ca6e30e2ccce182",
+  "original_probes_unchanged": true,
+  "results": {
+    "original_probes": "4 PASS",
+    "related_api": "152 PASS / 15 SKIP / 1 XFAIL",
+    "node": "53 PASS",
+    "local_pg": "5 PASS",
+    "formal_fact_provenance": "NOT IMPLEMENTED; --runxfail fails with missing source_kind"
+  },
+  "no_formal_migration_grant_build_deploy": true
+}

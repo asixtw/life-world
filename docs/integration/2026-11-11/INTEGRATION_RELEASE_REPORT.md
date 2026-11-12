@@ -1,6 +1,6 @@
 # PR #26 Integration QA／Release Gate｜NO-GO
 
-**最新狀態以第12節Gate A核准紀錄為準。Owner已正式核准a2eb363的UX；B/C/D與Code Review不因此通過。較早未核准狀態保留為歷史。**
+**最新狀態：Gate A核准見第12節；安全修復歷程見第13節，Owner核准提交狀態見第14節。Owner已正式核准a2eb363的UX；B/C/D與Code Review不因此通過。較早未核准狀態保留為歷史。**
 
 2026-11-12。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準`6d4ba0a3ea3d895678ad733cde2c42f773154f4f`，精確交付Head/Tree見PR收據。遠端main唯讀核對仍`68102f230aa947a434286ba9260e1ae75f6634b0`。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret、Alpha匯入或切流。
 
@@ -225,3 +225,21 @@ Owner指定Boyi為獨立人工Reviewer，尚無Code Review結論；[Boyi審查�
 [Cloud SQL備份/隔離還原正式操作方案](../2026-11-12_RELEASE_GATE_REVIEW/CLOUD_SQL_BACKUP_RESTORE_PLAN.md)及Sequence唯讀補件已準備；列明既有兩庫/Marker/Owner、既有私有Bucket的新Export、同時點metadata、固定generation/hash、隔離PG18.6、資料/權限/Sequence驗證及失敗停止/回復方案。命令模板與SQL均NOT EXECUTED。
 
 **Gate A UX APPROVED；Gate B PARTIAL/BLOCKED；Gate C NOT RUN；Gate D NO-GO。** 本次核准不含Merge、Migration、GRANT、Build、Deploy或切流；沒有執行正式操作。本批僅文件與核准紀錄，產品tree不變。
+
+
+## 13. AI Review最小安全修復（2026-11-12，未提交）
+
+Owner另行授權F1–F5本機安全修復與隔離驗證，基準f3f4c9f；[當次差異、測試與提交計畫](../2026-11-12_SECURITY_FIX/README.md)。F1未核准模型模擬後端封鎖；F2人物來源綁定；F3媒體工作限額／逐段成本；F4唯讀有效性投影已修復並測試。原四探針4 PASS、相關API152 PASS/15 SKIP/1 XFAIL、Node53 PASS、本機受限PG5 PASS。測試集合重疊，不相加。
+
+F5只有[正式來源契約審查稿](../2026-11-12_SECURITY_FIX/FACT_PROVENANCE_CONTRACT.review.md)：草稿持久化PASS，正式fact source_kind/source_revision/quote仍未實作，strict XFAIL及強制執行的缺欄FAIL明確保留。未改010/011、未Migration/GRANT、未Commit/Push/Build/Deploy/切流。
+
+Boyi是Owner，**不是獨立人工Code Reviewer**；前節相反描述為歷史誤記，現依Owner最新指示更正。本次審查為AI-Assisted，沒有獨立人工通過結論。Gate A核准不自動撤銷；媒體錯誤與來源失效提示列小範圍影響確認，四步設計未改。Gate B仍BLOCKED、GCP E2E NOT RUN、Merge/Alpha NO-GO。等待Owner確認分批提交計畫與F5契約，不自行發布。
+
+
+## 14. Owner核准A/B/C提交與F5有條件契約（2026-11-12）
+
+Owner已明確核准普通Commit/Push至原PR #26分支；[提交收據與逐批測試](../2026-11-12_SECURITY_FIX/SUBMISSION_RECORD.md)。A=`fe1b68416844d01b75f420d6e072e2f1fa9361a8`，B=`eae607c32980d2a2d31b9bdbde35eda34254b1c1`，C為收錄本節及提交收據的文件/測試Commit（由Git記錄解析，不製造自參照SHA）。產品程式只到B，C不再更動app。
+
+F5原則方向有條件核准；已補manual與經歷證據區分、草稿/正式來源/無草稿版本、明確撤回/更正/恢復狀態機、多來源/舊資料與完整API寫入路徑。**未正式凍結、未實作新欄位/History表**。獨立測試2 PASS、2 strict XFAIL：原provenance缺欄保留，另重現一般upsert清空revoked_at；未改SKIP或宣稱通過。見[契約補充](../2026-11-12_SECURITY_FIX/FACT_PROVENANCE_CONTRACT.review.md)。
+
+Gate A仍Approved；人工Owner核准不冒充獨立Code Review，Gate B仍BLOCKED、GCP E2E NOT RUN、Merge/Alpha NO-GO。Commit/Push核准不含任何Migration、GRANT、Cloud Build、Deploy、切流或Merge main。

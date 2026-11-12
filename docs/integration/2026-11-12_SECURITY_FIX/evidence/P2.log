@@ -1,0 +1,4 @@
+.......x.....                                                            [100%]
+=========================== short test summary info ============================
+XFAIL tests/test_fact_provenance_contract.py::test_formal_fact_provenance_requires_reviewed_schema_contract - F5正式fact_sources缺source_kind/source_revision/quote；僅契約審查，本輪不執行Schema變更
+12 passed, 1 xfailed in 1.13s

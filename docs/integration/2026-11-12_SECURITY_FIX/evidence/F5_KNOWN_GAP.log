@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_formal_fact_provenance_requires_reviewed_schema_contract _________
+tests/test_fact_provenance_contract.py:39: in test_formal_fact_provenance_requires_reviewed_schema_contract
+    assert source['source_kind']=='raw' and source['source_revision']==d['revision'] and source['quote']==item['quote']
+           ^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'source_kind'
+=========================== short test summary info ============================
+FAILED tests/test_fact_provenance_contract.py::test_formal_fact_provenance_requires_reviewed_schema_contract
+1 failed in 0.10s

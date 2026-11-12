@@ -1,0 +1,19 @@
+.................................sssssssssssssss........................ [ 75%]
+.......................                                                  [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/ai/test_usage_isolation.py:17: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:35: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:47: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:63: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:75: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:99: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_ai_runtime.py:183: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:8: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:22: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:34: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:45: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:58: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:67: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:78: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_pg_ai_usage.py:41: 需要明確本機PG18合成副本
+80 passed, 15 skipped in 5.38s
