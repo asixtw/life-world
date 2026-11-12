@@ -1,6 +1,6 @@
 {
   "base": "68102f230aa947a434286ba9260e1ae75f6634b0",
-  "reviewed_product_head": "1bbca75db34da7cb56c2b3939b9d6abc774947bc",
+  "reviewed_product_head": "a2eb3632037726b93f3bea82b395fa7e5d010aa6",
   "github_actions_directory_present": false,
   "triggers": [
     {
@@ -35,6 +35,7 @@
         "app/schemas.py",
         "app/service.py",
         "app/static/app.js",
+        "app/static/art/softlife/lumi-hero.png",
         "app/static/audio.js",
         "app/static/birth.js",
         "app/static/connections.js",
@@ -53,6 +54,7 @@
         "app/static/person_details.js",
         "app/static/persons.js",
         "app/static/relationships.js",
+        "app/static/softlife.css",
         "app/static/styles.css",
         "scripts/audit_synthetic_handoff.py",
         "scripts/compare_schema_snapshots.py",
@@ -70,6 +72,7 @@
         "tests/frontend_birth_lifecycle.cjs",
         "tests/frontend_experience_validation.cjs",
         "tests/frontend_quantity.cjs",
+        "tests/frontend_softlife.cjs",
         "tests/legacy_profile_support.py",
         "tests/product/test_gcp139_return.py",
         "tests/product/test_google_exchange.py",

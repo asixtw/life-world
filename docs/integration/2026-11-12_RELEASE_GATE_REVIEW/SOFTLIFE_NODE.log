@@ -1,0 +1,13 @@
+✔ Soft Life 主題在舊樣式之後載入，四主分頁與現有腳本仍保留 (1.32125ms)
+✔ 新 Lumi 圖片與核實 demo v1 完全相同，尺寸及既有 fallback 保留 (2.9125ms)
+✔ 新素材載入失敗仍回到既有 CSS Lumi，不依賴 API (0.48625ms)
+✔ 視覺主題包含窄螢幕、焦點及減少動態規則，不載入外部資源 (0.177167ms)
+✔ 新增小字色與暖白／側欄／主視覺背景達到 4.5:1 對比 (0.360417ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45.234292

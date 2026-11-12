@@ -207,3 +207,10 @@ Diff審查追加：修正API競態拒絕後隱藏按鈕抑制返回第二步的�
 - 業務Schema最新可得仍Owner2026-11-11兩庫快照（42表/326欄/81FK），非本輪即時SQL。正式011/PG Feature Store、最小權限、完整來源持久契約、Purger審查與兼容回復/備份演練仍阻擋。
 
 **A待Owner核准；B PARTIAL/BLOCKED；C GCP E2E NOT RUN；D NO-GO。未達Merge Ready**。Owner先做UX/獨立Review，之後備份/恢復、來源/Schema/權限、E2E Migration/GRANT、固定Image Build/部署/真Provider驗收各自另批。不得以本機修復/測試當成已發布或已核准。
+
+
+### PR26並行視覺提交整合與最新固定產品
+
+普通Push發現遠端8c82c49新增已授權推送的Soft Life視覺候選。已正常整合到同分支，保留雙方提交，未強推/未Merge main。最新產品Commit `a2eb3632037726b93f3bea82b395fa7e5d010aa6`，App tree `c823bdde84ae8ab90c75a45d557cb6cd9e9c0623`。
+
+合併後26項防呆/三尺寸完整四步UI→API→本機PG PASS（63.07秒），視覺Node 5 PASS；36張圖/3段錄影與來源SHA見發布審查包。原8198登入、同Owner/業務資料不變/零JS錯誤已補驗。788 PASS/87 SKIP是同後端1bbca75的完整API/Node收據，不冒稱合併後重跑全套。Gate A仍待Owner核准新合併畫面，正式Code Review無批准，其他Gate仍NO-GO。

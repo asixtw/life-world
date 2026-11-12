@@ -5,9 +5,9 @@
 ## 固定候選與操作
 
 - 工作區 `/private/tmp/lw-integration-20261111`；分支 `integration/pr24-first-unified-schema010-20261111`，沿用Draft PR #26。
-- 產品Commit `1bbca75db34da7cb56c2b3939b9d6abc774947bc`；App tree `a6e8abf558673acd96f763197dd33b3a0d36b86d`。防呆產品22c99eb；本輪另加0e4940e草稿格式保護、1bbca75來源快照競態保護。後續交付Commit只涉及審查文件/SQL草案。
+- 產品Commit `a2eb3632037726b93f3bea82b395fa7e5d010aa6`；App tree `c823bdde84ae8ab90c75a45d557cb6cd9e9c0623`。防呆產品22c99eb；本輪另加0e4940e草稿格式保護、1bbca75來源快照競態保護。已保留並整合遠端並行提交8c82c49的Soft Life視覺，不覆蓋他人工作，沒有Merge main。後續交付Commit只涉及文件/證據。
 - Owner入口 **http://127.0.0.1:8198/**。沿用原本機測試帳密，先保存舊頁草稿再重新整理，正常登入後 `/#record`；不需Google。已因後端修復優雅重載相同服務/隔離PG/資料目錄，不重設帳號、Session或資料。
-- 防呆畫面與23項驗證：[日期/期間交付](../2026-11-12_GATE_A_VALIDATION/README.md)。四步R3畫面/錄影：[R3證據](../2026-11-12_GATE_A_R3/index.html)。舊畫面保留歷史，不冒稱本輪重新擷取。
+- 防呆畫面與23項驗證：[日期/期間交付](../2026-11-12_GATE_A_VALIDATION/README.md)。四步R3畫面/錄影：[R3證據](../2026-11-12_GATE_A_R3/index.html)。舊畫面保留歷史；本輪合併候選另有[最新三尺寸畫廊](index.html)及ux/36張圖/3錄影，皆合成資料。
 
 ## Gate 狀態
 
@@ -38,7 +38,9 @@
 
 | 收據 | 結果 | 限制 |
 |---|---|---|
-| API_NODE.log | **788 PASS／87 SKIP，33.83秒** | 最新產品全tests；SQLite/Node，87項專用PG容器未配置 |
+| API_NODE.log | **788 PASS／87 SKIP，33.83秒** | 後端1bbca75全tests；SQLite/Node，87項專用PG容器未配置；視覺整合後另補下列測試 |
+| MERGED_UI_PG.log | **26 PASS，63.07秒** | 合併候選a2eb363：23項新防呆＋3尺寸完整四步UI→API→本機PG，36圖/3錄影；與前輪重疊 |
+| SOFTLIFE_NODE.log | **5 PASS** | 遠端視覺候選的靜態契約/素材失敗退路，非Owner設計核准 |
 | DRAFT_SOURCE_TESTS.log | **28 PASS，2.21秒** | 草稿/來源/競態相關子集；先前階段與完整套件重疊 |
 | RELEASE_SAFETY_TESTS.log | **24 PASS** | 發布器單元測試，不是真Build/Deploy |
 | DRAFT_COMPAT_LOCAL_PG.json | PASS | 受限lw_e2e_app真本機PG，新v2生日回讀/未知封套拒寫/原文版本不變；合成Owner，非GCP |
@@ -102,3 +104,7 @@ FORMAT_RED.log、MEMORY_RACE_RED.log保留修正前真紅燈；設定停用/來�
 4. 固定Image Build、E2E部署與真Google/付費AI驗收各自授權；main Merge/Alpha發布仍另批。
 
 在上述阻擋解除前，正式GCP E2E結果為NOT RUN，無新Image Digest，結論維持**NO-GO**。此報告不授權任何操作。
+
+## 遠端並行提交處理
+
+第一次普通Push被拒（遠端由846f250進到8c82c49）。唯讀Fetch確認新提交只改Soft Life視覺、Lumi圖及測試/文件，沒有覆蓋本輪service.py/relationship_memory.py。使用正常分支Merge a2eb363保留雙方提交，沒有force/rebase或Merge main。新視覺仍為Candidate，需Owner對合併後畫面做Gate A，不能拿舊截圖自動核准。合併後26項UI/PG、5項視覺Node與原入口驗收均PASS，沒有重新冒稱跑完整788項。
