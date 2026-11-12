@@ -217,6 +217,9 @@ class LifeWorld(DraftReviewMixin, PersonDetailsMixin, PersonsMixin, PersonExperi
         result['contributions'] = json.loads(result['contributions'])  # 保存「result['contributions']」供後續驗證或回傳使用
         story = c.execute('SELECT payload FROM draft_stories WHERE draft_id=?', (draft_id,)).fetchone()  # 回讀未確認的多人整理
         payload=json.loads(story[0]) if story else None
+        # 新舊Revision混用時，未知版本不可誤當舊StoryInput再被覆寫；保留原列供相容讀取器處理。
+        require(not isinstance(payload,dict) or '_format' not in payload or payload['_format']=='experience_draft_v2',
+                409,'draft_format_unsupported','這份草稿使用較新的格式，請保留內容並使用相容版本開啟；尚未修改資料。')
         envelope=isinstance(payload,dict) and payload.get('_format')=='experience_draft_v2'
         result['story']=payload.get('story') if envelope else payload
         result['review']=payload.get('review') if envelope else None
