@@ -6,7 +6,16 @@ window.BasicCandidatesUI=(()=>{
   const esc=v=>c.esc(v??'');
   function initialize(context){c=context;}
   function entries(f=c.getFlow()){return [...(f?.birthdayCandidates||[]).map(x=>({kind:'birthday',x})),...(f?.employmentCandidates||[]).map(x=>({kind:'employment',x}))];}
-  function field(key,label,value,type='text'){return `<label class="field">${label}<input type="${type}" data-supplement-input="${key}" value="${esc(value)}" ${type==='number'?'min="1" step="1"':type==='text'?'maxlength="300"':''}></label>`;}
+  function field(key,label,value,type='text'){const max={birth_month:12,birth_day:31,birth_year:9999}[key];return `<label class="field">${label}<input type="${type}" data-supplement-input="${key}" value="${esc(value)}" ${type==='number'?'min="1" step="1" max="'+max+'"':type==='text'?'maxlength="300"':''}><small class="error-message" data-field-error="${key}" aria-live="polite"></small></label>`;}
+  /** 輸入/離欄/加入前同一檢查，不丟棄原值；只有有效資訊能進入待確認清單。 */
+  function validateInputs(row,complete=false){
+    const values=Object.fromEntries([...row.querySelectorAll('[data-supplement-input]')].map(n=>[n.dataset.supplementInput,n.value])),kind=values.dimension;
+    const errors=kind==='birthday'?ExperienceValidation.birthday(values,complete):kind==='employment'?ExperienceValidation.employment(values,complete):{};
+    for(const input of row.querySelectorAll('[data-supplement-input]'))if(input.validity?.badInput)errors[input.dataset.supplementInput]='請輸入完整的數字或日期。';
+    for(const node of row.querySelectorAll('[data-field-error]')){const message=errors[node.dataset.fieldError]||'';node.textContent=message;const input=row.querySelector('[data-supplement-input='+node.dataset.fieldError+']');input.setAttribute('aria-invalid',String(!!message));}
+    return errors;
+  }
+
   function inputs(v){return `<div data-basic-fields hidden><div data-basic-birthday hidden>${field('birth_month','月份',v.birth_month,'number')}${field('birth_day','日期',v.birth_day,'number')}${field('birth_year','出生年（選填，不推算年齡）',v.birth_year,'number')}</div><div data-basic-employment hidden><label class="field">本次任職<select data-supplement-input="employment_id"><option value="">新增一筆任職，不結束原有工作</option></select></label>${field('company_name','公司／組織',v.company_name)}${field('job_title','職稱／工作身分',v.job_title)}<label class="field">任職狀態<select data-supplement-input="employment_status">${[['unknown','未知'],['current','目前'],['past','過去']].map(([k,t])=>`<option value="${k}" ${v.employment_status===k?'selected':''}>${t}</option>`).join('')}</select></label>${field('valid_from','開始日期（選填）',v.valid_from,'date')}${field('valid_to','結束日期（選填）',v.valid_to,'date')}</div><p class="small" data-basic-prior-status role="status"></p><p class="small muted">自行記錄可以不指定證據；原文來源須核對片段與得知依據。最後確認前不更新人物檔案。</p></div>`;}
   function birthday(v){return v.birth_month==null?(v.birth_year!=null?'出生年 '+v.birth_year+'（月日待填）':v.birth_day!=null?'月份待填 · '+v.birth_day+' 日':'尚未填寫生日月日'):`${v.birth_year==null?'':v.birth_year+' 年 '}${v.birth_month} 月 ${v.birth_day??'待填'} 日`;}
   function work(v){return '公司／組織：'+(v.company_name===undefined?'未修改':v.company_name||'空白')+'；職稱：'+(v.job_title===undefined?'未修改':v.job_title||'空白')+'；'+({current:'目前',past:'過去',unknown:'未知'}[v.employment_status]||'狀態未修改')+(v.valid_from||v.valid_to?'；期間：'+(v.valid_from||'未指定')+' 至 '+(v.valid_to||'未指定'):'');}
@@ -17,7 +26,7 @@ window.BasicCandidatesUI=(()=>{
     const kind=row.querySelector('[data-supplement-input=dimension]').value,isBasic=!!labels[kind];
     row.querySelector('[data-basic-fields]').hidden=!isBasic;row.querySelector('[data-basic-birthday]').hidden=kind!=='birthday';row.querySelector('[data-basic-employment]').hidden=kind!=='employment';
     row.querySelector('[data-supplement-input=value]').closest('label').hidden=isBasic;row.querySelector('[data-supplement-input=description]').closest('label').hidden=isBasic;
-    if(!isBasic)return;
+    validateInputs(row);if(!isBasic)return;
     const flow=c.getFlow(),owner=c.state.me.owner_id,person=c.people(row.closest('form')).find(p=>p.key===row.dataset.supplementPerson),note=row.querySelector('[data-basic-prior-status]');
     if(!person?.personId){note.textContent='待建立人物，尚無原有基本資料。';return;}
     note.textContent='正在讀取原有基本資料…';
@@ -32,6 +41,7 @@ window.BasicCandidatesUI=(()=>{
   }
   /** 回傳一項指定人物的本機候選；只讀版本，不在加入/保存草稿時寫正式資料。 */
   async function create(person,v,raw){
+    const errors=v.dimension==='birthday'?ExperienceValidation.birthday(v,true):ExperienceValidation.employment(v,true);if(Object.keys(errors).length)throw new Error(Object.values(errors)[0]);
     const f=c.getFlow(),owner=c.state.me.owner_id,kind=v.dimension;
     const details=person.personId?await c.api('/people/'+person.personId+'/details'):null;
     if(f!==c.getFlow()||owner!==c.state.me?.owner_id)throw new Error('帳號或草稿已變更，未加入資訊。');
@@ -103,5 +113,7 @@ window.BasicCandidatesUI=(()=>{
   }
   document.addEventListener('change',e=>{if(e.target.matches('[data-supplement-input=employment_id]')){const row=e.target.closest('[data-supplement-person]'),job=priorDetails.get(row)?.employments.find(j=>j.id===e.target.value);if(job){for(const key of ['company_name','job_title','employment_status','valid_from','valid_to'])row.querySelector('[data-supplement-input='+key+']').value=job[key]??'';row.dispatchEvent(new Event('input',{bubbles:true}));}}if(e.target.matches('[data-supplement-input=dimension]'))configure(e.target.closest('[data-supplement-person]'));if(e.target.dataset.basicSelect)update(e.target.dataset.basicSelect,'select',e.target.checked);});
   document.addEventListener('click',e=>{const n=e.target.closest('[data-basic-exclude]');if(n)update(n.dataset.basicExclude,'exclude');});
-  return {initialize,entries,inputs,configure,create,ready,render,text,onPerson,valid};
+  document.addEventListener('input',e=>{if(e.target.matches('[data-supplement-input]'))validateInputs(e.target.closest('[data-supplement-person]'));});
+  document.addEventListener('focusout',e=>{if(e.target.matches('[data-supplement-input]'))validateInputs(e.target.closest('[data-supplement-person]'));});
+  return {validateInputs,initialize,entries,inputs,configure,create,ready,render,text,onPerson,valid};
 })();

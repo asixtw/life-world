@@ -2,14 +2,14 @@
 window.ExperienceUI=(()=>{
   let c, flow=null;
   /** @typedef {{ownerId:string,draftId:?string,expectedRevision:?number,currentStep:number,rawText:string,occurredAt:string,goalId:?string,contributions:Array,personId:?string,pendingPerson:?Object,story:?Object,editedSummary:string,hasSummary:boolean,summarySourceRaw:?string,summarySourceHash:?string,tasks:Array<string>,personCandidates:Array<Object>,birthdayCandidates:Array<Object>,employmentCandidates:Array<Object>,supplementInputs:Record<string,Object>,aiConsent:boolean,aiCandidate:?string,dirty:boolean,requestId:?string,mediaScope:?string}} ExperienceFlowState */
-  function initialize(context){c=context;MomentUI.initialize(context);BasicCandidatesUI.initialize({state:c.state,esc:c.esc,toast:c.toast,api:c.api,getFlow:()=>flow,people:currentReviewPeople,refresh:refreshReviewSummary});window.PersonSupplementsUI?.initialize({state:c.state,esc:c.esc,toast:c.toast,getFlow:()=>flow,people:currentReviewPeople});}
+  function initialize(context){c=context;ExperienceValidation.initialize(context);MomentUI.initialize(context);BasicCandidatesUI.initialize({state:c.state,esc:c.esc,toast:c.toast,api:c.api,getFlow:()=>flow,people:currentReviewPeople,refresh:refreshReviewSummary});window.PersonSupplementsUI?.initialize({state:c.state,esc:c.esc,toast:c.toast,getFlow:()=>flow,people:currentReviewPeople});}
   function capture(event){ // 單一 DOM 是編輯值來源，換步不重建媒體或清空表單。
     const form=document.querySelector('#record-form,#review-form');if(!form||!flow)return;
     const f=new FormData(form),refreshPeople=!event||!['summary','tasks'].includes(event.target?.name);
     Object.assign(flow,{rawText:f.get('raw_text')??flow.rawText,occurredAt:f.get('occurred_at'),goalId:f.get('goal_id')||null,personId:f.get('person_id')||null,story:refreshPeople?window.ConnectionsUI.collectEditor(form,false):flow.story,dirty:c.state.dirty,contributions:[...f].filter(([k])=>k.startsWith('quantity-')).map(([k,v])=>({action_id:k.slice(9),quantity:v}))});
     if(f.has('moment_ai_mode'))flow.organizeMode=f.get('moment_ai_mode');
     if(f.has('draft_ai_mode'))flow.organizeMode=f.get('draft_ai_mode');
-    QuantityUI.sync(form);MomentUI.sync();flow.pendingPerson=flow.story?.pending_person||null;
+    QuantityUI.sync(form);ExperienceValidation.sync(form);ExperienceValidation.people(form);MomentUI.sync();flow.pendingPerson=flow.story?.pending_person||null;
     if(f.has('summary')){flow.editedSummary=String(f.get('summary'));flow.hasSummary=true;}
     if(f.has('tasks'))flow.tasks=String(f.get('tasks')).split('\n').map(t=>t.trim()).filter(Boolean);
     if(form.querySelector('[data-summary-source-review]')?.checked){flow.summarySourceRaw=flow.rawText;flow.summarySourceHash=c.state.draft?.raw_sha256;}
@@ -29,6 +29,7 @@ window.ExperienceUI=(()=>{
     return {...(d?.review||{}),summary:flow.hasSummary?flow.editedSummary:null,summary_source_sha256:flow.summarySourceHash??(flow.summarySourceRaw===flow.rawText?d?.raw_sha256:null)??null,summary_needs_review:flow.hasSummary&&flow.summarySourceRaw!==flow.rawText,tasks:flow.tasks||[],person_candidates:flow.personCandidates||d?.review?.person_candidates||[],birthday_candidates:flow.birthdayCandidates||d?.review?.birthday_candidates||[],employment_candidates:flow.employmentCandidates||d?.review?.employment_candidates||[]};
   }
   function storyForDraft(form){
+    if(!ExperienceValidation.people(form,true))throw new Error('請確認每位人物的稱呼與角色，並選擇本次角色；原輸入保留。');
     window.PersonSupplementsUI?.validate(form);const story=window.ConnectionsUI.collectEditor(form);
     // 單人舊介面的穩定暫存鍵只在有逐人候選時轉成多人契約，不提前建立人物。
     if(story?.pending_person&&[...(flow?.personCandidates||[]),...BasicCandidatesUI.entries(flow).map(({x})=>x)].some(x=>x.target.client_ref==='legacy')){story.pending_people=[{...story.pending_person,client_ref:'legacy'}];delete story.pending_person;}
@@ -174,6 +175,7 @@ window.ExperienceUI=(()=>{
   function mount(){
     closePersonPreview();document.querySelector('#experience-person-preview .experience-preview-body')?.replaceChildren();
     const form=document.querySelector('#record-form');
+    ExperienceValidation.mountReview(document.querySelector('#review-form'));
     document.body.classList.toggle('experience-focus',!!(form||document.querySelector('#review-form'))); // 四步手機專注模式，流程外恢復原導覽。
     if(!form){
       const review=document.querySelector('#review-form'),d=c.state.draft;
@@ -206,6 +208,7 @@ window.ExperienceUI=(()=>{
       try{
         if(step===1&&!await MomentUI.validate())return;
         if(flow!==ownFlow||!form.isConnected||flow.currentStep!==step)return;
+        if(step===2&&!ExperienceValidation.sync(form))return;
         const section=sections[step-1];
         if(step===1&&!form.elements.raw_text.value.trim()){form.elements.moment_input_tab.value='text';MomentUI.sync();form.elements.raw_text.focus();c.toast('請先輸入或校對經歷文字。');return;}
         for(const field of section.querySelectorAll('input,textarea,select'))if(!field.reportValidity())return;
@@ -216,7 +219,7 @@ window.ExperienceUI=(()=>{
     form.parentElement.dataset.recordWrapper='true';
     const heading=form.parentElement.querySelector('.heading');heading.querySelector('.eyebrow').textContent='A MOMENT WORTH KEEPING';heading.before(form.querySelector('.moment-flow-head'),form.querySelector('#experience-step-track'));
     const title=heading.querySelector('h1');title.id='experience-step-title';title.tabIndex=-1;
-    MomentUI.mount(form,flow.organizeMode);c.state.experienceFlow=flow;show(previousStep);capture();
+    MomentUI.mount(form,flow.organizeMode);ExperienceValidation.mount(form);c.state.experienceFlow=flow;show(c.state.validationReturnStep||previousStep);delete c.state.validationReturnStep;capture();
   }
   function refreshCapabilities(){
     // 同Owner升級只替換已鎖住的人物區；保留表單、原文、媒體、步驟與未選人物的狀態。
@@ -227,5 +230,5 @@ window.ExperienceUI=(()=>{
     delete section.dataset.guestLocked;
     window.ConnectionsUI.hydrateEditors();window.PersonSupplementsUI?.refresh();
   }
-  return {initialize,mount,capture,refreshCapabilities,summaryState,summaryReview,tasksState,reviewSnapshot,storyForDraft,refreshReviewSummary,getState:()=>flow};
+  return {show,initialize,mount,capture,refreshCapabilities,summaryState,summaryReview,tasksState,reviewSnapshot,storyForDraft,refreshReviewSummary,getState:()=>flow};
 })();

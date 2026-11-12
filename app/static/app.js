@@ -45,13 +45,14 @@ function toast(message) { // 顯示短暫操作提示並重設關閉計時器
   clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 4500); // 執行「顯示短暫操作提示並重設關閉計時器」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function showError(error) { // 在頁面與對話框顯示可閱讀的錯誤
-  const fields = error.fields?.length ? ` 欄位：${error.fields.join('、')}` : ''; // 組合可閱讀的欄位錯誤提示
-  $('#notice').innerHTML = `<div class="callout error-message">${esc(error.message + fields)}</div>`; // 執行「在頁面與對話框顯示可閱讀的錯誤」的目前處理步驟
+  const message=ExperienceValidation.apiMessage(error); // 組合可閱讀的欄位錯誤提示
+  $('#notice').innerHTML = `<div class="callout error-message">${esc(message)}</div>`; // 執行「在頁面與對話框顯示可閱讀的錯誤」的目前處理步驟
+  if(['contribution_out_of_range','goal_setup_required','policy_required'].includes(error.code)&&$('#review-form')&&!document.querySelector('[data-review-goal-validation]:not([hidden])'))$('#notice').insertAdjacentHTML('beforeend',button('fix-experience-goal','返回第二步修正目標與數量','secondary'));
   if ($('#account-dialog').open) { // 依目前選項或狀態進入對應處理分支
     const existing = $('#dialog-error'); // 尋找目前對話框內的錯誤訊息區
-    if (existing) existing.textContent = error.message + fields; // 依目前選項或狀態進入對應處理分支
+    if (existing) existing.textContent = message; // 依目前選項或狀態進入對應處理分支
   } // 結束目前回呼、區塊或模組定義
-  if ($('#source-dialog')?.open) $('#source-error').textContent=error.message+fields; // 來源儲存失敗保持表單並顯示退路
+  if ($('#source-dialog')?.open) $('#source-error').textContent=message; // 來源儲存失敗保持表單並顯示退路
 } // 結束目前回呼、區塊或模組定義
 async function api(path, options = {}) { // 統一送出 API、CSRF、JSON 與連線失敗處理
   if(state.googleUncertain && options.method && !['GET','HEAD'].includes(options.method) && path!=='/auth/external/status' && !(path==='/auth/external/exchange' && options.googleExchangeOnce))throw new Error('登入交換結果尚未核對，請先核對登入結果；原表單會保留。');
@@ -175,9 +176,9 @@ function contributionFields(goal, values = []) { // 單位只控制操作建議�
   return QuantityUI.fields(goal,values,esc);
 } // 結束目前回呼、區塊或模組定義
 function recordView() { // 產生原始經歷表單並帶入人物與目標上下文
-  const d = state.editingDraft ? state.draft : null, active = state.world.goals.filter(g => g.status === 'active'); // 讀取此次編輯的經歷草稿
+  const d = state.editingDraft ? state.draft : null; // 讀取此次編輯的經歷草稿
   const params = new URLSearchParams(location.hash.split('?')[1] || ''); // 解析目前路由的查詢參數
-  const goalId = d ? d.goal_id : params.has('goal') ? params.get('goal') : params.has('person') ? null : active[0]?.id; // 保留目前選定目標的識別碼
+  const goalId = d ? d.goal_id : params.has('goal') ? params.get('goal') : null; // 保留目前選定目標的識別碼
   const goal = state.world.goals.find(g => g.id === goalId); // 讀取目前選定目標及其行動資料
   const actionContext=!d&&goal?.actions.find(a=>a.id===params.get('action'));
   const requestedDate=params.get('date');
@@ -419,6 +420,7 @@ function showDraftAICandidate(result){
 }
 async function saveDraft(form, review, destination = 'history') { // 新增或依版本修改草稿，成功後接續核對或返回
   if(!await MomentUI.validate())return; // 在第一步就提示時間，不等走完人物才由API拒絕。
+  if(!ExperienceValidation.sync(form)){ExperienceUI.show(2);return;}
   await MediaUI.awaitReady(); // 縮圖完成才綁定素材與保存伺服器草稿。
   const f = new FormData(form), body = {raw_text:f.get('raw_text'), occurred_at:inputISO(f.has('calendar_time')?f.get('calendar_date')+'T'+f.get('calendar_time'):f.get('occurred_at'),form.dataset.calendarZone||state.me.timezone),goal_id:f.get('goal_id') || null,person_id:f.get('person_id') || null,contributions:contributions(form)}; // 讀取使用者目前表單值，不直接推論人物資訊
   const savedReview=ExperienceUI.reviewSnapshot();if(savedReview)body.review=savedReview;
@@ -456,7 +458,7 @@ document.addEventListener('change', async event => { // 監聽欄位變更
     if (await PeopleUI.change(event.target)) return; // 依目前選項或狀態進入對應處理分支
     if (event.target.name === 'person_id' && $('#people-review-fields')) $('#people-review-fields').innerHTML = await PeopleUI.reviewExtras(event.target.value); // 依目前選項或狀態進入對應處理分支
     if (event.target.name === 'goal_id' && $('#record-form')) { // 依目前選項或狀態進入對應處理分支
-      $('#contribution-fields').innerHTML = contributionFields(state.world.goals.find(g => g.id === event.target.value)); // 執行「處理change事件與對應的介面狀態」的目前處理步驟
+      ExperienceValidation.changeGoal(event.target.form); // 執行「處理change事件與對應的介面狀態」的目前處理步驟
     } // 結束目前回呼、區塊或模組定義
     if (event.target.name === 'person_id' && event.target.value === '__upgrade') {event.target.value = ''; accountView('claim');} // 依目前選項或狀態進入對應處理分支
     if (event.target.dataset.task) { // 依目前選項或狀態進入對應處理分支
@@ -534,6 +536,7 @@ document.addEventListener('click', async event => { // 監聽點擊
       else if($('#record-form,#review-form')) {const root=$('[data-story-editor]');if(root.querySelector('[data-pending-target-list]')){ConnectionsUI.addPendingPerson(root);return;}root.querySelector('#include-story').checked=true;root.querySelector('.story-editor-body').hidden=false;const pending=root.querySelector('[name=pending_person_enabled]');pending.checked=true;pending.closest('details').open=true;root.querySelector('[name=pending_person_name]').focus();state.dirty=true;}
       else PeopleUI.openPersonEditor(); // 處理前述條件不成立時的替代流程
     } // 結束目前回呼、區塊或模組定義
+    if(action==='fix-experience-goal'){const owner=state.me.owner_id;ExperienceUI.capture();state.draft={...state.draft,contributions:contributions($('#review-form'))};state.validationReturnStep=2;state.editingDraft=true;await refresh();if(state.me?.owner_id!==owner){state.draft=null;state.editingDraft=false;state.experienceFlow=null;delete state.validationReturnStep;navigate('world');return;}navigate('record');}
     if (action === 'edit-current-draft') {state.editingDraft = true; navigate('record');} // 帶回目前草稿進行修改
     if (action === 'retry-guest-cleanup') {await GuestLocalCleanup.retry();return;}
     if (action === 'google-login-existing') {accountView('login');return;}

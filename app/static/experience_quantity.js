@@ -34,7 +34,8 @@ window.QuantityUI=(()=>{
       input.step=stepFor(input.value,input.dataset.quantityUnit);
       // 不截斷/改寫使用者文字；超出六位小數交由既有契約拒絕。
       const status=input.closest('.quantity-field').querySelector('[data-quantity-status]');
-      status.textContent=input.value&&input.step==='any'?'已保留部分完成數量：'+format(input.value)+' '+input.dataset.quantityUnit:'';
+      const error=input.validity.badInput?'請輸入完整的活動數量。':window.ExperienceValidation?.quantity(input.value);
+      status.textContent=error||(input.value&&input.step==='any'?'已保留部分完成數量：'+format(input.value)+' '+input.dataset.quantityUnit:'');
     }
   }
   document.addEventListener('input',e=>{if(e.target.matches('[data-quantity-input]'))sync(e.target.closest('form'));});

@@ -7,7 +7,7 @@ import subprocess
 import pytest
 
 
-@pytest.mark.parametrize("filename", ["frontend_audio_lifecycle.cjs", "frontend_birth_lifecycle.cjs", "frontend_quantity.cjs"])
+@pytest.mark.parametrize("filename", ["frontend_audio_lifecycle.cjs", "frontend_birth_lifecycle.cjs", "frontend_quantity.cjs", "frontend_experience_validation.cjs"])
 def test_frontend_lifecycle_contract(filename):
     """Node 保留每個子測試的輸出，任何失敗都回傳非零狀態。"""
     node = os.environ.get("LIFEWORLD_NODE") or shutil.which("node")

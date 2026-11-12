@@ -101,14 +101,18 @@ def test_existing_job_diff_failure_retry_and_version_conflict(page):
 
 
 @pytest.mark.parametrize('month,day,year',[('2','31',''),('','','2000'),('','12','')])
-def test_invalid_date_can_be_drafted_but_must_be_excluded_and_unadded_data_is_preserved(page,month,day,year):
+def test_invalid_date_cannot_be_added_and_unadded_data_is_preserved(page,month,day,year):
     person,h=seed(page);card=choose_existing(page,person)
     card.locator('[data-supplement-input=dimension]').select_option('birthday');supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual');card.locator('[data-supplement-input=birth_month]').fill(month);card.locator('[data-supplement-input=birth_day]').fill(day);card.locator('[data-supplement-input=birth_year]').fill(year)
     page.locator('[data-experience-review]').click();expect(page.locator('#notice')).to_contain_text('尚未加入資訊')
     card.get_by_role('button',name='加入資訊',exact=True).click()
+    expect(card).to_have_attribute('open','')
+    assert page.evaluate('ExperienceUI.getState().birthdayCandidates.length')==0
+    for key,value in [('birth_month',month),('birth_day',day),('birth_year',year)]:expect(card.locator('[data-supplement-input='+key+']')).to_have_value(value)
+    assert any(card.locator('[data-field-error]').all_text_contents())
+    assert not page.request.get(BASE+'/api/state').json()['drafts']
+    card.get_by_role('button',name='清空這次輸入',exact=True).click()
     page.locator('[data-experience-review]').click();expect(page.locator('#review-form')).to_be_visible()
-    page.locator('[data-experience-preview]').click();page.locator('[data-basic-select]').click();expect(page.locator('[data-basic-select]')).not_to_be_checked()
-    page.locator('[data-basic-exclude]').click();page.get_by_role('button',name='完成檢視',exact=True).click()
     page.locator('#story-reviewed').check();page.get_by_role('button',name='我已核對，確認保存',exact=True).click();expect(page.locator('#review-form')).to_have_count(0)
     assert page.request.get(BASE+'/api/people/'+person['id']+'/details').json()['birthday'] is None
 

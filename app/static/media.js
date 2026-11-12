@@ -65,7 +65,7 @@ const MediaUI = (() => {
       if (field.type === 'checkbox' || field.type === 'radio') node.checked = field.checked;
       else node.value = field.value;
     }
-    window.ConnectionsUI?.restorePendingDraftState?.(form);window.ExperiencePeopleUI?.restore(form);window.PersonSupplementsUI?.restore(form); // 原文及hidden快照還原後才重建人物卡片。
+    window.ExperienceValidation?.restore(form);window.ConnectionsUI?.restorePendingDraftState?.(form);window.ExperiencePeopleUI?.restore(form);window.PersonSupplementsUI?.restore(form); // 原文及hidden快照還原後才重建人物卡片。
   }
   function releaseURLs() { for (const url of urls) URL.revokeObjectURL(url); urls.clear(); }
   function fileURL(blob) { const url = URL.createObjectURL(blob); urls.add(url); return url; }
