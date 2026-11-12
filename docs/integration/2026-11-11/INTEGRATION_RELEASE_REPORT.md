@@ -174,3 +174,19 @@ Owner確認舊候選仍像長表單，Gate A不核准。已逐項對照Demo與�
 - GitHub唯讀Code Review為reviews=0、threads=0，不代表審查通過；main候選路徑命中lw-api-main，未命中lw-web-main。Trigger/Cloud SQL資料沿用2026-11-11來源，未冒稱今日即時雲端查核。
 
 **Gate A Changes Requested／整體NO-GO**。等Owner人工重審及Code Review；B安全/Schema未通過、C GCP NOT RUN、D未授權。後續Migration、GRANT、Build、Deploy、Merge、Alpha切流/資料匯入分別另行核准。本輪未執行上述操作。
+
+
+## 10. 帳號切換接手／輸入防呆未提交狀態
+
+基準HEAD仍804f3f4；日期與目標期間防呆位於未提交工作區，不是PR26已發布版本。已讀回本機回歸118 PASS、相關API/契約84 PASS；修正追加測試的單一挑戰前置流程後，目標切換/跨時區2 PASS（1.62秒）。未重跑完整套件，不重複加總。
+
+[未提交交接與六張三尺寸錯誤畫面](../2026-11-12_GATE_A_VALIDATION/README.md)。下一步僅Diff審查/證據整理/固定版本，Gate A仍Changes Requested；後續Gate與禁止事項不變。
+
+Diff審查追加：修正API競態拒絕後隱藏按鈕抑制返回第二步的錯誤入口，先紅燈後驗證模組23 PASS（15.88秒）；未重跑全App，仍未Commit/Push。見同一未提交交接的SERVER_RACE_RED.log及VALIDATION_REVIEWED.log。
+
+
+### 防呆修正固定版本
+
+本機產品Commit `22c99eb8d483854945b0ea43724f77c19dec2ab7`，App tree `e06e6d2eecf4ed85ddf9d888040543aad60c2d97`。生日/任職輸入與離欄/加入前檢查、第二步目標期間/不計入/數量保存、API路徑轉譯與競態返回入口已固定；DTO/後端Schema/交易/獎勵未改。最新驗證模組23 PASS，原相關回歸118 PASS與API子集84 PASS分別列出來源，並非最新全套重跑。六張畫面與SQL收據見[固定版本交接](../2026-11-12_GATE_A_VALIDATION/README.md)。
+
+48份回歸產生的歷史變動先打包留存，再恢復舊版收據，避免歷史測試冒充新結果。此時尚未Push；Gate A仍待Owner人工核准，所有正式DB/發布禁止事項維持。
