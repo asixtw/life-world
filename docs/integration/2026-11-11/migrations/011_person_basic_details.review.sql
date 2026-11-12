@@ -6,6 +6,12 @@ BEGIN
  IF current_database() NOT IN ('life_world_e2e','life_world_alpha') OR current_setting('server_version_num')::int/10000<>18 THEN
   RAISE EXCEPTION 'STOP target/PG mismatch';
  END IF;
+ -- 同名DB不足以辨識環境；只接受Owner來源收據中的既有Marker，不自行補寫Marker。
+ IF (SELECT shobj_description(oid,'pg_database') FROM pg_database WHERE datname=current_database()) IS DISTINCT FROM
+    CASE current_database() WHEN 'life_world_e2e' THEN 'LIFEWORLD_E2E_SYNTHETIC_ONLY_v1'
+     WHEN 'life_world_alpha' THEN 'LIFEWORLD_PUBLIC_ALPHA_GCP144_V1' END THEN
+  RAISE EXCEPTION 'STOP database marker mismatch';
+ END IF;
  IF current_user<>(SELECT pg_get_userbyid(nspowner) FROM pg_namespace WHERE nspname='lw_core_draft') THEN
   RAISE EXCEPTION 'STOP: DBA must select reviewed existing schema owner role';
  END IF;

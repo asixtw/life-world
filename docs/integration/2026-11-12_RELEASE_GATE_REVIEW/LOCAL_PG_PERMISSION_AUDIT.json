@@ -1,0 +1,98 @@
+{
+  "database": "life_world_e2e",
+  "role": "lw_e2e_app",
+  "version": "PostgreSQL 18.0 on aarch64-apple-darwin25.6.0, compiled by Apple clang version 21.0.0 (clang-2100.3.34.2), 64-bit",
+  "environment": "isolated localhost marker structural copy; not Cloud SQL",
+  "permissions": [
+    {
+      "table": "person_basic_details",
+      "select": true,
+      "insert": true,
+      "update_all_columns": false,
+      "delete": false,
+      "update_columns": [
+        "birth_year",
+        "birth_month",
+        "birth_day",
+        "source_kind",
+        "source_experience_id",
+        "evidence_type",
+        "source_quote",
+        "source_status",
+        "confirmed_at",
+        "revision",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "person_basic_detail_history",
+      "select": true,
+      "insert": true,
+      "update_all_columns": false,
+      "delete": false,
+      "update_columns": []
+    },
+    {
+      "table": "person_employments",
+      "select": true,
+      "insert": true,
+      "update_all_columns": false,
+      "delete": false,
+      "update_columns": [
+        "company_name",
+        "job_title",
+        "employment_status",
+        "valid_from",
+        "valid_to",
+        "source_kind",
+        "source_experience_id",
+        "evidence_type",
+        "source_quote",
+        "source_status",
+        "confirmed_at",
+        "revision",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "person_employment_history",
+      "select": true,
+      "insert": true,
+      "update_all_columns": false,
+      "delete": false,
+      "update_columns": []
+    },
+    {
+      "table": "drafts",
+      "select": true,
+      "insert": true,
+      "update_all_columns": true,
+      "delete": true,
+      "update_columns": [
+        "id",
+        "owner_id",
+        "goal_id",
+        "person_id",
+        "raw_text",
+        "occurred_at",
+        "contributions",
+        "status",
+        "revision",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "data_consents",
+      "select": true,
+      "insert": true,
+      "update_all_columns": false,
+      "delete": false,
+      "update_columns": [
+        "revoked_at"
+      ]
+    }
+  ],
+  "table_count": 46,
+  "fk_count": 90
+}

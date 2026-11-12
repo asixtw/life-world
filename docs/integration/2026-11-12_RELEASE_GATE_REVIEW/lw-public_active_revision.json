@@ -1,0 +1,21 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": {
+    "metadata": {
+      "creationTimestamp": "2026-11-08T21:35:05.317050Z",
+      "labels": {
+        "cloud.googleapis.com/location": "asia-east1",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "lw-public",
+        "serving.knative.dev/configurationGeneration": "12",
+        "serving.knative.dev/route": "lw-public",
+        "serving.knative.dev/service": "lw-public",
+        "serving.knative.dev/serviceUid": "7b9e7fa1-cd68-4908-8783-3b3cc94c554e"
+      },
+      "name": "lw-public-camera-8f377fa"
+    },
+    "status": {
+      "imageDigest": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:68f072c973ab40075b1ba5533a55a6324d5c7a3cf71b00920b0dfc589e2e0e75"
+    }
+  }
+}

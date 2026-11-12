@@ -1,0 +1,13 @@
+{
+  "environment": "isolated local marker PG18; not GCP",
+  "runtime": "lw_e2e_app",
+  "owner_fingerprint": "41c4219ba6f1d3d1",
+  "current_v2_birthday_roundtrip": "PASS",
+  "unknown_format_read_edit_rejected": "PASS",
+  "unknown_payload_preserved": "PASS",
+  "raw_revision_unchanged": "PASS",
+  "synthetic_original_payload_restored": "PASS",
+  "new_experiences": 0,
+  "new_rewards": 0,
+  "schema_grants_changes": false
+}

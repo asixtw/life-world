@@ -1,0 +1,35 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": {
+    "metadata": {
+      "annotations": {
+        "lifeworld.dev/release-commit": "82d0925597aeb23b95023f102b1ca98c46666fe9",
+        "lifeworld.dev/release-created": "2026-11-05T14:14:44.895516Z",
+        "lifeworld.dev/release-previous": "[{\"type\": \"TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION\", \"revision\": \"lw-web-main-00005-qtk\", \"percent\": 100}]",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "592.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/invoker-iam-disabled": "true",
+        "run.googleapis.com/maxScale": "3",
+        "run.googleapis.com/operation-id": "43625c8e-a76e-4c8a-b531-b8af49dcdc51",
+        "run.googleapis.com/urls": "[\"https://lw-web-main-162310640466.asia-east1.run.app\",\"https://lw-web-main-u5py2jttpa-de.a.run.app\"]",
+        "serving.knative.dev/creator": "lw-build-stg@life-world-513506.iam.gserviceaccount.com",
+        "serving.knative.dev/lastModifier": "asixtw@gmail.com"
+      },
+      "generation": 10,
+      "name": "lw-web-main"
+    },
+    "status": {
+      "latestCreatedRevisionName": "lw-web-main-c-13023a4b4ed8448bab94ca3502269eda",
+      "latestReadyRevisionName": "lw-web-main-c-13023a4b4ed8448bab94ca3502269eda",
+      "traffic": [
+        {
+          "percent": 100,
+          "revisionName": "lw-web-main-c-13023a4b4ed8448bab94ca3502269eda"
+        }
+      ],
+      "url": "https://lw-web-main-u5py2jttpa-de.a.run.app"
+    }
+  }
+}

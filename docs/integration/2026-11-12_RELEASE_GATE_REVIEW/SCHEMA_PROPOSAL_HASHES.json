@@ -1,0 +1,6 @@
+{
+  "app/migrations/011_person_basic_details.sql": "f898fbabfd744aaf00e2db3aa4f0cbbaba9f0b88dc8a2ed9b716ffe9efa2e993",
+  "docs/integration/2026-11-11/migrations/011_person_basic_details.review.sql": "2becc5bb8d08f3ebed68ce10962520de0cd925bd7884d117d50911747ca5020b",
+  "docs/integration/2026-11-12_RELEASE_GATE_REVIEW/MINIMUM_PRIVILEGES.review.sql": "8a111fb3400c09ab8ef5bcc3bdfed6dacec266f72f772e1222ecb2bd9232173b",
+  "docs/integration/2026-11-11/evidence/SCHEMA_DIFF.json": "262e39967fbe36721fea7527f9a5e215ee926a096d1d19d0979d3d57793ab801"
+}

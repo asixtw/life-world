@@ -1,6 +1,6 @@
 # PR #26 Integration QA／Release Gate｜NO-GO
 
-**最新Gate A以第9節R3四項修正證據為準。先前PASS只證明資料閉環，不代表「記錄這一刻」設計已整合或Owner已核准。**
+**最新狀態以第11節發布前審查為準；Gate A防呆細節見第10節。先前PASS只證明資料閉環，不代表「記錄這一刻」設計已整合或Owner已核准。**
 
 2026-11-12。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準`6d4ba0a3ea3d895678ad733cde2c42f773154f4f`，精確交付Head/Tree見PR收據。遠端main唯讀核對仍`68102f230aa947a434286ba9260e1ae75f6634b0`。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret、Alpha匯入或切流。
 
@@ -192,3 +192,18 @@ Diff審查追加：修正API競態拒絕後隱藏按鈕抑制返回第二步的�
 48份回歸產生的歷史變動先打包留存，再恢復舊版收據，避免歷史測試冒充新結果。此時尚未Push；Gate A仍待Owner人工核准，所有正式DB/發布禁止事項維持。
 
 已成功Push既有PR26整合分支：804f3f4→201a2b0；後續僅文件狀態同步，產品Commit仍22c99eb。未合併/部署，Gate A仍待人工核准。
+
+
+## 11. 全部必要工作之發布前審查（2026-11-12）
+
+最新固定產品 `1bbca75db34da7cb56c2b3939b9d6abc774947bc`，App tree `a6e8abf558673acd96f763197dd33b3a0d36b86d`；前輪生日/任職/目標期間及API提示已22c99eb提交。新增0e4940e未知草稿格式拒寫與1bbca75記憶來源/設定撤回競態防護。工作區與PR26分支延續，不重開專案。
+
+[發布前審查唯一入口](../2026-11-12_RELEASE_GATE_REVIEW/README.md)：含Code Review分區、Schema010/011/最小權限稿、Purger90/61 FK、來源契約、DraftReview相容回復、備份、現役Digest、Merge Trigger與精確E2E/Alpha操作順序。SQL均REVIEW ONLY，未執行正式Migration或GRANT。
+
+- 最新全API/Node **788 PASS、87 SKIP（33.83秒）**；相關草稿/來源28 PASS、發布安全24 PASS；直接本機PG讀寫驗證未知格式拒寫/原文版本不變。不是GCP E2E或獨立Review批准。
+- 原入口 http://127.0.0.1:8198/ 已優雅重載同DB/資料目錄，正常UI登入原Owner、業務資料未變、零JS例外；OWNER_ENTRY_CHECK.json附新Commit。
+- GCP唯讀確認：lw-public-camera-8f377fa仍100%，Digest `68f072c973ab40075b1ba5533a55a6324d5c7a3cf71b00920b0dfc589e2e0e75`；三服務未修改。API main Trigger人工核准仍true；舊main68102f2的Build `3b71f171-045d-4d49-a12b-2226102441bf`仍PENDING，不核准/取消。PR26即時Open/Draft、reviews=[]。
+- Cloud SQL自動備份/PITR均false，backup list空。歷史手動export仍存在且generation/hash匹配，但只有post005/32表範圍，不能當現行010/011的完整可還原保障。未開備份設定、未建立Build或下載業務備份。
+- 業務Schema最新可得仍Owner2026-11-11兩庫快照（42表/326欄/81FK），非本輪即時SQL。正式011/PG Feature Store、最小權限、完整來源持久契約、Purger審查與兼容回復/備份演練仍阻擋。
+
+**A待Owner核准；B PARTIAL/BLOCKED；C GCP E2E NOT RUN；D NO-GO。未達Merge Ready**。Owner先做UX/獨立Review，之後備份/恢復、來源/Schema/權限、E2E Migration/GRANT、固定Image Build/部署/真Provider驗收各自另批。不得以本機修復/測試當成已發布或已核准。

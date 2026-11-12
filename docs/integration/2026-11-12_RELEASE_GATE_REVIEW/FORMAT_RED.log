@@ -1,0 +1,12 @@
+F
+=================================== FAILURES ===================================
+___________ test_unknown_draft_envelope_is_blocked_without_overwrite ___________
+tests/test_draft_format_compatibility.py:11: in test_unknown_draft_envelope_is_blocked_without_overwrite
+    r=client.get('/api/drafts/'+d['id']);assert r.status_code==409 and r.json()['error']['code']=='draft_format_unsupported'
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert (200 == 409)
+E    +  where 200 = <Response [200 OK]>.status_code
+=========================== short test summary info ============================
+FAILED tests/test_draft_format_compatibility.py::test_unknown_draft_envelope_is_blocked_without_overwrite
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.10s
