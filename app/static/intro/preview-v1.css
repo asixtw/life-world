@@ -1,0 +1,94 @@
+/* 依Owner參考圖重新整理構圖：安靜平面UI、完整Lumi與蛋；所有樣式限於獨立導覽。 */
+.lw-preview{--paper:var(--lw-color-paper);--ink:var(--lw-color-ink);--muted:var(--lw-color-muted);--green:var(--lw-color-primary);--mint:var(--lw-color-brand-mint);--line:var(--lw-color-line);--gold:var(--lw-color-pending);font-family:var(--lw-font-family);overflow:visible;}
+.lw-preview .lw-header,.lw-preview main,.lw-preview .lw-footer{width:min(1200px,calc(100% - 48px));}
+.lw-preview .lw-header{min-height:88px;}
+.lw-preview .lw-brand>span{font-weight:600;letter-spacing:0;}
+.lw-preview .lw-brand small,.lw-preview .lw-edition{font-size:12px;letter-spacing:0;}
+.lw-preview .lw-brand svg{color:var(--green);}
+.lw-preview .lw-audio summary{font-size:14px;border-radius:16px;}
+.lw-preview .lw-audio-panel{border-radius:20px;box-shadow:var(--lw-shadow-card);max-width:calc(100vw - 40px);}
+.lw-preview .lw-audio-panel p,.lw-preview .lw-audio-panel small{font-size:14px;line-height:1.65;}
+.lw-preview .lw-story{align-items:start;gap:48px;padding-block:40px;min-height:0;}
+.lw-preview .lw-copy{padding:0;}
+.lw-preview .lw-eyebrow{font-size:12px;letter-spacing:0;color:var(--muted);margin-bottom:24px;}
+.lw-preview .lw-eyebrow>span{background:var(--mint);}
+.lw-preview h1{font-size:40px;line-height:1.4;letter-spacing:0;font-weight:600;}
+.lw-preview h1 em{color:var(--green);}
+.lw-preview #experience-copy h1,.lw-preview #summary-copy h1{font-size:32px;line-height:1.45;}
+.lw-preview .lw-intro,.lw-preview .lw-story-card blockquote{font-size:16px;line-height:1.7;}
+.lw-preview .lw-kicker{font-size:14px;line-height:1.65;letter-spacing:0;margin-bottom:16px;}
+.lw-preview .lw-button{font-size:16px;min-height:52px;border-radius:16px;font-weight:600;line-height:1.4;box-shadow:none;padding:16px 20px;gap:12px;}
+.lw-preview .lw-primary{background:var(--green);color:var(--paper);}
+.lw-preview .lw-primary:hover:not(:disabled){background:var(--lw-color-primary-hover);transform:none;}
+.lw-preview .lw-primary:disabled{background:var(--lw-color-surface-soft);color:var(--muted);}
+.lw-preview .lw-secondary{background:var(--lw-color-surface-soft);border-color:var(--lw-color-input-line);}
+.lw-preview .lw-link{font-size:14px;min-height:44px;line-height:1.65;color:var(--green);}
+.lw-preview .lw-micro{font-size:12px;letter-spacing:0;line-height:1.5;}
+.lw-preview .lw-story-card{padding:24px;border-radius:20px;border-color:var(--line);background:var(--lw-color-surface);box-shadow:none;animation:none;}
+.lw-preview .lw-card-label,.lw-preview .lw-card-foot{font-size:12px;line-height:1.5;}
+.lw-preview .lw-card-label>span:last-child{color:var(--gold);}
+.lw-preview .lw-draft-row h2{font-size:16px;font-weight:600;line-height:1.5;}
+.lw-preview .lw-draft-row p{font-size:14px;line-height:1.65;}
+.lw-preview .lw-stepper{font-size:12px;line-height:1.5;letter-spacing:0;gap:12px;flex-wrap:wrap;}
+.lw-preview .lw-stepper li{gap:8px;}
+.lw-preview .lw-stage-actions{margin-top:24px;gap:8px;}
+/* 圖片使用共同方形畫布；移除初版浮台、環形軌道與懸浮標籤，角色自行接地。 */
+.lw-preview .lw-scene{display:block;position:relative;width:100%;max-width:400px;height:auto;min-height:0;margin-inline:auto;padding:0;}
+.lw-preview .lw-scene::before,.lw-preview .lw-scene-orbit,.lw-preview .lw-spark,.lw-preview .lw-dais,.lw-preview .lw-scene-chip{display:none;animation:none;}
+.lw-preview .lw-scene-note{position:static;display:block;font-size:14px;line-height:1.65;letter-spacing:0;text-align:center;color:var(--muted);margin:0 0 12px;}
+.lw-preview .lw-egg-scene{position:relative;width:100%;height:auto;margin:0;}
+.lw-preview .lw-egg{position:relative;left:auto;bottom:auto;width:100%;height:auto;max-width:none;aspect-ratio:1;transform:none;filter:none;border-radius:0;}
+.lw-preview .lw-egg:hover:not(:disabled){transform:none;}
+.lw-preview .lw-egg img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
+.lw-preview .lw-egg-caption{position:static;font-size:14px;line-height:1.65;min-height:24px;margin-top:4px;letter-spacing:0;}
+.lw-preview .lw-scene-footer{position:static;font-size:12px;line-height:1.5;text-align:center;letter-spacing:0;margin-top:16px;}
+.lw-preview .lw-reveal-scene{position:relative;width:100%;aspect-ratio:1;}
+.lw-preview .lw-reveal-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;opacity:0;transform:none;transition:opacity 250ms ease-in-out,transform 600ms ease-in-out;}
+.lw-preview[data-reveal="shell"] [data-reveal-shell],.lw-preview[data-reveal="peek"] [data-reveal-peek],.lw-preview[data-reveal="closed"] [data-reveal-closed],.lw-preview[data-reveal="open"] [data-reveal-open],.lw-preview[data-reveal="settled"] [data-reveal-open]{opacity:1;}
+.lw-preview[data-reveal="peek"] [data-reveal-peek],.lw-preview[data-reveal="closed"] [data-reveal-closed],.lw-preview[data-reveal="open"] [data-reveal-open],.lw-preview[data-reveal="settled"] [data-reveal-open]{transition-duration:400ms,600ms;transition-delay:200ms,0ms;}
+/* 開殼沿用同一深裂蛋的上下輪廓，先抬起殼蓋，避免兩張全蛋淡入造成嫩芽重影。 */
+.lw-preview .lw-shell-motion{position:absolute;inset:0;opacity:0;transition:opacity 250ms ease-in-out;}
+.lw-preview[data-reveal="anticipate"] .lw-shell-motion,.lw-preview[data-reveal="shell"] .lw-shell-motion{opacity:1;}
+.lw-preview .lw-reveal-scene .lw-shell-motion img{opacity:1;transition:transform 1000ms cubic-bezier(.22,.61,.36,1);}
+.lw-preview .lw-shell-lid{clip-path:polygon(0 0,100% 0,100% 34%,73% 34%,69% 38%,62% 36%,58% 42%,47% 39%,42% 44%,40% 48%,33% 54%,28% 52%,27% 48%,0 52%);transform-origin:48% 43%;}
+.lw-preview .lw-shell-base{clip-path:polygon(0 52%,27% 48%,28% 52%,33% 54%,40% 48%,42% 44%,47% 39%,58% 42%,62% 36%,69% 38%,73% 34%,100% 34%,100% 100%,0 100%);}
+.lw-preview[data-reveal="shell"] .lw-shell-lid,.lw-preview[data-reveal="peek"] .lw-shell-lid,.lw-preview[data-reveal="closed"] .lw-shell-lid,.lw-preview[data-reveal="open"] .lw-shell-lid,.lw-preview[data-reveal="settled"] .lw-shell-lid{transform:translate(-3%,-11%) rotate(-5deg);}
+.lw-preview .lw-reveal-scene [data-reveal-open]{transform:translateY(12px);}
+.lw-preview[data-reveal="open"] [data-reveal-open],.lw-preview[data-reveal="settled"] [data-reveal-open]{transform:none;}
+.lw-preview .lw-lumi-scene{position:relative;width:100%;animation:none;}
+.lw-preview .lw-lumi-scene>img{display:block;width:100%;height:auto;aspect-ratio:1;margin:0;object-fit:contain;mask-image:none;mix-blend-mode:normal;}
+.lw-preview .lw-lumi-message{position:static;width:100%;max-width:none;transform:none;margin:16px 0 0;padding:20px;border:1px solid var(--line);border-radius:20px;background:var(--lw-color-surface);box-shadow:none;}
+.lw-preview .lw-lumi-message strong{font-size:16px;line-height:1.5;}
+.lw-preview .lw-lumi-message p{font-size:14px;line-height:1.65;}
+.lw-preview .lw-result{border-color:var(--line);border-radius:20px;padding:20px;background:var(--lw-color-surface);}
+.lw-preview .lw-result h2,.lw-preview .lw-how-steps h3,.lw-preview .lw-values h2{font-size:16px;line-height:1.5;}
+.lw-preview .lw-result p,.lw-preview .lw-how-steps p,.lw-preview .lw-how-heading>p:last-child,.lw-preview .lw-values p{font-size:14px;line-height:1.65;}
+.lw-preview .lw-result small,.lw-preview .lw-gentle,.lw-preview .lw-demo-note,.lw-preview .lw-how-boundary,.lw-preview .lw-release-note,.lw-preview .lw-footer,.lw-preview .lw-footer small{font-size:12px;line-height:1.5;letter-spacing:0;}
+.lw-preview .lw-small-icon{color:var(--green);background:var(--lw-color-surface-soft);}
+.lw-preview .lw-how{border-radius:24px;background:var(--lw-color-surface-soft);border-color:var(--line);padding:32px;}
+.lw-preview .lw-values{gap:32px;}
+.lw-preview .lw-values strong{color:var(--ink);}
+@media(max-width:760px){
+ .lw-preview .lw-header,.lw-preview main,.lw-preview .lw-footer{width:calc(100% - 40px);}
+ .lw-preview .lw-header{min-height:80px;gap:12px;}.lw-preview .lw-brand>span{font-size:20px;}
+ .lw-preview .lw-story{display:block;padding-block:24px;}.lw-preview .lw-eyebrow{margin-bottom:20px;}
+ .lw-preview h1{font-size:28px;}.lw-preview #experience-copy h1,.lw-preview #summary-copy h1{font-size:24px;}
+ .lw-preview .lw-scene{max-width:280px;margin-block:24px;}.lw-preview .lw-scene-note{font-size:14px;}
+ .lw-preview .lw-welcome-actions,.lw-preview .lw-summary-actions{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:24px;}
+ .lw-preview .lw-welcome-actions .lw-link{text-align:center;}.lw-preview .lw-button{width:100%;}
+ .lw-preview .lw-story-card{padding:20px;}.lw-preview .lw-values{grid-template-columns:1fr;gap:24px;}.lw-preview .lw-values>p{grid-column:auto;}
+ .lw-preview .lw-how{padding:20px;}.lw-preview .lw-how-steps{grid-template-columns:1fr;gap:24px;}
+ .lw-preview .lw-demo-note{text-align:left;}.lw-preview .lw-scene-footer{font-size:12px;}
+}
+@media(max-width:360px){.lw-preview .lw-header,.lw-preview main,.lw-preview .lw-footer{width:calc(100% - 32px);}}
+@media(prefers-reduced-motion:reduce){.lw-preview .lw-reveal-scene img{transition:none;transform:none;}.lw-preview .lw-egg:hover:not(:disabled){transform:none;}}
+
+/* 敲擊以畫布中心為錨點，不能繼承初版絕對定位的translateX(-50%)。 */
+.lw-preview[data-busy="true"] .lw-egg{animation:lw-centered-tap 650ms ease both;}
+@keyframes lw-centered-tap{0%,100%{transform:rotate(0);}30%{transform:rotate(-1deg) scale(.99);}65%{transform:rotate(1deg);}}
+/* 全部分鏡共享最高的自然高度，切換文案不會把手機上的蛋向下推。 */
+.lw-preview .lw-prose-stack{display:grid;min-width:0;}
+.lw-preview .lw-prose-current,.lw-preview .lw-prose-sizer{grid-area:1 / 1;min-width:0;}
+.lw-preview .lw-prose-sizer{visibility:hidden;pointer-events:none;}
+/* 敘事文字換行、破殼時拿掉圖說，都不改變共同畫布的頂部。 */
+.lw-preview .lw-scene-note{min-height:3.3em;}

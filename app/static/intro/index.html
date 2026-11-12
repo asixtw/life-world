@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="記下真實努力，也留下與重要的人的連結。敲開一顆蛋，認識 Life World 與 Lumi。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Life World｜把每一步，留在自己的世界</title>
+  <link rel="icon" href="/static/intro/assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/intro/design-tokens.css">
+  <link rel="stylesheet" href="/static/intro/preview.css">
+  <link rel="stylesheet" href="/static/intro/preview-v1.css">
+  <script src="/static/intro-preference.js" defer></script>
+  <script src="/static/intro/config.js" defer></script>
+  <script src="/static/intro/entry-bridge.js" defer></script>
+  <script src="/static/intro/hatch-timing.js" defer></script>
+  <script src="/static/intro/preview.js" defer></script>
+  <link rel="stylesheet" href="/static/intro/integration.css">
+</head>
+<body style="margin:0">
+<div class="lw-preview" data-phase="welcome" data-stage="0" data-busy="false">
+  <header class="lw-header">
+    <a class="lw-brand" href="#" aria-label="Life World 首頁" data-action="restart">
+      <svg viewBox="0 0 36 40" aria-hidden="true"><path d="M18 12C7 12 5 22 6 29c1 11 23 11 24 0 1-7-2-17-12-17Z" fill="currentColor" opacity=".18"/><path d="M18 16C7 15 8 5 9 4c9-1 11 7 9 12Zm1 0C19 5 29 3 31 4c0 9-6 13-12 12Z" fill="currentColor"/></svg>
+      <span>Life World<small>讓每一步，都有回應</small></span>
+    </a>
+    <div class="lw-header-actions">
+      <a class="lw-link" href="/#welcome" data-intro-exit>直接進入產品</a>
+      <details class="lw-audio">
+        <summary aria-label="開啟聲音設定"><span aria-hidden="true">♫</span><span>聲音</span><span class="lw-audio-dot" aria-hidden="true"></span></summary>
+        <div class="lw-audio-panel">
+          <p>依你的喜好，讓世界有聲音。</p>
+          <label>背景音樂<input id="music-toggle" type="checkbox" role="switch"></label>
+          <label>互動音效<input id="sfx-toggle" type="checkbox" role="switch"></label>
+          <small>預設靜音；兩個開關各自獨立。</small>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <main>
+    <section class="lw-story" aria-label="認識 Life World">
+      <div class="lw-copy">
+        <p class="lw-eyebrow"><span></span> 記下努力，也記得重要的人。</p>
+        <div id="welcome-copy">
+          <p class="lw-kicker">你的每一天，都有值得留下的事。</p>
+          <h1 id="welcome-title">把真實的努力，<br>與重要的人，<br><em>留在自己的世界。</em></h1>
+          <p class="lw-intro">記下經歷，讓 AI 幫你整理，最後由你決定留下什麼。<br class="lw-desktop-break">讓成長有跡可循，也讓人與人的連結被記得。</p>
+          <div class="lw-welcome-actions">
+            <button class="lw-button lw-primary" id="start" data-action="start">敲開故事，認識 Life World <span aria-hidden="true">↗</span></button>
+            <button class="lw-link" data-action="skip">直接看重點 <span aria-hidden="true">→</span></button>
+          </div>
+          <p class="lw-micro">照自己的步調體驗・不用註冊，不需輸入資料</p>
+        </div>
+
+        <div id="experience-copy" hidden>
+          <ol class="lw-stepper" aria-label="故事進度">
+            <li data-step="1"><span>01</span>真實經歷</li>
+            <li data-step="2"><span>02</span>AI 整理</li>
+            <li data-step="3"><span>03</span>自己確認</li>
+          </ol>
+          <div class="lw-prose-stack"><div class="lw-prose-current">
+          <h1 id="story-title" tabindex="-1"></h1>
+          <p id="story-description" class="lw-intro"></p>
+          <div id="story-content"></div>
+          </div></div>
+          <div class="lw-stage-actions">
+            <button class="lw-button lw-primary" id="advance" data-action="advance"></button>
+            <button class="lw-link" data-action="skip">跳過演出，直接看重點 →</button>
+          </div>
+        </div>
+
+        <div id="summary-copy" hidden>
+          <p class="lw-kicker">一段經歷，不只是一筆紀錄。</p>
+          <h1 id="summary-title" tabindex="-1">努力被看見，<br><em>連結被記得。</em></h1>
+          <p class="lw-intro">Life World 把目標、真實經歷與重要的人連起來。<br class="lw-desktop-break">AI 協助整理，你保有最後的決定。</p>
+          <div class="lw-results">
+            <article class="lw-result"><span class="lw-small-icon" aria-hidden="true">↗</span><div><h2>我的成長</h2><p>留下 30 分鐘的英文練習，<br>看見自己比昨天更敢開口。</p><small>成長紀錄・演示</small></div></article>
+            <article class="lw-result"><span class="lw-small-icon" aria-hidden="true">◎</span><div><h2>重要的人</h2><p>記得和小安一起練習的經歷，<br>讓下一次相遇有跡可循。</p><small>人物互動卡・演示</small></div></article>
+          </div>
+          <div class="lw-summary-actions">
+            <a class="lw-button lw-primary" id="product-entry" href="/#welcome">開始我的故事</a>
+            <button class="lw-button lw-secondary" id="how-button" data-action="how" aria-controls="how-it-works" aria-expanded="false">看看使用方式 <span aria-hidden="true">↓</span></button>
+            <button class="lw-link" data-action="restart">再體驗一次 <span aria-hidden="true">↺</span></button>
+          </div>
+          <p class="lw-gentle">你可以慢慢來。缺席不扣分，Lumi 會歡迎你回來。</p>
+        </div>
+      </div>
+
+      <div class="lw-scene" id="scene">
+        <div class="lw-scene-orbit" aria-hidden="true"></div>
+        <span class="lw-spark lw-spark-one" aria-hidden="true">✧</span>
+        <span class="lw-spark lw-spark-two" aria-hidden="true">✦</span>
+        <span class="lw-scene-note" id="scene-note">每一個開始，都藏著可能。</span>
+        <div class="lw-egg-scene" id="egg-scene">
+          <div class="lw-dais" aria-hidden="true"></div>
+          <button id="egg" class="lw-egg" data-action="advance" type="button" disabled aria-label="先開始體驗，再輕觸目標蛋">
+            <img data-egg="0" src="/static/intro/assets/art/v1/egg-rest-512.png" width="1280" height="1280" alt="" fetchpriority="high">
+            <img data-egg="1" src="/static/intro/assets/art/v1/egg-fine-512.png" width="1280" height="1280" alt="" hidden>
+            <img data-egg="2" src="/static/intro/assets/art/v1/egg-deep-512.png" width="1280" height="1280" alt="" hidden>
+            <img data-egg="3" src="/static/intro/assets/art/v1/egg-open-512.png" width="1280" height="1280" alt="" hidden>
+            <span class="lw-egg-fallback" hidden aria-hidden="true"><span>⌁</span></span>
+          </button>
+          <span class="lw-scene-chip lw-scene-chip-growth"><i aria-hidden="true">↗</i> 一點點進步</span>
+          <span class="lw-scene-chip lw-scene-chip-people"><i aria-hidden="true">◎</i> 一次有意義的相遇</span>
+          <div class="lw-egg-caption"><span class="lw-touch-dot" aria-hidden="true"></span><span id="egg-caption">從一顆目標蛋，開始你的故事</span></div>
+        </div>
+        <div class="lw-reveal-scene" id="reveal-scene" hidden aria-hidden="true">
+          <img data-reveal-deep src="/static/intro/assets/art/v1/egg-deep-512.png" width="512" height="512" alt="">
+          <div data-reveal-shell class="lw-shell-motion"><img class="lw-shell-base" src="/static/intro/assets/art/v1/egg-deep-512.png" width="512" height="512" alt=""><img class="lw-shell-lid" src="/static/intro/assets/art/v1/egg-deep-512.png" width="512" height="512" alt=""></div>
+          <img data-reveal-peek src="/static/intro/assets/art/v1/lumi-hatch-peek-512.png" width="512" height="512" alt="">
+          <img data-reveal-closed src="/static/intro/assets/art/v1/lumi-hatch-closed-512.png" width="512" height="512" alt="">
+          <img data-reveal-open src="/static/intro/assets/art/v1/lumi-welcome-512.png" width="512" height="512" alt="">
+        </div>
+        <div class="lw-lumi-scene" id="lumi-scene" hidden>
+          <img id="lumi-art" src="/static/intro/assets/art/v1/lumi-welcome-512.png" width="512" height="512" alt="奶油白身體、薄荷綠嫩葉的 Lumi，溫和地迎接你">
+          <div class="lw-lumi-fallback" hidden><span aria-hidden="true">✦</span><strong>Lumi 在這裡陪伴你</strong><p>你的努力與連結，都值得被留下。</p></div>
+          <div class="lw-lumi-message"><span aria-hidden="true">✦</span><div><strong>嗨，我是 Lumi。</strong><p>陪你把真實的一小步，慢慢種成自己的世界。</p></div></div>
+        </div>
+        <span class="lw-scene-footer">照自己的步調，慢慢來就好。</span>
+      </div>
+    </section>
+
+    <p class="lw-demo-note"><span aria-hidden="true">◈</span> 互動流程示意・固定虛構內容，不建立世界或呼叫 AI；僅在此瀏覽器記住已看過或跳過介紹。</p>
+
+    <section id="how-it-works" class="lw-how" hidden aria-labelledby="how-title">
+      <div class="lw-how-heading"><p class="lw-eyebrow">MAKE IT YOUR OWN</p><h2 id="how-title" tabindex="-1">真正的故事，從你的生活開始。</h2><p>剛才是一段示意。正式使用時，每一步都由你決定。</p></div>
+      <ol class="lw-how-steps">
+        <li><span>01</span><h3>給自己一個方向</h3><p>設定一個目標與三個習慣，迎接自己的 Lumi。</p></li>
+        <li><span>02</span><h3>留下一段經歷</h3><p>記下真實的努力，也記下與誰發生了什麼。</p></li>
+        <li><span>03</span><h3>讓 AI 幫忙整理</h3><p>查看摘要、下一步與人物資訊候選；可以修改、採納或排除。</p></li>
+        <li><span>04</span><h3>由你確認，慢慢累積</h3><p>確認後才保存與更新。成長有跡可循，互動有原文可回顧。</p></li>
+      </ol>
+      <p class="lw-how-boundary">只是提到一個人，不等於和他互動。AI 提出的是候選，不替任何人下定論。</p>
+      <p class="lw-release-note">本頁是固定虛構示例。正式使用需進入產品，由你建立目標並確認經歷；介紹演出不會更新正式成果。</p>
+    </section>
+
+    <section class="lw-values" aria-label="Life World 的兩種價值">
+      <p>讓平凡的一天，<br><strong>多一點被記得的意義。</strong></p>
+      <div><span aria-hidden="true">↗</span><h2>看見自己的成長</h2><p>把一次次真實投入，連成走過的路。</p></div>
+      <div><span aria-hidden="true">◎</span><h2>記得重要的人</h2><p>從共同經歷出發，延續人與人的連結。</p></div>
+    </section>
+    <noscript><div class="lw-noscript"><h2>認識 Life World</h2><p>記下真實努力與人物互動 → AI 協助整理草稿 → 由你修改、確認 → 留下成長與連結。缺席不扣分。</p><p>此頁為固定示例，無 AI 呼叫或資料保存。啟用 JavaScript 可體驗三次敲蛋。</p></div></noscript>
+  </main>
+  <footer class="lw-footer"><span>Life World <span aria-hidden="true">·</span> 讓真實的一小步，成為你的世界。</span><small>獨立互動介紹 v0.3</small></footer>
+  <p id="live-status" class="lw-sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+</div>
+</body>
+</html>

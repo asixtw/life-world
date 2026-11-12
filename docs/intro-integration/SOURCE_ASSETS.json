@@ -1,0 +1,221 @@
+{
+  "date": "2026-11-12",
+  "status": "independent_local_candidate",
+  "source_commit": "8dfe11976cae4e80c778bf8a989e55b74522d062",
+  "visual_reference_commit": "a2eb3632037726b93f3bea82b395fa7e5d010aa6",
+  "approval_basis": [
+    "docs/SOFTLIFE_VISUAL_CANDIDATE_20261112.md",
+    "docs/integration/2026-11-11/INTEGRATION_RELEASE_REPORT.md §12",
+    "app/static/audio-approved.json"
+  ],
+  "note": "本次依Owner新參考完成獨立導覽構圖；新素材/聲音保留來源與候選界線，未發布正式產品。",
+  "assets": [
+    {
+      "path": "assets/art/lumi-hero.png",
+      "source": "app/static/art/softlife/lumi-hero.png",
+      "bytes": 1443016,
+      "sha256": "4fc69c850fd760cc85882d40b48ab1ea1eb946964e4d3dd6d2c0a21d95c50750",
+      "use": "既有 Soft Life／目標蛋示意"
+    },
+    {
+      "path": "assets/art/egg-rest.png",
+      "source": "app/static/art/egg-rest.png",
+      "bytes": 500964,
+      "sha256": "6bb5e377dbaf40367ff8726394e944dc7489b47bd21d36561fd9ff1cb4eb09a3",
+      "use": "既有 Soft Life／目標蛋示意"
+    },
+    {
+      "path": "assets/art/egg-fine.png",
+      "source": "app/static/art/egg-fine.png",
+      "bytes": 565068,
+      "sha256": "f7682e3e0a433f857cbaba01b52a804d4d1cb02c5ff882796ecf2307cf3ce1f6",
+      "use": "既有 Soft Life／目標蛋示意"
+    },
+    {
+      "path": "assets/art/egg-deep.png",
+      "source": "app/static/art/egg-deep.png",
+      "bytes": 578286,
+      "sha256": "87585e05a376269141b31d83243d9bca7e1c22e04a5e4c5681407043b4b63f5c",
+      "use": "既有 Soft Life／目標蛋示意"
+    },
+    {
+      "path": "assets/art/egg-open.png",
+      "source": "app/static/art/egg-open.png",
+      "bytes": 691469,
+      "sha256": "ac907360c88e7b022c73a3dc824c5f14ce09e7ae2a6c2d9b8f2a1b22792ea1da",
+      "use": "既有 Soft Life／目標蛋示意"
+    },
+    {
+      "path": "assets/audio/login-bgm.wav",
+      "source": "app/static/audio/login-bgm.wav",
+      "bytes": 768044,
+      "sha256": "4a3edf07dfb5a2dfc9500f11bac92c7042774a54bfb9b1ab5e6065b04fa2a85a",
+      "use": "沿用 audio-approved.json 中 approved=true 的已採用素材；僅用於獨立演示"
+    },
+    {
+      "path": "assets/audio/ui-tap.wav",
+      "source": "app/static/audio/ui-tap.wav",
+      "bytes": 7724,
+      "sha256": "02eea828728dd0a01a2a5390adb37380c69910ffed3cf6747b5ec0fbeca0e476",
+      "use": "沿用 audio-approved.json 中 approved=true 的已採用素材；僅用於獨立演示"
+    },
+    {
+      "path": "assets/audio/first-hatch.wav",
+      "source": "app/static/audio/first-hatch.wav",
+      "bytes": 155564,
+      "sha256": "5963b2378b4e1cf41f4c7eca01899b9b3283ba1b240a3a9fb13f5768aecdf5cc",
+      "use": "沿用 audio-approved.json 中 approved=true 的已採用素材；僅用於獨立演示"
+    },
+    {
+      "path": "assets/art/v1/egg-deep-512.png",
+      "source": "app/static/art/design-v1/egg-deep-512.png",
+      "sha256": "20c0275f7482c9ff82a5f4418ec1dbe4b3b7a3072db3d0486ceee23301ed4161",
+      "bytes": 128861,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/art/v1/egg-fine-512.png",
+      "source": "app/static/art/design-v1/egg-fine-512.png",
+      "sha256": "60f5224cb981ccf2c3f7cb1a5fceeacfc058452f0c3ca0ee3ff4cfb3caaa4dce",
+      "bytes": 120340,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/art/v1/egg-open-512.png",
+      "source": "app/static/art/design-v1/egg-open-512.png",
+      "sha256": "8a8a8781f0056b476b24fac9e517abf84e77c194b5e3f1f5f3af5b8cdbcd9c4b",
+      "bytes": 127728,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/art/v1/egg-rest-512.png",
+      "source": "app/static/art/design-v1/egg-rest-512.png",
+      "sha256": "432ca59d3bf92cf7330a005e738f311327aefa670eb7698669c4c4693cdb6744",
+      "bytes": 119028,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/art/v1/lumi-hatch-closed-512.png",
+      "source": "app/static/art/design-v1/lumi-hatch-closed-512.png",
+      "sha256": "c7275f15ff57f042f5e9e80441f58f88cf27ff1b91c656215a2345182f96258f",
+      "bytes": 171562,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/art/v1/lumi-hatch-peek-512.png",
+      "source": "app/static/art/design-v1/lumi-hatch-peek-512.png",
+      "sha256": "8c4c73782be4946d18c2c7f780af775d8ef2d8afa46005d781a62dd08fa22df9",
+      "bytes": 173791,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/art/v1/lumi-welcome-512.png",
+      "source": "app/static/art/design-v1/lumi-welcome-512.png",
+      "sha256": "4ef4ae1c87966318bba6da1385443a39d2a785f0c86fc823ea712d452066440c",
+      "bytes": 151706,
+      "use": "design language v1 generated candidate; owner visual review pending"
+    },
+    {
+      "path": "assets/audio/v1/egg-deep-v1.m4a",
+      "source": "app/static/audio/design-v1/egg-deep-v1.m4a",
+      "bytes": 7720,
+      "sha256": "1f6ab58f31c05242906e08a578c6307140679f0d1bec3767cb171b8be65e951f",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/egg-deep-v1.wav",
+      "source": "app/static/audio/design-v1/egg-deep-v1.wav",
+      "bytes": 124844,
+      "sha256": "c9314dc3768d8c693f7dddcd123ea0356cf0b52c5556674e8618148b9630a478",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/egg-fine-v1.m4a",
+      "source": "app/static/audio/design-v1/egg-fine-v1.m4a",
+      "bytes": 6943,
+      "sha256": "3ef62f22c7015d857b5c060b994e236ac45f9711cdfc9cad4a423689154447b8",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/egg-fine-v1.wav",
+      "source": "app/static/audio/design-v1/egg-fine-v1.wav",
+      "bytes": 80684,
+      "sha256": "f67b6cc72d71fd99f971ccc40f486aab982afd4df64410f72d55f20c27e7e768",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/first-hatch-v1.m4a",
+      "source": "app/static/audio/design-v1/first-hatch-v1.m4a",
+      "bytes": 13900,
+      "sha256": "ae1ffd4242b0989d06421fd50c739097cce8826c301f399cc85686723f0fea17",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/first-hatch-v1.wav",
+      "source": "app/static/audio/design-v1/first-hatch-v1.wav",
+      "bytes": 432044,
+      "sha256": "a02624c1c6647e06265a32a4cf9cc5ba11de3e8d0be49fad79d72a2f9ac5d416",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/login-v1.m4a",
+      "source": "app/static/audio/design-v1/login-v1.m4a",
+      "bytes": 308398,
+      "sha256": "f077a5fc77fa524c238126a5e420cebf9639b22a624ab14c5d9bb708dbae1d44",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/login-v1.wav",
+      "source": "app/static/audio/design-v1/login-v1.wav",
+      "bytes": 4608044,
+      "sha256": "254450d29a67dc3162b2233395a910719e58f58c5662b2ac690f4d5f74828782",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/shell-open-v1.m4a",
+      "source": "app/static/audio/design-v1/shell-open-v1.m4a",
+      "bytes": 8690,
+      "sha256": "1dc5c255556d16c9575c88044ec1dc88ecdf0803a1be65fd0c5e394852c6c20b",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/shell-open-v1.wav",
+      "source": "app/static/audio/design-v1/shell-open-v1.wav",
+      "bytes": 182444,
+      "sha256": "4c652e9250154ef685ea12bdb2627cd2a0f1d0df3030d23caa3a691ec72f00e2",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/ui-tap-v1.m4a",
+      "source": "app/static/audio/design-v1/ui-tap-v1.m4a",
+      "bytes": 4933,
+      "sha256": "7de18a685d4af9fb5bdfd5322791e2535c3c06ff998a71a7831a636b8c3c3da6",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    },
+    {
+      "path": "assets/audio/v1/ui-tap-v1.wav",
+      "source": "app/static/audio/design-v1/ui-tap-v1.wav",
+      "bytes": 46124,
+      "sha256": "b6c34420dab172c832c136bdbbcf288761c1efa2229a6181457c6f6262d4afd3",
+      "use": "已交付聲音候選；導覽播放用WAV，M4A另保留"
+    }
+  ],
+  "design_language": "1.0.0",
+  "approval_note": "沿用先前音訊，新角色依 Owner 參考圖生成，待目視驗收。",
+  "presentation_revision": "0.3",
+  "updated": "2026-11-13",
+  "timing": {
+    "fine_ms": 800,
+    "deep_ms": 1000,
+    "third_click_ms": 4800,
+    "frames_ms": {
+      "anticipate": 0,
+      "shell": 650,
+      "peek": 1650,
+      "closed": 2550,
+      "open": 3250,
+      "settled": 4200
+    }
+  },
+  "layout": "Warm-white flat interface, no dais or orbit; mobile character precedes primary action"
+}

@@ -1,0 +1,16 @@
+/* 只限定首次選擇與關於選單，保留既有產品操作版面。 */
+.intro-choice{max-width:640px;margin:24px auto;padding:24px;border:1px solid #E5E9DF;border-radius:20px;background:#FFFEFA;color:#1F2D2A;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;}
+.intro-choice .intro-eyebrow{font-size:14px;color:#66736D;margin:0 0 16px;}
+.intro-choice h1{font-size:clamp(24px,4vw,32px);font-weight:600;line-height:1.45;margin:0 0 16px;}
+.intro-choice>p{font-size:16px;line-height:1.7;}
+.intro-choice>img{display:block;width:200px;max-width:100%;height:auto;object-fit:contain;margin:20px auto;}
+.intro-choice-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.intro-choice-actions>a,.intro-choice-actions>button{display:flex;justify-content:center;align-items:center;flex:1 1 180px;min-height:52px;padding:14px 20px;border:1px solid #204B40;border-radius:16px;font-size:16px;line-height:1.4;text-align:center;white-space:normal;min-width:0;overflow-wrap:anywhere;}
+.intro-choice-actions .primary{background:#204B40;color:#FFFDF8;}.intro-choice-actions .secondary{background:#F2F5EC;color:#204B40;border-color:#D7E0D2;}
+.intro-choice-actions :focus-visible,.intro-menu :focus-visible{outline:3px solid #4B8E77;outline-offset:4px;}
+.intro-choice .intro-choice-note{font-size:14px;color:#66736D;margin-top:16px;}
+.intro-menu{position:relative;margin-left:auto;flex-shrink:0;}
+.intro-menu summary{cursor:pointer;min-height:44px;display:flex;align-items:center;padding:8px 12px;font-size:14px;color:#204B40;}
+.intro-menu[open]>a{display:block;position:absolute;z-index:20;right:0;top:100%;width:240px;max-width:calc(100vw - 40px);padding:16px 20px;border:1px solid #E5E9DF;border-radius:16px;background:#FFFEFA;color:#204B40;box-shadow:0 6px 24px #1F2D2A0A;font-size:14px;line-height:1.65;}
+.topbar:has(.intro-menu){flex-wrap:wrap;gap:8px;}
+@media(max-width:400px){.intro-choice{padding:20px;margin:16px 0;}.topbar:has(.intro-menu) .breadcrumb{flex-basis:100%;}}

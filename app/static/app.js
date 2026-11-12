@@ -142,6 +142,7 @@ function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').textContent = state.me?.status==='guest' ? '訪客模式' : (state.me?.name?.slice(0,1) || '○'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
 } // 結束目前回呼、區塊或模組定義
 function welcomeView() {
+  if(window.IntroEntry?.shouldOffer(state.me))return window.IntroEntry.choice(); // 介紹偏好只影響提示，不取代後端的新手狀態。
   if(state.capabilities?.public_gate_closed)return `<section class="hero"><div class="hero-copy"><h1>Life World</h1><p>讓真實的一小步，成為你的世界。</p><p>記下經歷、整理想法，讓目標與重要的人逐漸連起來。</p><div class="button-row">${button('entry-guest','不用註冊，先開始')}${button('entry-google','Google 登入','secondary')}${button('entry-email','Email 註冊／登入','secondary')}${button('entry-test','專用測試帳密登入','text-button')}</div><p class="callout" role="status">資料保存服務準備中，目前不接受個人資料。你可以查看入口流程；尚未建立帳號、登入或保存世界。</p><p>目標與三個習慣 · 經歷與人工確認 · 人物小劇場 · Lumi陪伴</p></div>${lumi('welcome')}</section>`;
   return `<div class="welcome">${heading('把每一步，種成自己的世界。','不需要一次走很遠。先給想做的事，一個小小的開始。')}<section class="hero"><div class="hero-copy"><div class="eyebrow">A WORLD THAT GROWS WITH YOU</div><h2>從一顆目標蛋，<br>開始你的故事。</h2><p>記下真實的努力，收集成長的痕跡。建立第一個目標後，新的陪伴也將誕生。</p><div class="button-row">${button('guest','不用註冊，先開始 →')}${button('login-dialog',state.capabilities?.google_login_available?'使用 Google 登入':'登入我的世界','text-button')}</div></div>${lumi('welcome')}</section>${!state.capabilities?.google_login_available?'<p class="callout" role="status">Google 登入尚未啟用。可先以訪客操作；既有帳號入口供授權測試帳號使用，尚未完成跨裝置 Google 恢復驗收。</p>':''}<p class="small muted">資料儲存於目前連線的服務。訪客尚無帳號恢復保障；請用虛構內容測試。</p></div>`; // 組合「產生訪客開始與本機帳號登入入口」所需的畫面或提交資料
 } // 結束目前回呼、區塊或模組定義
@@ -505,6 +506,7 @@ document.addEventListener('click', async event => { // 監聽點擊
   if(target.disabled)return; // 防止重複派送仍在處理的操作。
   const action = target.dataset.action; target.disabled = true; // 讀取按鈕明確指定的操作代碼
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
+    if(action==='intro-direct'){window.IntroEntry?.dismiss();await render();$('#app [data-action=guest],#app [data-action=entry-guest]')?.focus();return;}
     if(action==='entry-retry'){await retryPublicEntry();return;}
     if(action?.startsWith('entry-')){publicEntryView(action.slice(6));return;}
     if (await DraftsUI.handleClick(action,target)) return;
@@ -649,3 +651,7 @@ start().catch(showError); // 啟動 App，未處理錯誤交由共用提示呈�
 
 // 使用委派事件以符合既有 CSP，不允許內嵌腳本。
 document.addEventListener("click",event=>{if(event.target.closest("[data-home-retry]"))render().catch(showError);});
+
+// 返回快取歡迎頁或另一分頁完成介紹時，只更新提示，不打斷產品內任何表單。
+window.addEventListener('pageshow',event=>{if(event.persisted&&state.route==='welcome')render().catch(showError);});
+window.addEventListener('storage',event=>{if(event.key===window.LifeWorldIntroPreference?.key&&state.route==='welcome')render().catch(showError);});

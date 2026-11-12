@@ -1,0 +1,19 @@
+# 只建置及推送映像；候選驗證與切流分開執行，不變更DB／IAM／Secrets。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-product-build@life-world-513506.iam.gserviceaccount.com
+timeout: 1200s
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _COMMIT: local-unpublished
+steps:
+  - id: public-intro-overlay
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --build-arg
+      - VCS_REF=${_COMMIT}
+      - -t
+      - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:public-intro-${_COMMIT}-${BUILD_ID}
+      - .
+images:
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:public-intro-${_COMMIT}-${BUILD_ID}

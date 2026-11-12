@@ -1,5 +1,7 @@
 # 共同規格入口
 
+- **[公開介紹部署](intro-integration/RELEASE.md)**：同環境/intro、首次可選與選單重看；保留現役產品流程。
+
 - [UX v0.3 Candidate 設計審核](experience/ux-v03-candidate/README.md)：NOT APPROVED，Owner 明確核准前停止產品串接；[互動 Demo](experience/ux-v03-candidate/index.html)／[合併關卡](experience/ux-v03-candidate/MERGE_GATES.md)。
 
 - [2026-11-10 經歷四步與人物關聯修復候選](experience/2026-11-10/README.md)：未合併／未部署，v0.2 UX、待新增人物交易及交會顯示邊界。
