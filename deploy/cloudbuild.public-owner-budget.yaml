@@ -1,0 +1,16 @@
+# 單次建置與無網路設定驗證；不自行呼叫AI、資料庫或部署。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-product-build@life-world-513506.iam.gserviceaccount.com
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _COMMIT: approval-required
+steps:
+  - id: per-owner-ai-budget
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '--build-arg', 'VCS_REF=${_COMMIT}', '-t', 'asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:owner-budget-${_COMMIT}-${BUILD_ID}', '.']
+  - id: verify-settings-without-provider
+    name: gcr.io/cloud-builders/docker
+    args: ['run', '--rm', '--network=none', '--entrypoint=python', 'asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:owner-budget-${_COMMIT}-${BUILD_ID}', '-c', 'from app.ai_runtime import AISettings; from app.runtime import RuntimeSettings; import app.main; s=AISettings(budget_scope="owner",max_budget_microusd=20000000,max_total_budget_microusd=20000000); assert s.budget_scope=="owner"; assert RuntimeSettings(alpha_write_quota_enforced=False).alpha_write_quota_enforced is False; print("Runtime settings PASS; no Provider call")']
+images:
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:owner-budget-${_COMMIT}-${BUILD_ID}

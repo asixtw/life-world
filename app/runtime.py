@@ -49,6 +49,7 @@ class RuntimeSettings:
     auth_trusted_proxies: tuple = ()
     alpha_worlds_total: int = 30
     alpha_worlds_daily: int = 20
+    alpha_write_quota_enforced: bool = True  # 封測可只記錄累計寫入；不影響短時間限流。
     alpha_owner_writes: int = 100
     alpha_global_writes: int = 3000
     alpha_source_writes: int = 200
@@ -86,6 +87,7 @@ class RuntimeSettings:
             raise ValueError('IAP staging requires shared rate protection')
         for n in self.auth_trusted_proxies:
             if ipaddress.ip_network(n).prefixlen==0:raise ValueError('Wildcard proxies are forbidden')
+        if type(self.alpha_write_quota_enforced) is not bool:raise ValueError('Invalid Alpha write quota mode')
         for value in (self.alpha_worlds_total,self.alpha_worlds_daily,self.alpha_owner_writes,self.alpha_global_writes,self.alpha_source_writes):
             if not isinstance(value,int) or isinstance(value,bool) or not 1<=value<=1000000:raise ValueError('Invalid Alpha quota')
         if not isinstance(self.alpha_storage_bytes,int) or isinstance(self.alpha_storage_bytes,bool) or not 1<=self.alpha_storage_bytes<=1_000_000_000:raise ValueError('Invalid storage byte cap')
@@ -174,6 +176,7 @@ class RuntimeSettings:
                    auth_trusted_proxies=tuple(x.strip() for x in os.environ.get('LIFEWORLD_AUTH_TRUSTED_PROXIES','').split(',') if x.strip()),
                    alpha_worlds_total=int(os.environ.get('LIFEWORLD_ALPHA_WORLDS_TOTAL','30')),
                    alpha_worlds_daily=int(os.environ.get('LIFEWORLD_ALPHA_WORLDS_DAILY','20')),
+                   alpha_write_quota_enforced=flag('LIFEWORLD_ALPHA_WRITE_QUOTA_ENFORCED',True),
                    alpha_owner_writes=int(os.environ.get('LIFEWORLD_ALPHA_OWNER_WRITES','100')),
                    alpha_global_writes=int(os.environ.get('LIFEWORLD_ALPHA_GLOBAL_WRITES','3000')),
                    alpha_source_writes=int(os.environ.get('LIFEWORLD_ALPHA_SOURCE_WRITES','200')),

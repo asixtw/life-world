@@ -1,0 +1,5 @@
+# 僅覆蓋額度作用域與累計寫入開關，底層保留介紹、圖示及上傳修復。
+FROM asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:6c5eac650057fdbf3dcc68d298dcdb30f95e7c85873601b8a1fa0a53b9014e8c
+ARG VCS_REF
+LABEL org.opencontainers.image.revision=$VCS_REF
+COPY --chown=10001:10001 overlay/ /srv/lifeworld/app/

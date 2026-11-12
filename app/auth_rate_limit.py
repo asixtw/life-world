@@ -63,7 +63,7 @@ class AuthRateLimiter:
             return canonical(chain[-1])
         except (ValueError,AttributeError):raise protection_unavailable() from None
 
-    def take(self,c,scope,identifier,limit,seconds=None,capacity=False):
+    def take(self,c,scope,identifier,limit,seconds=None,capacity=False,enforce=True):
         """列鎖／SQLite寫鎖包住首次插入及門檻，拒絕不延長首次起算視窗。"""
         now=self.clock().astimezone(timezone.utc)
         key=hmac.new(self.settings.auth_rate_secret.encode(),(scope+'\0'+identifier).encode(),hashlib.sha256).hexdigest()
@@ -73,7 +73,7 @@ class AuthRateLimiter:
         started=datetime.fromisoformat(row['window_started_at'])
         used=row['attempts']
         if seconds is not None and (now-started).total_seconds()>=seconds:started,used=now,0
-        if used>=limit:
+        if enforce and used>=limit:
             if capacity:return DomainError(409,'alpha_capacity_reached','本輪 Alpha 測試額度已滿；已保存內容仍可查看，請留意後續開放。')
             error=DomainError(429,'rate_limited','操作過於頻繁，請稍後再試。')
             error.headers={'X-RateLimit-Scope':scope,'Retry-After':str(max(1,int(seconds-(now-started).total_seconds()+.999))), 'Cache-Control':'no-store'}
@@ -123,7 +123,7 @@ class AuthRateLimiter:
 
 
 class AlphaDatabase:
-    """所有owner寫交易都有原子總額度，避免只限制建立世界卻無界寫其他表。"""
+    """Owner寫入原子記次；累計阻擋可配置，短期限流與儲存護欄獨立。"""
     def __init__(self,db,limiter):
         self.inner,self.limiter=db,limiter
         self.backend=db.backend
@@ -163,8 +163,9 @@ class AlphaDatabase:
                 self.limiter._check_config()
                 s=self.limiter.settings
                 if not s.alpha_writes_enabled:raise DomainError(503,'alpha_paused','Alpha 暫停寫入，已保存內容仍可查看。')
+                # 只解除終身寫入阻擋，仍原子記次；來源/登入短期限流及世界建立額度不變。
                 for scope,key,limit in [('alpha_writes_total','all',s.alpha_global_writes),('alpha_owner_writes',owner,s.alpha_owner_writes)]:
-                    error=self.limiter.take(c,scope,key,limit,capacity=True)
+                    error=self.limiter.take(c,scope,key,limit,capacity=True,enforce=s.alpha_write_quota_enforced)
                     if error:raise error
             yield c
             if write:

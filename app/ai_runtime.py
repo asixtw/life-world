@@ -21,14 +21,16 @@ class AISettings:
     max_budget_microusd:int=0
     historical_reservation_microusd:int=0
     max_total_budget_microusd:int=0  # 有限環境必須明確配置；不再硬編碼US$20。
+    budget_scope:str='global'  # owner模式僅用本人收據計費用限額；其他環境預設契約不變。
     budget_mode:str='finite'
     max_concurrent_calls:int=16  # 每個Runtime process的在途模型呼叫上限；跨worker預留仍由DB交易鎖保護。
 
     def __post_init__(self):
+        if self.budget_scope not in ('global','owner'):raise ValueError('Explicit AI budget scope required')
         if self.budget_mode not in ('finite','isolated_e2e_unlimited_total'):raise ValueError('Explicit AI budget mode required')
         for value in (self.historical_reservation_microusd,self.max_total_budget_microusd,self.reservation_microusd,self.max_budget_microusd):
             if type(value) is not int or not 0<=value<=9_000_000_000_000_000:raise ValueError('Invalid integer AI budget')
-        if self.approved and self.budget_mode=='finite' and self.max_total_budget_microusd<=self.historical_reservation_microusd:raise ValueError('Approved AI requires a finite cumulative budget above historical reservation')
+        if self.approved and self.budget_mode=='finite' and self.max_total_budget_microusd<=(self.historical_reservation_microusd if self.budget_scope=='global' else 0):raise ValueError('Approved AI requires a finite cumulative budget above historical reservation')
         if self.budget_mode=='isolated_e2e_unlimited_total' and self.max_total_budget_microusd!=0:raise ValueError('Unlimited total mode must explicitly use zero total budget')
         if type(self.max_concurrent_calls) is not int or not 1<=self.max_concurrent_calls<=128:raise ValueError('Bounded AI concurrency required')
         if self.max_total_budget_microusd<0 or (self.max_total_budget_microusd and self.max_total_budget_microusd<self.reservation_microusd):raise ValueError('Invalid total test budget')
@@ -41,7 +43,7 @@ class AISettings:
         mode=os.environ.get('LIFEWORLD_AI_BUDGET_MODE','finite')
         if mode=='isolated_e2e_unlimited_total' and (os.environ.get('LIFEWORLD_DB_NAME')!='life_world_e2e' or os.environ.get('LIFEWORLD_ACCESS_MODE')=='public_alpha'):
             raise ValueError('Unlimited cumulative budget is restricted to isolated E2E database')
-        return cls(budget_mode=mode,max_concurrent_calls=int(os.environ.get('LIFEWORLD_AI_MAX_CONCURRENT_CALLS','16')),historical_reservation_microusd=int(os.environ.get('LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD','0')),max_total_budget_microusd=int(os.environ.get('LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD','0')),provider=os.environ.get('LIFEWORLD_AI_PROVIDER',''),model=os.environ.get('LIFEWORLD_AI_MODEL',''),approved=os.environ.get('LIFEWORLD_AI_CALLS_APPROVED','false')=='true',
+        return cls(budget_scope=os.environ.get('LIFEWORLD_AI_BUDGET_SCOPE','global'),budget_mode=mode,max_concurrent_calls=int(os.environ.get('LIFEWORLD_AI_MAX_CONCURRENT_CALLS','16')),historical_reservation_microusd=int(os.environ.get('LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD','0')),max_total_budget_microusd=int(os.environ.get('LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD','0')),provider=os.environ.get('LIFEWORLD_AI_PROVIDER',''),model=os.environ.get('LIFEWORLD_AI_MODEL',''),approved=os.environ.get('LIFEWORLD_AI_CALLS_APPROVED','false')=='true',
             max_input_bytes=int(os.environ.get('LIFEWORLD_AI_MAX_INPUT_BYTES','8192')),max_media_bytes=int(os.environ.get('LIFEWORLD_AI_MAX_MEDIA_BYTES','1000000')),max_output_tokens=int(os.environ.get('LIFEWORLD_AI_MAX_OUTPUT_TOKENS','512')),
             max_owner_daily_calls=int(os.environ.get('LIFEWORLD_AI_OWNER_DAILY_CALLS','2')),max_global_calls=int(os.environ.get('LIFEWORLD_AI_GLOBAL_DAILY_CALLS',os.environ.get('LIFEWORLD_AI_GLOBAL_CALLS','5'))),reservation_microusd=int(os.environ.get('LIFEWORLD_AI_RESERVATION_MICROUSD','0')),max_budget_microusd=int(os.environ.get('LIFEWORLD_AI_DAILY_BUDGET_MICROUSD',os.environ.get('LIFEWORLD_AI_BUDGET_MICROUSD','0'))))
 
@@ -154,13 +156,17 @@ class AIRuntime:
                 job=c.execute("SELECT response FROM requests WHERE owner_id=? AND operation='ai_media_work_v1' AND request_id=?",(owner,media_work[2])).fetchone()
                 require(job is not None and json.loads(job['response'])['work_id']==media_work[3],403,'media_work_owner','辨識工作不存在。')
             else:self._daily_jobs(c,owner,now)
-            used=sum(row['reservation_microusd'] for _,row in receipts)
+            # 費用仍保留所有失敗/未知預留；owner模式不可讓A的費用扣掉B的額度。
+            used=sum(row['reservation_microusd'] for receipt_owner,row in receipts if s.budget_scope=='global' or receipt_owner==owner)
             require(used+s.reservation_microusd<=s.max_budget_microusd,429,'ai_quota_reached','最近24小時 AI 預算已達上限；原始素材保留。')
             if s.max_total_budget_microusd:
                 # 僅加總成本預留metadata，包含失敗/費用未知；與滾動24h次數額度分開。
                 value="(response::jsonb->>'reservation_microusd')::bigint" if self.service.db.backend=='postgresql' else "json_extract(response,'$.reservation_microusd')"
-                total=c.execute(f"SELECT COALESCE(sum({value}),0) AS used FROM requests WHERE operation='ai_attempt_v1'").fetchone()['used']
-                require(int(total)+s.historical_reservation_microusd+s.reservation_microusd<=s.max_total_budget_microusd,429,'ai_total_budget_reached','測試期 AI 總預算已達上限，請聯絡管理者；原始紀錄仍可手動編輯。')
+                owner_clause=' AND owner_id=?' if s.budget_scope=='owner' else ''
+                total=c.execute(f"SELECT COALESCE(sum({value}),0) AS used FROM requests WHERE operation='ai_attempt_v1'"+owner_clause,(owner,) if owner_clause else ()).fetchone()['used']
+                # 舊全域預留無Owner不能重複歸到每個帳號；保留原設定作內部追溯，不當成零費用。
+                historical=s.historical_reservation_microusd if s.budget_scope=='global' else 0
+                require(int(total)+historical+s.reservation_microusd<=s.max_total_budget_microusd,429,'ai_total_budget_reached','測試期 AI 總預算已達上限，請聯絡管理者；原始紀錄仍可手動編輯。')
             request_id=request_id or str(uuid4());receipt={'operation':operation,'created_at':now.isoformat(),'reservation_microusd':s.reservation_microusd}
             if media_work is not None:receipt['media_work_id']=media_work[3]
             c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_attempt_v1',request_id,fingerprint,json.dumps(receipt)))
