@@ -14,8 +14,10 @@ _spec.loader.exec_module(bootstrap)
 
 def settings():
     config = bootstrap.test_config()
+    # 測試庫與 alpha 同一套 010 結構，關係來源跟 alpha 上的 010 程式一樣用 link_table。
     return RuntimeSettings(backend='postgresql', db_host=config['host'], db_port=config['port'],
-                           db_password=config['password'], pool_size=8, pg_tls='disable')
+                           db_password=config['password'], pool_size=8, pg_tls='disable',
+                           relation_source_store='link_table')
 
 
 def reset():
