@@ -48,10 +48,13 @@ def test_runtime_privileges_mirror_alpha_app_and_add_only_the_011_minimum():
     grants = bootstrap.runtime_grants()
     rows = [r for r in bootstrap.alpha_snapshot()['effective_runtime_privileges'] if r['role'] == 'lw_alpha_app']
     assert len(rows) == 42
+    # alpha 待套用的權限（2026-11-12 Jerry 核准列入，與 011 一起等 Owner 核准後才在真實 alpha 執行）：只有刪除草稿。
+    pending = set(bootstrap.PENDING_ALPHA_GRANTS)
+    assert pending == {'GRANT DELETE ON "drafts" TO lw_app_role'} and pending <= set(grants)
     for row in rows:
         for privilege in ('select', 'insert', 'update', 'delete'):
             statement = 'GRANT ' + privilege.upper() + ' ON "' + row['table'] + '" TO lw_app_role'
-            assert (statement in grants) == row[privilege], statement
+            assert (statement in grants) == (row[privilege] or statement in pending), statement
     assert 'GRANT UPDATE ("revoked_at") ON "data_consents" TO lw_app_role' in grants  # alpha 既有的欄位權限
     assert not any('TRUNCATE' in g or ' ALL ' in g or 'lw_migrator' in g for g in grants)
     # 011：四表可讀可新增；目前值只開放指定欄位更新；History 不可更新或刪除（與 e2e 已執行的權限相同）。

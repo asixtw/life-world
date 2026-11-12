@@ -185,8 +185,10 @@ def test_archive_hides_restores_and_never_deletes(client):
     assert again.status_code == 409 and again.json()['error']['code'] == 'connection_exists'  # 畫面改為提供恢復
     old_page = client.post(f"/api/people/{w['a']['id']}/connections", json={'request_id': 'old-2', 'other_person_id': w['b']['id'], 'label': '舊頁面覆蓋'})
     assert old_page.status_code == 409 and old_page.json()['error']['code'] == 'connection_archived'
-    assert stored(client, cid) == {'label': '一同平定江東', 'description': '一同平定江東', 'relation_types': json.dumps([{'kind': 'friend'}]),
-                                   'confirmation_status': 'archived', 'revision': 2}
+    row = stored(client, cid)
+    # relation_types 比對 JSON 內容：PostgreSQL（alpha 的 jsonb）會去掉空白，SQLite 保留寫入時的字串。
+    assert json.loads(row.pop('relation_types')) == [{'kind': 'friend'}]
+    assert row == {'label': '一同平定江東', 'description': '一同平定江東', 'confirmation_status': 'archived', 'revision': 2}
     restored = patch(client, cid, 'x-7', 2, confirmation_status='confirmed')
     assert restored.status_code == 200 and restored.json()['confirmation_status'] == 'confirmed' and restored.json()['revision'] == 3
     assert view(client, w['a'], cid)['status'] == 'active'

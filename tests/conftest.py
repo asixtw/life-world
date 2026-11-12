@@ -24,6 +24,25 @@ def client(app):  # 提供自動關閉的 FastAPI 測試用戶端
         yield client  # 提供區塊或測試使用的資源，之後繼續清理
 
 
+def memory_closed_on_postgres(app, clients):
+    """規格（表規格與擬真資料交接 v1.1）：relationship_features／relationship_memory_preferences 這一輪 PostgreSQL 不建。
+    PostgreSQL 上改驗證功能關閉：兩表不存在、個人化 API 一律 503 memory_not_open、帳號資料不變。
+    SQLite 回傳 False，由原測試照常驗證完整行為；PostgreSQL 驗證完回傳 True。"""
+    if app.state.service.db.backend != 'postgresql':
+        return False
+    assert app.state.feature_store is None  # 預設不開；PostgreSQL 沒有這兩張表，不能開
+    with app.state.service.db.connect() as c:
+        absent = c.execute("SELECT to_regclass('relationship_features') IS NULL AND to_regclass('relationship_memory_preferences') IS NULL")
+        assert bool(absent.fetchone()[0])  # PG 連線層把布林轉成 1／0
+    for client in clients:
+        before = client.get('/api/state').json()
+        for method, body in (('GET', None), ('PUT', {'enabled': True, 'preferences': {'summary_style': 'concise'}}), ('DELETE', None)):
+            response = client.request(method, '/api/personalization', json=body)
+            assert response.status_code == 503 and response.json()['error']['code'] == 'memory_not_open', (method, response.text)
+        assert client.get('/api/state').json() == before
+    return True
+
+
 @pytest.fixture
 def sqlite_app(tmp_path):
     """專門重現 SQLite 歷史上可存在、PG 約束已禁止的舊資料狀態。"""

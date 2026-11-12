@@ -13,7 +13,8 @@ def test_unknown_draft_envelope_is_blocked_without_overwrite(client,app):
  assert client.put('/api/drafts/'+d['id'],json=edit).status_code==409
  assert client.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d,contributions=[])).status_code==409
  with app.state.service.db.connect() as c:
-  assert c.execute('SELECT payload FROM draft_stories WHERE draft_id=?',(d['id'],)).fetchone()[0]==payload
+  # 內容原封不動即可：PostgreSQL（alpha 的 jsonb）會正規化格式，SQLite 保留原字串；兩者都必須等於原內容。
+  assert json.loads(c.execute('SELECT payload FROM draft_stories WHERE draft_id=?',(d['id'],)).fetchone()[0])==json.loads(payload)
   row=c.execute('SELECT raw_text,revision FROM drafts WHERE id=?',(d['id'],)).fetchone();assert row['raw_text']==d['raw_text'] and row['revision']==d['revision']
   assert c.execute('SELECT count(*) FROM experiences WHERE owner_id=?',(me['owner_id'],)).fetchone()[0]==0
 

@@ -194,3 +194,17 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 PostgreSQL 輪的 116 項失敗在 main 原樣上同樣存在（差異只有已修正的模擬測試），不是本次修改造成；Cloud Build 過去因 SQLite 輪先失敗而沒有跑到。主因是 `scripts/pg_test_bootstrap.py` 只建立 STEP10 核心草稿結構，程式需要的 010／011 資料表（`person_basic_details`、`person_employments`、`data_consents`、`subject_experiences`、`relationship_memory_preferences` 等）不存在。這一輪**沒有修正**，Cloud Build 的測試資料庫要套用哪些 migration 待決定。
 
 NOT RUN：Cloud Build 重新建置（觸發條件只有推到 main）、Cloud Run 發布（唯讀預檢目前回 `RELEASE_BLOCKED: API runtime differs from production`）、真實模型呼叫。
+
+## 2026-11-12 · Step 3 PostgreSQL 測試庫改用 alpha 結構（010＋011）
+
+依《表規格與擬真資料交接》v1.1：e2e／alpha 同一套 010（42 表），011 是生日／任職四表；`relationship_features`、`relationship_memory_preferences` 這一輪 PostgreSQL 不建。Step 3 的合成 PostgreSQL 改由 alpha 010 唯讀結構快照建表，套 011 審查稿（只去掉環境關卡），Runtime 權限鏡像 alpha 的 `lw_alpha_app`，011 四表沿用 e2e 已執行的最小權限，另列一項 alpha 待套用權限（刪除已存草稿）。PostgreSQL 測試使用 `link_table`。
+
+剩下 17 項依 Jerry 核准的建議處理：只能在 SQLite 執行的寫法改成兩種資料庫都能跑（3）、改用欄名讀資料列（4）、目錄檢查改核對 alpha 010＋011（1）、JSON 欄位改比對內容（2）、關係記憶在 PostgreSQL 改驗證功能關閉且不寫入（5）、刪除草稿依 alpha 待套用權限驗證（2）。
+
+| 項目（本機 PostgreSQL 18.6、Python 3.12.15、Node 24.20.0） | 結果 |
+|---|---|
+| 完整 PostgreSQL | **826 passed／0 failed**／82 skipped／1 xfailed（改前 116 failed） |
+| 完整 SQLite | **809 passed／0 failed**／99 skipped／1 xfailed |
+| 測試庫結構與權限（`tests/test_pg_test_schema.py`） | 3 passed；實作前 3 failed |
+
+NOT RUN：Cloud Build、Cloud Run 部署、真實 alpha 的 011 與權限套用。

@@ -1,6 +1,6 @@
 """記憶重建途中撤回/停用不可重新寫入舊特徵；僅合成SQLite，非真模型。"""
 import pytest
-from conftest import onboard,register,draft,confirm_payload
+from conftest import onboard,register,draft,confirm_payload,memory_closed_on_postgres
 from app.errors import DomainError
 from app.relationship_memory import FeatureStore
 
@@ -15,7 +15,15 @@ def prepared(client,app):
  return store,me['owner_id'],p['id'],experience['id']
 
 
+def closed_on_postgres(client,app):
+ """PostgreSQL 這一輪沒有關係記憶表（規格 v1.1）：改驗證功能關閉、不寫入。"""
+ if app.state.service.db.backend!='postgresql':return False
+ onboard(client);register(client)
+ return memory_closed_on_postgres(app,[client])
+
+
 def test_disabled_during_snapshot_cannot_republish_features(client,app,monkeypatch):
+ if closed_on_postgres(client,app):return
  store,owner,person,experience=prepared(client,app);original=app.state.service.person_overview
  def overview(*args):
   result=original(*args);store.configure(owner,False,{});return result
@@ -28,6 +36,7 @@ def test_disabled_during_snapshot_cannot_republish_features(client,app,monkeypat
 
 @pytest.mark.parametrize('withdraw',['story','fact'])
 def test_source_withdrawn_during_snapshot_is_not_written(client,app,monkeypatch,withdraw):
+ if closed_on_postgres(client,app):return
  store,owner,person,experience=prepared(client,app)
  from app import relationship_engine
  original=relationship_engine.build_context

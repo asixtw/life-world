@@ -32,78 +32,46 @@ def app_raw():
 
 
 def test_catalog_types_constraints_ownership_and_no_theater(app, tmp_path):
-    """以 PG catalog 核對，而非只解析 SQL 檔案。"""
+    """以 PG catalog 核對測試庫就是 alpha 010 快照＋011（表規格與擬真資料交接 v1.1），而非只解析 SQL 檔案。
+    2026-11-12 之前這裡核對 11-02 的 31 表核心草稿；Cloud Run 改連 alpha 後，測試庫改用 alpha 的實際結構。"""
     assert app.state.service.db.backend == 'postgresql'
     assert not list(tmp_path.glob('*.sqlite*'))
-    with bootstrap.admin_connection() as raw, closing(raw.cursor()) as c:
-        c.execute("SELECT count(*) FROM pg_tables WHERE schemaname='lw_core_draft'")
-        assert c.fetchone()[0] == 32
-        c.execute("SELECT count(*), bool_and(convalidated) FROM pg_constraint WHERE connamespace='lw_core_draft'::regnamespace AND contype='f'")
-        assert c.fetchone() == [60, True]
-        c.execute("SELECT count(*) FROM information_schema.columns WHERE table_schema='lw_core_draft'")
-        assert c.fetchone()[0] == 207
-        c.execute("SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='lw_core_draft'")
-        types = {(t, n): d for t, n, d in c.fetchall()}
-        # 32表逐欄與既有 SQLite migration 的全新合成參照比對，不能只驗六個樣本。
-        numeric = {('actions','target'),('actions','per_occurrence'),('contributions','quantity'),
-                   ('habit_quantity_versions','quantity'),('pending_contributions','quantity'),
-                   ('pending_contributions','accepted_quantity')}
-        jsonb = {('actions','weekdays'),('actions','schedule_dates'),('completions','evidence_ids'),
-                 ('draft_stories','payload'),('drafts','contributions'),('goal_reviews','previous_state'),
-                 ('goal_reviews','new_state'),('people','roles'),('people','tags'),
-                 ('person_connections','source_experience_ids'),('requests','response'),
-                 ('story_history','before_json'),('story_history','after_json')}
-        boolean = {('actions','target_is_derived'),('experience_participants','interacted'),
-                   ('experience_stories','reviewed'),('experience_stories','available'),
-                   ('people','followed'),('tasks','done')}
-        dates = {('goals','start_date'),('goals','deadline'),('habit_quantity_versions','effective_from')}
-        expected_types, expected_not_null, expected_fk = {},set(),set()
-        with Database(tmp_path / 'explicit-sqlite-schema-reference').connect() as reference:
-            tables = [r[0] for r in reference.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
-            # PG核心006固定32表；SQLite另有尚未批准部署PG的009記憶契約，不能當PG已建表。
-            sqlite_only={'relationship_memory_preferences','relationship_features'}
-            assert len(tables)==34 and sqlite_only.issubset(tables)
-            tables=[table for table in tables if table not in sqlite_only]
-            assert len(tables)==32
-            for table in tables:
-                for col in reference.execute('PRAGMA table_info("' + table + '")'):
-                    key = (table,col['name'])
-                    expected_types[key] = ('numeric' if key in numeric else 'jsonb' if key in jsonb else
-                        'boolean' if key in boolean else 'date' if key in dates else
-                        'timestamp with time zone' if col['name'].endswith('_at') else
-                        {'TEXT':'text','INTEGER':'bigint','BLOB':'bytea'}[col['type']])
-                    if col['notnull'] or col['pk']:
-                        expected_not_null.add(key)
-                for fk in reference.execute('PRAGMA foreign_key_list("' + table + '")'):
-                    assert fk['on_update'] == fk['on_delete'] == 'NO ACTION'
-                    expected_fk.add((table,fk['from'],fk['table'],fk['to']))
-        for table in ('goal_reviews','story_history'):
-            expected_types[table,'audit_seq'] = 'bigint'
-            expected_not_null.add((table,'audit_seq'))
-        assert types == expected_types
-        c.execute("SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='lw_core_draft' AND is_nullable='NO'")
-        assert {tuple(r) for r in c.fetchall()} == expected_not_null
+    snapshot = bootstrap.alpha_snapshot()['structure']
+    alpha_tables = {r['name'] for r in snapshot['relations'] if r['kind'] == 'r'}
+    new_011 = set(bootstrap.GRANTS_011)
+    with closing(bootstrap.admin_connection()) as raw, closing(raw.cursor()) as c:
+        c.execute("SELECT tablename FROM pg_tables WHERE schemaname='lw_core_draft'")
+        assert {r[0] for r in c.fetchall()} == alpha_tables | new_011 and len(alpha_tables) == 42
+        assert not (alpha_tables | new_011) & {'relationship_features', 'relationship_memory_preferences'}  # 這一輪 PG 不建
+        # 逐欄型別與 NOT NULL 跟 alpha 快照一致（format_type 與快照同一種表示法）。
+        c.execute("""SELECT t.relname,a.attname,format_type(a.atttypid,a.atttypmod),NOT a.attnotnull FROM pg_attribute a
+            JOIN pg_class t ON t.oid=a.attrelid WHERE t.relnamespace='lw_core_draft'::regnamespace AND t.relkind='r'
+            AND a.attnum>0 AND NOT a.attisdropped""")
+        columns = {(r[0], r[1]): (r[2], r[3]) for r in c.fetchall()}
+        expected = {(x['table'], x['name']): (x['type'], x['nullable']) for x in snapshot['columns'] if x['table'] in alpha_tables}
+        assert {k: v for k, v in columns.items() if k[0] in alpha_tables} == expected
+        assert sum(1 for k in columns if k[0] in new_011) == 63  # 011 四表共 63 欄（與 011 套用後的核對相同）
+        # 外鍵：alpha 的 81 個定義逐字相同（含連動刪除行為），再加 011 的 9 個（沒有連動，NO ACTION）；全部已驗證。
+        c.execute("""SELECT conname,convalidated,pg_get_constraintdef(oid),confupdtype,confdeltype FROM pg_constraint
+            WHERE connamespace='lw_core_draft'::regnamespace AND contype='f'""")
+        fks = {r[0]: r for r in c.fetchall()}
+        unqualified = lambda text: text.replace('lw_core_draft.', '')  # 定義是否帶 schema 取決於 search_path，不影響內容
+        alpha_fks = {k['name']: unqualified(k['definition']) for k in snapshot['constraints'] if k['kind'] == 'f'}
+        assert len(alpha_fks) == 81 and len(fks) == 81 + 9 and all(r[1] for r in fks.values())
+        assert {name: unqualified(fks[name][2]) for name in alpha_fks} == alpha_fks
+        assert all(r[3] == r[4] == 'a' for name, r in fks.items() if name not in alpha_fks)
         c.execute("SELECT table_name,column_name,identity_generation FROM information_schema.columns WHERE table_schema='lw_core_draft' AND is_identity='YES'")
         assert {tuple(r) for r in c.fetchall()} == {('goal_reviews','audit_seq','ALWAYS'),('story_history','audit_seq','ALWAYS')}
-        c.execute("""SELECT t.relname,a.attname,r.relname,b.attname
-            FROM pg_constraint f JOIN pg_class t ON t.oid=f.conrelid JOIN pg_class r ON r.oid=f.confrelid
-            CROSS JOIN LATERAL unnest(f.conkey,f.confkey) k(src,dst)
-            JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=k.src
-            JOIN pg_attribute b ON b.attrelid=r.oid AND b.attnum=k.dst
-            WHERE f.connamespace='lw_core_draft'::regnamespace AND f.contype='f'
-            AND f.confupdtype='a' AND f.confdeltype='a'""")
-        assert {tuple(r) for r in c.fetchall()} == expected_fk
-        for key, expected in {('actions','target'): 'numeric', ('drafts','contributions'): 'jsonb',
-                              ('drafts','occurred_at'): 'timestamp with time zone',
-                              ('goals','deadline'): 'date', ('tasks','done'): 'boolean',
-                              ('evidence','content'): 'bytea'}.items():
-            assert types[key] == expected
         c.execute("SELECT count(*) FROM pg_class WHERE relnamespace='lw_core_draft'::regnamespace AND relkind='S'")
         assert c.fetchone()[0] == 2
         c.execute("SELECT bool_and(relowner='lw_migration_role'::regrole) FROM pg_class WHERE relnamespace='lw_core_draft'::regnamespace AND relkind IN ('r','S')")
         assert c.fetchone()[0] is True
+        # 約束以外的索引：alpha 的 23 個加上 011 的 4 個。
         c.execute("SELECT count(*) FROM pg_index i JOIN pg_class t ON t.oid=i.indrelid LEFT JOIN pg_constraint c ON c.conindid=i.indexrelid WHERE t.relnamespace='lw_core_draft'::regnamespace AND c.oid IS NULL")
-        assert c.fetchone()[0] == 11
+        assert c.fetchone()[0] == 23 + 4
+        # 劇場提案（lw_theater_draft）沒有建立。
+        c.execute("SELECT to_regnamespace('lw_theater_draft') IS NULL")
+        assert c.fetchone()[0] is True
         c.execute("SELECT rolsuper,rolcreatedb,rolcreaterole,rolbypassrls FROM pg_roles WHERE rolname='lw_app'")
         assert c.fetchone() == [False] * 4
         c.execute("SELECT pg_has_role('lw_app','lw_migration_role','MEMBER')")

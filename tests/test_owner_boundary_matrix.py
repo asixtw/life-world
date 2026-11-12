@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.relationship_memory import FeatureStore
-from conftest import onboard, register
+from conftest import onboard, register, memory_closed_on_postgres
 from test_people import person, event, fact_body
 
 @pytest.fixture
@@ -65,7 +65,11 @@ def test_cross_owner_read_list_mutate_nested_and_revoke(owners,attacker):
 
 @pytest.mark.parametrize('deleting',[0,1])
 def test_delete_personalization_only_affects_session_owner(owners,deleting):
-    app,rows=owners;store=FeatureStore(app.state.service);app.state.feature_store=store
+    app,rows=owners
+    # PostgreSQL 這一輪沒有關係記憶表（規格 v1.1）：兩個帳號都只能得到 503，資料都不變。
+    if memory_closed_on_postgres(app,[r['client'] for r in rows]):
+        return
+    store=FeatureStore(app.state.service);app.state.feature_store=store
     for r in rows:
         store.configure(r['owner'],True,{'summary_style':'concise'});assert store.context(r['owner'])['features']
     target=rows[1-deleting];before=snapshot(target)

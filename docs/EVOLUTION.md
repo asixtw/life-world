@@ -250,3 +250,7 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 - 開放後全套測試暴露救回的路由有一個缺陷：`test_review_security_fixes.py::test_simulation_does_not_send_withdrawn_story` 失敗——交會故事撤回後，人物資訊仍以那則故事為來源送給模型（F1 封鎖期間這支測試只因整體被擋而通過）。修正：模擬只使用沒有被撤回的來源，和 `relationship_memory` 記憶用途同一條規則；人物資訊沒有可用來源就在呼叫模型前回 422 `confirmed_sources_required`。新增邊界測試：同一則資訊還有其他未撤回來源時仍可模擬，但只送出可用來源。
 
 測試結果見 [ACCEPTANCE](ACCEPTANCE.md) 同日條目。
+
+## 2026-11-12 · Step 3 PostgreSQL 測試庫與 alpha 同一套結構
+
+Jerry 確認環境規則：本機連 Cloud SQL `life_world_e2e`，Cloud Run 連 `life_world_alpha`，Web 與 API 相同。Step 3 的合成 PostgreSQL 原本停在 11-02 的 31 表核心草稿，main 的程式已需要 010／011 的表，PostgreSQL 輪有 116 項失敗（過去因 SQLite 輪先失敗而沒有執行到）。改為以 alpha 010 結構快照＋011 建立，權限鏡像 alpha；剩下的落差逐項處理後兩種資料庫全套通過。alpha 待套用：011 四表與最小權限、`drafts` 的刪除權限（需 Owner 核准後在真實 alpha 執行）。

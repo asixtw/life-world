@@ -23,6 +23,9 @@ GRANTS_011 = {'person_basic_details': ('birth_year', 'birth_month', 'birth_day')
 SOURCE_COLUMNS_011 = ('source_kind', 'source_experience_id', 'evidence_type', 'source_quote', 'source_status',
                       'confirmed_at', 'revision', 'updated_at')
 ACL_PRIVILEGES = {'r': 'SELECT', 'a': 'INSERT', 'w': 'UPDATE', 'x': 'REFERENCES'}
+# alpha 待套用的權限：2026-11-12 Jerry 核准列入（刪除已存草稿需要），與 011 一起等 Owner 核准後才在真實 alpha 執行。
+# 測試庫先照「套用後」的 alpha 驗證；清單之外不補任何 alpha 沒有的權限。
+PENDING_ALPHA_GRANTS = ('GRANT DELETE ON "drafts" TO lw_app_role',)
 
 
 def quote(name):
@@ -96,7 +99,7 @@ def runtime_grants(snapshot=None):
         if values:
             grants.append('GRANT UPDATE (' + ', '.join(quote(c) for c in values + SOURCE_COLUMNS_011) + ') ON '
                           + quote(table) + ' TO lw_app_role')
-    return list(dict.fromkeys(grants))
+    return list(dict.fromkeys(grants + list(PENDING_ALPHA_GRANTS)))
 
 
 def test_config():

@@ -170,7 +170,7 @@ def test_profile_save_read_back_versioning_and_stale(client):
     assert client.get(f"/api/persons/{b['id']}").json()['profile'] is None  # 不影響其他人物
     with client.app.state.service.db.connect() as c:
         rows = c.execute("SELECT kind,title FROM notes WHERE person_id=?", (a['id'],)).fetchall()
-    assert [tuple(r) for r in rows] == [('preparation', persons_module.PROFILE_TITLE)] * 2  # 只新增，舊版保留
+    assert [(r['kind'], r['title']) for r in rows] == [('preparation', persons_module.PROFILE_TITLE)] * 2  # 只新增，舊版保留（用欄名取值，PostgreSQL 的資料列是 dict）
     assert save_profile(client, a['id'], 'pf-4', second.json()['id'], personality='x' * 2001).status_code == 422
     assert save_legacy_profile(client, a['id'], {'request_id': 'pf-5', 'expected_profile_id': second.json()['id'],
                                                                'fields': {'unknown_field': 'x'}}).status_code == 422
@@ -243,4 +243,9 @@ def test_no_new_tables_or_character_cards(client):
     save_profile(client, a['id'], 's-1', None, background='背景')
     with client.app.state.service.db.connect() as c:
         assert c.execute("SELECT COUNT(*) FROM works WHERE kind='character_card'").fetchone()[0] == 0
-        assert c.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%person_profile%'").fetchone()[0] == 0
+        # 兩種資料庫都不得多出人物設定專用表：SQLite 查 sqlite_master，PostgreSQL 查目前 schema 的系統目錄。
+        if client.app.state.service.db.backend == 'postgresql':
+            catalog = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=current_schema() AND table_name LIKE '%person_profile%'"
+        else:
+            catalog = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%person_profile%'"
+        assert c.execute(catalog).fetchone()[0] == 0

@@ -10,6 +10,7 @@
 """
 import hashlib
 import json
+from contextlib import closing
 from datetime import datetime, timezone
 
 import pytest
@@ -54,8 +55,10 @@ def person_experience(client, owner, sid, people, status='active'):
 
 def rows(client, connection_id):
     with client.app.state.service.db.connect() as c:
-        return [tuple(r) for r in c.execute('SELECT experience_id,subject_experience_id,source_position FROM person_connection_experience_sources '
-                                            'WHERE connection_id=? ORDER BY experience_id IS NULL,source_position', (connection_id,))]
+        # 用欄名取值：PostgreSQL 的資料列是 dict，tuple(r) 會得到欄名而不是值。
+        return [(r['experience_id'], r['subject_experience_id'], r['source_position'])
+                for r in c.execute('SELECT experience_id,subject_experience_id,source_position FROM person_connection_experience_sources '
+                                   'WHERE connection_id=? ORDER BY experience_id IS NULL,source_position', (connection_id,))]
 
 
 def jsonb(client, connection_id):
@@ -77,15 +80,32 @@ def patch(client, connection_id, request_id, expected_revision, **body):
     return client.patch(f'/api/connections/{connection_id}', json={'request_id': request_id, 'expected_revision': expected_revision, **body})
 
 
+def link_table_shape(c, backend):
+    """關聯表的欄位順序與外鍵（參照表、本表欄、參照欄）：SQLite 讀 PRAGMA，PostgreSQL 讀系統目錄。"""
+    if backend == 'postgresql':
+        columns = [r['column_name'] for r in c.execute(
+            "SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() "
+            "AND table_name='person_connection_experience_sources' ORDER BY ordinal_position")]
+        fks = sorted((r['ref'], r['src'], r['dst']) for r in c.execute(
+            "SELECT r.relname AS ref,a.attname AS src,b.attname AS dst FROM pg_constraint f "
+            "JOIN pg_class t ON t.oid=f.conrelid JOIN pg_class r ON r.oid=f.confrelid "
+            "CROSS JOIN LATERAL unnest(f.conkey,f.confkey) k(s,d) "
+            "JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=k.s JOIN pg_attribute b ON b.attrelid=r.oid AND b.attnum=k.d "
+            "WHERE f.contype='f' AND t.relname='person_connection_experience_sources' AND t.relnamespace=to_regnamespace(current_schema())"))
+        return columns, fks
+    columns = [r[1] for r in c.execute('PRAGMA table_info(person_connection_experience_sources)')]
+    return columns, sorted((r[2], r[3], r[4]) for r in c.execute('PRAGMA foreign_key_list(person_connection_experience_sources)'))
+
+
 def test_sqlite_link_table_matches_final_e2e_shape(client):
+    """名稱沿用；PostgreSQL 那一輪（與 alpha 同一套 010 結構）也要符合同一個形狀。"""
     with client.app.state.service.db.connect() as c:
-        columns = [r[1] for r in c.execute('PRAGMA table_info(person_connection_experience_sources)')]
-        fks = sorted((r[2], r[3], r[4]) for r in c.execute('PRAGMA foreign_key_list(person_connection_experience_sources)'))
+        columns, fks = link_table_shape(c, client.app.state.service.db.backend)
     assert columns == ['connection_id', 'owner_id', 'subject_experience_id', 'experience_id', 'source_position']
     assert fks == [('experiences', 'experience_id', 'id'), ('experiences', 'owner_id', 'owner_id'),
                    ('person_connections', 'connection_id', 'id'), ('person_connections', 'owner_id', 'owner_id'),
                    ('subject_experiences', 'owner_id', 'owner_id'), ('subject_experiences', 'subject_experience_id', 'id')]
-    assert client.app.state.service.relation_source_store == 'link_table'  # SQLite 的結構一定含 010
+    assert client.app.state.service.relation_source_store == 'link_table'  # 兩種資料庫都用 010 的 link_table
 
 
 def test_post_writes_link_table_and_get_reads_it_in_order(client):
@@ -255,9 +275,20 @@ def test_legacy_mode_after_migration_stops_relation_writes(tmp_path):
 
 def test_ready_requires_the_link_table_in_link_mode(client):
     assert client.get('/ready').status_code == 200
-    with client.app.state.service.db.connect(write=True) as c:
-        c.execute('DROP TABLE person_connection_experience_sources')
-    assert client.get('/ready').status_code == 503  # 連結模式卻沒有關聯表：明確報未就緒，不退回 JSONB
+    if client.app.state.service.db.backend == 'postgresql':
+        # Runtime 帳號不能改結構；用專用測試 cluster 的管理帳號暫時改名，驗證後改回，不影響其他測試。
+        from pg_support import bootstrap
+        with closing(bootstrap.admin_connection()) as raw, closing(raw.cursor()) as c:
+            c.execute('ALTER TABLE lw_core_draft.person_connection_experience_sources RENAME TO pces_hidden_for_ready_test')
+        try:
+            assert client.get('/ready').status_code == 503
+        finally:
+            with closing(bootstrap.admin_connection()) as raw, closing(raw.cursor()) as c:
+                c.execute('ALTER TABLE lw_core_draft.pces_hidden_for_ready_test RENAME TO person_connection_experience_sources')
+    else:
+        with client.app.state.service.db.connect(write=True) as c:
+            c.execute('DROP TABLE person_connection_experience_sources')
+        assert client.get('/ready').status_code == 503  # 連結模式卻沒有關聯表：明確報未就緒，不退回 JSONB
     assert client.get('/api/capabilities').json()['relation_sources'] == 'link_table'
 
 
