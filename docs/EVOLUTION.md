@@ -234,3 +234,9 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-12 v1.1資料契約稽核（只讀）
 
 010快照與011本機候選的欄位/FK對照無差異；模板為空、Gold是人工預期，真背景AI NOT RUN。已分離輸入/輸出/正式採納，列出S07獎勵衝突、背景來源失效與九項profile寫入API相容性阻擋；不新增產品或模型呼叫。詳[v1.1稽核](integration/2026-11-12_DATA_CONTRACT_AUDIT/README.md)，維持Draft/NO-GO。
+
+## 2026-11-12 · PR26 Soft Life 視覺候選
+
+在 PR26 `804f3f4` 上適配已核實的 Soft Life 3D Lumi 主圖與獨立 CSS 主題，保留四主分頁、四步紀錄、登入及資料契約；未將展示站的多願望行為移入 App。初次程式測試通過；後續依授權保留新提交並接續 PR26 審查，不提升 App 版本，未合併或部署。[範圍、素材來源與驗證界線](SOFTLIFE_VISUAL_CANDIDATE_20261112.md)。
+
+後續按既有 PR26 推送授權，在新基準 `846f250d` 乾淨套入相同視覺候選，保留生日／目標期間防呆與交接證據，沒有重寫原三個提交。

@@ -1,0 +1,172 @@
+/* Soft Life 視覺適配。只覆寫外觀，不增刪產品內容、互動或資料狀態。 */
+:root {
+  --paper: #fffdf8;
+  --white: #fffefa;
+  --ink: #1f2d2a;
+  --muted: #66736d;
+  --green: #204b40;
+  --mint: #e7f0e6;
+  --line: #e5e9df;
+  --gold: #a1843d;
+  --soft-shadow: 0 8px 30px #25473507;
+}
+
+body { background: var(--paper); color: var(--ink); }
+.app-shell { grid-template-columns: 232px minmax(0, 1fr); }
+.sidebar { background: #f5f6ef; padding: 38px 22px 24px; border-color: #e6eadd; }
+.brand { gap: 11px; letter-spacing: -.6px; font-size: 21px; }
+.brand-symbol { display: grid; place-items: center; width: 39px; height: 43px; border-radius: 14px; background: #e0eddf; color: #49876e; font-size: 29px; flex-shrink: 0; }
+.brand small { letter-spacing: .9px; color: var(--muted); }
+#nav { margin-top: 58px; gap: 11px; }
+.nav-link { min-height: 52px; padding: 13px 16px; gap: 14px; border-radius: 14px; color: #617268; }
+.nav-link.active { background: #e0ebdf; color: #264d3e; font-weight: 650; }
+.nav-link:hover { background: #e8eee4; }
+.sidebar-bottom { border-top: 1px solid #e0e6db; line-height: 1.9; color: var(--muted); }
+.status-dot { background: #68a88c; }
+.topbar { height: 84px; background: var(--paper); border-color: var(--line); gap: 18px; }
+.breadcrumb { color: #66766b; }
+#account-button { background: #f0e7d3; color: #635d47; border-color: #e3dac6; }
+.content { max-width: 1260px; padding-top: 37px; }
+.heading { margin-bottom: 28px; }
+h1 { letter-spacing: .4px; font-weight: 650; font-size: 32px; }
+h2 { font-weight: 650; letter-spacing: .2px; }
+.eyebrow { color: var(--muted); font-size: 10px; letter-spacing: 2px; }
+.heading p, .hero-copy > p { color: var(--muted); }
+
+/* 保留四個主分頁及其操作，統一卡片、表單與焦點可讀性。 */
+.card, .stat { background: #fffefa; border-color: var(--line); border-radius: 20px; box-shadow: var(--soft-shadow); }
+.card { padding: 27px; }
+.primary, .secondary, .danger, .text-button { border-radius: 13px; min-height: 46px; }
+.primary { background: var(--green); color: #fffdf8; box-shadow: 0 4px 12px #214e4010; }
+.primary:hover { background: #30624f; }
+.secondary { background: #f2f5ec; border-color: #dce5d7; color: #345943; }
+.secondary:hover { background: #e6eee1; }
+.danger { background: #f9eae4; color: #884731; }
+.text-button { color: var(--green); box-shadow: none; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid #4b8e77; outline-offset: 4px;
+}
+input, textarea, select { background: #fffefa; border-color: #d7e0d2; border-radius: 12px; }
+input:disabled { background: #f1f2eb; }
+fieldset { border-color: #e1e7d9; border-radius: 16px; }
+.callout { border-color: #e1e7d8; background: #f3f5eb; color: #586a57; border-radius: 13px; }
+.error-message { background: #f9eee8; color: #884731; border-color: #e9d4c7; }
+.tag { background: #eaf1e4; color: #526a50; border-radius: 7px; }
+.tag.gold { color: #7b652e; background: #f7efd9; }
+.circle-icon, .stat-icon { background: #edf2e3; color: #68845c; }
+.empty { color: var(--muted); }
+.raw-source { background: #f4f6ed; border-color: #b8cfb1; }
+.progress, .progress > progress, .progress progress::-webkit-progress-bar { background: #e7ecdf; }
+.progress progress::-webkit-progress-value { background: #83ac91; }
+.progress progress::-moz-progress-bar { background: #83ac91; }
+dialog { background: var(--paper); color: var(--ink); border-color: var(--line); border-radius: 24px; box-shadow: 0 25px 80px #17332725; }
+dialog::backdrop { background: #20382b40; backdrop-filter: blur(4px); }
+#audio-preferences[open] { background: var(--paper); border-color: var(--line); }
+
+/* 主視覺使用 demo v1 原始圖，不裁去角色、目標蛋或基座，也不覆寫舊資產。 */
+.hero { background: #f5f6ed; border: 1px solid #e4e9db; border-radius: 25px; }
+.hero-copy { padding: 35px 32px; }
+.hero h2 { font-weight: 600; }
+.hero-art.lumi-art { width: 100%; height: auto; min-height: 260px; max-height: 380px; transform: none; padding: 0; align-self: center; }
+.lumi-art::before { display: none; }
+.lumi-asset { display: block; width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; mask-image: radial-gradient(ellipse 70% 71% at 50% 50%, #000 52%, transparent 85%); }
+.lumi-art [data-lumi-fallback] { min-height: 260px; display: grid; place-items: center; }
+.welcome { gap: 16px; min-height: 65vh; }
+.welcome h1 { font-size: 36px; }
+.welcome .hero { grid-template-columns: 1.05fr 1fr; min-height: 370px; }
+.welcome .hero-copy { padding: 45px 0 40px 34px; }
+.welcome .hero .lumi-art { width: 110%; margin-left: -8%; }
+.welcome .hero h2 { font-size: 29px; }
+.home-overview { gap: 24px; align-items: stretch; }
+.home-lumi { background: #f5f6ed; min-height: 460px; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.home-lumi .hero-copy { background: transparent; backdrop-filter: none; border-radius: 0; max-width: none; padding: 32px 30px 0; }
+.home-lumi .hero-copy h2 { margin-bottom: 6px; }
+.home-lumi .hero-copy p { margin-bottom: 0; font-size: 14px; }
+.home-lumi .lumi-art { width: 110%; align-self: center; margin: 0 0 26px; min-height: 280px; max-height: none; }
+/* 圖片已帶植栽與基座；僅隱藏重複裝飾，舊檔仍完整保留。 */
+.home-lumi .world-cabinet, .home-lumi .world-plant { display: none; }
+.home-goal { padding: 29px; }
+.home-goal > h2 { margin-top: 12px; }
+.home-habit-row { border-color: #dfe6d6; background: #fbfcf7; border-radius: 14px; padding: 14px 16px; color: var(--ink); }
+.home-habit-row:hover { background: #eef4e9; }
+.home-habit-row small { color: #5b6d57; }
+.dash-habit, .dash-overview .card { border-radius: 18px; }
+.dash-bar { color: #7aa58b; }
+.moment-tabs { background: #edf2e6; }
+.moment-tabs [aria-selected=true] { background: var(--white); box-shadow: 0 2px 8px #25473512; }
+.moment-organize { background: #fbfcf7; border-color: #dfe6d6; }
+#experience-step-track span { background: #e7ecdf; }
+#experience-step-track .done { background: #83ac91; }
+
+/* 願望蛋沿用 demo 的 CSS 立體語彙，不引入新孵化規則。 */
+.egg { background: radial-gradient(ellipse at 31% 24%, #fffef9 12%, #f9f4e7 52%, #dfdac7 100%); border-color: #e5dfcd; border-radius: 49% 51% 47% 48% / 61% 61% 39% 39%; box-shadow: inset -5px -4px 10px #9a9b7e18, 0 8px 6px -6px #5d695940; color: #659d83; }
+.egg.completed { background: radial-gradient(ellipse at 31% 24%, #fffff7, #e5efdc); }
+.birth-scene { min-height: 350px; }
+[data-birth] .hero { background: #f8f7f0; }
+[data-birth-lumi] .lumi-art { max-width: 410px; }
+footer { color: var(--muted); border-color: var(--line); line-height: 1.9; }
+
+@media (max-width: 1100px) and (min-width: 681px) {
+  .app-shell { grid-template-columns: 190px minmax(0, 1fr); }
+  .sidebar { padding-inline: 16px; }
+  .brand { font-size: 18px; }
+  .home-overview { grid-template-columns: minmax(0, 1fr); }
+  .home-lumi { min-height: 350px; flex-direction: row; align-items: center; }
+  .home-lumi .hero-copy { width: 42%; padding: 25px 0 25px 25px; }
+  .home-lumi .lumi-art { width: 62%; margin: 0; min-height: 240px; }
+  .welcome .hero { grid-template-columns: minmax(0, 1fr); }
+  .welcome .hero-copy { padding: 30px 30px 0; }
+  .welcome .hero .lumi-art { width: min(100%, 460px); margin: 0; }
+}
+
+@media (max-width: 680px) {
+  .app-shell { display: block; }
+  .sidebar { height: calc(72px + env(safe-area-inset-bottom)); padding: 0 6px env(safe-area-inset-bottom); background: #fffdf8f5; }
+  #nav { margin: 0; gap: 2px; height: 72px; }
+  .nav-link { min-height: 50px; gap: 0; padding: 6px 10px; border-radius: 13px; margin: 6px 0; }
+  .nav-link.active { background: #edf3e6; }
+  .topbar { height: 66px; padding: 0 18px; gap: 10px; }
+  .breadcrumb { font-size: 11px; }
+  .breadcrumb > span { margin: 0 5px; }
+  .content { padding: 26px 18px 20px; }
+  .heading { margin-bottom: 22px; }
+  h1, .welcome h1 { font-size: 28px; letter-spacing: 0; }
+  .heading p { font-size: 13px; }
+  .card { padding: 21px; border-radius: 20px; }
+  .primary, .secondary, .danger { white-space: normal; text-align: center; }
+  .hero { grid-template-columns: minmax(0, 1fr); border-radius: 22px; }
+  .hero-copy, .welcome .hero-copy { padding: 27px 24px 0; }
+  .hero h2, .welcome .hero h2 { font-size: 25px; }
+  .hero-copy > p { font-size: 13px; line-height: 1.9; }
+  .hero .primary { min-height: 46px; font-size: 13px; padding: 11px 16px; }
+  .hero-art.lumi-art { width: 100%; min-height: 210px; max-height: 300px; }
+  .welcome { min-height: 0; }
+  .welcome .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .welcome .hero .lumi-art { width: 108%; margin: 0 -4% 8px; }
+  .home-overview { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .home-lumi { min-height: 360px; }
+  .home-lumi .hero-copy { padding: 25px 24px 0; }
+  .home-lumi .lumi-art { width: 110%; margin: 0 0 14px; min-height: 220px; }
+  .home-goal { padding: 24px 21px; }
+  .home-habit-row { padding: 13px 14px; }
+  .birth-scene { min-height: 300px; }
+  .birth-egg { width: 155px; height: 205px; }
+  footer { padding: 23px 18px calc(96px + env(safe-area-inset-bottom)); font-size: 10px; }
+}
+
+@media (max-width: 360px) {
+  .topbar { padding-inline: 12px; gap: 7px; }
+  .breadcrumb { font-size: 10px; }
+  .breadcrumb > span { margin-inline: 3px; }
+  #account-button { padding-inline: 9px; font-size: 11px; }
+  #audio-preferences summary { font-size: 12px; }
+  .content { padding-inline: 14px; }
+  h1, .welcome h1 { font-size: 25px; }
+  .hero-copy, .welcome .hero-copy { padding-inline: 20px; }
+  .home-lumi { min-height: 320px; }
+  .card { padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lumi-asset, .primary, .secondary, .nav-link { animation: none; transition: none; }
+}
