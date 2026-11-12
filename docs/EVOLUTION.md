@@ -2,7 +2,7 @@
 
 ## 2026-11-13｜公開介紹發布批次
 
-Owner核准部署；從現役421e9b95移植介紹功能，保留PR26。驗收與實際發布結果見[本批紀錄](intro-integration/RELEASE.md)。
+Owner核准部署後，從現役421e9b95移植介紹功能並保留PR26；Runtime提交c73ddf8、lw-public-intro-c73ddf8已100%上線，正式4項唯讀驗收通過。驗收與實際發布結果見[本批紀錄](intro-integration/RELEASE.md)。
 
 ## 2026-11-11 PR26整合候選（未部署）
 

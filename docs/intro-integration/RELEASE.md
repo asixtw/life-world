@@ -23,7 +23,7 @@ Owner最新指示「ok 幫我做到部署」，本批提交、Push、Build、同
 
 ## 結果
 
-部署準備中；以下實績與收據於操作完成後更新，不預先宣稱上線。
+**已發布：lw-public-intro-c73ddf8，100%正式流量。**
 
 ## 發布前驗收
 
@@ -34,3 +34,16 @@ Owner最新指示「ok 幫我做到部署」，本批提交、Push、Build、同
 850e03c的Cloud Build與零流量Deploy皆成功，設定讀回完全符合預期；HTTP／全部素材逐byte校驗亦通過。隨後應用程式瀏覽器驗收出現 **2 PASS／2 FAIL**，失敗限320／390手機首次開始：程式尚在下載、畫面先呈現可點按鈕，場景初始化重排時第一次操作落空。此時未切正式流量，僅review tag在候選。
 
 [原始失敗XML](release/CANDIDATE_LIVE.xml)／[載入診斷](release/START_DIAGNOSTIC.json)保留；沒有把它當成通過。新增三尺寸「阻擋preview.js下載」測試，先 **3 FAIL**，修正為初始化後才啟用開始／跳過／聲音控制，再 **3 PASS**。本次必要修正仍限已授權介紹功能，未改正式產品流程；修正後以新提交／新Build建立候選，不重送任何失敗的雲端寫入（先前雲端寫入均成功，無結果不明）。正式流量保留421e9b95，直到修正後候選完整通過。
+
+## 最終實績
+
+- 已Push發布分支`release/public-intro-20261113`，Runtime來源提交`c73ddf8c83e2eb41d2499a045ef104f14f585bd2`；未Merge／Push main。
+- 最終Cloud Build `51c3d429-2348-4edc-be69-c7fa768e77d4` **SUCCESS**，新Digest `sha256:972da0d1ef0efb792c0fd8c443eb25092be9d74e5ed969cb5467541e51af4c01`。
+- Revision `lw-public-intro-c73ddf8`，正式100%；`alpha-guest-review`同版，舊421e9b95與初次850e03c候選保留零流量。
+- 原／新有效Revision spec與服務template spec去除映像後精確一致，網路／容量註記不變。沒有改DB、IAM、Secrets、Host白名單、登入或正式產品流程；僅新增介紹路由與入口。
+- 修正版針對性檢查 **5 PASS／0 FAIL**，包含慢速載入的瀏覽器回歸 **21 PASS／0 FAIL**；修正版候選線上 **4 PASS／0 FAIL（14.86秒）**，指定正式數字網址 **4 PASS／0 FAIL（18.19秒）**。沒有SKIP；正式驗收未登入真人、未建立世界或呼叫AI，測試攔截任何產品寫入。
+- 三尺寸完整介紹、固定`#welcome`入口、完成後不重複提示與選單另開重看通過。原生Safari／Android及陌生訪客理解度仍NOT RUN。
+
+[正式介紹](https://lw-public-162310640466.asia-east1.run.app/intro)／[正式入口](https://lw-public-162310640466.asia-east1.run.app/#welcome)／[發布收據](release/RELEASE_RECEIPT.json)／[最終流量](release/FINAL_STATE.json)／[有效設定比對](release/CANDIDATE_CONFIG_FINAL.json)／[修正版候選XML](release/CANDIDATE_LIVE_FINAL.xml)／[正式XML](release/PRODUCTION_LIVE.xml)／[30檔發布白名單](release/CONTEXT_MANIFEST_FINAL.json)。
+
+正式畫面：[390手機入口](release/screenshots/390-production-entry.png)／[390介紹](release/screenshots/390-production-intro.png)／[1440桌面入口](release/screenshots/1440-production-entry.png)／[1440介紹](release/screenshots/1440-production-intro.png)。

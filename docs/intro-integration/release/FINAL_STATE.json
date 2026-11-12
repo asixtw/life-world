@@ -1,0 +1,14 @@
+{
+  "service": "lw-public",
+  "revision": "lw-public-intro-c73ddf8",
+  "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:972da0d1ef0efb792c0fd8c443eb25092be9d74e5ed969cb5467541e51af4c01",
+  "traffic": [
+    {
+      "percent": 100,
+      "revisionName": "lw-public-intro-c73ddf8",
+      "tag": "alpha-guest-review",
+      "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+    }
+  ],
+  "effective_runtime_unchanged": true
+}

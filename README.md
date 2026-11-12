@@ -1,6 +1,6 @@
 # Life World · Python 本機 App
 
-> **2026-11-13 公開介紹發布批次：**[本批狀態、驗收與部署紀錄](docs/intro-integration/RELEASE.md)。以現役421e9b95保留PR26與圖示後接入介紹，非整站回退。
+> **2026-11-13 公開介紹已發布：**[本批狀態、驗收與部署紀錄](docs/intro-integration/RELEASE.md)。以現役421e9b95保留PR26與圖示後接入介紹，非整站回退。
 
 > **2026-11-05 工程整合：**先讀[Public Alpha共同交付與未完成事項](docs/RELEASE_PUBLIC_ALPHA_20261105.md)。包含Alpha限流／預建登入與Dashboard；本機驗證通過，Docker及雲端公開驗收未完成，合併main不代表已上線。
 

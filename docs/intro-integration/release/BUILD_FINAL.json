@@ -1,0 +1,16 @@
+{
+  "id": "51c3d429-2348-4edc-be69-c7fa768e77d4",
+  "status": "SUCCESS",
+  "images": [
+    {
+      "artifactRegistryPackage": "projects/life-world-513506/locations/asia-east1/repositories/lw-product-candidates/packages/lw-product/versions/sha256:972da0d1ef0efb792c0fd8c443eb25092be9d74e5ed969cb5467541e51af4c01",
+      "digest": "sha256:972da0d1ef0efb792c0fd8c443eb25092be9d74e5ed969cb5467541e51af4c01",
+      "name": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:public-intro-c73ddf8c83e2eb41d2499a045ef104f14f585bd2-51c3d429-2348-4edc-be69-c7fa768e77d4",
+      "pushTiming": {
+        "endTime": "2026-11-12T20:13:01.277755976Z",
+        "startTime": "2026-11-12T20:12:47.927607932Z"
+      }
+    }
+  ],
+  "logUrl": "https://console.cloud.google.com/cloud-build/builds/51c3d429-2348-4edc-be69-c7fa768e77d4?project=162310640466"
+}

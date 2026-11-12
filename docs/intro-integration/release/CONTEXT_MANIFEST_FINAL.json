@@ -1,0 +1,124 @@
+{
+  "files": [
+    {
+      "path": "app/main.py",
+      "sha256": "dd4740b9e04a1eae417a1ff70c562af1ba8a75d0b4ad339d26493d9f003dfe48"
+    },
+    {
+      "path": "app/static/index.html",
+      "sha256": "5b2fa728e74d5c98d4f7a3528f87faef68710c6e5ce901e227585b1db2992d69"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "17fe31517fc039ba8e82a3c889961d9ba952c3a812206b8366acae4d279f6d2f"
+    },
+    {
+      "path": "app/static/intro-entry.css",
+      "sha256": "a331111178df0b494459185e459fe050be0e428bbc6517fa826e9d1f219bcf7e"
+    },
+    {
+      "path": "app/static/intro-entry.js",
+      "sha256": "23a2b767f233238cbc837d1cae04c4cdcfbaaf90f26043afb78cc9b6035a0aff"
+    },
+    {
+      "path": "app/static/intro-preference.js",
+      "sha256": "28c08969dc56bb27f7df741d942f9aa53be075460f5bf89e7af729c2e2cf84e9"
+    },
+    {
+      "path": "app/static/intro/asset-manifest.json",
+      "sha256": "3300d0b6ad3a1955529f674f7c77822f2639925189bcba842db3b2ca49a6c432"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-deep-512.png",
+      "sha256": "20c0275f7482c9ff82a5f4418ec1dbe4b3b7a3072db3d0486ceee23301ed4161"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-fine-512.png",
+      "sha256": "60f5224cb981ccf2c3f7cb1a5fceeacfc058452f0c3ca0ee3ff4cfb3caaa4dce"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-open-512.png",
+      "sha256": "8a8a8781f0056b476b24fac9e517abf84e77c194b5e3f1f5f3af5b8cdbcd9c4b"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-rest-512.png",
+      "sha256": "432ca59d3bf92cf7330a005e738f311327aefa670eb7698669c4c4693cdb6744"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/lumi-hatch-closed-512.png",
+      "sha256": "c7275f15ff57f042f5e9e80441f58f88cf27ff1b91c656215a2345182f96258f"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/lumi-hatch-peek-512.png",
+      "sha256": "8c4c73782be4946d18c2c7f780af775d8ef2d8afa46005d781a62dd08fa22df9"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/lumi-welcome-512.png",
+      "sha256": "4ef4ae1c87966318bba6da1385443a39d2a785f0c86fc823ea712d452066440c"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/egg-deep-v1.wav",
+      "sha256": "c9314dc3768d8c693f7dddcd123ea0356cf0b52c5556674e8618148b9630a478"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/egg-fine-v1.wav",
+      "sha256": "f67b6cc72d71fd99f971ccc40f486aab982afd4df64410f72d55f20c27e7e768"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/first-hatch-v1.wav",
+      "sha256": "a02624c1c6647e06265a32a4cf9cc5ba11de3e8d0be49fad79d72a2f9ac5d416"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/login-v1.wav",
+      "sha256": "254450d29a67dc3162b2233395a910719e58f58c5662b2ac690f4d5f74828782"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/shell-open-v1.wav",
+      "sha256": "4c652e9250154ef685ea12bdb2627cd2a0f1d0df3030d23caa3a691ec72f00e2"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/ui-tap-v1.wav",
+      "sha256": "b6c34420dab172c832c136bdbbcf288761c1efa2229a6181457c6f6262d4afd3"
+    },
+    {
+      "path": "app/static/intro/assets/icon.svg",
+      "sha256": "76ddfc7a7b2405f02ae7a84ada31777ff195104eed5fbee75473e878987c8a87"
+    },
+    {
+      "path": "app/static/intro/design-tokens.css",
+      "sha256": "7a5062a14a3d78b8edd3747bbd8dbdf1651993e5980444659ba305859af1a9d8"
+    },
+    {
+      "path": "app/static/intro/hatch-timing.js",
+      "sha256": "98318035cd3b38a66fc5d8555732711131e449b3046b420d32a24a653559e0ad"
+    },
+    {
+      "path": "app/static/intro/preview-v1.css",
+      "sha256": "2c1847940dd7abb8d15b74cb2fbbe60a43872a1424c3a129358076642606e6cf"
+    },
+    {
+      "path": "app/static/intro/preview.css",
+      "sha256": "3c888ab3ce322fed818731b0d90c56c48425c7e76f6391f0914ab781f5bb969a"
+    },
+    {
+      "path": "app/static/intro/preview.js",
+      "sha256": "c1ad8228aef9c14524dd65908946977cb02314dfe74633c08d61e3c9d3ccd0bd"
+    },
+    {
+      "path": "app/static/intro/index.html",
+      "sha256": "f34eeca0185b114490a7b9b86dda843dbc56749359a1c998d598fc4b8e55ebfe"
+    },
+    {
+      "path": "app/static/intro/config.js",
+      "sha256": "aa93e684f2ed247dc8e1854f26baf6f01ace24db04931691f7b758fc22e31bbb"
+    },
+    {
+      "path": "app/static/intro/entry-bridge.js",
+      "sha256": "327332777043b1178932e21180719fdfaae1a237f002cf7c5895684437b74d09"
+    },
+    {
+      "path": "app/static/intro/integration.css",
+      "sha256": "dc19af7812ab5da4812026e03b2e2ec3e4595cab8e826375da0e9bd0e3d80838"
+    }
+  ]
+}

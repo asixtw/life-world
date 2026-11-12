@@ -1,4 +1,6 @@
-# 公開互動介紹接入｜部署批次
+# 公開互動介紹接入｜已發布
+
+**已上線：**[獨立介紹](https://lw-public-162310640466.asia-east1.run.app/intro)／[產品入口](https://lw-public-162310640466.asia-east1.run.app/#welcome)。Runtime提交`c73ddf8`、Revision`lw-public-intro-c73ddf8`、100%流量；正式4項驗收通過，詳[發布收據與實績](RELEASE.md)。
 
 2026-11-13（Asia/Taipei）。Owner採用獨立公開介紹、產品初次可選、完成／跳過後不再提示及選單重看；指定結尾進入`https://lw-public-162310640466.asia-east1.run.app/#welcome`。本機以相同來源`/#welcome`驗證，部署後即為指定網址。Owner隨後明確指示「ok 幫我做到部署」，本批已獲Commit／Push／Build／Deploy及同服務切流授權。
 
@@ -39,4 +41,4 @@
 
 原本圖示批次的head「完全不新增腳本」測試，依本次需求改為只允許兩個介紹腳本與一份樣式，原腳本及樣式的順序／屬性仍逐項嚴格比對，沒有刪案例或放寬任意變更。放大字體測試曾因注入style被既有CSP拒絕，改用先讀取各元素原字級再透過CSSOM放大；不放寬產品CSP。其後抓到主要按鈕繼承nowrap造成窄螢幕溢出，已局部修正為自然換行。初次與中途XML保留，不作最終通過證據。
 
-Owner主觀視覺／節奏採用、5位陌生訪客理解度、原生Safari／Android及正式雲端驗收均尚未執行。本機SQLite結果不代表PostgreSQL發布Gate已通過。
+以下屬初版本機階段的待驗收記錄：Owner主觀視覺／節奏、5位陌生訪客理解度、原生Safari／Android。正式雲端介紹驗收現已完成，見本頁最上方實績。本機SQLite結果不代表PostgreSQL發布Gate已通過。

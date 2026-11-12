@@ -1,0 +1,83 @@
+{
+  "recorded_at": "2026-11-13T04:16:40.704101+08:00",
+  "urls": {
+    "intro": "https://lw-public-162310640466.asia-east1.run.app/intro",
+    "product": "https://lw-public-162310640466.asia-east1.run.app/#welcome"
+  },
+  "service": "lw-public",
+  "region": "asia-east1",
+  "project": "life-world-513506",
+  "base_commit": "421e9b95c21a4abd1059f3c235545649e12ca830",
+  "source_commit": "c73ddf8c83e2eb41d2499a045ef104f14f585bd2",
+  "branch": "release/public-intro-20261113",
+  "pushed": true,
+  "build": "51c3d429-2348-4edc-be69-c7fa768e77d4",
+  "build_status": "SUCCESS",
+  "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:972da0d1ef0efb792c0fd8c443eb25092be9d74e5ed969cb5467541e51af4c01",
+  "revision": "lw-public-intro-c73ddf8",
+  "traffic": [
+    {
+      "percent": 100,
+      "revisionName": "lw-public-intro-c73ddf8",
+      "tag": "alpha-guest-review",
+      "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+    }
+  ],
+  "runtime_files": 30,
+  "backend_files": 1,
+  "static_files": 29,
+  "effective_runtime_unchanged": true,
+  "db_iam_secrets_changed": false,
+  "main_merged_or_pushed": false,
+  "product_writes_during_cloud_tests": 0,
+  "real_AI_calls": 0,
+  "checks": {
+    "RELEASE_BACKEND_FINAL.xml": {
+      "tests": "53",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.905"
+    },
+    "release/START_FIX_UNIT.xml": {
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.246"
+    },
+    "release/START_FIX_BROWSER.xml": {
+      "tests": "21",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "24.131"
+    },
+    "release/CANDIDATE_LIVE_FINAL.xml": {
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "14.860"
+    },
+    "release/PRODUCTION_LIVE.xml": {
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "18.187"
+    }
+  },
+  "initial_candidate": {
+    "commit": "850e03c",
+    "revision": "lw-public-intro-850e03c",
+    "cloud_writes": "SUCCESS with correct readback",
+    "application_tests": "2 passed / 2 failed; startup click race",
+    "canonical_production_traffic_before_fix": "unchanged 421e9b95 100%",
+    "fix": "disable initial interactive controls until layout and handlers ready; slow-load red 3 / green 3"
+  },
+  "pending": [
+    "原生iPhone／Android實機驗收",
+    "5位陌生訪客理解度測試"
+  ]
+}
