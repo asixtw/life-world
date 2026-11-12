@@ -747,3 +747,15 @@ footer{
 .moment-organize input[type=radio]{width:18px;height:18px;min-height:18px;display:inline-block;padding:0;margin:0 8px 0 0;accent-color:var(--green);vertical-align:middle}
 .moment-tabs button{white-space:nowrap}.media-transcript{margin-top:12px}.media-transcript>summary{font-size:13px}
 @media(max-width:360px){.moment-tabs button{font-size:13px;padding:10px 2px}}
+/* R3：常用數量增減與原值輸入分離，仍可手動填部分完成。 */
+.quantity-entry{display:flex;gap:8px;align-items:center}.quantity-entry input{flex:1;min-width:0}.quantity-entry button{flex:0 0 44px;min-width:44px;padding:8px}
+
+/* 人物搜尋是逐列選擇，保留同名識別與44px以上點擊範圍。 */
+[data-workflow-options]{display:grid;gap:8px;margin-block:12px}
+.person-search-row{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:12px;border:1px solid var(--line,#d8e3dc);border-radius:12px;background:var(--surface,#fff);text-align:left;color:inherit}
+.person-search-avatar{flex:0 0 36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#e7f1ec}
+.person-search-copy{flex:1;min-width:0;display:grid;gap:4px;overflow-wrap:anywhere}
+.person-search-copy small{color:#596e64;font-size:.8rem}
+.person-search-row:focus-visible{outline:3px solid #6d9e8b;outline-offset:2px}
+.person-search-row [data-person-selected]{font-size:.75rem;flex-shrink:0}
+.person-search-row[hidden]{display:none}

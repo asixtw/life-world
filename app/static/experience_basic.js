@@ -34,7 +34,7 @@ window.BasicCandidatesUI=(()=>{
   async function create(person,v,raw){
     const f=c.getFlow(),owner=c.state.me.owner_id,kind=v.dimension;
     const details=person.personId?await c.api('/people/'+person.personId+'/details'):null;
-    if(f!==c.getFlow()||owner!==c.state.me?.owner_id)throw new Error('帳號或草稿已變更，未加入候選。');
+    if(f!==c.getFlow()||owner!==c.state.me?.owner_id)throw new Error('帳號或草稿已變更，未加入資訊。');
     const x={candidate_ref:crypto.randomUUID(),target:person.personId?{person_id:person.personId}:{client_ref:person.key.slice(8)},expected_revision:0,source_kind:v.source_kind||'manual',source_sha256:null,quote:v.source_kind==='raw'?v.quote:null,evidence_type:v.evidence_type||null,selected:false,excluded:false,needs_review:true};
     if(kind==='birthday'){
       x.expected_revision=details?.birthday?.revision||0;x.value=Object.fromEntries(['birth_year','birth_month','birth_day'].map(k=>[k,v[k]===''||v[k]==null?null:Number(v[k])]));
@@ -63,7 +63,7 @@ window.BasicCandidatesUI=(()=>{
   function render(p,dialog){
     const own=entries().filter(({x})=>onPerson(x,p));if(!own.length)return;
     const body=dialog.querySelector('.experience-preview-body');body.querySelector('[data-basic-candidate-review]')?.remove();
-    body.insertAdjacentHTML('afterbegin',`<section data-basic-candidate-review><h3>本次基本資料變更</h3><p class="small">逐項核對這份資料；不是向人物本人獨立查證。未採用不會寫入。</p>${own.map(({kind,x})=>`<section class="card space-top" data-basic-review-row="${esc(x.candidate_ref)}"><h4>${labels[kind]} · ${kind==='birthday'?(x.expected_revision===0?'新增生日':'更正生日'):!x.employment_id?'新增任職':'更正任職'}</h4><p data-basic-prior="${esc(x.candidate_ref)}">${p.personId?'正在讀取原值…':'待建立人物，尚無原值。'}</p><p>→ 本次資料：${esc(text(kind,x))}</p><details><summary>查看資料來源</summary><p>${x.source_kind==='raw'?'本次原文片段':'我手動提供／自行記錄'}</p>${x.quote?`<blockquote>${esc(x.quote)}</blockquote>`:''}<p>${esc({stated_by_person:'人物本人告知',observed_by_user:'我觀察到',documented_source:'文件記載'}[x.evidence_type]||'未指定證據，不視為人物本人告知')}</p></details>${x.needs_review?'<p class="small">'+(x.source_kind==='raw'&&x.source_sha256&&x.source_sha256!==c.state.draft?.raw_sha256?'原始經歷已修改，這項資訊需要重新核對；請對照目前原文。':'請核對內容、有效來源與日期；不完整資料請返回修改或排除。')+'</p>':''}<label class="check-line"><input type="checkbox" data-basic-select="${esc(x.candidate_ref)}" ${x.selected?'checked':''} ${p.personId?'disabled':''}>我已核對，最後確認時保存</label><button type="button" class="text-button" data-basic-exclude="${esc(x.candidate_ref)}">${x.excluded?'恢復待核對':'本次不保存這項'}</button><p data-basic-result>${x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'尚未核對，目前不會寫入'}</p></section>`).join('')}</section>`);
+    body.insertAdjacentHTML('afterbegin',`<section data-basic-candidate-review><h3>本次基本資料變更</h3><p class="small">逐項核對這份資料；不是向人物本人獨立查證。未採用不會寫入。</p>${own.map(({kind,x})=>`<section class="card space-top" data-basic-review-row="${esc(x.candidate_ref)}"><h4>${labels[kind]} · ${kind==='birthday'?(x.expected_revision===0?'新增生日':'更正生日'):!x.employment_id?'新增任職':'更正任職'}</h4><p data-basic-prior="${esc(x.candidate_ref)}">${p.personId?'正在讀取原值…':'待建立人物，尚無原值。'}</p><p>→ 本次資料：${esc(text(kind,x))}</p><details><summary>查看資料來源</summary><p>${x.source_kind==='raw'?'本次原文片段':'我手動提供／自行記錄'}</p>${x.quote?`<blockquote>${esc(x.quote)}</blockquote>`:''}<p>${esc({stated_by_person:'人物本人告知',observed_by_user:'我觀察到',documented_source:'文件記載'}[x.evidence_type]||'未指定證據，不視為人物本人告知')}</p></details>${x.needs_review?'<p class="small">'+(x.source_kind==='raw'&&x.source_sha256&&x.source_sha256!==c.state.draft?.raw_sha256?'原始經歷已修改，這項資訊需要重新核對；請對照目前原文。':'請核對內容、有效來源與日期；不完整資料請返回修改或排除。')+'</p>':''}<label class="check-line"><input type="checkbox" data-basic-select="${esc(x.candidate_ref)}" ${x.selected?'checked':''} ${p.personId?'disabled':''}>我已核對，最後確認時保存</label><button type="button" class="text-button" data-basic-exclude="${esc(x.candidate_ref)}">${x.excluded?'恢復待你確認':'本次不保存這項'}</button><p data-basic-result>${x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'待你確認，目前不會寫入'}</p></section>`).join('')}</section>`);
     if(p.personId)loadPrior(p,dialog,own);
   }
   /** 原值與候選版本不同就撤銷採用；不可靜默更新預期版本來繞過衝突。 */
@@ -77,10 +77,10 @@ window.BasicCandidatesUI=(()=>{
         const n=dialog.querySelector('[data-basic-prior="'+CSS.escape(x.candidate_ref)+'"]');if(!n)continue;
         n.textContent='原有資料：'+(prior?text(kind,{value:prior}):'尚無此筆資料')+(prior?.source_status==='withdrawn'?'（來源已撤回，不能當有效證據）':'');
         const control=dialog.querySelector('[data-basic-select="'+CSS.escape(x.candidate_ref)+'"]');control.disabled=false;
-        if((prior?.revision||0)!==x.expected_revision){n.textContent+='；版本已變更，請返回第三步重新加入候選，不會自動覆寫。';x.selected=false;x.needs_review=true;n.dataset.versionConflict='true';dialog.querySelector('[data-basic-select="'+CSS.escape(x.candidate_ref)+'"]').disabled=true;control.checked=false;control.closest('[data-basic-review-row]').querySelector('[data-basic-result]').textContent='版本衝突，目前不會寫入';c.state.dirty=true;}
+        if((prior?.revision||0)!==x.expected_revision){n.textContent+='；版本已變更，請返回第三步重新加入資訊，不會自動覆寫。';x.selected=false;x.needs_review=true;n.dataset.versionConflict='true';dialog.querySelector('[data-basic-select="'+CSS.escape(x.candidate_ref)+'"]').disabled=true;control.checked=false;control.closest('[data-basic-review-row]').querySelector('[data-basic-result]').textContent='版本衝突，目前不會寫入';c.state.dirty=true;}
       }
       c.refresh();
-    }catch{if(f===c.getFlow()&&dialog.dataset.personKey===key)dialog.querySelectorAll('[data-basic-prior]').forEach(n=>n.textContent='原值暫時讀取失敗，請關閉後重開；候選保留。');}
+    }catch{if(f===c.getFlow()&&dialog.dataset.personKey===key)dialog.querySelectorAll('[data-basic-prior]').forEach(n=>n.textContent='原值暫時讀取失敗，請關閉後重開；資訊保留。');}
   }
   function valid(kind,x){
     // IndexedDB是可被修改的輸入，不信任另一Owner/任意JSON；正式API仍會再次驗證。
@@ -99,7 +99,7 @@ window.BasicCandidatesUI=(()=>{
     const {kind,x}=found,row=document.querySelector('[data-basic-review-row="'+CSS.escape(ref)+'"]');
     if(action==='select'&&value&&!ready(kind,x,true)){c.toast('資料或來源尚未完整，請返回第三步修改或排除此項。');row.querySelector('[data-basic-select]').checked=false;return;}
     if(action==='exclude'){x.excluded=!x.excluded;x.selected=false;}else{x.selected=value;x.excluded=false;if(value){x.needs_review=false;if(x.source_kind==='raw')x.source_sha256=c.state.draft.raw_sha256;}}
-    c.state.dirty=true;c.refresh();row.querySelector('[data-basic-select]').checked=x.selected;row.querySelector('[data-basic-exclude]').textContent=x.excluded?'恢復待核對':'本次不保存這項';row.querySelector('[data-basic-result]').textContent=x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'尚未核對，目前不會寫入';
+    c.state.dirty=true;c.refresh();row.querySelector('[data-basic-select]').checked=x.selected;row.querySelector('[data-basic-exclude]').textContent=x.excluded?'恢復待你確認':'本次不保存這項';row.querySelector('[data-basic-result]').textContent=x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'待你確認，目前不會寫入';
   }
   document.addEventListener('change',e=>{if(e.target.matches('[data-supplement-input=employment_id]')){const row=e.target.closest('[data-supplement-person]'),job=priorDetails.get(row)?.employments.find(j=>j.id===e.target.value);if(job){for(const key of ['company_name','job_title','employment_status','valid_from','valid_to'])row.querySelector('[data-supplement-input='+key+']').value=job[key]??'';row.dispatchEvent(new Event('input',{bubbles:true}));}}if(e.target.matches('[data-supplement-input=dimension]'))configure(e.target.closest('[data-supplement-person]'));if(e.target.dataset.basicSelect)update(e.target.dataset.basicSelect,'select',e.target.checked);});
   document.addEventListener('click',e=>{const n=e.target.closest('[data-basic-exclude]');if(n)update(n.dataset.basicExclude,'exclude');});

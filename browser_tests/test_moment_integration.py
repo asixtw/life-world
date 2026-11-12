@@ -51,12 +51,12 @@ def test_category_change_preserves_visible_unadded_input_and_can_add_next(page):
     category=card.locator('[data-supplement-input=dimension]');category.select_option('interests');card.locator('[data-supplement-input=value]').fill('閱讀')
     category.select_option('birthday');expect(category).to_have_value('interests')
     expect(card.locator('[data-supplement-input=value]')).to_be_visible();expect(card.locator('[data-supplement-status]')).to_contain_text('先加入')
-    card.get_by_role('button',name='加入待核對項目',exact=True).click()
+    card.get_by_role('button',name='加入資訊',exact=True).click()
     expect(card.locator('[data-supplement-input=source_kind]')).to_be_visible()
     supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual');card.locator('[data-supplement-input=evidence_type]').select_option('stated_by_person')
-    card.get_by_role('button',name='加入待核對項目',exact=True).click();expect(card).to_contain_text('閱讀')
+    card.get_by_role('button',name='加入資訊',exact=True).click();expect(card).to_contain_text('閱讀')
     card.locator('summary').first.click();category.select_option('birthday');card.locator('[data-supplement-input=birth_month]').fill('6');card.locator('[data-supplement-input=birth_day]').fill('15')
-    card.get_by_role('button',name='加入待核對項目',exact=True).click();supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual');card.get_by_role('button',name='加入待核對項目',exact=True).click()
+    card.get_by_role('button',name='加入資訊',exact=True).click();supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual');card.get_by_role('button',name='加入資訊',exact=True).click()
     expect(card).to_contain_text('6 月 15 日')
     assert page.request.get(BASE+'/api/people/'+person['id']+'/details').json()['birthday'] is None
 

@@ -30,11 +30,27 @@ def prepare(page):
 
 
 def choose_image(page, kind='image'):
-    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
-    page.locator('[data-media-file="' + kind + '"]').set_input_files(
+    page.get_by_role('tab',name='拍照／影像',exact=True).click()
+    page.locator('[data-media-file="' + ('image' if kind in ('card','screenshot') else kind) + '"]').set_input_files(
         {'name': '虛構測試.png', 'mimeType': 'image/png', 'buffer': PNG})
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
+    if kind=='card':
+        page.locator('[data-media-purpose] > summary').click()
+        page.locator('[data-media-card-purpose]').check()
     expect(page.locator('#media-storage')).to_contain_text('已保存在此裝置')
+
+
+def save_for_review(page):
+    # 真正經過四步，不能繼續點已移除的舊單頁保存鈕。
+    page.locator('[data-experience-next]').click()
+    page.locator('[data-experience-next]').click()
+    page.locator('[data-experience-review]').click()
+
+
+def reveal_photo(page):
+    if page.locator('#review-form').count():
+        page.locator('[data-review-raw] > summary').click()
+    else:page.get_by_role('tab',name='拍照／影像',exact=True).click()
 
 
 @pytest.mark.parametrize('width', [390, 1440])
@@ -67,9 +83,11 @@ def test_attachment_transcript_review_refresh_and_confirm(page, width, tmp_path)
     page.screenshot(path=str(folder / ('media-review-' + str(width) + '.png')), full_page=True)
     page.reload()
     expect(page.locator('#raw-text')).to_have_value('原本的文字\n\n人工更正內容')
+    reveal_photo(page)
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
-    page.get_by_role('button', name='保存草稿並進入核對', exact=False).click()
+    save_for_review(page)
     expect(page.locator('#review-form')).to_be_visible()
+    reveal_photo(page)
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
     assert page.request.get(BASE + '/api/state').json()['rewards']['total'] == before
     page.get_by_role('button', name='我已核對，確認保存', exact=True).click()
@@ -185,17 +203,20 @@ def test_navigation_cancel_and_return_keeps_local_draft(page):
     page.locator('#nav').get_by_role('link', name='世界', exact=True).click()
     page.get_by_role('button', name='繼續編輯', exact=True).click()
     expect(page.locator('#raw-text')).to_have_value('保留返回位置與文字')
+    page.get_by_role('tab',name='文字',exact=True).click()
     page.locator('#raw-text').fill('')
     page.reload()
     page.locator('#nav').get_by_role('link', name='世界', exact=True).click()
+    page.get_by_role('button',name='保留此裝置草稿並離開',exact=True).click()
     page.goto(BASE + '/#record')
+    reveal_photo(page)
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
 
 
 def test_storage_failure_is_not_reported_as_saved(page):
     page.add_init_script("Object.defineProperty(indexedDB,'open',{value:()=>{throw new Error('storage denied')}})")
     prepare(page)
-    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
+    page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file="image"]').set_input_files(
         {'name': '不可遺失.png', 'mimeType': 'image/png', 'buffer': PNG})
     expect(page.locator('#media-storage')).to_contain_text('保存失敗')
@@ -246,7 +267,7 @@ def test_cancel_pending_permission_releases_late_microphone(page):
 def test_invalid_file_keeps_existing_content(page):
     prepare(page)
     page.locator('#raw-text').fill('仍然保留的文字')
-    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
+    page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file="image"]').set_input_files(
         {'name': 'bad.svg', 'mimeType': 'image/svg+xml', 'buffer': b'<svg/>'})
     expect(page.locator('#toast')).to_contain_text('不支援')
@@ -262,6 +283,7 @@ def test_media_only_draft_can_be_found_without_inventing_text(page):
     expect(page.get_by_role('heading', name='此裝置尚未整理的草稿')).to_be_visible()
     page.reload()
     page.get_by_role('link', name='接續素材草稿', exact=False).click()
+    reveal_photo(page)
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
     expect(page.locator('#raw-text')).to_have_value('')
     data=page.request.get(BASE+'/api/state').json()
@@ -272,7 +294,7 @@ def test_server_newer_draft_is_not_overwritten_by_local_fields(page):
     prepare(page)
     page.locator('#raw-text').fill('舊版本機文字')
     choose_image(page)
-    page.get_by_role('button', name='保存草稿並進入核對', exact=False).click()
+    save_for_review(page)
     expect(page.locator('#review-form')).to_be_visible()
     saved=page.request.get(BASE+'/api/state').json()['drafts'][0]
     csrf=page.request.get(BASE+'/api/auth/me').json()['csrf_token']
@@ -284,6 +306,7 @@ def test_server_newer_draft_is_not_overwritten_by_local_fields(page):
     page.reload()
     page.get_by_role('button', name='返回修改原始草稿', exact=True).click()
     expect(page.locator('#raw-text')).to_have_value('另一視窗已更新的伺服器原文')
+    reveal_photo(page)
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
 
 
@@ -292,7 +315,8 @@ def test_text_only_server_save_survives_unavailable_media_storage(page):
     page.add_init_script("Object.defineProperty(indexedDB,'open',{value:()=>{throw new Error('storage denied')}})")
     prepare(page)
     page.locator('#raw-text').fill('不依賴本機媒體儲存的文字草稿')
-    page.get_by_role('button', name='保存草稿並進入核對', exact=False).click()
+    save_for_review(page)
     expect(page.locator('#review-form')).to_be_visible()
+    page.locator('[data-review-raw] > summary').click()
     expect(page.locator('.raw-source').first).to_contain_text('不依賴本機媒體儲存的文字草稿')
     assert len(page.request.get(BASE+'/api/state').json()['drafts'])==1

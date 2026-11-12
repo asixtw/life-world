@@ -9,7 +9,7 @@ window.ExperienceUI=(()=>{
     Object.assign(flow,{rawText:f.get('raw_text')??flow.rawText,occurredAt:f.get('occurred_at'),goalId:f.get('goal_id')||null,personId:f.get('person_id')||null,story:refreshPeople?window.ConnectionsUI.collectEditor(form,false):flow.story,dirty:c.state.dirty,contributions:[...f].filter(([k])=>k.startsWith('quantity-')).map(([k,v])=>({action_id:k.slice(9),quantity:v}))});
     if(f.has('moment_ai_mode'))flow.organizeMode=f.get('moment_ai_mode');
     if(f.has('draft_ai_mode'))flow.organizeMode=f.get('draft_ai_mode');
-    MomentUI.sync();flow.pendingPerson=flow.story?.pending_person||null;
+    QuantityUI.sync(form);MomentUI.sync();flow.pendingPerson=flow.story?.pending_person||null;
     if(f.has('summary')){flow.editedSummary=String(f.get('summary'));flow.hasSummary=true;}
     if(f.has('tasks'))flow.tasks=String(f.get('tasks')).split('\n').map(t=>t.trim()).filter(Boolean);
     if(form.querySelector('[data-summary-source-review]')?.checked){flow.summarySourceRaw=flow.rawText;flow.summarySourceHash=c.state.draft?.raw_sha256;}
@@ -60,20 +60,20 @@ window.ExperienceUI=(()=>{
     const facts=candidateForPerson(person),basic=BasicCandidatesUI.entries(flow).filter(({x})=>BasicCandidatesUI.onPerson(x,person));
     const all=[...facts,...basic.map(({x})=>x)];if(!all.length)return '沒有補充資訊變更 · ';
     const pending=facts.filter(x=>!x.excluded&&(!x.selected||!candidateReady(x)||x.needs_review)).length+basic.filter(({kind,x})=>!x.excluded&&(!x.selected||!BasicCandidatesUI.ready(kind,x)||x.needs_review)).length;
-    return pending?`${pending} 項待核對 · `:`已核對：採用 ${all.filter(x=>x.selected&&!x.excluded).length} 項／排除 ${all.filter(x=>x.excluded).length} 項 · `;
+    return pending?`有 ${pending} 項資訊待你確認 · `:`已核對：採用 ${all.filter(x=>x.selected&&!x.excluded).length} 項／排除 ${all.filter(x=>x.excluded).length} 項 · `;
   }
   function refreshReviewSummary(){
     const form=document.querySelector('#review-form'),root=document.querySelector('#experience-review-overview');
     if(!form||!root||flow?.ownerId!==c.state.me?.owner_id||flow.currentStep!==4)return;
     const d=c.state.draft,goal=(c.state.world?.goals||[]).find(g=>g.id===d?.goal_id),people=currentReviewPeople(form);
     const quantities=[...form.querySelectorAll('[name^="quantity-"]')].filter(n=>Number(n.value)>0).map(n=>{
-      const action=goal?.actions.find(a=>a.id===n.name.slice(9));return action?`${action.title} ${n.value} ${action.unit}`:'';
+      const action=goal?.actions.find(a=>a.id===n.name.slice(9));return action?`${action.title} ${QuantityUI.format(n.value)} ${action.unit}`:'';
     }).filter(Boolean);
     root.innerHTML=`<section class="review-block"><h3>目標與進度</h3><p>${c.esc(goal?.title||'本次不關聯目標')}</p><p class="small">${c.esc(quantities.join(' · ')||'沒有新增活動量')}</p></section><section class="review-block"><h3>人物關聯</h3><div class="stack">${people.length?people.map(p=>`<button type="button" class="card experience-person-preview" data-experience-preview="${c.esc(p.key)}"><strong>${c.esc(p.name)}</strong><span class="tag">${p.isNew?'待建立':p.unmatched?'原文提及，待配對':'既有人物'}</span><span class="small">${c.esc([...new Set(p.roles)].map(r=>roleText[r]||'尚未選角色').join(' · '))}</span><span class="small muted">${c.esc(personReviewStatus(p))}查看本次關聯與保存範圍 ›</span></button>`).join(''):'<p>沒有相關人物，不建立或修改人物資料。</p>'}</div></section>`;
     const candidates=flow.personCandidates||[],pending=candidates.filter(x=>!x.excluded&&(!x.selected||!candidateReady(x)||x.needs_review));
     const basicPending=BasicCandidatesUI.entries(flow).filter(({kind,x})=>!x.excluded&&(!x.selected||x.needs_review||!BasicCandidatesUI.ready(kind,x)));
     const submit=form.querySelector('button.primary:not([type=button])');if(submit)submit.disabled=pending.length+basicPending.length>0;
-    let status=form.querySelector('[data-review-candidate-status]');if(status)status.textContent=pending.length+basicPending.length?`還有 ${pending.length+basicPending.length} 項人物資訊待核對或排除；點人物卡查看。`:'人物補充已逐項核對或排除，最後確認才保存。';
+    let status=form.querySelector('[data-review-candidate-status]');if(status)status.textContent=pending.length+basicPending.length?`還有 ${pending.length+basicPending.length} 項人物資訊待你確認或排除；點人物卡查看。`:'人物補充已逐項核對或排除，最後確認才保存。';
     const acceptance=form.querySelector('#experience-review-people-acceptance');
     let reviewed=acceptance.querySelector('#story-reviewed');
     // 舊草稿還原會重建editor；保留表單外唯一核對入口，不能留下重複ID或兩份核對狀態。
@@ -98,7 +98,7 @@ window.ExperienceUI=(()=>{
     dialog.querySelector('#experience-preview-title').textContent=p.name+' · 本次確認內容';
     const updates=p.personId&&form.elements.person_id?.value===p.personId?window.PeopleUI.reviewPayload(form).person_updates:[];
     // 本輪只預覽真正在Confirm提交的內容；沒有對應候選時不捏造公司/生日或原值差異。
-    dialog.querySelector('.experience-preview-body').innerHTML=`<p class="small">尚未正式保存；完成檢視不會寫入人物或經歷。</p><h3>最後確認後會保存</h3>${p.isNew?`<p>待建立的稱呼：${c.esc(p.name)}</p><p class="small">由使用者在本次表單手動輸入；姓名相同不會自動合併。</p>`:''}<p>本次經歷關聯：${c.esc([...new Set(p.roles)].map(r=>roleText[r]||'尚未選角色').join(' · '))}</p>${p.unmatched?'<p class="small">只保留原文提及線索，不建立或配對正式人物。</p>':''}${updates.length?`<h3>已勾選的人物資訊候選</h3>${updates.map(u=>`<p>${c.esc({interests:'興趣與嗜好',food:'飲食偏好',skills:'專長與背景',habits:'互動習慣'}[u.dimension]||'人物資訊')}：${c.esc(u.value)}</p><p class="small">需最後確認，來源為本次經歷及使用者核對。</p>`).join('')}`:!p.isNew&&!candidateForPerson(p).length&&!BasicCandidatesUI.entries(flow).some(({x})=>BasicCandidatesUI.onPerson(x,p))?'<p>這次只關聯人物，沒有待修改的基本資料。</p>':''}<details><summary>查看本次原始經歷來源</summary><div class="raw-source">${c.esc(d.raw_text)}</div></details><p class="small muted">這次未列出的資料不會自動寫入人物檔案；不會自行補造未提供的資訊。</p>`;
+    dialog.querySelector('.experience-preview-body').innerHTML=`<p class="small">尚未正式保存；完成檢視不會寫入人物或經歷。</p><h3>最後確認後會保存</h3>${p.isNew?`<p>待建立的稱呼：${c.esc(p.name)}</p><p class="small">由使用者在本次表單手動輸入；姓名相同不會自動合併。</p>`:''}<p>本次經歷關聯：${c.esc([...new Set(p.roles)].map(r=>roleText[r]||'尚未選角色').join(' · '))}</p>${p.unmatched?'<p class="small">只保留原文提及線索，不建立或配對正式人物。</p>':''}${updates.length?`<h3>已選擇的人物資訊</h3>${updates.map(u=>`<p>${c.esc({interests:'興趣與嗜好',food:'飲食偏好',skills:'專長與背景',habits:'互動習慣'}[u.dimension]||'人物資訊')}：${c.esc(u.value)}</p><p class="small">需最後確認，來源為本次經歷及使用者核對。</p>`).join('')}`:!p.isNew&&!candidateForPerson(p).length&&!BasicCandidatesUI.entries(flow).some(({x})=>BasicCandidatesUI.onPerson(x,p))?'<p>這次只關聯人物，沒有待修改的基本資料。</p>':''}<details><summary>查看本次原始經歷來源</summary><div class="raw-source">${c.esc(d.raw_text)}</div></details><p class="small muted">這次未列出的資料不會自動寫入人物檔案；不會自行補造未提供的資訊。</p>`;
     renderCandidatePreview(p,dialog);BasicCandidatesUI.render(p,dialog);
     if(!dialog.open)dialog.showModal();dialog.querySelector('#experience-preview-title').focus();
     if(p.personId)await loadPriorFacts(p,dialog,d.id);
@@ -112,7 +112,7 @@ window.ExperienceUI=(()=>{
     // 輸入管道與證據分開，不由manual推定親眼觀察；各候選以穩定ref獨立核對。
     const root=dialog.querySelector('.experience-preview-body');
     root.querySelector('[data-person-candidate-review]')?.remove();
-    root.insertAdjacentHTML('afterbegin',`<section data-person-candidate-review><h3>本次人物補充</h3><p class="small">勾選只表示你核對這份資料，不代表向人物本人獨立查證；最後確認才寫入。</p>${person.personId?'<div data-prior-facts role="status">正在讀取原有資料…</div>':'<p class="small">待建立人物，尚無原有資料。</p>'}${candidates.map(x=>`<section class="card space-top" data-candidate-row="${c.esc(x.candidate_ref)}"><h4>${c.esc(dimensionNames[x.dimension]||'尚未選資訊類別')}</h4><p>本次新增：${c.esc(x.value||'尚未填寫')}</p>${x.description?`<p>${c.esc(x.description)}</p>`:''}<div class="field"><label for="evidence-${c.esc(x.candidate_ref)}">這項資訊從何得知？</label><select id="evidence-${c.esc(x.candidate_ref)}" data-candidate-evidence="${c.esc(x.candidate_ref)}"><option value="">請選擇，不預設推測</option>${Object.entries(evidenceNames).map(([key,label])=>`<option value="${key}" ${x.evidence_type===key?'selected':''}>${label}</option>`).join('')}</select></div><details><summary>查看資料來源</summary><p class="small">${x.source_kind==='manual'?'由使用者手動提供；輸入方式不等於證據類型。':'本次原文片段'}</p>${x.quote?`<blockquote>${c.esc(x.quote)}</blockquote>`:''}</details>${x.needs_review?'<p class="callout" data-candidate-stale>來源或資訊需要重新核對；請對照目前原文與內容。</p>':''}<label class="check-line"><input type="checkbox" data-candidate-select="${c.esc(x.candidate_ref)}" ${x.selected?'checked':''}>我已核對，最後確認時加入人物資訊</label><button type="button" class="text-button" data-candidate-exclude="${c.esc(x.candidate_ref)}">${x.excluded?'已排除，點擊恢復待核對':'本次不保存這項'}</button><p class="small" data-candidate-result="${c.esc(x.candidate_ref)}">${x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'尚未核對，目前不會寫入人物檔案'}</p></section>`).join('')}</section>`);
+    root.insertAdjacentHTML('afterbegin',`<section data-person-candidate-review><h3>本次人物補充</h3><p class="small">勾選只表示你核對這份資料，不代表向人物本人獨立查證；最後確認才寫入。</p>${person.personId?'<div data-prior-facts role="status">正在讀取原有資料…</div>':'<p class="small">待建立人物，尚無原有資料。</p>'}${candidates.map(x=>`<section class="card space-top" data-candidate-row="${c.esc(x.candidate_ref)}"><h4>${c.esc(dimensionNames[x.dimension]||'尚未選資訊類別')}</h4><p>本次新增：${c.esc(x.value||'尚未填寫')}</p>${x.description?`<p>${c.esc(x.description)}</p>`:''}<div class="field"><label for="evidence-${c.esc(x.candidate_ref)}">這項資訊從何得知？</label><select id="evidence-${c.esc(x.candidate_ref)}" data-candidate-evidence="${c.esc(x.candidate_ref)}"><option value="">請選擇，不預設推測</option>${Object.entries(evidenceNames).map(([key,label])=>`<option value="${key}" ${x.evidence_type===key?'selected':''}>${label}</option>`).join('')}</select></div><details><summary>查看資料來源</summary><p class="small">${x.source_kind==='manual'?'由使用者手動提供；輸入方式不等於證據類型。':'本次原文片段'}</p>${x.quote?`<blockquote>${c.esc(x.quote)}</blockquote>`:''}</details>${x.needs_review?'<p class="callout" data-candidate-stale>來源或資訊需要重新核對；請對照目前原文與內容。</p>':''}<label class="check-line"><input type="checkbox" data-candidate-select="${c.esc(x.candidate_ref)}" ${x.selected?'checked':''}>我已核對，最後確認時加入人物資訊</label><button type="button" class="text-button" data-candidate-exclude="${c.esc(x.candidate_ref)}">${x.excluded?'已排除，點擊恢復待你確認':'本次不保存這項'}</button><p class="small" data-candidate-result="${c.esc(x.candidate_ref)}">${x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'待你確認，目前不會寫入人物檔案'}</p></section>`).join('')}</section>`);
   }
   async function loadPriorFacts(person,dialog,draftId){
     const owner=c.state.me.owner_id;
@@ -122,9 +122,9 @@ window.ExperienceUI=(()=>{
       if(owner!==c.state.me?.owner_id||flow?.draftId!==draftId||dialog.dataset.personKey!==person.key)return;
       const node=dialog.querySelector('[data-prior-facts]');if(!node)return;
       node.replaceChildren();const heading=document.createElement('h4');heading.textContent='原有資料（本次不覆寫）';node.append(heading);
-      if(candidateForPerson(person).some(x=>x.expected_person_revision!==overview.person.revision)){const warning=document.createElement('p');warning.className='callout';warning.textContent='人物資料版本與候選不同；候選不會自動套用到新版，請返回重新核對或排除此項。';node.append(warning);}
+      if(candidateForPerson(person).some(x=>x.expected_person_revision!==overview.person.revision)){const warning=document.createElement('p');warning.className='callout';warning.textContent='人物資料版本與本次資訊不同；資訊不會自動套用到新版，請返回重新核對或排除此項。';node.append(warning);}
       for(const dimension of [...new Set(candidateForPerson(person).map(x=>x.dimension))]){const line=document.createElement('p');line.className='small';line.textContent=(dimensionNames[dimension]||'人物資訊')+'：'+((overview.facts[dimension]||[]).map(x=>x.value).join('、')||'尚無已確認資料');node.append(line);}
-    }catch(error){if(owner===c.state.me?.owner_id&&flow?.draftId===draftId&&dialog.dataset.personKey===person.key){const node=dialog.querySelector('[data-prior-facts]');if(node)node.textContent='原有資料暫時讀取失敗，請關閉後重開；原候選與輸入保留。';}}
+    }catch(error){if(owner===c.state.me?.owner_id&&flow?.draftId===draftId&&dialog.dataset.personKey===person.key){const node=dialog.querySelector('[data-prior-facts]');if(node)node.textContent='原有資料暫時讀取失敗，請關閉後重開；原資訊與輸入保留。';}}
   }
   function updateCandidate(ref,action,value){
     const x=flow?.personCandidates?.find(x=>x.candidate_ref===ref);if(!x||flow.ownerId!==c.state.me?.owner_id)return;
@@ -138,8 +138,8 @@ window.ExperienceUI=(()=>{
     // 逐項採用只更新該列，不重建抽屜，避免失去焦點或尚未完成的選擇。
     const row=document.querySelector('[data-candidate-row="'+CSS.escape(ref)+'"]');if(!row)return;
     row.querySelector('[data-candidate-select]').checked=x.selected;
-    row.querySelector('[data-candidate-exclude]').textContent=x.excluded?'已排除，點擊恢復待核對':'本次不保存這項';
-    row.querySelector('[data-candidate-result]').textContent=x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'尚未核對，目前不會寫入人物檔案';
+    row.querySelector('[data-candidate-exclude]').textContent=x.excluded?'已排除，點擊恢復待你確認':'本次不保存這項';
+    row.querySelector('[data-candidate-result]').textContent=x.selected?'確認後會保存':x.excluded?'此次完成後不會保留到人物檔案':'待你確認，目前不會寫入人物檔案';
     if(row.querySelector('[data-candidate-stale]'))row.querySelector('[data-candidate-stale]').hidden=!x.needs_review;
   }
   document.addEventListener('change',event=>{

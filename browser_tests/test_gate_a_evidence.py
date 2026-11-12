@@ -32,7 +32,7 @@ def add(card,kind,values,source_kind='manual',quote=None):
         field=card.locator('[data-supplement-input="'+key+'"]')
         if key in ('employment_status','employment_id'):field.select_option(value)
         else:field.fill(value)
-    card.get_by_role('button',name='加入待核對項目',exact=True).click()
+    card.get_by_role('button',name='加入資訊',exact=True).click()
     expect(card).not_to_have_attribute('open','')
 
 

@@ -70,13 +70,14 @@ const MediaUI = (() => {
   function releaseURLs() { for (const url of urls) URL.revokeObjectURL(url); urls.clear(); }
   function fileURL(blob) { const url = URL.createObjectURL(blob); urls.add(url); return url; }
   function controls() {
-    return `<div class="media-inputs" role="group" aria-label="新增紀錄素材">${[['image','圖片'],['screenshot','截圖'],['camera','拍照'],['card','名片'],['audio','音檔']].map(([kind,label]) => `<label class="secondary media-file">${label}<input type="file" data-media-file="${kind}" accept="${kind==='audio'?'audio/wav,audio/x-wav,audio/webm,audio/ogg,audio/mp4,audio/mpeg':'image/*'}" ${kind==='camera'?'capture="environment"':''} aria-label="${label}"></label>`).join('')}</div>`;
+    // 取得方式與用途分層；圖片/截圖共用選取，名片用途留在素材內設定。
+    return `<div class="media-inputs" role="group" aria-label="新增紀錄素材">${[['camera','拍照'],['image','選取照片'],['audio','音檔']].map(([kind,label])=>`<label class="secondary media-file">${label}<input type="file" data-media-file="${kind}" accept="${kind==='audio'?'audio/wav,audio/x-wav,audio/webm,audio/ogg,audio/mp4,audio/mpeg':'image/*'}" ${kind==='camera'?'capture="environment"':''} aria-label="${label}"></label>`).join('')}</div>`;
   }
   function itemView(item) {
     const e = ctx.esc, busy = requests.has(item.id), isCard = item.kind === 'card';
     const label = item.kind === 'audio' ? '上傳並轉文字' : '上傳並辨識文字';
     const source = item.kind === 'audio' ? `<audio controls preload="metadata" src="${fileURL(item.blob)}" aria-label="選擇性試聽錄音"></audio>` : `<img src="${fileURL(item.blob)}" alt="所選${isCard?'名片':'圖片'}的本機預覽">`;
-    return `<article class="media-item" data-media-id="${e(item.id)}" data-media-kind="${e(item.kind)}"><h3>${e(item.name)}</h3><p class="small muted">${(item.blob.size/1024).toFixed(1)} KiB · ${e(item.mime)} · ${busy?'正在傳送／辨識，尚未保存正式資料':'原素材僅在此裝置'}</p>${source}${isCard?'<p class="callout">名片只供人物資料校對，不會建立見面、經歷或獎勵。</p>':''}<div class="button-row"><button type="button" class="secondary" data-media="recognize" ${busy?'disabled':''}>${label}</button>${busy?'<button type="button" class="secondary" data-media="cancel-upload">取消辨識</button>':''}<button type="button" class="text-button" data-media="remove">移除此素材</button></div>${busy?'<p role="status">正在上傳或等待辨識回應…</p><progress aria-label="上傳與辨識處理中"></progress>':''}${item.error?`<p class="media-error" role="alert">${e(item.error)}</p>`:''}${item.originalText?`<details><summary>查看未修改的辨識原文</summary><pre class="raw-source">${e(item.originalText)}</pre></details>`:''}<details class="media-transcript" ${item.editedText||item.originalText||item.error||busy?'open':''}><summary>手動校對文字／加入經歷（選填）</summary><div class="field"><label for="media-text-${e(item.id)}">校對文字</label><textarea id="media-text-${e(item.id)}" data-media-text maxlength="20000" placeholder="可手動輸入；不覆寫原始素材或辨識原文">${e(item.editedText || '')}</textarea></div><label class="check-line"><input type="checkbox" data-media-checked ${item.checked?'checked':''}>我已核對這段文字</label><button type="button" class="secondary" data-media="${isCard?'copy':'apply'}" ${!item.checked||!item.editedText?.trim()||active.readOnly?'disabled':''}>${isCard?'複製已校對文字':'加入經歷文字'}</button>${active.readOnly?'<p class="small muted">此處保留本機來源。修改正式經歷須回到原草稿核對。</p>':''}</details></article>`;
+    return `<article class="media-item" data-media-id="${e(item.id)}" data-media-kind="${e(item.kind)}"><h3>${e(item.name)}</h3><p class="small muted">${(item.blob.size/1024).toFixed(1)} KiB · ${e(item.mime)} · ${busy?'正在傳送／辨識，尚未保存正式資料':'原素材僅在此裝置'}</p>${source}${item.kind!=='audio'?`<details data-media-purpose><summary>照片用途（選填）</summary><label class="check-line"><input type="checkbox" data-media-card-purpose ${isCard?'checked':''} ${busy||active.readOnly?'disabled':''}>這是一張名片</label><p class="small muted">用途不會改變原始素材；名片只供人物資料校對，不建立互動或獎勵。</p></details>`:''}${item.purposeMessage?`<p class="small" role="status">${e(item.purposeMessage)}</p>`:''}${isCard?'<p class="callout">名片只供人物資料校對，不會建立見面、經歷或獎勵。</p>':''}<div class="button-row"><button type="button" class="secondary" data-media="recognize" ${busy?'disabled':''}>${label}</button>${busy?'<button type="button" class="secondary" data-media="cancel-upload">取消辨識</button>':''}<button type="button" class="text-button" data-media="remove">移除此素材</button></div>${busy?'<p role="status">正在上傳或等待辨識回應…</p><progress aria-label="上傳與辨識處理中"></progress>':''}${item.error?`<p class="media-error" role="alert">${e(item.error)}</p>`:''}${item.originalText?`<details><summary>查看未修改的辨識原文</summary><pre class="raw-source">${e(item.originalText)}</pre></details>`:''}<details class="media-transcript" ${item.editedText||item.originalText||item.error||busy?'open':''}><summary>手動校對文字／加入經歷（選填）</summary><div class="field"><label for="media-text-${e(item.id)}">校對文字</label><textarea id="media-text-${e(item.id)}" data-media-text maxlength="20000" placeholder="可手動輸入；不覆寫原始素材或辨識原文">${e(item.editedText || '')}</textarea></div><label class="check-line"><input type="checkbox" data-media-checked ${item.checked?'checked':''}>我已核對這段文字</label><button type="button" class="secondary" data-media="${isCard?'copy':'apply'}" ${!item.checked||!item.editedText?.trim()||active.readOnly?'disabled':''}>${isCard?'複製已校對文字':'加入經歷文字'}</button>${active.readOnly?'<p class="small muted">此處保留本機來源。修改正式經歷須回到原草稿核對。</p>':''}</details></article>`;
   }
   function draw() {
     const root = document.querySelector('#media-panel');
@@ -170,7 +171,7 @@ const MediaUI = (() => {
     const types = kind==='audio' ? ['audio/wav','audio/x-wav','audio/webm','audio/ogg','audio/mp4','audio/mpeg'] : ['image/png','image/jpeg'];
     if (!types.includes(mime)) throw new Error('目前不支援這個檔案格式；請選擇 PNG／JPEG 圖片或支援的音檔。');
     // IndexedDB 保存音訊或整理後的圖片 Blob；object URL 僅供目前畫面，不拿來當永久來源。
-    session.items.push({id:crypto.randomUUID(), kind:kind==='camera'?'image':kind, name:originalName || file.name || '錄音', uploadName:file.name, originalBytes, mime, blob:file, originalText:'',editedText:'',checked:false});
+    session.items.push({id:crypto.randomUUID(), kind:kind==='camera'?'image':kind, acquisitionKind:kind, name:originalName || file.name || '錄音', uploadName:file.name, originalBytes, mime, blob:file, originalText:'',editedText:'',checked:false});
     if (active===session) draw();
     await persist(session);
   }
@@ -327,6 +328,15 @@ const MediaUI = (() => {
     document.addEventListener('change', async event=>{
       try {
         if(event.target.matches('[data-media-file]')) {await addFile(event.target.files[0],event.target.dataset.mediaFile); event.target.value='';}
+        else if(active&&event.target.matches('[data-media-card-purpose]')) {
+          if(active.readOnly||active.owner!==ctx.state.me?.owner_id)return;
+          const session=active,item=session.items.find(i=>i.id===event.target.closest('[data-media-id]').dataset.mediaId);
+          if(!item||item.kind==='audio'||requests.has(item.id))return;
+          item.kind=event.target.checked?'card':item.acquisitionKind==='screenshot'?'screenshot':'image';
+          item.checked=false;item.editRevision=(item.editRevision||0)+1;
+          item.purposeMessage='用途已變更，請重新確認文字後再使用；原素材與文字保留。';
+          await persist(session);if(active===session)draw();
+        }
         else if(active&&event.target.matches('[data-media-checked]')) {const root=event.target.closest('[data-media-id]'),item=active.items.find(i=>i.id===root.dataset.mediaId); item.checked=event.target.checked; updateApply(item,root); await persist();}
         else if(active&&event.target.closest('#record-form'))capture();
       } catch(error){ctx.toast(error.message);}
