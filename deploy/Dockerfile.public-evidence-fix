@@ -1,0 +1,5 @@
+# 在現役介紹版不可變映像上，只覆蓋成果上傳護欄；不覆蓋任何前端或重裝依賴。
+FROM asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:972da0d1ef0efb792c0fd8c443eb25092be9d74e5ed969cb5467541e51af4c01
+ARG VCS_REF
+LABEL org.opencontainers.image.revision=$VCS_REF
+COPY --chown=10001:10001 overlay/ /srv/lifeworld/app/

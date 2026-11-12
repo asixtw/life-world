@@ -179,7 +179,9 @@ class AlphaBodyLimit:
     def __init__(self,app,max_bytes=65536):self.app,self.max_bytes=app,max_bytes
 
     async def __call__(self,scope,receive,send):
-        if scope['type']!='http' or not scope['path'].startswith('/api/') or scope['path']=='/api/media/recognize' or scope['method'] in ('GET','HEAD','OPTIONS'):
+        from .media import is_goal_evidence_upload
+        # 成果圖片改由獨立串流護欄負責；不是取消上傳大小或身分驗證。
+        if scope['type']!='http' or not scope['path'].startswith('/api/') or scope['path']=='/api/media/recognize' or is_goal_evidence_upload(scope) or scope['method'] in ('GET','HEAD','OPTIONS'):
             return await self.app(scope,receive,send)
         from starlette.responses import JSONResponse
         chunks=[];size=0

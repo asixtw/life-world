@@ -16,14 +16,29 @@ IMAGE_TYPES = {'image/png': 'PNG', 'image/jpeg': 'JPEG'}
 AUDIO_TYPES = ('audio/wav', 'audio/x-wav', 'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg')
 
 
+def is_goal_evidence_upload(scope):
+    """只辨識真正的成果multipart入口，不能靠其他路徑或JSON冒用圖片額度。"""
+    parts=scope.get('path','').split('/')
+    content_type=next((v for k,v in scope.get('headers',[]) if k.lower()==b'content-type'),b'')
+    return (scope.get('method')=='POST' and len(parts)==5 and parts[:3]==['','api','goals']
+            and bool(parts[3]) and parts[4]=='evidence'
+            and content_type.split(b';',1)[0].strip().lower()==b'multipart/form-data')
+
+
 class MediaBodyLimit:
     """在 multipart 解析／暫存前限制總量，包含未提供 Content-Length 的串流。"""
-    def __init__(self, app, max_bytes):
+    def __init__(self, app, max_bytes, evidence_max_bytes=None):
         self.app, self.max_bytes = app, max_bytes
+        self.evidence_max_bytes = max_bytes if evidence_max_bytes is None else evidence_max_bytes
 
     async def __call__(self, scope, receive, send):
-        if scope['type'] != 'http' or scope['path'] != '/api/media/recognize':
+        if scope['type'] != 'http':
             return await self.app(scope, receive, send)
+        evidence = is_goal_evidence_upload(scope)
+        if scope['path'] != '/api/media/recognize' and not evidence:
+            return await self.app(scope, receive, send)
+        # 圖片額度獨立於長音訊；兩者都在multipart暫存前逐段檢查。
+        max_bytes = self.evidence_max_bytes if evidence else self.max_bytes
         size = 0
         started = False
         exceeded = False
@@ -38,7 +53,7 @@ class MediaBodyLimit:
             message = await receive()
             if message['type'] == 'http.request':
                 size += len(message.get('body', b''))
-                if size > self.max_bytes:
+                if size > max_bytes:
                     exceeded = True
                     raise UploadLimitExceeded()
             return message

@@ -87,7 +87,8 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     install_ai_routes(app)  # 保留既有GIS/IAP邊界；僅組裝預設停用的AI候選。
     audio_max_bytes=int(os.environ.get('LIFEWORLD_AUDIO_MAX_BYTES',str(policy.max_upload_bytes)))
     if not 1<=audio_max_bytes<=64*1024*1024:raise ValueError('Audio capacity must be bounded to 64MiB')
-    app.add_middleware(media.MediaBodyLimit, max_bytes=max(policy.max_upload_bytes,audio_max_bytes) + 65536)
+    app.add_middleware(media.MediaBodyLimit, max_bytes=max(policy.max_upload_bytes,audio_max_bytes) + 65536,
+                       evidence_max_bytes=policy.max_upload_bytes + 65536)
     if settings.access_mode=='public_alpha':app.add_middleware(AlphaBodyLimit)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_hosts))
 

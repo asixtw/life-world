@@ -10,7 +10,8 @@ from fastapi.testclient import TestClient
 
 ROOT=Path(__file__).resolve().parents[1]
 STATIC=ROOT/'app/static'
-BASE='74ebf30fdb3262f57dcb92cb3a9119ce0f247224'
+# 現役已增加介紹入口；以本次發布前版本保護全部既有腳本，不回退舊首頁。
+BASE='c73ddf8c83e2eb41d2499a045ef104f14f585bd2'
 
 
 class Head(HTMLParser):

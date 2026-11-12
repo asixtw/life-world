@@ -1,0 +1,16 @@
+# 單次建置／驗證Python imports／推映像，不自行部署或切流。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-product-build@life-world-513506.iam.gserviceaccount.com
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _COMMIT: approval-required
+steps:
+  - id: evidence-upload-guard-fix
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '--build-arg', 'VCS_REF=${_COMMIT}', '-t', 'asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:evidence-fix-${_COMMIT}-${BUILD_ID}', '.']
+  - id: verify-runtime-imports
+    name: gcr.io/cloud-builders/docker
+    args: ['run', '--rm', '--network=none', '--entrypoint=python', 'asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:evidence-fix-${_COMMIT}-${BUILD_ID}', '-c', 'import app.main, app.media, app.auth_rate_limit; print("Python runtime imports PASS")']
+images:
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:evidence-fix-${_COMMIT}-${BUILD_ID}
