@@ -1,0 +1,17 @@
+{
+  "entry": "http://127.0.0.1:8198",
+  "product_commit": "5d4c564cdbd7978b805d047f968f10850d84e66c",
+  "existing_account_reused": true,
+  "same_owner_fingerprint": "c82e65a7b794adc9",
+  "normal_ui_password_login": "PASS",
+  "three_real_tabs": "PASS",
+  "server_time_default": "2026-10-27T15:00",
+  "source_error_visible": "PASS",
+  "candidate_retry_after_selecting_source": "PASS",
+  "business_state_unchanged": true,
+  "formal_person_details_unchanged": true,
+  "missing_csrf_rejected": true,
+  "javascript_errors": [],
+  "google_oauth": "NOT RUN",
+  "cloud_modified": false
+}

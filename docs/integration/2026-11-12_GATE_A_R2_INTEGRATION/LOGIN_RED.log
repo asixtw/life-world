@@ -1,0 +1,12 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_anonymous_login_form_does_not_enter_person_supplement_scope _______
+browser_tests/test_moment_integration.py:90: in test_anonymous_login_form_does_not_enter_person_supplement_scope
+    assert errors==[]
+E   assert ["Cannot read...ng 'status')"] == []
+E     
+E     Left contains one more item: "Cannot read properties of null (reading 'status')"
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED browser_tests/test_moment_integration.py::test_anonymous_login_form_does_not_enter_person_supplement_scope
+1 failed in 0.80s

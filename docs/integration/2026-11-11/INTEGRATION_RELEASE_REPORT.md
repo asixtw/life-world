@@ -1,5 +1,7 @@
 # PR #26 Integration QA／Release Gate｜NO-GO
 
+**最新Gate A以第8節R2正式整合證據為準。先前PASS只證明資料閉環，不代表「記錄這一刻」設計已整合或Owner已核准。**
+
 2026-11-12。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準`6d4ba0a3ea3d895678ad733cde2c42f773154f4f`，精確交付Head/Tree見PR收據。遠端main唯讀核對仍`68102f230aa947a434286ba9260e1ae75f6634b0`。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret、Alpha匯入或切流。
 
 **人物基本資料閉環已完成本機驗證，停止功能擴充，轉QA。** 不表示Owner UX Approved或GCP可發布。Jerry進階劇場、人物作品、AI角色演出、完整角色創作未核准，不列R+1或必做未來功能；既有相容表/API不得因此擴充、刪除資料或執行非必要Migration。私人筆記、現實情境準備、Lumi互動與此類角色劇場分開。
@@ -144,3 +146,19 @@ Owner暫不核准Gate A，要求現有設計的真實三尺寸完整證據與可
 Owner網址 **http://127.0.0.1:8198/**；登入後`/#record`。服務固定合成日期2026-10-27；既有目標/人物可重用，只寫入localhost:57518同名但獨立marker PG副本。人工驗收期間不再跑TRUNCATE fixture，不重設此庫。Google能力未開，本輪不以模擬OAuth替代。
 
 Gate A仍待Owner親自核准。真Google/Gemini、GCP、實機及Gate B/C/D未自動通過；沒有Migration、Build、Deploy或正式DB修改。
+
+## 8. R2「記錄這一刻」正式整合與Owner問題修正
+
+Owner確認舊候選仍像長表單，Gate A不核准。已逐項對照Demo與正式元件，交付[P1差異表與剩餘差異](../2026-11-12_GATE_A_R2_INTEGRATION/P1_DESIGN_DIFF.md)、[實際產品畫廊](../2026-11-12_GATE_A_R2_INTEGRATION/index.html)。產品Commit `5d4c564cdbd7978b805d047f968f10850d84e66c`，App tree `7ad75a0b2ecf2124d27bb00a435e061b281a072b`。
+
+第一步改為真正文字/拍照影像/語音分頁、輸入/素材回饋、收合時間與單一手動/AI意圖；媒體校對選填收合、加入文字後返回文字tab。分頁只作用於既有DOM與MediaUI，未搬入Demo模擬API。第二/三步標題/副標與短進度對齊；人物補充維持逐人收合，缺來源原地展開提示、未加入資料不再被換類別藏起。第四步AI設定收合、摘要與逐人核對為主。
+
+日期原錯用瀏覽器日期，且直到末步才拒絕；現GET身分僅新增唯讀server_now metadata，採同一業務時鐘預填，第一步Next/保存前重讀服務時間並提示。原Session/Owner/CSRF不變，不放寬未來時間。另修正常匿名登入時人物補充模組讀取空Owner的JS例外。
+
+[最終驗收表/收據](../2026-11-12_GATE_A_R2_INTEGRATION/README.md)：本機SQLite/Node 771 PASS、87 SKIP；P1核心UI→API→受限本機PG18 88 PASS；匿名防護後最新版本10 PASS（含重跑與新增，不加總成98）；AI授權UI9 PASS為明示替身、媒體/R2共15 PASS亦有重疊。39張三尺寸實際畫面、3錄影、2張原Owner入口補驗，含照片/語音入口與日期錯誤。程式/測試/差異/未完成均附收據，不宣稱全部PG或真模型通過。
+
+原入口 **http://127.0.0.1:8198/** 已優雅載入修正版，沿用相同資料庫/資料目錄；沒有清空Owner帳號、Session、草稿或正式人物資料。正常既有帳密已實測三分頁、正確時間預填、來源錯誤後加入生日候選、無JS例外；比較前後world/人物詳情完全未變。Owner若開著舊頁，請先存草稿再重新整理。
+
+仍有明確差異：第一步AI是選用意圖，草稿來源固定後在第四步依原授權/API執行，並非Demo第一步即時假摘要；本機未開真Gemini、真照片/語音辨識、真Google或實機。Guest中途Google升級後新增媒體tab的即時解鎖未做聯測，不能自行視為通過。這些列為待審閱/受控E2E缺口，不用模擬結果替代。Gate A仍待Owner核准，B/C/D不自動解鎖。
+
+沒有Schema變更、Migration、正式GRANT、Cloud Build、Deploy、Merge或GCP正式資源修改。測試Provider只在獨立localhost驗收服務，Owner入口AI旗標未開放。
