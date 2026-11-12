@@ -1,0 +1,114 @@
+{
+  "id": "lw-mobile-web-icon-v1",
+  "version": "1.0.0",
+  "date": "2026-11-13",
+  "source_size": [
+    1254,
+    1254
+  ],
+  "source_sha256": "2a4606099361acc672aa24fbb56e8800f444bb3669acb9c983c2d598fc4383f2",
+  "source_file": "source/lumi-mobile-icon-v1.png",
+  "source_method": "built-in imagegen, identity-preserving edit of existing approved-direction Lumi pose",
+  "reference": "app/static/art/design-v1/lumi-idle-512.png",
+  "reference_sha256": "b0ae867e2664881a60306a1d3fadeb4897c5cfca581e52c9da7999bb5ae24546",
+  "background": "opaque RGB; full-bleed mint, no baked corners",
+  "maskable_safe_circle": {
+    "center": [
+      0.5,
+      0.5
+    ],
+    "radius": 0.4
+  },
+  "approval_status": "owner_authorized_public_site_20261113",
+  "real_ios_android_installation": "NOT RUN",
+  "license_status": "generated_project_candidate; external_distribution_rights_not_independently_verified",
+  "variants": [
+    {
+      "file": "icon-16.png",
+      "size": 16,
+      "sha256": "fffeb77e171af76fd7c9a6f3269dc5926de3bc217b4607351957e15449712830",
+      "bytes": 561
+    },
+    {
+      "file": "icon-32.png",
+      "size": 32,
+      "sha256": "06df5d0bb7132d4e64e3f624d61c5693206fcf5f35c49645d83960885c6901d6",
+      "bytes": 1501
+    },
+    {
+      "file": "icon-48.png",
+      "size": 48,
+      "sha256": "d20a0029e685d097f32f9a734734114d36ca24b7fde4fd9f5529e957bca5085e",
+      "bytes": 2837
+    },
+    {
+      "file": "icon-64.png",
+      "size": 64,
+      "sha256": "039607a87548d90a61fcbfdcc8f8d557b9f67e1d95eb22d6f2e32ffe902285d1",
+      "bytes": 4411
+    },
+    {
+      "file": "icon-128.png",
+      "size": 128,
+      "sha256": "d2bcfe14f1e90a0e6b601f287a5faf48a2040d8df01dd22a073e5104d21d8c40",
+      "bytes": 13956
+    },
+    {
+      "file": "icon-152.png",
+      "size": 152,
+      "sha256": "43c0a7cc5908c2bdcb87c08fa5e40ff2be649c677c6d0c3734e5a9bb33327622",
+      "bytes": 18882
+    },
+    {
+      "file": "icon-167.png",
+      "size": 167,
+      "sha256": "166001dfd70befe1146fecbc00470b1a90902f2531aca9f8673d2dd1bc609c98",
+      "bytes": 22287
+    },
+    {
+      "file": "icon-180.png",
+      "size": 180,
+      "sha256": "40212eb6715722c33bc056ef185acd0230a7e4e1dd48e27085ac2910beabbc50",
+      "bytes": 25566
+    },
+    {
+      "file": "icon-192.png",
+      "size": 192,
+      "sha256": "ca278392d3f6a3124e15492fd789cac123ce17f9956392eb15c5c3c7e9cc6df1",
+      "bytes": 28685
+    },
+    {
+      "file": "icon-256.png",
+      "size": 256,
+      "sha256": "f3ef6fcf956d154a2992fee076330144a89e60cf8b2d977f7721866cdaba5783",
+      "bytes": 50196
+    },
+    {
+      "file": "icon-512.png",
+      "size": 512,
+      "sha256": "008e2034fea08227fee3873e16970278b69917ea6d3ae1a5396c2c5bebcd3959",
+      "bytes": 202442
+    },
+    {
+      "file": "icon-1024.png",
+      "size": 1024,
+      "sha256": "cf3ba98fb37b83c3a8a175c7edbe09e46a5e3974fc6945bd4d48069cbeae8aa0",
+      "bytes": 775594
+    },
+    {
+      "file": "icon-maskable-192.png",
+      "size": 192,
+      "purpose": "maskable",
+      "sha256": "ca278392d3f6a3124e15492fd789cac123ce17f9956392eb15c5c3c7e9cc6df1",
+      "bytes": 28685
+    },
+    {
+      "file": "icon-maskable-512.png",
+      "size": 512,
+      "purpose": "maskable",
+      "sha256": "008e2034fea08227fee3873e16970278b69917ea6d3ae1a5396c2c5bebcd3959",
+      "bytes": 202442
+    }
+  ],
+  "integration_target": "lw-public"
+}

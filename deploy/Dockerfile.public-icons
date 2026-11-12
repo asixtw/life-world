@@ -1,0 +1,6 @@
+# 在不可變的現役正式映像上僅覆蓋靜態檔，避免帶入main較新後端或重裝依賴。
+FROM asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:68f072c973ab40075b1ba5533a55a6324d5c7a3cf71b00920b0dfc589e2e0e75
+ARG VCS_REF=local-unpublished
+LABEL org.opencontainers.image.revision=$VCS_REF \
+      lifeworld.icon-base="sha256:68f072c973ab40075b1ba5533a55a6324d5c7a3cf71b00920b0dfc589e2e0e75"
+COPY --chown=10001:10001 overlay/ /srv/lifeworld/app/static/

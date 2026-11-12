@@ -1,0 +1,19 @@
+# 本批只建置／推映像，沒有自動切流、IAM或DB操作；發布前另核對候選。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-product-build@life-world-513506.iam.gserviceaccount.com
+timeout: 1200s
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _COMMIT: local-unpublished
+steps:
+  - id: static-icon-overlay
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --build-arg
+      - VCS_REF=${_COMMIT}
+      - -t
+      - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:mobile-icons-${_COMMIT}-${BUILD_ID}
+      - .
+images:
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:mobile-icons-${_COMMIT}-${BUILD_ID}

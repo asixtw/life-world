@@ -3,9 +3,16 @@
 <head> <!-- 建立頁面結構容器 -->
   <meta charset="utf-8"> <!-- 使用 UTF-8 正確顯示中文 -->
   <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 以裝置寬度呈現手機與桌面版面 -->
-  <link rel="icon" type="image/png" href="/static/art/app-icon.png">
+  <!-- 手機主畫面圖示使用版本化路徑，保留原有角色與業務流程。 -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/art/mobile-web-v1/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/static/art/mobile-web-v1/favicon.ico">
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/art/mobile-web-v1/icon-152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/static/art/mobile-web-v1/icon-167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/art/mobile-web-v1/icon-180.png">
+  <link rel="manifest" href="/static/mobile-manifest-v1.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="Life World">
   <script src="/static/art.js" defer></script>
-  <meta name="theme-color" content="#edf3e9"> <!-- 設定瀏覽器工具列的品牌背景色 -->
+  <meta name="theme-color" content="#FFFDF8"> <!-- 設定瀏覽器工具列的品牌背景色 -->
   <title>Life World · 把每一步，種成自己的世界</title> <!-- 設定瀏覽器分頁標題 -->
   <link rel="stylesheet" href="/static/styles.css"> <!-- 載入共用或人物流程樣式 -->
   <link rel="stylesheet" href="/static/relationships.css"> <!-- 載入共用或人物流程樣式 -->
