@@ -113,5 +113,24 @@ def install(app):
     @app.post('/api/people/{person_id}/simulation',tags=['AI drafts'])
     def simulation(person_id:str,request:Request,data:SimulationInput):
         who=owner(request);app.state.ai_runtime.authorize(who)
-        # 發布範圍未核准人物角色演出，必須在讀取來源及模型外呼之前後端封鎖。
-        require(False,422,'simulation_not_released','人物 AI 模擬尚未開放；私人筆記仍可使用。')
+        # 2026-11-12 Jerry 決定開放人物 AI 模擬：移除 fe1b684（F1）加上的封鎖，恢復原本流程。
+        overview=service.person_overview(who,person_id)
+        # 撤回的交會故事不刪原經歷，但不能再當模擬來源送給模型（與 relationship_memory 記憶用途同一條規則）；
+        # 一則人物資訊沒有可用來源就整則不可用，請求在呼叫模型前以 422 拒絕。
+        with service.db.connect() as db:
+            usable=lambda ref:db.execute('''SELECT 1 FROM experiences x WHERE x.id=? AND x.owner_id=? AND NOT EXISTS (
+                SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id AND s.owner_id=x.owner_id AND s.available=FALSE)''',(ref,who)).fetchone() is not None
+            available={fact['id']:{'value':fact['value'],'refs':[s['id'] for s in fact['sources'] if usable(s['id'])]}
+                       for group in overview['facts'].values() for fact in group if fact['status']=='confirmed'}
+        available={key:item for key,item in available.items() if item['refs']}
+        require(all(f in available for f in data.fact_ids),422,'confirmed_sources_required','只可使用本人已確認且仍有來源的人物資訊。')
+        facts=[{'fact_id':f,'value':available[f]['value'],'source_experience_ids':available[f]['refs']} for f in dict.fromkeys(data.fact_ids)]
+        from .relationship_engine import build_context
+        source_ids=sorted({ref for fact in facts for ref in fact['source_experience_ids']})
+        # 來源摘要必須再次限定Owner，內部提示每次重算，撤回／刪除即不沿用。
+        with service.db.connect() as db:
+            records=[dict(row) for ref in source_ids for row in db.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(ref,who)).fetchall()]
+        context=build_context(facts,records,data.message,service.now().isoformat())
+        result=app.state.ai_runtime.generate(who,'simulation',{'person_id':person_id,'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message},request_id=data.request_id)
+        # 一般人物卡／對話UI不暴露內部雙端標籤；只回可解釋的來源與有限行為。
+        return {**result,'simulation':True,'behavior':context['behavior'],'behavior_source':'rules','source_experience_ids':source_ids,'uncertainty':'simulation_not_prediction','notice':result['notice']+' 私人模擬，不是對真人反應的預測；不寫入人物事實。'}

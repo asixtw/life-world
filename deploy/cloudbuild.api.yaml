@@ -37,6 +37,20 @@ steps:
       - -ceu
       - |
         python -m pip install --disable-pip-version-check -r requirements.api-test.lock
+        # Node 前端契約測試（LIFEWORLD_NODE）屬於發布測試；用與 web 建置相同的 Node，核對官方 SHA-256 才使用。
+        python - <<'PY'
+        import hashlib, io, os, tarfile, urllib.request
+        data = urllib.request.urlopen('https://nodejs.org/dist/v24.22.2/node-v24.22.2-linux-x64.tar.xz', timeout=120).read()
+        if hashlib.sha256(data).hexdigest() != '48cc0e21e048790e54c0cf5749c2725005313d652651c40b7a21feb9697aaf75':
+            raise SystemExit('Node archive SHA-256 mismatch; refusing to run frontend contract tests with it')
+        with tarfile.open(fileobj=io.BytesIO(data), mode='r:xz') as archive:
+            binary = archive.extractfile('node-v24.22.2-linux-x64/bin/node').read()
+        with open('.step10-tests/node', 'wb') as target:
+            target.write(binary)
+        os.chmod('.step10-tests/node', 0o755)
+        PY
+        export LIFEWORLD_NODE="$$PWD/.step10-tests/node"
+        "$$LIFEWORLD_NODE" --version
         python -m pytest tests -q --junitxml=.step10-tests/sqlite.xml
         export LIFEWORLD_TEST_PG_PASSWORD="$$(sed -n 's/^POSTGRES_PASSWORD=//p' .step10-tests/synthetic.env)"
         python scripts/pg_test_bootstrap.py

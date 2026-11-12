@@ -65,6 +65,42 @@ def test_api_build_shell_syntax_after_substitution():
             assert result.returncode == 0, (step['id'], result.stderr)
 
 
+def node_step():
+    config = yaml.safe_load((ROOT / 'deploy/cloudbuild.api.yaml').read_text(encoding='utf-8'))
+    return next(s for s in config['steps'] if s['id'] == 'sqlite-and-real-pg18-tests')['args'][-1]
+
+
+def test_release_tests_get_the_pinned_node_before_both_pytest_runs():
+    """Node 前端契約（例如 test_person_choices_frontend.py 直接讀 LIFEWORLD_NODE）是發布測試的一部分。
+    1a02a82 的 Cloud Build 在這一步沒有 Node，KeyError 讓 Step 3 失敗，後續建置與發布都沒有執行。
+    SQLite 與 PostgreSQL 兩輪都要拿到同一個 Node；版本跟 web 建置（collaboration/ui-kit/Dockerfile）一致，
+    避免兩條建置用不同的前端執行環境驗證同一批 JS。"""
+    lines = [line.strip() for line in node_step().splitlines()]
+    runs = [i for i, line in enumerate(lines) if 'pytest tests' in line]
+    exports = [i for i, line in enumerate(lines) if line.startswith('export LIFEWORLD_NODE=')]
+    assert len(runs) == 2 and len(exports) == 1 and exports[0] < runs[0]
+    web = re.search(r'^FROM node:(\d+\.\d+\.\d+)-', (ROOT / 'collaboration/ui-kit/Dockerfile').read_text(encoding='utf-8'), re.M)[1]
+    assert f'https://nodejs.org/dist/v{web}/node-v{web}-linux-x64.tar.xz' in node_step()
+
+
+def test_release_node_download_is_refused_when_the_checksum_does_not_match(tmp_path, monkeypatch):
+    """下載內容和固定的官方 SHA-256 不符就停止，不寫出 node、不讓測試用來源不明的執行檔。不連網。"""
+    script = node_step()
+    code = script.split("python - <<'PY'\n", 1)[1].split('\nPY\n', 1)[0]
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / '.step10-tests').mkdir()
+    import io
+    import urllib.request
+    monkeypatch.setattr(urllib.request, 'urlopen', lambda *args, **kwargs: io.BytesIO(b'not the official archive'))
+    try:
+        exec(compile(code, 'cloudbuild-node', 'exec'), {'__name__': '__main__'})
+    except SystemExit as stop:
+        assert stop.code and 'SHA-256' in str(stop.code)
+    else:
+        raise AssertionError('checksum mismatch must stop the build step')
+    assert not (tmp_path / '.step10-tests/node').exists()
+
+
 def test_api_build_source_guards_reject_missing_or_invalid_identity(tmp_path):
     """只執行本機來源驗證，不啟動 Docker、不呼叫任何 GCP 工具。"""
     config = yaml.safe_load((ROOT / 'deploy/cloudbuild.api.yaml').read_text(encoding='utf-8'))

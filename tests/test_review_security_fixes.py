@@ -2,6 +2,7 @@
 from test_ai_runtime import prepared
 from conftest import onboard,register,draft,confirm_payload
 from dataclasses import replace
+import json
 import pytest
 
 def story_source(c):
@@ -50,6 +51,26 @@ def test_simulation_does_not_send_withdrawn_story(prepared):
  p.text='{"utterance":"synthetic"}'
  out=c.post('/api/people/'+a+'/simulation',json={'consent':True,'fact_ids':[fid],'message':'合成問題'})
  assert out.status_code==422 and not p.calls, f'withdrawn source sent: HTTP {out.status_code}, provider calls={len(p.calls)}'
+
+def test_simulation_keeps_a_fact_with_another_live_source_but_never_sends_the_withdrawn_story(prepared):
+ """同一則人物資訊還有未撤回的來源時仍可模擬，但只送出可用來源；撤回的故事不出現在模型輸入與回應。"""
+ app,c,me,g,r,p=prepared;app.state.ai_runtime=r
+ a=c.post('/api/people',json={'name':'合成人物'}).json()['id']
+ d=draft(c,g,raw_text='合成人物說喜歡登山。',contributions=[],story={'participants':[{'person_id':a,'interacted':True}]})
+ body=confirm_payload(d,contributions=[],story=d['story'],story_reviewed=True,person_id=a,person_updates=[{'dimension':'interests','value':'登山','evidence_type':'stated_by_person','selected':True}])
+ done=c.post('/api/drafts/'+d['id']+'/confirm',json=body);assert done.status_code==201,done.text
+ xid=done.json()['experience_id']
+ second=draft(c,g);live=c.post('/api/drafts/'+second['id']+'/confirm',json=confirm_payload(second,request_id='confirm-live'));assert live.status_code==201,live.text
+ fid=app.state.service.person_overview(me['owner_id'],a)['facts']['interests'][0]['id']
+ with app.state.service.db.connect(write=True) as db:
+  db.execute('INSERT INTO fact_sources VALUES (?,?,?,NULL)',(fid,live.json()['experience_id'],'stated_by_person'))
+ assert c.post('/api/connections/stories/'+xid+'/availability',json={'request_id':'withdraw','expected_revision':1,'available':False}).status_code==200
+ p.text='{"utterance":"synthetic"}'
+ out=c.post('/api/people/'+a+'/simulation',json={'consent':True,'fact_ids':[fid],'message':'合成問題'})
+ assert out.status_code==200,out.text
+ assert out.json()['source_experience_ids']==[live.json()['experience_id']]
+ assert p.calls[-1]['case']['confirmed_facts'][0]['source_experience_ids']==[live.json()['experience_id']]
+ assert xid not in json.dumps(p.calls[-1]['case'])
 
 
 def test_all_basic_source_writes_roll_back_and_confirmed_mentions_remain_allowed(client):

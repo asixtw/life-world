@@ -2,6 +2,8 @@
 
 **最新狀態：Owner已核准A/B/C提交；當次獨立測試、實際Commit及F5剩餘阻擋見[提交收據](SUBMISSION_RECORD.md)。下文未提交描述為提交核准前的歷史記錄。**
 
+**F1 後續（2026-11-12）：Jerry 決定開放人物 AI 模擬、不再阻擋；F1 的 HTTP 與 Runtime 兩道封鎖已移除並救回原本的模擬流程，見 [EVOLUTION](../../EVOLUTION.md) 的「main 發布測試 Step 3 修正」。下文 F1 的描述保留為歷史紀錄。**
+
 2026-11-12。基準 **f3f4c9f5a9a0833d5966e427d9c9a33c85b45731**，原整合分支／工作目錄不變。全部為**未提交本機修改**，無新Commit SHA，未Push。原Gate A核准不自行撤銷；Gate B仍BLOCKED、GCP E2E NOT RUN、Merge/Alpha NO-GO。
 
 ## 分批結果與設計決策

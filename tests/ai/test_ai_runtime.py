@@ -87,7 +87,7 @@ def test_http_candidate_edit_confirm_and_followup_idempotence(prepared):
     c.headers['X-CSRF-Token']='wrong';assert c.post('/api/experiences/'+xid+'/tasks',json=selected).status_code==403
 
 
-def test_unreleased_simulation_is_blocked_without_reading_or_sending_sources(prepared):
+def test_simulation_uses_confirmed_sources_and_never_writes_facts(prepared):
     app,c,me,g,runtime,p=prepared;app.state.ai_runtime=runtime
     person=c.post('/api/people',json={'name':'合成人物','role':'合成角色'});assert person.status_code==201
     person_id=person.json()['id'];d=draft(c,g);confirmed=c.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d));assert confirmed.status_code==201
@@ -96,13 +96,13 @@ def test_unreleased_simulation_is_blocked_without_reading_or_sending_sources(pre
         db.execute("INSERT INTO fact_sources VALUES (?,?,?,NULL)",('synthetic-fact',confirmed.json()['experience_id'],'stated_by_person'))
     p.text=json.dumps({'utterance':'合成模擬發言，不代表真人反應'})
     result=c.post('/api/people/'+person_id+'/simulation',json={'consent':True,'fact_ids':['synthetic-fact'],'message':'合成演練問題'})
-    assert result.status_code==422 and result.json()['error']['code']=='simulation_not_released'
-    assert p.calls==[]
+    assert result.status_code==200 and result.json()['simulation'] is True and result.json()['applied'] is False
+    assert p.calls[-1]['case']['confirmed_facts'][0]['value']=='合成技能'
     with app.state.service.db.connect() as db:
         assert db.execute('SELECT count(*) FROM person_facts').fetchone()[0]==1
         assert db.execute('SELECT count(*) FROM notes').fetchone()[0]==0
     rejected=c.post('/api/people/'+person_id+'/simulation',json={'consent':True,'fact_ids':['foreign-or-revoked'],'message':'合成'})
-    assert rejected.status_code==422 and len(p.calls)==0
+    assert rejected.status_code==422 and len(p.calls)==1
 
 
 def test_multimodal_adapter_uses_inline_data_without_key_in_url():
@@ -200,13 +200,25 @@ def test_concurrent_reservations_do_not_overrun_global_daily_cap(prepared):
         assert db.execute("SELECT count(*) AS n FROM requests WHERE operation='ai_attempt_v1'").fetchone()['n']==3
 
 
-def test_service_layer_blocks_simulation_even_without_http(prepared):
-    """未核准AI角色演出不可經內部Runtime繞過HTTP封鎖；私人資料不送出。"""
+def test_theater_prompt_requires_character_voice_instead_of_narrator(prepared):
+    """真實評測曾回解說口吻；契約要求角色直接回話，替身不證明生成品質。"""
     app,c,me,g,runtime,p=prepared
-    before=c.get('/api/state').json()
-    with pytest.raises(Exception) as exc:
-        runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':[],'message':'合成'})
-    assert exc.value.code=='simulation_not_released' and p.calls==[]
+    p.text=json.dumps({'utterance':'可以先給我一份簡短議程嗎？'})
+    result=runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':[],'message':'合成邀請練習'})
+    assert result['applied'] is False
+    assert '第一人稱' in p.calls[0]['system']
+    assert '不要替使用者詢問是否合適' in p.calls[0]['system']
+
+
+def test_simulation_contract_keeps_conflicts_and_unknowns_explicit(prepared):
+    """只驗證提示契約與不自動保存；不把預設替身台詞當成模型品質通過。"""
+    app,c,me,g,runtime,p=prepared
+    facts=[{'fact_id':'f1','value':'合成人物喜歡電話','source_experience_ids':['s1']},{'fact_id':'f2','value':'合成人物不喜歡電話','source_experience_ids':['s2']}]
+    p.text=json.dumps({'utterance':'這部分我還不確定，可以再確認嗎？'})
+    before=c.get('/api/state').json();runtime.generate(me['owner_id'],'simulation',{'confirmed_facts':facts,'message':'合成未知情境'})
+    prompt=p.calls[-1]
+    assert prompt['case']['confirmed_facts']==facts
+    assert '來源互相矛盾' in prompt['system'] and '承認不知道' in prompt['system']
     assert c.get('/api/state').json()==before
 
 

@@ -240,3 +240,13 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 在 PR26 `804f3f4` 上適配已核實的 Soft Life 3D Lumi 主圖與獨立 CSS 主題，保留四主分頁、四步紀錄、登入及資料契約；未將展示站的多願望行為移入 App。初次程式測試通過；後續依授權保留新提交並接續 PR26 審查，不提升 App 版本，未合併或部署。[範圍、素材來源與驗證界線](SOFTLIFE_VISUAL_CANDIDATE_20261112.md)。
 
 後續按既有 PR26 推送授權，在新基準 `846f250d` 乾淨套入相同視覺候選，保留生日／目標期間防呆與交接證據，沒有重寫原三個提交。
+
+## 2026-11-12 · main 發布測試 Step 3 修正（1a02a82）與開放人物 AI 模擬
+
+`1a02a82`（PR #26 合併）觸發的 Cloud Build 在 Step 3 `sqlite-and-real-pg18-tests` 有兩項失敗，後續建置、驗證、推送與發布都沒有執行：
+
+- `tests/test_person_choices_frontend.py`：測試直接讀 `LIFEWORLD_NODE`，Step 3 的 `python:3.12-slim` 沒有 Node（其他 Node 測試沒有 Node 時會 skip，所以之前沒有暴露）。前端程式本身正確，有 Node 就通過。修正：Step 3 下載與 web 建置相同的 Node 24.22.2，核對官方 SHA-256 後才設定 `LIFEWORLD_NODE`，SQLite 與 PostgreSQL 兩輪都使用；原本因沒有 Node 而 skip 的前端測試也一起實際執行。
+- `tests/test_public_relationship_engine.py`：F1（`fe1b684`）在 HTTP 與 Runtime 兩層把人物 AI 模擬寫死為 422 `simulation_not_released`，並刪除模擬路由的實作；這支測試沒有跟著改（當時沒有跑全套）。Jerry 於 2026-11-12 決定開放模擬、不再阻擋：移除兩道封鎖，救回 `fe1b684` 之前的路由實作與 Runtime 的 `simulation` 操作；F1 改寫的兩支測試還原為原本三支成功案例（與 `fe1b684` 之前逐字相同）。F1 以外的修正（F2 人物來源綁定、F3 媒體工作、F4 來源狀態投影）不變。
+- 開放後全套測試暴露救回的路由有一個缺陷：`test_review_security_fixes.py::test_simulation_does_not_send_withdrawn_story` 失敗——交會故事撤回後，人物資訊仍以那則故事為來源送給模型（F1 封鎖期間這支測試只因整體被擋而通過）。修正：模擬只使用沒有被撤回的來源，和 `relationship_memory` 記憶用途同一條規則；人物資訊沒有可用來源就在呼叫模型前回 422 `confirmed_sources_required`。新增邊界測試：同一則資訊還有其他未撤回來源時仍可模擬，但只送出可用來源。
+
+測試結果見 [ACCEPTANCE](ACCEPTANCE.md) 同日條目。

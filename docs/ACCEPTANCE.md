@@ -175,3 +175,22 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 接續 `846f250d` 保留三個新提交後，Windows 隔離 pytest **779 passed／90 skipped／0 failed**、Node **58 passed**。完整新基準與瀏覽器檢查界線記於上述報告；歷史 772／29 不冒充本輪結果。
 
 接續真實 Chromium 指定防呆 **23 passed**；六頁三寬度及圖片 fallback 共21畫面無水平溢出、pageerrors 0。完整瀏覽器套件、Safari及產品主觀驗收仍未完成。
+
+## 2026-11-12 · main 發布測試 Step 3 修正（1a02a82）與開放人物 AI 模擬
+
+依據：Cloud Build `3be00bba-539c-41fc-ad76-0869e1e64744`（`1a02a82`）Step 3 SQLite 輪 2 failed／785 passed／114 skipped／1 xfailed，PostgreSQL 輪沒有執行。修正內容見 [EVOLUTION](EVOLUTION.md) 同日條目。
+
+本機環境：Python 3.12.15＋`requirements.api-test.lock`（61 套件逐一相同）；Node 24.20.0（本機）；Cloud Build 會用固定的 24.22.2。PostgreSQL 18.6 可攜版、cluster_name 與 Cloud Build 相同、`scripts/pg_test_bootstrap.py` 初始化。對照組是 main `da161c3` 原樣。
+
+| 項目 | 修正後 | main 原樣 |
+|---|---|---|
+| 兩項原失敗分別執行 | 各 1 passed | 各 1 failed（KeyError `LIFEWORLD_NODE`；422 `simulation_not_released`） |
+| Step 1 發布安全測試（`deploy/tests/test_release.py`） | 24 OK | — |
+| 建置設定測試（`tests/test_api_build_config.py`＋`deploy/tests/test_web_main.py`） | 14 passed；新增兩項修正前 failed | — |
+| 模擬／撤回來源／前端相關（5 個檔） | 32 passed；撤回來源兩項在拿掉過濾後 failed（突變檢查） | — |
+| 完整 SQLite（`pytest tests`，有 Node） | **806 passed／0 failed**／99 skipped／1 xfailed | 801 passed／1 failed／99 skipped／1 xfailed |
+| 完整 PostgreSQL（`LIFEWORLD_TEST_BACKEND=postgresql`） | 707 passed／**116 failed**／82 skipped／1 xfailed | 702 passed／117 failed／82 skipped／1 xfailed |
+
+PostgreSQL 輪的 116 項失敗在 main 原樣上同樣存在（差異只有已修正的模擬測試），不是本次修改造成；Cloud Build 過去因 SQLite 輪先失敗而沒有跑到。主因是 `scripts/pg_test_bootstrap.py` 只建立 STEP10 核心草稿結構，程式需要的 010／011 資料表（`person_basic_details`、`person_employments`、`data_consents`、`subject_experiences`、`relationship_memory_preferences` 等）不存在。這一輪**沒有修正**，Cloud Build 的測試資料庫要套用哪些 migration 待決定。
+
+NOT RUN：Cloud Build 重新建置（觸發條件只有推到 main）、Cloud Run 發布（唯讀預檢目前回 `RELEASE_BLOCKED: API runtime differs from production`）、真實模型呼叫。
