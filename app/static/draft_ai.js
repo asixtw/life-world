@@ -45,7 +45,7 @@ window.DraftAIUI=(()=>{
     if(!root())return;
     clearCandidate();if(c.state.me?.status!=='registered')return;
     const token=epoch,key=scope();
-    try{const data=await metadata(token,key);if(!data)return;status(data.available?'可選用AI整理；尚未傳送原文。':'AI整理目前未開放，可繼續手動記錄。');}
+    try{const data=await metadata(token,key);if(!data)return;status(data.available?'可選用AI整理；尚未傳送原文。':'AI整理目前未開放，可繼續手動記錄。');if(data.available&&c.state.experienceFlow?.organizeMode==='ai'){root().closest('details')?.setAttribute('open','');await choose();}}
     catch{if(valid(token,key)){status('暫時無法確認AI可用狀態，原文與摘要保留。');root().querySelector('[data-draft-ai-recheck]').hidden=false;}}
   }
   function disclosure(data,kind){

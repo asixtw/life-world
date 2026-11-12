@@ -61,6 +61,7 @@ class LifeWorld(DraftReviewMixin, PersonDetailsMixin, PersonsMixin, PersonExperi
     def public_user(self, user, csrf=None):  # 回傳公開帳號與伺服器當地日期。
         result = {k: user[k] for k in ('status', 'username', 'name', 'bio', 'timezone')}  # 準備本次操作的回傳資料
         result.update(owner_id=user['id'], lumi_hatched=bool(user['hatched_at']))  # 合併本次明確設定的欄位
+        result['server_now'] = self.now().isoformat()  # 與經歷禁止未來時間使用同一權威時鐘，僅新增唯讀metadata。
         result['today'] = self.now().astimezone(ZoneInfo(user['timezone'])).date().isoformat()  # 建立草稿與截止日依伺服器判定。
         if csrf:  # 依目前條件選擇下一步處理分支
             result['csrf_token'] = csrf  # 保存「result['csrf_token']」供後續驗證或回傳使用

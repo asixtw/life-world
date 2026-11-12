@@ -8,7 +8,7 @@ from test_integration_person_details import seed,ART
 def review(page,raw='合成原始經歷。'):
     p,headers=seed(page)
     response=page.request.post(BASE+'/api/experiences/drafts',headers=headers,data={'raw_text':raw,'occurred_at':'2026-10-27T00:00:00Z','contributions':[]});assert response.ok,response.text();d=response.json()
-    page.goto(BASE+'/#review/'+d['id']);page.reload()
+    page.goto(BASE+'/#review/'+d['id']);page.reload();page.locator('[data-review-ai-controls] > summary').click()
     return d,headers
 
 
@@ -118,3 +118,18 @@ def test_unavailable_capability_keeps_manual_and_does_not_call_provider(page):
     expect(page.locator('[name=draft_ai_mode][value=manual]')).to_be_checked()
     expect(page.locator('[data-draft-ai-status]')).to_contain_text('目前未開放')
     assert page.request.get(BASE+'/api/ai/usage').json()['calls']==0
+
+
+def test_step1_ai_intent_uses_existing_review_consent_not_early_provider(page):
+    """真PG/授權API，Provider明示替身；選用意圖不是授權也不提前寫正式資料。"""
+    from test_journey import set_occurred
+    seed(page);page.goto(BASE+'/#record');page.reload();page.locator('#raw-text').fill('第一步選AI仍須草稿授權。');set_occurred(page,'2026-10-27T12:00')
+    requests=[];page.on('request',lambda r:requests.append(r.url) if '/suggest' in r.url and r.method=='POST' else None)
+    page.locator('[name=moment_ai_mode][value=ai]').check()
+    assert not requests and not page.request.get(BASE+'/api/state').json()['experiences']
+    page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click();page.locator('[data-experience-review]').click()
+    expect(page.locator('#draft-ai-consent-dialog')).to_be_visible();expect(page.locator('#draft-ai-consent-dialog')).to_contain_text('測試替身')
+    assert not requests
+    page.get_by_role('button',name='同意並整理',exact=True).click();expect(page.locator('#candidate-panel')).to_contain_text('合成AI整理候選')
+    assert len(requests)==1
+    state=page.request.get(BASE+'/api/state').json();assert not state['experiences'] and not state['rewards']['events']

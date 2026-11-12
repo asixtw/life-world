@@ -730,3 +730,20 @@ footer{
 [data-draft-ai]{min-width:0}
 [data-draft-ai] .check-line{min-height:44px;align-items:center;margin:8px 0}
 [data-draft-ai] input[type=radio]{width:18px;height:18px;min-height:18px;padding:0;flex:0 0 18px;margin:0;accent-color:var(--green)}
+
+/* R2記錄這一刻：只改輸入揭露，不建立第二套資料表單。 */
+.moment-tabs{display:flex;gap:4px;padding:5px;background:#edf2eb;border-radius:16px;margin:0 0 22px}
+.moment-tabs button{flex:1;min-width:0;padding:10px 5px;border:0;background:transparent;font-size:14px}
+.moment-tabs [aria-selected=true]{background:white;box-shadow:0 2px 6px #273b2518;border-radius:12px;font-weight:700}
+.moment-text textarea{min-height:200px}.moment-sources{font-size:12px;color:var(--muted);padding:12px 0;line-height:1.8}
+[data-moment-time]{margin:12px 0 22px;border-top:1px solid #e4e9df;padding-top:14px}
+[data-moment-time-error],[data-supplement-status]{color:#924b43;font-size:14px;line-height:1.7}
+.moment-organize{border:1px solid #e4e9df;border-radius:16px;padding:16px;margin:18px 0}
+.moment-organize .choice{display:block;padding:10px 0}.moment-organize .choice span{display:block;font-size:12px;color:var(--muted);padding-left:24px}
+[data-experience-step="1"] #media-panel .media-panel>h2{display:none}
+[data-experience-step="1"] #media-panel{margin-bottom:16px}[data-experience-step="1"] .media-inputs{gap:8px}
+.moment-flow-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}.moment-flow-head p{margin:0}
+#experience-step-track{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 24px}#experience-step-track span{height:5px;border-radius:4px;background:#e7ece5}#experience-step-track .done{background:#86ac9a}
+.moment-organize input[type=radio]{width:18px;height:18px;min-height:18px;display:inline-block;padding:0;margin:0 8px 0 0;accent-color:var(--green);vertical-align:middle}
+.moment-tabs button{white-space:nowrap}.media-transcript{margin-top:12px}.media-transcript>summary{font-size:13px}
+@media(max-width:360px){.moment-tabs button{font-size:13px;padding:10px 2px}}

@@ -1,4 +1,6 @@
 """真正本機UI→草稿→確認交易；不把API種入候選當成填寫流程，不呼叫外部AI。"""
+from test_journey import supplement_source
+from test_journey import set_occurred
 from pathlib import Path
 import pytest
 from playwright.sync_api import expect
@@ -9,7 +11,7 @@ ART=Path(__file__).resolve().parents[1]/'docs/integration/2026-11-11/screenshots
 
 
 def record(page):
-    page.goto(BASE+'/#record');page.reload();page.locator('#raw-text').fill('和小安一起閱讀，提到小明。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.goto(BASE+'/#record');page.reload();page.locator('#raw-text').fill('和小安一起閱讀，提到小明。');set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
 
 
@@ -17,7 +19,7 @@ def supplement(card,kind,values):
     if card.get_attribute('open') is None:card.locator('summary').first.click()
     card.locator('[data-supplement-input=dimension]').select_option(kind)
     expect(card.locator('[data-supplement-input=source_kind]')).to_have_value('')
-    card.locator('[data-supplement-input=source_kind]').select_option('manual')
+    supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual')
     for key,value in values.items():
         control=card.locator('[data-supplement-input="'+key+'"]')
         if key in ['employment_status','employment_id']:control.select_option(value)
@@ -69,7 +71,7 @@ def choose_existing(page,person):
 def test_existing_job_diff_failure_retry_and_version_conflict(page):
     person,h=seed(page)
     job=page.request.post(BASE+'/api/people/'+person['id']+'/employments',headers=h,data={'request_id':'prior-job','confirmed':True,'value':{'company_name':'原組織','job_title':'原職稱','employment_status':'current'},'source':{'source_kind':'manual'}}).json()
-    card=choose_existing(page,person);card.locator('[data-supplement-input=dimension]').select_option('employment');card.locator('[data-supplement-input=source_kind]').select_option('manual')
+    card=choose_existing(page,person);card.locator('[data-supplement-input=dimension]').select_option('employment');supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual')
     card.locator('[data-supplement-input=employment_id]').select_option(job['id'])
     expect(card.locator('[data-supplement-input=company_name]')).to_have_value('原組織')
     card.locator('[data-supplement-input=job_title]').fill('新職稱');card.get_by_role('button',name='加入待核對項目',exact=True).click()
@@ -101,7 +103,7 @@ def test_existing_job_diff_failure_retry_and_version_conflict(page):
 @pytest.mark.parametrize('month,day,year',[('2','31',''),('','','2000'),('','12','')])
 def test_invalid_date_can_be_drafted_but_must_be_excluded_and_unadded_data_is_preserved(page,month,day,year):
     person,h=seed(page);card=choose_existing(page,person)
-    card.locator('[data-supplement-input=dimension]').select_option('birthday');card.locator('[data-supplement-input=source_kind]').select_option('manual');card.locator('[data-supplement-input=birth_month]').fill(month);card.locator('[data-supplement-input=birth_day]').fill(day);card.locator('[data-supplement-input=birth_year]').fill(year)
+    card.locator('[data-supplement-input=dimension]').select_option('birthday');supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual');card.locator('[data-supplement-input=birth_month]').fill(month);card.locator('[data-supplement-input=birth_day]').fill(day);card.locator('[data-supplement-input=birth_year]').fill(year)
     page.locator('[data-experience-review]').click();expect(page.locator('#notice')).to_contain_text('尚未加入候選')
     card.get_by_role('button',name='加入待核對項目',exact=True).click()
     page.locator('[data-experience-review]').click();expect(page.locator('#review-form')).to_be_visible()
@@ -113,7 +115,7 @@ def test_invalid_date_can_be_drafted_but_must_be_excluded_and_unadded_data_is_pr
 
 def test_basic_partial_local_input_restores_without_server_write(page):
     person,h=seed(page);card=choose_existing(page,person)
-    card.locator('[data-supplement-input=dimension]').select_option('birthday');card.locator('[data-supplement-input=source_kind]').select_option('manual');card.locator('[data-supplement-input=birth_month]').fill('4')
+    card.locator('[data-supplement-input=dimension]').select_option('birthday');supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual');card.locator('[data-supplement-input=birth_month]').fill('4')
     page.get_by_role('button',name='離開記錄',exact=True).click();page.get_by_role('button',name='保留此裝置草稿並離開',exact=True).click()
     other=page.context.new_page()
     try:
@@ -188,7 +190,7 @@ def test_raw_source_change_requires_recheck_while_manual_birthday_survives(page)
     person,h=seed(page);card=choose_existing(page,person)
     page.locator('[data-experience-prev]').click();page.locator('[data-experience-prev]').click();page.locator('#raw-text').fill('小安說在組織甲工作。');page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
     supplement(card,'birthday',{'birth_month':'2','birth_day':'29'})
-    card.locator('summary').first.click();card.locator('[data-supplement-input=dimension]').select_option('employment');card.locator('[data-supplement-input=company_name]').fill('組織甲');card.locator('[data-supplement-input=source_kind]').select_option('raw');card.locator('[data-supplement-input=evidence_type]').select_option('stated_by_person');card.get_by_text('原文片段與補充說明',exact=True).click();card.locator('[data-supplement-input=quote]').fill('在組織甲工作');card.get_by_role('button',name='加入待核對項目',exact=True).click()
+    card.locator('summary').first.click();card.locator('[data-supplement-input=dimension]').select_option('employment');card.locator('[data-supplement-input=company_name]').fill('組織甲');supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('raw');card.locator('[data-supplement-input=evidence_type]').select_option('stated_by_person');card.get_by_text('原文片段與補充說明',exact=True).click();card.locator('[data-supplement-input=quote]').fill('在組織甲工作');card.get_by_role('button',name='加入待核對項目',exact=True).click()
     page.locator('[data-experience-review]').click();expect(page.locator('#review-form')).to_be_visible();page.locator('[data-experience-preview]').click()
     for row in page.locator('[data-basic-review-row]').all():row.locator('[data-basic-select]').check()
     page.get_by_role('button',name='完成檢視',exact=True).click()
@@ -241,9 +243,11 @@ def test_draft_save_503_then_lost_timeout_response_preserves_and_recovers_once(p
 
 def test_switching_information_category_never_discards_unadded_text(page):
     person,h=seed(page);card=choose_existing(page,person)
-    card.locator('[data-supplement-input=dimension]').select_option('interests');card.locator('[data-supplement-input=value]').fill('尚未加入的登山喜好');card.locator('[data-supplement-input=source_kind]').select_option('manual')
-    card.locator('[data-supplement-input=dimension]').select_option('birthday');card.locator('[data-supplement-input=birth_month]').fill('4');card.locator('[data-supplement-input=birth_day]').fill('12')
-    card.get_by_role('button',name='加入待核對項目',exact=True).click();expect(page.locator('#toast')).to_contain_text('其他資訊類別還有未保存輸入')
-    expect(card.locator('[data-supplement-input=value]')).to_have_value('尚未加入的登山喜好');expect(card.locator('[data-supplement-input=birth_month]')).to_have_value('4')
+    card.locator('[data-supplement-input=dimension]').select_option('interests');card.locator('[data-supplement-input=value]').fill('尚未加入的登山喜好');supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option('manual')
+    card.locator('[data-supplement-input=dimension]').select_option('birthday')
+    expect(card.locator('[data-supplement-input=dimension]')).to_have_value('interests')
+    expect(card.locator('[data-supplement-status]')).to_contain_text('請先加入')
+    expect(card.locator('[data-supplement-input=value]')).to_be_visible()
+    expect(card.locator('[data-supplement-input=value]')).to_have_value('尚未加入的登山喜好')
     card.get_by_role('button',name='清空這次輸入',exact=True).click();expect(card.locator('[data-supplement-input=value]')).to_have_value('')
     assert not page.request.get(BASE+'/api/state').json()['drafts'] and page.request.get(BASE+'/api/people/'+person['id']+'/details').json()['birthday'] is None

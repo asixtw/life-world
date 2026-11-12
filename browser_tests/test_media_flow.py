@@ -30,6 +30,7 @@ def prepare(page):
 
 
 def choose_image(page, kind='image'):
+    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file="' + kind + '"]').set_input_files(
         {'name': '虛構測試.png', 'mimeType': 'image/png', 'buffer': PNG})
     expect(page.get_by_text('虛構測試.png', exact=True)).to_be_visible()
@@ -81,6 +82,7 @@ def test_card_is_a_local_contact_draft_not_an_experience(page):
     prepare(page)
     choose_image(page, 'card')
     expect(page.locator('.media-item')).to_contain_text('名片只供人物資料校對')
+    page.locator('.media-transcript > summary').click()
     page.get_by_label('校對文字').fill('測試姓名，測試公司')
     page.get_by_label('我已核對這段文字').check()
     expect(page.get_by_role('button', name='加入經歷文字', exact=True)).to_have_count(0)
@@ -95,7 +97,8 @@ def test_permission_denial_and_cancel_preserve_text(page):
     });""")
     prepare(page)
     page.locator('#raw-text').fill('拒絕權限也不能消失')
-    page.locator('.media-recorder > summary').click()
+    if page.get_by_role('tab',name='語音',exact=True).count():page.get_by_role('tab',name='語音',exact=True).click()
+    else:page.locator('.media-recorder > summary').click()
     page.get_by_role('button', name='開始錄音', exact=True).click()
     expect(page.locator('#recorder-status')).to_contain_text('未取得麥克風權限')
     expect(page.locator('#raw-text')).to_have_value('拒絕權限也不能消失')
@@ -118,7 +121,8 @@ def test_recorder_stops_tracks_and_never_uploads_automatically(page):
     prepare(page)
     calls = []
     page.on('request', lambda req: calls.append(req.url) if '/api/media/recognize' in req.url else None)
-    page.locator('.media-recorder > summary').click()
+    if page.get_by_role('tab',name='語音',exact=True).count():page.get_by_role('tab',name='語音',exact=True).click()
+    else:page.locator('.media-recorder > summary').click()
     page.get_by_role('button', name='開始錄音', exact=True).click()
     expect(page.locator('#recorder-status')).to_contain_text('錄音中')
     page.get_by_role('button', name='停止錄音', exact=True).click()
@@ -191,6 +195,7 @@ def test_navigation_cancel_and_return_keeps_local_draft(page):
 def test_storage_failure_is_not_reported_as_saved(page):
     page.add_init_script("Object.defineProperty(indexedDB,'open',{value:()=>{throw new Error('storage denied')}})")
     prepare(page)
+    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file="image"]').set_input_files(
         {'name': '不可遺失.png', 'mimeType': 'image/png', 'buffer': PNG})
     expect(page.locator('#media-storage')).to_contain_text('保存失敗')
@@ -227,7 +232,8 @@ def test_cancel_pending_permission_releases_late_microphone(page):
         window.allowMicrophone=()=>resolve({getTracks:()=>[{stop(){window.released++}}]});
       })});""")
     prepare(page)
-    page.locator('.media-recorder > summary').click()
+    if page.get_by_role('tab',name='語音',exact=True).count():page.get_by_role('tab',name='語音',exact=True).click()
+    else:page.locator('.media-recorder > summary').click()
     page.get_by_role('button', name='開始錄音', exact=True).click()
     expect(page.locator('#recorder-status')).to_contain_text('等待麥克風權限')
     page.get_by_role('button', name='取消錄音', exact=True).click()
@@ -240,6 +246,7 @@ def test_cancel_pending_permission_releases_late_microphone(page):
 def test_invalid_file_keeps_existing_content(page):
     prepare(page)
     page.locator('#raw-text').fill('仍然保留的文字')
+    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file="image"]').set_input_files(
         {'name': 'bad.svg', 'mimeType': 'image/svg+xml', 'buffer': b'<svg/>'})
     expect(page.locator('#toast')).to_contain_text('不支援')

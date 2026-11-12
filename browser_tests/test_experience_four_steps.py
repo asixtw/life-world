@@ -1,4 +1,5 @@
 """隔離 Chromium 四步與人物複用；沒有呼叫真實模型。"""
+from test_journey import set_occurred
 from pathlib import Path
 from uuid import uuid4
 import pytest
@@ -46,10 +47,10 @@ def test_pending_four_steps_and_choices(page,width):
     people=page.request.get(BASE+'/api/state').json()['people']
     assert len(people)==2 and people[1]['tags']==['學校專題']
     page.goto(BASE+'/#record')
-    expect(page.locator('#experience-step-title')).to_have_text('記錄經歷')
+    expect(page.locator('#experience-step-title')).to_have_text('記錄這一刻。')
     page.locator('#raw-text').fill('今天與小安一起讀書，也提到人物甲。')
     # 合成服務固定時鐘；不使用瀏覽器實際今日，仍保留後端禁止未來經歷的規則。
-    page.locator('#occurred-at').fill('2026-10-27T12:00')
+    set_occurred(page,'2026-10-27T12:00')
     shot(page,f'{width}-step1.png')
     page.get_by_role('button',name='下一步',exact=True).click()
     expect(page.locator('#experience-step-title')).to_have_text('目標活動數量')
@@ -98,7 +99,7 @@ def test_guest_diary_and_failure_preserves_input(page):
     expect(page.locator('#media-panel')).to_have_count(0)
     page.locator('#raw-text').fill('今天獨自散步。')
     # 合成服務固定時鐘；不使用瀏覽器實際今日，仍保留後端禁止未來經歷的規則。
-    page.locator('#occurred-at').fill('2026-10-27T12:00')
+    set_occurred(page,'2026-10-27T12:00')
     page.get_by_role('button',name='下一步',exact=True).click()
     page.locator('[name=goal_id]').select_option('')
     page.get_by_role('button',name='下一步',exact=True).click()
@@ -119,7 +120,7 @@ def test_cancel_pending_person_leaves_no_orphan(page):
     page.goto(BASE+'/#record')
     page.locator('#raw-text').fill('還未決定是否保存的經歷。')
     # 合成服務固定時鐘；不使用瀏覽器實際今日，仍保留後端禁止未來經歷的規則。
-    page.locator('#occurred-at').fill('2026-10-27T12:00')
+    set_occurred(page,'2026-10-27T12:00')
     page.get_by_role('button',name='下一步',exact=True).click()
     page.get_by_role('button',name='下一步',exact=True).click()
     page.get_by_role('button',name='＋ 新增人物',exact=True).click()
@@ -147,7 +148,8 @@ def test_goal_quantity_and_media_survive_steps(page):
     page.goto(BASE+'/#record')
     page.locator('#raw-text').fill('完成半小時練習，附上合成圖片。')
     # 合成服務固定時鐘；不使用瀏覽器實際今日，仍保留後端禁止未來經歷的規則。
-    page.locator('#occurred-at').fill('2026-10-27T12:00')
+    set_occurred(page,'2026-10-27T12:00')
+    page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file=image]').set_input_files({'name':'synthetic.png','mimeType':'image/png','buffer':PNG})
     expect(page.locator('.media-item')).to_have_count(1)
     page.get_by_role('button',name='下一步',exact=True).click()

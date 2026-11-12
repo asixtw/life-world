@@ -1,4 +1,5 @@
 """第三步角色/來源/Owner與本機草稿；真本機API，不是Google或Alpha驗收。"""
+from test_journey import set_occurred
 from uuid import uuid4
 import pytest
 from playwright.sync_api import expect
@@ -7,7 +8,7 @@ from test_integration_person_details import seed
 
 
 def record(page,raw):
-    page.goto(BASE+'/#record');page.reload();page.locator('#raw-text').fill(raw);page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.goto(BASE+'/#record');page.reload();page.locator('#raw-text').fill(raw);set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
 
 

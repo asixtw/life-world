@@ -1,4 +1,6 @@
 """Gate A 實際UI/PG證據；僅合成資料，錄影不冒充UX核准或真外部AI。"""
+from test_journey import supplement_source
+from test_journey import set_occurred
 import json
 import subprocess
 from pathlib import Path
@@ -7,7 +9,8 @@ from playwright.sync_api import sync_playwright, expect
 from test_journey import BASE
 from test_integration_person_details import seed
 
-ART=Path(__file__).resolve().parents[1]/'docs/integration/2026-11-12_GATE_A'
+import os
+ART=Path(os.environ.get('LIFEWORLD_UX_ARTIFACT_DIR',str(Path(__file__).resolve().parents[1]/'docs/integration/2026-11-12_GATE_A')))
 
 
 def shot(page,width,name):
@@ -20,7 +23,7 @@ def shot(page,width,name):
 def add(card,kind,values,source_kind='manual',quote=None):
     if card.get_attribute('open') is None:card.locator('summary').first.click()
     card.locator('[data-supplement-input=dimension]').select_option(kind)
-    card.locator('[data-supplement-input=source_kind]').select_option(source_kind)
+    supplement_source(card);card.locator('[data-supplement-input=source_kind]').select_option(source_kind)
     if quote:
         card.get_by_text('原文片段與補充說明',exact=True).click()
         card.locator('[data-supplement-input=quote]').fill(quote)
@@ -49,7 +52,9 @@ def test_gate_a_full_flow_video_and_readback(width):
             before=page.request.get(BASE+'/api/state').json();goal=before['goals'][0];action=goal['actions'][0]
             raw='今天與人物小安閱讀並交流，也提到小明。人物小安告訴我喜歡登山、清淡飲食、擅長設計、習慣先聆聽。'
             page.goto(BASE+'/#record');page.reload()
-            page.locator('#raw-text').fill(raw);page.locator('#occurred-at').fill('2026-10-27T12:00')
+            page.locator('#raw-text').fill(raw);set_occurred(page,'2026-10-27T12:00')
+            time=page.locator('[data-moment-time]')
+            if time.count() and time.get_attribute('open') is not None:time.locator('summary').first.click()
             shot(page,width,'step1')
             page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option(goal['id'])
             page.locator('[name="quantity-'+action['id']+'"]').fill('0.5');shot(page,width,'step2')

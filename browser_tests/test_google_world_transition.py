@@ -1,4 +1,5 @@
 """真瀏覽器／本機API，GIS是明示替身；不等於真Google驗收。"""
+from test_journey import set_occurred
 import os,uuid
 import pytest
 from playwright.sync_api import expect
@@ -62,7 +63,7 @@ def test_step3_upgrade_unlocks_people_without_changing_choice_or_form(page,width
     page.set_viewport_size({'width':width,'height':950})
     me,g,h=world(page,'第三步保留世界')
     page.goto(BASE+'/#record');page.locator('#raw-text').fill('尚未保存，沒有關聯人物。')
-    page.locator('#occurred-at').fill('2026-10-27T12:00')
+    set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('[name^="quantity-"]').first.fill('2')
     page.locator('[data-experience-next]').click()
     page.evaluate('window.originalRecordForm=document.querySelector("#record-form");window.originalRaw=document.querySelector("#raw-text")')
@@ -86,7 +87,7 @@ def test_step3_upgrade_unlocks_people_without_changing_choice_or_form(page,width
 
 def test_step3_upgrade_cancel_and_rejected_exchange_preserve_inputs(page):
     me,g,h=world(page,'取消保留第三步');page.goto(BASE+'/#record')
-    page.locator('#raw-text').fill('取消或失敗仍保留這段內容。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('#raw-text').fill('取消或失敗仍保留這段內容。');set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
     sdk(page,'reject-step3-'+uuid.uuid4().hex)
     page.locator('#account-button').click();page.get_by_role('button',name='保存目前世界',exact=True).click()

@@ -1,4 +1,5 @@
 """以實際本機API驗收人物生日/多份任職畫面；不是PG或Owner UX核准。"""
+from test_journey import set_occurred
 from pathlib import Path
 from uuid import uuid4
 import pytest
@@ -160,7 +161,7 @@ def test_unsaved_summary_does_not_leak_into_another_draft(page):
 def test_two_pending_people_can_be_added_with_independent_roles_before_confirm(page,width):
     page.set_viewport_size({'width':width,'height':950})
     p,headers=seed(page);page.goto(BASE+'/#record');page.reload()
-    page.locator('#raw-text').fill('和小安閱讀，提到小明。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('#raw-text').fill('和小安閱讀，提到小明。');set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click()
     page.get_by_role('button',name='＋ 新增人物',exact=True).click();page.locator('[data-pending-target]').first.locator('[data-target-name]').fill('小安');page.locator('[data-pending-target]').first.locator('[data-target-role]').select_option('interaction')
     page.get_by_role('button',name='再加入一位人物',exact=True).click()
@@ -198,7 +199,7 @@ def test_two_pending_people_can_be_added_with_independent_roles_before_confirm(p
 @pytest.mark.parametrize('related',[False,True])
 def test_partial_multi_person_local_draft_survives_leaving_and_new_page(page,related):
     p,h=seed(page);page.goto(BASE+'/#record');page.reload()
-    page.locator('#raw-text').fill('尚未完成的人物草稿。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('#raw-text').fill('尚未完成的人物草稿。');set_occurred(page,'2026-10-27T12:00')
     page.locator('[data-experience-next]').click();page.locator('[data-experience-next]').click()
     page.get_by_role('button',name='＋ 新增人物',exact=True).click();page.locator('[data-pending-target]').first.locator('[data-target-name]').fill('待建甲')
     page.get_by_role('button',name='再加入一位人物',exact=True).click();page.locator('[data-pending-target]').nth(1).locator('[data-target-name]').fill('待建乙')
@@ -224,7 +225,7 @@ def test_partial_multi_person_local_draft_survives_leaving_and_new_page(page,rel
 def test_mobile_record_focus_has_explicit_exit_and_restores_navigation(page,width):
     page.set_viewport_size({'width':width,'height':950});p,h=seed(page);page.goto(BASE+'/#record');page.reload()
     expect(page.locator('#nav')).not_to_be_visible()
-    page.locator('#raw-text').fill('手機專注記錄，不遺失內容。');page.locator('#occurred-at').fill('2026-10-27T12:00')
+    page.locator('#raw-text').fill('手機專注記錄，不遺失內容。');set_occurred(page,'2026-10-27T12:00')
     page.get_by_role('button',name='離開記錄',exact=True).click();expect(page.locator('#account-dialog')).to_contain_text('尚未保存')
     page.get_by_role('button',name='繼續編輯',exact=True).click();expect(page.locator('#raw-text')).to_have_value('手機專注記錄，不遺失內容。')
     page.locator('[data-experience-next]').click();page.locator('#goal-id').select_option('');page.locator('[data-experience-next]').click();page.locator('[data-experience-review]').click()

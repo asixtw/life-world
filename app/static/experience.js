@@ -2,12 +2,14 @@
 window.ExperienceUI=(()=>{
   let c, flow=null;
   /** @typedef {{ownerId:string,draftId:?string,expectedRevision:?number,currentStep:number,rawText:string,occurredAt:string,goalId:?string,contributions:Array,personId:?string,pendingPerson:?Object,story:?Object,editedSummary:string,hasSummary:boolean,summarySourceRaw:?string,summarySourceHash:?string,tasks:Array<string>,personCandidates:Array<Object>,birthdayCandidates:Array<Object>,employmentCandidates:Array<Object>,supplementInputs:Record<string,Object>,aiConsent:boolean,aiCandidate:?string,dirty:boolean,requestId:?string,mediaScope:?string}} ExperienceFlowState */
-  function initialize(context){c=context;BasicCandidatesUI.initialize({state:c.state,esc:c.esc,toast:c.toast,api:c.api,getFlow:()=>flow,people:currentReviewPeople,refresh:refreshReviewSummary});window.PersonSupplementsUI?.initialize({state:c.state,esc:c.esc,toast:c.toast,getFlow:()=>flow,people:currentReviewPeople});}
+  function initialize(context){c=context;MomentUI.initialize(context);BasicCandidatesUI.initialize({state:c.state,esc:c.esc,toast:c.toast,api:c.api,getFlow:()=>flow,people:currentReviewPeople,refresh:refreshReviewSummary});window.PersonSupplementsUI?.initialize({state:c.state,esc:c.esc,toast:c.toast,getFlow:()=>flow,people:currentReviewPeople});}
   function capture(event){ // 單一 DOM 是編輯值來源，換步不重建媒體或清空表單。
     const form=document.querySelector('#record-form,#review-form');if(!form||!flow)return;
     const f=new FormData(form),refreshPeople=!event||!['summary','tasks'].includes(event.target?.name);
     Object.assign(flow,{rawText:f.get('raw_text')??flow.rawText,occurredAt:f.get('occurred_at'),goalId:f.get('goal_id')||null,personId:f.get('person_id')||null,story:refreshPeople?window.ConnectionsUI.collectEditor(form,false):flow.story,dirty:c.state.dirty,contributions:[...f].filter(([k])=>k.startsWith('quantity-')).map(([k,v])=>({action_id:k.slice(9),quantity:v}))});
-    flow.pendingPerson=flow.story?.pending_person||null;
+    if(f.has('moment_ai_mode'))flow.organizeMode=f.get('moment_ai_mode');
+    if(f.has('draft_ai_mode'))flow.organizeMode=f.get('draft_ai_mode');
+    MomentUI.sync();flow.pendingPerson=flow.story?.pending_person||null;
     if(f.has('summary')){flow.editedSummary=String(f.get('summary'));flow.hasSummary=true;}
     if(f.has('tasks'))flow.tasks=String(f.get('tasks')).split('\n').map(t=>t.trim()).filter(Boolean);
     if(form.querySelector('[data-summary-source-review]')?.checked){flow.summarySourceRaw=flow.rawText;flow.summarySourceHash=c.state.draft?.raw_sha256;}
@@ -160,8 +162,11 @@ window.ExperienceUI=(()=>{
   function show(step){
     flow.currentStep=step;
     document.querySelectorAll('[data-experience-step]').forEach(n=>{n.hidden=Number(n.dataset.experienceStep)!==step;});
-    const title=document.querySelector('#experience-step-title');title.textContent=['記錄經歷','目標活動數量','人物關聯'][step-1];title.focus();
-    document.querySelector('#experience-progress').textContent=`${step} / 4 · 記錄經歷 → 目標活動數量 → 人物關聯 → 檢視並確認`;
+    const title=document.querySelector('#experience-step-title');title.textContent=['記錄這一刻。','目標活動數量','人物關聯'][step-1];title.focus();
+    document.querySelector('#experience-progress').textContent=`${step} / 4`;
+    document.querySelectorAll('#experience-step-track span').forEach((n,i)=>n.classList.toggle('done',i<step));
+    const subtitle=document.querySelector('[data-record-wrapper] .heading p');
+    if(subtitle)subtitle.textContent=['先留下真實經過，目標和人物稍後再補。','選擇目標與實際活動量，也可以只記日記。','只選這次真實相關的人物，補充資訊是選填的。'][step-1];
     document.querySelector('[data-experience-prev]').hidden=step===1;
     document.querySelector('[data-experience-next]').hidden=step===3;
     document.querySelector('[data-experience-review]').hidden=step!==3;
@@ -172,14 +177,14 @@ window.ExperienceUI=(()=>{
     document.body.classList.toggle('experience-focus',!!(form||document.querySelector('#review-form'))); // 四步手機專注模式，流程外恢復原導覽。
     if(!form){
       const review=document.querySelector('#review-form'),d=c.state.draft;
-      if(review&&d){const acceptance=review.querySelector('#story-reviewed')?.closest('label');if(acceptance)review.querySelector('#experience-review-people-acceptance').append(acceptance);review.insertAdjacentHTML('afterbegin','<button type="button" class="text-button" data-action="leave-experience">離開記錄</button>');const prior=summaryState(d),personReviewSignature=flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id?flow.personReviewSignature:null;flow={ownerId:c.state.me.owner_id,draftId:d.id,expectedRevision:d.revision,currentStep:4,rawText:d.raw_text,occurredAt:d.occurred_at,goalId:d.goal_id,contributions:d.contributions,personId:d.person_id,pendingPerson:d.story?.pending_person||null,story:d.story,editedSummary:review.elements.summary.value,hasSummary:true,summarySourceRaw:prior.sourceRaw,summarySourceHash:prior.sourceHash,tasks:tasksState(d),personCandidates:structuredClone(flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id&&flow.expectedRevision===d.revision?flow.personCandidates||d.review?.person_candidates||[]:d.review?.person_candidates||[]),birthdayCandidates:structuredClone(flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id&&flow.expectedRevision===d.revision?flow.birthdayCandidates||d.review?.birthday_candidates||[]:d.review?.birthday_candidates||[]),employmentCandidates:structuredClone(flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id&&flow.expectedRevision===d.revision?flow.employmentCandidates||d.review?.employment_candidates||[]:d.review?.employment_candidates||[]),personReviewSignature,aiConsent:false,aiCandidate:c.state.candidate||null,dirty:c.state.dirty,requestId:null,mediaScope:'draft:'+d.id};review.addEventListener('input',capture);review.addEventListener('change',capture);refreshReviewSummary();}
+      if(review&&d){const acceptance=review.querySelector('#story-reviewed')?.closest('label');if(acceptance)review.querySelector('#experience-review-people-acceptance').append(acceptance);review.insertAdjacentHTML('afterbegin','<button type="button" class="text-button" data-action="leave-experience">離開記錄</button>');const prior=summaryState(d),personReviewSignature=flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id?flow.personReviewSignature:null;flow={ownerId:c.state.me.owner_id,draftId:d.id,expectedRevision:d.revision,currentStep:4,rawText:d.raw_text,occurredAt:d.occurred_at,goalId:d.goal_id,contributions:d.contributions,personId:d.person_id,pendingPerson:d.story?.pending_person||null,story:d.story,editedSummary:review.elements.summary.value,hasSummary:true,summarySourceRaw:prior.sourceRaw,summarySourceHash:prior.sourceHash,tasks:tasksState(d),personCandidates:structuredClone(flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id&&flow.expectedRevision===d.revision?flow.personCandidates||d.review?.person_candidates||[]:d.review?.person_candidates||[]),birthdayCandidates:structuredClone(flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id&&flow.expectedRevision===d.revision?flow.birthdayCandidates||d.review?.birthday_candidates||[]:d.review?.birthday_candidates||[]),employmentCandidates:structuredClone(flow?.ownerId===c.state.me.owner_id&&flow.draftId===d.id&&flow.expectedRevision===d.revision?flow.employmentCandidates||d.review?.employment_candidates||[]:d.review?.employment_candidates||[]),personReviewSignature,organizeMode:flow?.organizeMode||'manual',aiConsent:false,aiCandidate:c.state.candidate||null,dirty:c.state.dirty,requestId:null,mediaScope:'draft:'+d.id};review.addEventListener('input',capture);review.addEventListener('change',capture);refreshReviewSummary();}
       else flow=null;
       c.state.experienceFlow=flow;return;
     }
     // 從第四步選擇修改原文應回第一步；同一份record表單的局部恢復才保留原步。
     const carry=flow?.ownerId===c.state.me.owner_id&&flow.draftId===(c.state.editingDraft?c.state.draft?.id:null)?flow:null;
     const previousStep=flow?.ownerId===c.state.me.owner_id&&flow.currentStep<=3?flow.currentStep:1;
-    flow={ownerId:c.state.me.owner_id,draftId:c.state.editingDraft?c.state.draft?.id:null,expectedRevision:c.state.draft?.revision,currentStep:1,rawText:'',occurredAt:'',goalId:null,contributions:[],personId:null,pendingPerson:null,story:null,editedSummary:carry?.editedSummary??'',hasSummary:carry?.hasSummary||false,summarySourceRaw:carry?.summarySourceRaw??null,summarySourceHash:carry?.summarySourceHash??null,tasks:carry?.tasks,personCandidates:carry?.personCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.person_candidates||[]:[]),birthdayCandidates:carry?.birthdayCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.birthday_candidates||[]:[]),employmentCandidates:carry?.employmentCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.employment_candidates||[]:[]),supplementInputs:carry?.supplementInputs||{},personReviewSignature:carry?.personReviewSignature??null,aiConsent:false,aiCandidate:null,dirty:false,requestId:null,mediaScope:null};
+    flow={ownerId:c.state.me.owner_id,draftId:c.state.editingDraft?c.state.draft?.id:null,expectedRevision:c.state.draft?.revision,currentStep:1,rawText:'',occurredAt:'',goalId:null,contributions:[],personId:null,pendingPerson:null,story:null,editedSummary:carry?.editedSummary??'',hasSummary:carry?.hasSummary||false,summarySourceRaw:carry?.summarySourceRaw??null,summarySourceHash:carry?.summarySourceHash??null,tasks:carry?.tasks,personCandidates:carry?.personCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.person_candidates||[]:[]),birthdayCandidates:carry?.birthdayCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.birthday_candidates||[]:[]),employmentCandidates:carry?.employmentCandidates??structuredClone(c.state.editingDraft?c.state.draft?.review?.employment_candidates||[]:[]),supplementInputs:carry?.supplementInputs||{},personReviewSignature:carry?.personReviewSignature??null,organizeMode:carry?.organizeMode||'manual',aiConsent:false,aiCandidate:null,dirty:false,requestId:null,mediaScope:null};
     const sections=[1,2,3].map(n=>{const x=document.createElement('section');x.dataset.experienceStep=n;return x;});
     const nodes=[...form.children], goal=form.querySelector('#goal-id')?.closest('.field'),person=form.querySelector('#person-id');
     for(const node of nodes){
@@ -191,17 +196,27 @@ window.ExperienceUI=(()=>{
     }
     if(c.state.me.status==='guest'){sections[2].dataset.guestLocked='true';sections[2].innerHTML='<p>本次不關聯人物。訪客可繼續確認文字與目標活動量，不會呼叫 AI。</p>';}
     form.dataset.experienceFlow='true';form.append(...sections);
-    form.insertAdjacentHTML('afterbegin','<button type="button" class="text-button" data-action="leave-experience">離開記錄</button><p id="experience-progress" class="small muted" role="status"></p><h2 id="experience-step-title" tabindex="-1"></h2>');
+    form.insertAdjacentHTML('afterbegin','<div class="moment-flow-head"><button type="button" class="text-button" data-action="leave-experience">離開記錄</button><p id="experience-progress" class="small muted" role="status"></p></div><div id="experience-step-track" aria-hidden="true"><span></span><span></span><span></span><span></span></div>');
     form.insertAdjacentHTML('beforeend','<div class="button-row space-top"><button type="button" class="secondary" data-experience-prev>上一步</button><button type="button" class="primary" data-experience-next>下一步</button><button class="primary" name="intent" value="review" data-experience-review>檢視並確認 →</button><button class="text-button" name="intent" value="save">保存草稿並離開</button></div>');
     form.addEventListener('input',capture);form.addEventListener('change',capture);
     form.querySelector('[data-experience-prev]').onclick=()=>{capture();show(Math.max(1,flow.currentStep-1));};
-    form.querySelector('[data-experience-next]').onclick=()=>{
-      const section=sections[flow.currentStep-1];
-      for(const field of section.querySelectorAll('input,textarea,select'))if(!field.reportValidity())return;
-      if(flow.currentStep===1&&!form.elements.raw_text.value.trim()){c.toast('請先輸入或校對經歷文字。');return;}
-      capture();show(Math.min(3,flow.currentStep+1));
+    form.querySelector('[data-experience-next]').onclick=async()=>{
+      const next=form.querySelector('[data-experience-next]'),ownFlow=flow,step=flow.currentStep;
+      if(next.disabled)return;next.disabled=true;
+      try{
+        if(step===1&&!await MomentUI.validate())return;
+        if(flow!==ownFlow||!form.isConnected||flow.currentStep!==step)return;
+        const section=sections[step-1];
+        if(step===1&&!form.elements.raw_text.value.trim()){form.elements.moment_input_tab.value='text';MomentUI.sync();form.elements.raw_text.focus();c.toast('請先輸入或校對經歷文字。');return;}
+        for(const field of section.querySelectorAll('input,textarea,select'))if(!field.reportValidity())return;
+        if(step===1&&!form.elements.raw_text.value.trim()){c.toast('請先輸入或校對經歷文字。');return;}
+        capture();show(Math.min(3,step+1));
+      }finally{if(next.isConnected)next.disabled=false;}
     };
-    c.state.experienceFlow=flow;show(previousStep);capture();
+    form.parentElement.dataset.recordWrapper='true';
+    const heading=form.parentElement.querySelector('.heading');heading.querySelector('.eyebrow').textContent='A MOMENT WORTH KEEPING';heading.before(form.querySelector('.moment-flow-head'),form.querySelector('#experience-step-track'));
+    const title=heading.querySelector('h1');title.id='experience-step-title';title.tabIndex=-1;
+    MomentUI.mount(form,flow.organizeMode);c.state.experienceFlow=flow;show(previousStep);capture();
   }
   function refreshCapabilities(){
     // 同Owner升級只替換已鎖住的人物區；保留表單、原文、媒體、步驟與未選人物的狀態。

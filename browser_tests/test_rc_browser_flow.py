@@ -1,4 +1,5 @@
 """單一RC的完整瀏覽器閉環；必須搭配明示AI Fixture隔離服務，非真實OAuth/AI。"""
+from test_journey import set_occurred
 from uuid import uuid4
 import pytest
 from playwright.sync_api import expect
@@ -13,7 +14,7 @@ def test_rc_goal_ai_review_progress_reward_reload(page,width):
     goal=page.request.get(BASE+'/api/state').json()['goals'][0]
     page.get_by_role('link',name='記錄新經歷',exact=True).click()
     page.locator('#raw-text').fill('合成測試：今天閱讀15分鐘，整理一個重點。')
-    page.locator('#occurred-at').fill('2026-10-27T10:00')
+    set_occurred(page,'2026-10-27T10:00')
     page.locator('#goal-id').select_option(goal['id'])
     page.locator('#quantity-'+goal['actions'][0]['id']).fill('0.5')
     page.get_by_role('button',name='保存草稿並進入核對').click()
