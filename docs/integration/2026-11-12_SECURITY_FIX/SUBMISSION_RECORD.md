@@ -48,3 +48,18 @@ Diff檢查補註：來源/測試檔的`git diff --check`通過；保存的WORKTR
 產品Diff與證據已檢查：原文／人物正式歷史／經歷／目標與獎勵交易程式未擴充；新測試資料皆合成、PG只新增自有合成Owner。報告／Patch無Access Token、API Key、真密碼、Cookie或正式業務資料；公開基礎設施識別碼僅沿用儲存庫已有範圍，不公開Runtime env／Secrets。
 
 **狀態：Gate B BLOCKED／GCP E2E NOT RUN／Merge、Alpha NO-GO。** 完成普通Push並讀回後停止，不進行其他產品開發或雲端操作。
+
+
+## F5 最小防護提交（2026-11-12，Owner加速授權）
+
+基準HEAD與遠端均為a7a21af6e9635ab9b31e6024dc13dc10bf08b6dd。提交範圍僅app/people.py、test_fact_provenance_contract.py、test_fact_source_safety.py、test_pg_fact_source_safety.py及本收據；其他Audit/發布準備草稿保持未提交，不混入本次功能修復。
+
+完整產品Diff：一般fact寫入先檢查既有來源，撤回來源回409 source_restore_required，證據類型不符回409 source_correction_required；source衝突INSERT改DO NOTHING，不能清空revoked_at。沿用Owner交易鎖、來源關聯與冪等收據；未新增恢復API，未改UX、Schema或權限。
+
+本輪命令：`/private/tmp/lw-integration-venv/bin/python -m pytest tests/test_fact_provenance_contract.py tests/test_fact_source_safety.py tests/test_people.py tests/test_relation_sources.py tests/test_people_connections_visibility.py -q --tb=short`：47 PASS、1 strict XFAIL、0 FAIL、0 SKIP。`LIFEWORLD_INTEGRATION_PG_CONFIG=/private/tmp/lw-integration-pg18-config.json /private/tmp/lw-integration-venv/bin/python -m pytest tests/test_pg_fact_source_safety.py -q --tb=short`：4 PASS。兩集合環境不同，不冒充GCP測試。正式source_kind/source_revision/quote缺口仍strict XFAIL，不宣稱F5全部完成。
+
+差異審查：測試使用合成資料；固定字串為測試帳密，不含真實憑證或個資。重送、跨Owner、CSRF、版本、混合來源原子回滾及證據不覆寫已驗證。沒有正式恢復功能；Provider派送與完整持久化不是本次已通過項目。
+
+Alpha Export控制面前置重查：Project/Instance/DB匹配、RUNNABLE、無未完成作業、精確物件404、服務帳號既有objectCreator。但本機無可用私網DBA連線證明當下Marker/Schema/Owner/ACL/Sequence仍與Studio基準一致；Q4僅沿用Owner結果且未重跑，不能替代結構驗證。Export BLOCKED／NOT RUN，無Operation ID、Generation、Checksum。需Owner透過既有Studio提供基準延續確認／新結構唯讀結果，無需重複Q4；未發出Export、不另換目標。
+
+Gate A維持Approved；B BLOCKED、C NOT RUN、D NO-GO。沒有Migration、GRANT、Build、Deploy、Merge或切流。

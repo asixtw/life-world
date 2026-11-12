@@ -219,6 +219,15 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
                     422, 'invalid_conflict', '衝突資訊需屬同一維度且內容不同。')  # 驗證限制：衝突資訊需屬同一維度且內容不同。
         fact_id = old['id'] if old else uid()  # 準備同值既有資訊或新資訊的識別碼
         require(old is None or old['status'] != 'archived', 409, 'archived_fact', '這項資訊已封存，請從人物資訊變更歷史明確重新採用。')  # 驗證限制：這項資訊已封存，請從人物資訊變更歷史明確重新採用。
+        # 所有來源先驗後寫：普通create/Confirm不能把明確撤回當作重新同意，
+        # 也不能在缺少來源History契約時靜默覆寫既有證據類型。恢復/更正須另走核准契約。
+        if old:
+            for source_id in set(source_ids):
+                prior=c.execute('SELECT evidence_type,revoked_at FROM fact_sources WHERE fact_id=? AND experience_id=?',(fact_id,source_id)).fetchone()
+                require(prior is None or prior['revoked_at'] is None,409,'source_restore_required',
+                        '這筆來源已由你撤回；一般新增不會恢復，請保留撤回狀態或選擇其他有效來源。')
+                require(prior is None or prior['evidence_type']==data.evidence_type,409,'source_correction_required',
+                        '這筆來源已有不同的得知依據；一般新增不會覆寫原證據，請保留後另行核對。')
         if not old:  # 依目前條件選擇下一步處理分支
             c.execute('''INSERT INTO person_facts(id,owner_id,person_id,dimension,value,normalized_value,description,status,created_at)
                          VALUES (?,?,?,?,?,?,?,'confirmed',?)''',
@@ -227,7 +236,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             c.execute("UPDATE person_facts SET revision=revision+1,status=CASE WHEN status='unavailable' THEN 'confirmed' ELSE status END WHERE id=?", (fact_id,))  # 更新已確認人物資訊；值以參數傳入
         for source_id in set(source_ids):  # 逐項處理清單中的資料，保留目前交易或查詢條件
             c.execute('''INSERT INTO fact_sources(fact_id,experience_id,evidence_type,revoked_at) VALUES (?,?,?,NULL) ON CONFLICT(fact_id,experience_id)
-                         DO UPDATE SET evidence_type=excluded.evidence_type,revoked_at=NULL''', (fact_id, source_id, data.evidence_type))  # 新增人物資訊來源；值以參數傳入
+                         DO NOTHING''', (fact_id, source_id, data.evidence_type))  # 新增人物資訊來源；值以參數傳入
         if other:  # 依目前條件選擇下一步處理分支
             group = other['conflict_group'] or other['id']  # 準備同組衝突資訊的穩定識別碼
             c.execute("UPDATE person_facts SET conflict_group=?,status='conflict',revision=revision+1 WHERE id=? OR (person_id=? AND conflict_group=? AND status<>'archived')",

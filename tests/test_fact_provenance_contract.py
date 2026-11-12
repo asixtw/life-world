@@ -50,7 +50,6 @@ def test_manual_fact_still_requires_confirmed_experience(client):
     assert client.app.state.service.person_overview(d['owner_id'],p['id'])['facts']['interests']==[]
 
 
-@pytest.mark.xfail(strict=True,reason='F5狀態機待審：既有_write_fact upsert會清空revoked_at，普通寫入不可冒充明確恢復')
 def test_normal_upsert_must_not_restore_revoked_fact_source(client):
     """保留可重現阻擋，不以新增契約文件宣稱現碼狀態機已修復。"""
     p,d,item=prepared_fact(client)
@@ -65,4 +64,5 @@ def test_normal_upsert_must_not_restore_revoked_fact_source(client):
     r=client.post('/api/people/'+p['id']+'/facts',json={'request_id':'ordinary-upsert','dimension':'interests','value':'登山','evidence_type':'stated_by_person','source_experience_ids':[done.json()['experience_id']],'confirmed':True})
     with service.db.connect() as c:
         row=c.execute('SELECT revoked_at FROM fact_sources WHERE fact_id=? AND experience_id=?',(fact['id'],done.json()['experience_id'])).fetchone()
+    assert r.status_code==409 and r.json()['error']['code']=='source_restore_required',r.text
     assert row['revoked_at'] is not None,'一般upsert清空revoked_at，繞過明確恢復'
