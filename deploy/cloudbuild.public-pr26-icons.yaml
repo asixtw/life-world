@@ -1,0 +1,13 @@
+# 單次映像建置；不自動部署或切流。
+serviceAccount: projects/life-world-513506/serviceAccounts/lw-product-build@life-world-513506.iam.gserviceaccount.com
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _COMMIT: approval-required
+steps:
+  - id: overlay-approved-mobile-icons-on-pr26
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '--build-arg', 'VCS_REF=${_COMMIT}', '-t', 'asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:pr26-icons-${_COMMIT}-${BUILD_ID}', '.']
+images:
+  - asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product:pr26-icons-${_COMMIT}-${BUILD_ID}

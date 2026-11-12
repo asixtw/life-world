@@ -1,0 +1,37 @@
+{
+  "id": "/",
+  "name": "Life World",
+  "short_name": "Life World",
+  "lang": "zh-Hant",
+  "start_url": "/#world",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#FFFDF8",
+  "background_color": "#FFFDF8",
+  "icons": [
+    {
+      "src": "/static/art/mobile-web-v1/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/art/mobile-web-v1/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/art/mobile-web-v1/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/art/mobile-web-v1/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

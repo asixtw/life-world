@@ -1,0 +1,5 @@
+# 僅疊加已測試手機圖示，不重裝依賴或改PR26後端。
+FROM asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api@sha256:86f4d3443ed31da1c5784d0978e6e1e7e1357bd146c05e639c75612ded39f6ed
+ARG VCS_REF
+LABEL org.opencontainers.image.revision=$VCS_REF
+COPY --chown=10001:10001 overlay/ /srv/lifeworld/app/static/
