@@ -167,3 +167,11 @@ Web 來源唯讀核對：00004-rmt 於台北時間 2026-11-03 17:45 建立，com
 ### 2026-11-09 整合證據補充（取代上文「最新」的時間性敘述）
 
 完整整合版離線回歸為 **549 passed、17 PG skipped、13 warnings**。上文540屬歷史pool階段結果。OSSANG先前專用PG18執行17必測全通過，但該次整體542 passed、2 failed、13 Node skipped，且早於最後整合；不能當成本head完整Windows回歸。新core在Windows實機記憶體載入的constructor及6個CLI拒絕probe已通過，僅證明fail-closed路徑，不是Windows全功能或ACL驗收。詳見 `CORE_SAFETY_INTEGRATION_20261109.md`（位於 docs/testing）。三線完整驗收仍未完成。
+
+## 2026-11-12 · PR26 Soft Life 視覺候選
+
+見 [視覺候選範圍與本輪結果](SOFTLIFE_VISUAL_CANDIDATE_20261112.md)。初次以 PR26 `804f3f4` 為基準，僅適配視覺與素材。該次 pytest 772 passed／87 skipped；Node 29 passed；CSS／JS 語法檢查通過。瀏覽器因環境 socket 限制未執行，沒有桌面／手機視覺驗收或上線宣稱。後續已獲 PR26 推送授權，接續基準與重跑結果見上方報告；無 merge、deploy、正式 DB 變更。
+
+接續 `846f250d` 保留三個新提交後，Windows 隔離 pytest **779 passed／90 skipped／0 failed**、Node **58 passed**。完整新基準與瀏覽器檢查界線記於上述報告；歷史 772／29 不冒充本輪結果。
+
+接續真實 Chromium 指定防呆 **23 passed**；六頁三寬度及圖片 fallback 共21畫面無水平溢出、pageerrors 0。完整瀏覽器套件、Safari及產品主觀驗收仍未完成。
