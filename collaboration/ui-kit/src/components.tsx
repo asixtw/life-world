@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react' // 對話框處理初始焦點與 Esca
 export type ButtonKind = 'primary' | 'secondary' | 'text' | 'icon' | 'danger' // 六類按鈕由切換樣式涵蓋。
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode; kind?: ButtonKind; loading?: boolean; success?: boolean; error?: boolean; ref?: Ref<HTMLButtonElement> } // 呼叫端可傳 type、aria、事件及 ref。
 export function Button({ children, kind = 'primary', loading = false, success = false, error = false, disabled = false, type = 'button', className = '', ref, ...native }: ButtonProps) { // 展示樣式不吞掉原生契約。
-  return <button {...native} ref={ref} className={`button button--${kind} ${success ? 'is-success' : ''} ${error ? 'is-error' : ''} ${className}`} type={type} disabled={disabled || loading} aria-busy={loading}>{loading ? '處理中…' : children}</button> // 載入時停用並保留輔助技術狀態。
+  return <button {...native} ref={ref} className={`button button--${kind} ${success ? 'is-success' : ''} ${error ? 'is-error' : ''} ${loading ? 'is-loading' : ''} ${className}`} type={type} disabled={disabled || loading} aria-busy={loading}><span className="button__label">{children}</span>{loading&&<span className="button__loading" aria-hidden="true">處理中…</span>}</button> // 保留原標籤寬度及可讀名稱，避免載入時版面跳動。
 }
 
 export function Field({ label, help, error, children }: { label: string; help?: string; error?: string; children: ReactNode }) { // 文字、長文與其他輸入共用標籤。

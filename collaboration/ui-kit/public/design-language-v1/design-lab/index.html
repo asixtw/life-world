@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Life World 統一設計語言：角色、色彩、元件與互動狀態。">
+  <title>Life World｜設計元件庫 v1.0</title>
+  <link rel="stylesheet" href="../tokens.css"><link rel="stylesheet" href="../art.css">
+  <link rel="stylesheet" href="../design-language.css"><link rel="stylesheet" href="../birth-v1.css"><link rel="stylesheet" href="gallery.css"><link rel="stylesheet" href="room-audio.css">
+  <script src="config.js" defer></script><script src="../design-tokens.js" defer></script>
+  <script src="../art/design-v1/manifest.js" defer></script><script src="../design-icons.js" defer></script>
+  <script src="../lumi.js" defer></script><script src="../art.js" defer></script><script src="../birth.js" defer></script>
+  <script src="room-audio-manifest.js" defer></script><script src="room-audio.js" defer></script><script src="gallery.js" defer></script>
+</head>
+<body class="dl-lab">
+<a class="dl-skip" href="#main">跳到主要內容</a>
+<header class="dl-header"><a href="#top" class="dl-brand"><span data-icon="sprout"></span><span>Life World<small>DESIGN LANGUAGE · v1.0</small></span></a><nav aria-label="元件庫導覽"><a href="#foundations">基礎</a><a href="#components">元件</a><a href="#characters">Lumi 與蛋</a><a href="#interaction">互動</a><a href="#room">房間</a><a href="#sound-library">聲音</a></nav></header>
+<main id="main">
+  <section class="dl-hero" id="top"><div><p class="eyebrow">讓每一步，都有溫柔的回應</p><h1>同一個世界，<br>同一種溫暖。</h1><p>清楚的操作介面，柔和立體的 Lumi。<br>讓成長被看見，也讓重要的人被記得。</p><div class="button-row"><a href="#components" class="primary">探索元件 <span data-icon="arrow"></span></a><a href="#characters" class="text-button">看看 Lumi</a></div><p class="dl-note">本機設計候選・所有人物與回饋均為示例，沒有產品資料寫入。</p></div><div id="hero-lumi"></div></section>
+
+  <section id="foundations" class="dl-section"><div class="dl-section-title"><p class="eyebrow">01 / FOUNDATIONS</p><h2>從色彩到留白，都有共同依據。</h2><p>暖白是畫布，薄荷綠是陪伴；深綠負責操作，暖黃留下驚喜。</p></div><div id="colors" class="dl-color-grid"></div><div class="dl-grid-two"><article class="card"><h3>文字層級</h3><p class="dl-type-hero">每一點努力，都值得被記得。</p><h2>清楚的區塊標題</h2><p>16px 正文：記下真實經歷，最後由你確認。</p><p class="small">14px 說明：可以修改、採納或排除。</p><small>12px 圖說：固定示例，尚未正式保存。</small></article><article class="card"><h3>間距、圓角與圖示</h3><div id="spacing" class="dl-spacing"></div><p class="small">按鈕 16px／卡片 20px／面板 24px 圓角。</p><div class="dl-icon-row" id="icons"></div><p class="small">24px 基準、2px 圓端筆畫；操作區至少 44px。</p></article></div></section>
+
+  <section id="components" class="dl-section"><div class="dl-section-title"><p class="eyebrow">02 / COMPONENTS</p><h2>舒服，也要清楚好用。</h2><p>從日常操作到失敗重試，每個狀態都保留下一步。</p></div>
+    <div class="dl-toolbar"><label>預覽視寬<select id="preview-width"><option value="full">桌面／自動</option><option value="390">手機 390px</option><option value="320">窄螢幕 320px</option></select></label><label>狀態<select id="scenario"><option value="normal">一般示例</option><option value="loading">載入中</option><option value="error">保存失敗</option><option value="empty">空白</option><option value="long">長文字／多人物</option><option value="withdrawn">來源已撤回</option></select></label><label class="dl-check"><input id="quiet" type="checkbox">安靜呈現</label></div>
+    <div class="dl-example" id="example-board">
+      <article class="card"><h3>一個主要動作，其餘清楚陪襯。</h3><div class="button-row"><button class="primary" id="demo-save">保存示例</button><button class="secondary" id="open-dialog">開啟面板</button><button class="text-button" id="demo-clear">清除示例</button><button class="primary" disabled>停用</button><button class="secondary" disabled aria-busy="true">正在保存</button><button class="danger" id="demo-error">模擬失敗</button></div><p id="feedback" class="callout" role="status">這裡只展示元件狀態，不會保存產品資料。</p></article>
+      <div class="dl-grid-two"><article class="card"><h3>留下一段值得記得的事。</h3><form id="example-form"><div class="field"><label for="example-name">希望怎麼稱呼你？</label><input id="example-name" autocomplete="off" placeholder="例如：小安（虛構人物）"></div><div class="field"><label for="example-text">今天的經歷</label><textarea id="example-text" placeholder="今天和小安練習英文 30 分鐘，比上次更敢開口。"></textarea><small>可輸入虛構內容，切換狀態不清除文字。</small></div><label class="dl-check"><input id="example-confirm" type="checkbox">我已核對這份示例</label></form></article><div class="dl-stack" id="scenario-cards"></div></div>
+    </div>
+  </section>
+
+  <section id="characters" class="dl-section"><div class="dl-section-title"><p class="eyebrow">03 / LUMI & THE EGG</p><h2>同一個 Lumi，每一種心情。</h2><p>角色、蛋與姿勢使用共同透明畫布。新素材待 Owner 視覺驗收，原稿完整保留。</p></div><div class="dl-toolbar"><label>搜尋素材<input id="asset-search" type="search" placeholder="輸入 asset_id 或狀態"></label><label>分類<select id="asset-category"><option value="all">全部</option><option value="lumi">Lumi／視角</option><option value="hatch">蛋／孵化</option></select></label><label class="dl-check"><input id="checkerboard" type="checkbox">透明底檢視</label><label>顯示大小<select id="art-size"><option value="normal">標準</option><option value="large">放大</option></select></label></div><p class="small" role="status" id="asset-count"></p><div class="dl-asset-grid" id="asset-grid"></div><p class="callout dl-pending">素材來源為生成圖集；1024px 與部分 512px 是衍生放大檔，非原生 2048px 母檔。可編輯分層母檔及美術驗收仍待補齊。</p><details class="dl-comparison"><summary>查看原有素材與新候選的差異</summary><div class="dl-grid-two"><figure><img src="../art/softlife/lumi-hero.png" alt="原有 Soft Life 完整主視覺，包含角色、蛋與基座"><figcaption>原有完整主視覺（保留原檔）</figcaption></figure><figure><img src="../art/design-v1/lumi-idle-512.png" alt="依本輪參考圖製作的透明 Lumi 姿勢候選"><figcaption>本輪獨立透明角色候選</figcaption></figure></div></details></section>
+
+  <section id="interaction" class="dl-section"><div class="dl-section-title"><p class="eyebrow">04 / INTERACTION</p><h2>輕輕三下，迎接新的陪伴。</h2><p>這是孵化呈現示例，不建立目標、不呼叫 AI，也不改正式孵化狀態。</p></div><div class="dl-toolbar"><button class="secondary" id="restart-hatch">重播孵化示例</button><label class="dl-check"><input id="reduced" type="checkbox">減少動效</label><label class="dl-check"><input id="music" type="checkbox">背景音樂</label><label class="dl-check"><input id="sound" type="checkbox">互動音效</label></div><p class="small" id="audio-status" role="status">聲音預設關閉；兩個開關各自獨立。</p><div id="hatch-demo"></div><p class="dl-note">正常節奏：細裂 800ms → 深裂 1000ms → 第三擊開殼／閉眼／睜眼，共 2000ms。</p></section>
+  <section id="room" class="dl-section"><div class="dl-section-title"><p class="eyebrow">05 / A PLACE TO RETURN</p><h2>留一個位置，給今天的自己。</h2><p>暖白的光、薄荷綠的座椅。Lumi 在自己的小房間裡，陪你照自己的步調前進。</p></div>
+    <div class="dl-toolbar"><label>房間版本<select id="room-version"><option value="new">新版・柔和立體房間</option><option value="legacy">舊版・原有房間背景</option></select></label><label class="dl-check"><input id="room-quiet" type="checkbox">安靜姿勢</label><label class="dl-check"><input id="room-show-lumi" type="checkbox" checked>顯示 Lumi</label></div>
+    <div id="room-scene" class="dl-room" role="img" aria-label="暖白薄荷綠房間，Lumi 在中央地毯上陪伴你"><img id="room-background" src="../art/room-v1/room-furnished-v1.webp" width="1448" height="1086" alt=""><img id="room-lumi" src="../art/design-v1/lumi-idle-512.png" width="512" height="512" alt=""><p id="room-fallback" hidden>房間圖片暫時無法顯示。Lumi 與下方操作仍可使用，可以切換版本重試。</p></div>
+    <div class="dl-grid-two dl-room-notes"><article class="card"><h3>同一個房間，同一個陪伴。</h3><p>角色腳底與地毯對齊；切換安靜姿勢不改房間、不變成夜景，也不代表缺席的懲罰。</p></article><article class="card"><h3>看看這次改變的地方。</h3><p>重新製作空間、圓角家具、柔和日光與中央留白。家具包含於場景圖，Lumi 是獨立圖層；可編輯家具分層仍待補齊。</p></article></div><p class="small">新版房間為生成美術候選，等待目視採用。舊版背景完整保留；這裡不更動世界、家具或積分資料。</p>
+  </section>
+  <section id="sound-library" class="dl-section"><div class="dl-section-title"><p class="eyebrow">06 / SOUNDS OF SMALL STEPS</p><h2>讓回應，聽起來也很溫柔。</h2><p>重新作曲與合成的 12 項候選：8 個音效、3 首情境音樂、1 個房間環境聲。開啟對應開關，再逐項比較新舊版本。</p></div>
+    <div class="dl-toolbar"><label class="dl-check"><input id="compare-sound" type="checkbox">開啟音效試聽</label><label class="dl-check"><input id="compare-music" type="checkbox">開啟音樂／環境聲試聽</label><button id="audio-stop" class="secondary">停止全部聲音</button></div><p id="compare-status" class="callout" role="status">預設無聲；每次只播放一個同類音軌。新舊試聽為候選比較，不代表正式採用。</p><div id="audio-comparisons" class="dl-audio-grid"></div><p class="small">全部為本輪原創離線作曲／程式合成，沒有第三方取樣或人聲。WAV 原稿與 AAC 播放版均保留；92 項聲音總需求尚未全數完成，聽感與最終採用待確認。</p>
+  </section>
+</main>
+<footer class="dl-footer"><span>Life World · 讓真實的一小步，成為你的世界。</span><span>Design Language v1.0 · Local Candidate</span></footer>
+<dialog id="demo-dialog" aria-labelledby="dialog-title"><h2 id="dialog-title">慢慢來，內容都還在。</h2><p>這是共用面板示例。你可以按 Escape 或關閉，回到原本的操作。</p><p class="callout">此處沒有產品保存或資料修改。</p><button class="primary" data-close-dialog>關閉面板</button></dialog>
+<dialog id="asset-dialog" aria-labelledby="asset-title"><h2 id="asset-title"></h2><div id="asset-detail"></div><button class="primary" data-close-dialog>關閉規格</button></dialog>
+</body></html>

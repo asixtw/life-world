@@ -1,0 +1,83 @@
+/* 由 scripts/export_design_tokens.py 產生；請修改 design-tokens.json。 */
+:root {
+  --lw-color-paper: #fffdf8;
+  --lw-color-brand-mint: #cfecd7;
+  --lw-color-brand-yellow: #ffe266;
+  --lw-color-ink: #1f2d2a;
+  --lw-color-primary: #204b40;
+  --lw-color-primary-hover: #30624f;
+  --lw-color-muted: #66736d;
+  --lw-color-surface: #fffefa;
+  --lw-color-surface-soft: #f2f5ec;
+  --lw-color-line: #e5e9df;
+  --lw-color-input-line: #d7e0d2;
+  --lw-color-focus: #4b8e77;
+  --lw-color-success: #2f7358;
+  --lw-color-pending: #8a641f;
+  --lw-color-error: #a14335;
+  --lw-color-info: #3b6777;
+  --lw-color-success-surface: #edf5ed;
+  --lw-color-pending-surface: #fcf4df;
+  --lw-color-error-surface: #fbefea;
+  --lw-color-info-surface: #edf3f4;
+  --lw-font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  --lw-font-body: 1rem;
+  --lw-font-secondary: 0.875rem;
+  --lw-font-caption: 0.75rem;
+  --lw-font-card: 1.125rem;
+  --lw-font-section: 1.5rem;
+  --lw-font-page: 2rem;
+  --lw-font-hero: 2.5rem;
+  --lw-font-body-line: 1.7;
+  --lw-font-heading-line: 1.45;
+  --lw-font-weight-heading: 600;
+  --lw-spacing-1: 4px;
+  --lw-spacing-2: 8px;
+  --lw-spacing-3: 12px;
+  --lw-spacing-4: 16px;
+  --lw-spacing-5: 20px;
+  --lw-spacing-6: 24px;
+  --lw-spacing-8: 32px;
+  --lw-spacing-10: 40px;
+  --lw-spacing-12: 48px;
+  --lw-spacing-16: 64px;
+  --lw-radius-tag: 8px;
+  --lw-radius-input: 12px;
+  --lw-radius-button: 16px;
+  --lw-radius-card: 20px;
+  --lw-radius-dialog: 24px;
+  --lw-radius-pill: 9999px;
+  --lw-shadow-card: 0 6px 24px #1f2d2a0a;
+  --lw-shadow-dialog: 0 20px 60px #1f2d2a24;
+  --lw-control-height: 48px;
+  --lw-control-hero-height: 52px;
+  --lw-control-touch: 44px;
+  --lw-control-progress: 6px;
+  --lw-motion-press: 120ms;
+  --lw-motion-transition: 200ms;
+  --lw-motion-feedback: 600ms;
+  --lw-motion-egg-fine: 800ms;
+  --lw-motion-egg-deep: 1000ms;
+  --lw-motion-egg-open: 2000ms;
+  --lw-layout-max: 1200px;
+  --lw-layout-narrative: 640px;
+  --lw-layout-form: 480px;
+  --lw-layout-gutter: 24px;
+  --paper: var(--lw-color-paper);
+  --white: var(--lw-color-surface);
+  --ink: var(--lw-color-ink);
+  --muted: var(--lw-color-muted);
+  --green: var(--lw-color-primary);
+  --mint: var(--lw-color-brand-mint);
+  --line: var(--lw-color-line);
+  --gold: var(--lw-color-pending);
+}
+@media (max-width: 680px) {
+ :root {
+  --lw-font-page: 1.5rem;
+  --lw-font-hero: 1.75rem;
+  --lw-font-section: 1.25rem;
+  --lw-font-card: 1rem;
+  --lw-layout-gutter: 20px;
+ }
+}

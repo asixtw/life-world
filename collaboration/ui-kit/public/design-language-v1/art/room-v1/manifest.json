@@ -1,0 +1,30 @@
+{
+  "id": "lw-room-furnished-v1",
+  "version": "1.0.0",
+  "date": "2026-11-13",
+  "status": "candidate_owner_visual_review_pending",
+  "source_path": "art/room-v1/source/room-furnished-v1.png",
+  "source_size": [
+    1448,
+    1086
+  ],
+  "web_path": "art/room-v1/room-furnished-v1.webp",
+  "sha256": "edfd38d401af4cafb0d8e60e3bcf644d0eb11bfb4be63ec4b8e492fc7a195bcb",
+  "source_sha256": "5768fb46f45c4c234a03ec71e6ab7540b13c5167523d256e419f4ece2f9f97f9",
+  "legacy_path": "art/room-v1/room-legacy.webp",
+  "lumi_ground_anchor": [
+    0.5,
+    0.82
+  ],
+  "character_width_fraction": 0.24,
+  "character_canvas_ground": 0.875,
+  "editable_furniture_layers": false,
+  "layers": [
+    "furnished_room_background",
+    "existing_lumi_pose"
+  ],
+  "source_method": "OpenAI built-in imagegen; original prompt archived in docs",
+  "license_status": "generated_project_candidate; external_distribution_rights_not_independently_verified",
+  "quiet": "同一暖白房間，靜態閉眼姿勢；不是夜景或缺席懲罰",
+  "fallback": "場景失敗顯示文字及單獨 Lumi，操作保留"
+}

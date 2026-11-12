@@ -10,4 +10,7 @@
 .world-room__foreground{right:0;bottom:1%;width:19%;z-index:4} /* 前景獨立遮擋，但不覆蓋操作。 */
 .world-room--quiet .world-room__furniture,.world-room--quiet .world-room__foreground{filter:brightness(.7) saturate(.8)} /* Quiet 層目前只做候選色調，非獨立繪製。 */
 @media(max-width:600px){.world-room{aspect-ratio:3/4}.world-room__furniture{left:-10%;top:55%;width:54%}.world-room__foreground{right:-4%;bottom:2%;width:34%}.world-room__shadow{top:79%;width:44%}.world-room__lumi{top:79%;transform:translate(-50%,-90%) scale(.85)}} /* 真直向背景搭配手機獨立錨點。 */
-} /* 不聲稱已產出 1280×960 或 768×1024 點陣顯示版。 */
+.world-room--v1{aspect-ratio:4/3;background:#FFFDF8} /* 同一完整構圖等比縮放，不裁掉家具。 */
+.world-room--v1 .world-room__base img{object-fit:contain}
+.world-room--v1 .world-room__lumi{left:50%;top:82%;width:24%;height:auto;aspect-ratio:1;transform:translate(-50%,-87.5%)} /* 與原生元件庫共用腳底錨點。 */
+}

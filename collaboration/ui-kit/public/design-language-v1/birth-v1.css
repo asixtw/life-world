@@ -1,0 +1,21 @@
+/* 同一透明方形畫布／地面錨點，三擊後才揭露角色。 */
+[data-birth] .hero {display:flex;flex-direction:column;max-width:640px;margin:auto;text-align:center;}
+[data-birth] .hero-copy {padding-bottom:0;}
+.birth-scene {position:relative;display:grid;place-items:center;width:100%;min-height:0;height:auto;aspect-ratio:1;max-width:400px;margin:auto;isolation:isolate;}
+.birth-egg {position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;box-shadow:none;border-radius:0;background:transparent;overflow:visible;transition:none;}
+.birth-egg:disabled {background:transparent;filter:none;}
+.birth-egg.has-art::before {display:none;}
+.birth-egg .egg-layer {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity 200ms;}
+[data-stage="0"] .egg-rest,[data-stage="1"] .egg-fine,[data-stage="2"] .egg-deep,[data-stage="3"] .egg-open {opacity:1;}
+.birth-egg:not(.has-art) {inset:13% 25% 12%;width:50%;height:75%;border-radius:49% 51% 48% 48% / 62% 62% 38% 38%;background:radial-gradient(ellipse at 30% 25%,#fffefa,#f8eed8 60%,#ded4b7);box-shadow:0 14px 22px #1f2d2a10;}
+.birth-egg:not(.has-art)::after {content:'⌁';display:grid;place-items:center;height:100%;font-size:48px;color:var(--lw-color-primary);}
+.birth-reveal-frame {position:absolute;inset:0;display:none;pointer-events:none;}
+.birth-reveal-frame img {width:100%;height:100%;object-fit:contain;}
+[data-stage="3"] .birth-egg {opacity:0;transform:none;}
+[data-reveal="peek"] .birth-peek,[data-reveal="closed"] .birth-closed {display:block;animation:lw-birth-appear 200ms both;}
+[data-birth-lumi] {position:absolute;inset:0;display:grid;place-items:center;}
+[data-birth-lumi] .lw-lumi {width:100%;max-width:none;}
+[data-birth-enter] {display:inline-flex;align-items:center;justify-content:center;margin-top:16px;}
+@keyframes lw-birth-appear {from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:680px){.birth-scene{max-width:280px;}}
+@media(prefers-reduced-motion:reduce){.birth-reveal-frame{animation:none !important;}.egg-layer{transition:none !important;}}
