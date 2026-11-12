@@ -1,6 +1,6 @@
 # PR #26 Integration QA／Release Gate｜NO-GO
 
-**最新Gate A以第8節R2正式整合證據為準。先前PASS只證明資料閉環，不代表「記錄這一刻」設計已整合或Owner已核准。**
+**最新Gate A以第9節R3四項修正證據為準。先前PASS只證明資料閉環，不代表「記錄這一刻」設計已整合或Owner已核准。**
 
 2026-11-12。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準`6d4ba0a3ea3d895678ad733cde2c42f773154f4f`，精確交付Head/Tree見PR收據。遠端main唯讀核對仍`68102f230aa947a434286ba9260e1ae75f6634b0`。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret、Alpha匯入或切流。
 
@@ -162,3 +162,15 @@ Owner確認舊候選仍像長表單，Gate A不核准。已逐項對照Demo與�
 仍有明確差異：第一步AI是選用意圖，草稿來源固定後在第四步依原授權/API執行，並非Demo第一步即時假摘要；本機未開真Gemini、真照片/語音辨識、真Google或實機。Guest中途Google升級後新增媒體tab的即時解鎖未做聯測，不能自行視為通過。這些列為待審閱/受控E2E缺口，不用模擬結果替代。Gate A仍待Owner核准，B/C/D不自動解鎖。
 
 沒有Schema變更、Migration、正式GRANT、Cloud Build、Deploy、Merge或GCP正式資源修改。測試Provider只在獨立localhost驗收服務，Owner入口AI旗標未開放。
+
+
+## 9. Gate A R3 結束與發布前交接（2026-11-12）
+
+四項最小修正已完成，停止UX功能擴充：照片兩入口/名片用途分層、單位建議精度保留部分完成、同名人物搜尋結果列、逐人資訊狀態與未加入保護。產品Commit `a0bd5985d50881d0123db358e6ec2b88a5a940fb`，App tree `aeb87103599e2a92c3781a2d4da8a7b30ecb54e4`。
+
+- 實際操作 http://127.0.0.1:8198/ ，既有測試帳密登入後 `/#record`；最新畫廊 http://127.0.0.1:8200/ 。原Owner/業務資料未變，原服務與隔離本機PG保留，不使用Google替身冒稱OAuth成功。
+- 固定版本完整相關UI→API→本機PG：**98 PASS**；三尺寸截圖/錄影：**12 PASS**；直接SQL回讀：**15 PASS**（重疊案例，不相加）；API/Node **772 PASS、87 SKIP**；AI授權UI **9 PASS**（明示Provider替身）。39張截圖/3錄影。中間失敗與未執行均保留說明。
+- [唯一R3交接與GCP發布審查清單](../2026-11-12_GATE_A_R3/README.md)，包含逐項差異、測試命令/收據、Schema/011/權限/Purger/回復/備份/Trigger/固定映像Gate。
+- GitHub唯讀Code Review為reviews=0、threads=0，不代表審查通過；main候選路徑命中lw-api-main，未命中lw-web-main。Trigger/Cloud SQL資料沿用2026-11-11來源，未冒稱今日即時雲端查核。
+
+**Gate A Changes Requested／整體NO-GO**。等Owner人工重審及Code Review；B安全/Schema未通過、C GCP NOT RUN、D未授權。後續Migration、GRANT、Build、Deploy、Merge、Alpha切流/資料匯入分別另行核准。本輪未執行上述操作。

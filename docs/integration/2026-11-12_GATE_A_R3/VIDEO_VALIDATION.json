@@ -1,0 +1,32 @@
+{
+  "method": "Chromium metadata and initial decode; not full ffmpeg decode",
+  "results": [
+    {
+      "width": 320,
+      "loaded_video": true,
+      "metadata": {
+        "width": 320,
+        "height": 900,
+        "duration": 16.04
+      }
+    },
+    {
+      "width": 390,
+      "loaded_video": true,
+      "metadata": {
+        "width": 390,
+        "height": 900,
+        "duration": 16.04
+      }
+    },
+    {
+      "width": 1440,
+      "loaded_video": true,
+      "metadata": {
+        "width": 1440,
+        "height": 900,
+        "duration": 16.36
+      }
+    }
+  ]
+}
