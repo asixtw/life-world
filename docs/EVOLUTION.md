@@ -254,3 +254,7 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ## 2026-11-12 · Step 3 PostgreSQL 測試庫與 alpha 同一套結構
 
 Jerry 確認環境規則：本機連 Cloud SQL `life_world_e2e`，Cloud Run 連 `life_world_alpha`，Web 與 API 相同。Step 3 的合成 PostgreSQL 原本停在 11-02 的 31 表核心草稿，main 的程式已需要 010／011 的表，PostgreSQL 輪有 116 項失敗（過去因 SQLite 輪先失敗而沒有執行到）。改為以 alpha 010 結構快照＋011 建立，權限鏡像 alpha；剩下的落差逐項處理後兩種資料庫全套通過。alpha 待套用：011 四表與最小權限、`drafts` 的刪除權限（需 Owner 核准後在真實 alpha 執行）。
+
+## 2026-11-12 · main 的 API 自動發布改為 alpha
+
+`deploy/release.py` 的正式設定改為 `life_world_alpha`／`lw_alpha_app`，拒絕 dev 與 e2e；候選改照正式 revision 的完整設定部署，不再沿用服務範本（本機 e2e 部署會把範本換成 e2e 設定，11-05 起因此一直被擋）。先前已手動把 `lw-api-main` 100% 流量切到 alpha 版本，之後 main 的推送由 Step 8 自動發布。

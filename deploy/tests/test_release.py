@@ -19,16 +19,29 @@ def service():
             'trafficStatuses': [{'revision': 'old', 'percent': 100},
                                 {'revision': 'fixed', 'tag': 'hostfix', 'uri': 'https://hostfix---api-example.a.run.app'}],
             'template': {'serviceAccount': 'lw-api-runtime@life-world-513506.iam.gserviceaccount.com',
-                         'vpcAccess': {'egress': 'PRIVATE_RANGES_ONLY', 'networkInterfaces': [{'network': 'existing'}]},
-                         'containers': [{'image': 'old-image', 'env': [
+                         'vpcAccess': {'egress': 'PRIVATE_RANGES_ONLY',
+                                       'networkInterfaces': [{'network': 'existing', 'subnetwork': 'existing-subnet'}]},
+                         'timeout': '300s', 'maxInstanceRequestConcurrency': 80, 'scaling': {},
+                         'containers': [{'image': 'old-image', 'resources': {'limits': {'cpu': '1000m', 'memory': '512Mi'},
+                                                                             'cpuIdle': True, 'startupCpuBoost': True}, 'env': [
                              {'name': 'LIFEWORLD_DB_BACKEND', 'value': 'postgresql'},
                              {'name': 'LIFEWORLD_PG_CONNECTION', 'value': 'cloud_sql'},
-                             {'name': 'LIFEWORLD_DB_NAME', 'value': 'life_world_dev'},
+                             {'name': 'LIFEWORLD_DB_NAME', 'value': 'life_world_alpha'},
+                             {'name': 'LIFEWORLD_DB_USER', 'value': 'lw_alpha_app'},
                              {'name': 'LIFEWORLD_INSTANCE_CONNECTION_NAME', 'value': 'life-world-513506:asia-east1:lw-pg-staging-trial'},
                              {'name': 'LIFEWORLD_DB_PASSWORD', 'valueSource': {'secretKeyRef': {'secret': 'existing-secret', 'version': '1'}}},
                              {'name': 'LIFEWORLD_EXTERNAL_ORIGIN', 'value': 'https://api-example.a.run.app'},
                              {'name': 'LIFEWORLD_TRUSTED_HOSTS', 'value': 'api-example.a.run.app'},
                              {'name': 'LIFEWORLD_SECURE_COOKIES', 'value': 'true'}]}]}}
+
+
+def env_item(spec, name):
+    return next(x for x in spec['containers'][0]['env'] if x['name'] == name)
+
+
+def set_env(spec, name, value):
+    env = spec['containers'][0]['env']
+    env[:] = [x for x in env if x['name'] != name] + [{'name': name, 'value': value}]
 
 
 class ReleaseSafety(unittest.TestCase):
@@ -82,15 +95,52 @@ class ReleaseSafety(unittest.TestCase):
         self.assertEqual(set(result), {'LIFEWORLD_EXTERNAL_ORIGIN', 'LIFEWORLD_TRUSTED_HOSTS'})
 
     def test_api_network_or_secret_drift_blocks_release(self):
+        """正式 revision 本身缺私有網路，或密碼不是 Secret 參照，就阻擋。"""
         for field in ('vpcAccess', 'containers'):
             current = service()
             production = copy.deepcopy(current['template'])
             if field == 'vpcAccess':
-                current['template'][field]['egress'] = 'ALL_TRAFFIC'
+                production.pop('vpcAccess')
             else:
-                current['template']['containers'][0]['env'][4]['valueSource']['secretKeyRef']['version'] = '2'
-            with self.assertRaises(ValueError):
+                set_env(production, 'LIFEWORLD_DB_PASSWORD', 'plain-password')
+            with self.subTest(field=field), self.assertRaises(ValueError):
                 release.api_overrides(current, production, 'c-test')
+
+    def test_template_drift_from_local_e2e_deploys_no_longer_blocks_release(self):
+        """同一服務也部署本機用的 e2e 標籤，服務範本常是 e2e 設定；設定來源只看正式 revision（2026-11-05 起因此被擋）。"""
+        current = service()
+        production = copy.deepcopy(current['template'])
+        current['template']['vpcAccess']['egress'] = 'ALL_TRAFFIC'
+        set_env(current['template'], 'LIFEWORLD_DB_NAME', 'life_world_e2e')
+        result = release.api_overrides(current, production, 'c-test')
+        self.assertEqual(set(result), {'LIFEWORLD_EXTERNAL_ORIGIN', 'LIFEWORLD_TRUSTED_HOSTS'})
+
+    def test_api_release_accepts_only_the_alpha_database(self):
+        """2026-11-12：Cloud Run 只連 life_world_alpha；dev、e2e 或其他資料庫的正式設定一律不發布。"""
+        for name, value in (('LIFEWORLD_DB_NAME', 'life_world_dev'), ('LIFEWORLD_DB_NAME', 'life_world_e2e'),
+                            ('LIFEWORLD_DB_USER', 'lw_app'), ('LIFEWORLD_DB_USER', 'lw_e2e_app'),
+                            ('LIFEWORLD_INSTANCE_CONNECTION_NAME', 'other:asia-east1:other')):
+            production = copy.deepcopy(service()['template'])
+            set_env(production, name, value)
+            with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                release.api_overrides(service(), production, 'c-test')
+        self.assertTrue(release.api_overrides(service(), copy.deepcopy(service()['template']), 'c-test'))
+
+    def test_api_deploy_copies_the_production_config_instead_of_the_template(self):
+        production = copy.deepcopy(service()['template'])
+        overrides = {'LIFEWORLD_EXTERNAL_ORIGIN': 'https://api-example.a.run.app', 'LIFEWORLD_TRUSTED_HOSTS': 'h1,h2'}
+        with tempfile.TemporaryDirectory() as directory:
+            path = str(Path(directory) / 'env.json')
+            flags = release.api_deploy_flags(production, overrides, path)
+            env = json.loads(Path(path).read_text(encoding='utf-8'))
+        self.assertEqual((env['LIFEWORLD_DB_NAME'], env['LIFEWORLD_DB_USER']), ('life_world_alpha', 'lw_alpha_app'))
+        self.assertEqual(env['LIFEWORLD_TRUSTED_HOSTS'], 'h1,h2')
+        self.assertNotIn('LIFEWORLD_DB_PASSWORD', env)  # 憑證只以 Secret 參照傳入，不寫進檔案
+        for flag in ('--env-vars-file=' + path, '--set-secrets=LIFEWORLD_DB_PASSWORD=existing-secret:1',
+                     '--network=existing', '--subnet=existing-subnet', '--vpc-egress=private-ranges-only',
+                     '--timeout=300', '--cpu=1000m', '--memory=512Mi', '--concurrency=80',
+                     '--min-instances=0', '--max-instances=default', '--cpu-throttling', '--cpu-boost'):
+            self.assertIn(flag, flags)
 
     def test_localhost_production_is_never_used(self):
         current = service()
@@ -122,6 +172,16 @@ class FakeCloud:
             return 'sha256:' + 'a' * 64
         if args[:2] == ('run', 'deploy'):
             self.image = next(x.split('=', 1)[1] for x in args if x.startswith('--image='))
+            env_file = next((x.split('=', 1)[1] for x in args if x.startswith('--env-vars-file=')), None)
+            if env_file:  # api：只依這次給的部署參數重建候選設定，不沿用服務範本
+                self.candidate = copy.deepcopy(self.publisher.production)
+                env = [{'name': k, 'value': v} for k, v in json.loads(Path(env_file).read_text(encoding='utf-8')).items()]
+                for item in next(x.split('=', 1)[1] for x in args if x.startswith('--set-secrets=')).split(','):
+                    name, ref = item.split('=', 1)
+                    secret, version = ref.rsplit(':', 1)
+                    env.append({'name': name, 'valueSource': {'secretKeyRef': {'secret': secret, 'version': version}}})
+                self.candidate['containers'][0]['env'] = env
+                self.candidate['containers'][0].update(self.publisher.candidate_changes)
             self.publisher.state['trafficStatuses'].append({
                 'revision': self.publisher.revision, 'tag': self.publisher.tag,
                 'uri': 'https://' + self.publisher.tag + '---api-example.a.run.app'})
@@ -130,6 +190,10 @@ class FakeCloud:
 
     def json(self, url, **kwargs):
         if '/revisions/' in url:
+            if url.endswith('/revisions/' + self.publisher.revision) and getattr(self, 'candidate', None):
+                return {**copy.deepcopy(self.candidate), 'containers': [{**self.candidate['containers'][0], 'image': self.image}]}
+            if url.endswith('/revisions/old') and self.publisher.component == 'api':
+                return copy.deepcopy(self.publisher.production)
             return {'containers': [{'image': self.image}]}
         raise AssertionError(url)
 
@@ -140,11 +204,15 @@ class FakeCloud:
 
 
 class FakePublisher(release.Publisher):
-    def __init__(self, *, fail_health=0, lost_response=False, conflict=False):
-        super().__init__('web', 'a' * 40, '11111111-1111-4111-8111-111111111111')
+    def __init__(self, *, fail_health=0, lost_response=False, conflict=False, component='web', candidate_changes=None):
+        super().__init__(component, 'a' * 40, '11111111-1111-4111-8111-111111111111')
         self.state = service()
         self.state['etag'] = '0'
-        self.state['template']['serviceAccount'] = 'lw-web-runtime@life-world-513506.iam.gserviceaccount.com'
+        self.state['template']['serviceAccount'] = 'lw-' + component + '-runtime@life-world-513506.iam.gserviceaccount.com'
+        if component == 'api':  # 受保護的 hostfix 標籤名稱
+            self.state['trafficStatuses'][1]['revision'] = 'lw-api-main-00004-yiv'
+        self.production = copy.deepcopy(self.state['template'])  # 正式 revision（alpha）的設定
+        self.candidate_changes = candidate_changes or {}
         self.cloud = FakeCloud(self)
         self.fail_health, self.lost_response, self.conflict = fail_health, lost_response, conflict
         self.allocations = []
@@ -153,7 +221,7 @@ class FakePublisher(release.Publisher):
         return copy.deepcopy(self.state)
 
     def build(self, build_id):
-        return {'buildTriggerId': release.TRIGGERS['web'], 'createTime': '2026-11-05T00:00:00Z',
+        return {'buildTriggerId': release.TRIGGERS[self.component], 'createTime': '2026-11-05T00:00:00Z',
                 'substitutions': {'COMMIT_SHA': self.commit, 'BRANCH_NAME': 'main'}, 'status': 'FAILURE'}
 
     def fresh(self):
@@ -284,6 +352,32 @@ class ReleaseExecution(unittest.TestCase):
         publisher.state['annotations'] = {release.COMMIT: publisher.commit, release.CREATED: '2026-11-05T01:00:00Z'}
         self.execute(publisher)
         self.assertFalse(any(x[:2] == ('run', 'deploy') for x in publisher.cloud.commands))
+
+    def test_api_release_promotes_an_alpha_candidate_even_when_the_template_is_e2e(self):
+        publisher = FakePublisher(component='api')
+        set_env(publisher.state['template'], 'LIFEWORLD_DB_NAME', 'life_world_e2e')  # 本機 e2e 部署留下的範本
+        publisher.state['template']['vpcAccess']['egress'] = 'ALL_TRAFFIC'
+        self.execute(publisher)
+        self.assertEqual(positive(release.snapshot_traffic(publisher.state)), [(publisher.revision, 100)])
+        deploy = next(x for x in publisher.cloud.commands if x[:2] == ('run', 'deploy'))
+        self.assertIn('--no-traffic', deploy)
+        self.assertIn('--vpc-egress=private-ranges-only', deploy)
+        self.assertEqual(env_item(publisher.cloud.candidate, 'LIFEWORLD_DB_NAME')['value'], 'life_world_alpha')
+
+    def test_api_dev_production_is_refused_before_any_deploy(self):
+        publisher = FakePublisher(component='api')
+        set_env(publisher.production, 'LIFEWORLD_DB_NAME', 'life_world_dev')
+        with self.assertRaises(ValueError):
+            self.execute(publisher)
+        self.assertFalse(any(x[:2] == ('run', 'deploy') for x in publisher.cloud.commands))
+        self.assertEqual(positive(release.snapshot_traffic(publisher.state)), [('old', 100)])
+
+    def test_api_candidate_with_a_different_runtime_never_receives_traffic(self):
+        changed = {'resources': {'limits': {'cpu': '1000m', 'memory': '1Gi'}, 'cpuIdle': True, 'startupCpuBoost': True}}
+        publisher = FakePublisher(component='api', candidate_changes=changed)
+        with self.assertRaisesRegex(release.ReleaseError, 'Candidate changed API runtime configuration'):
+            self.execute(publisher)
+        self.assertEqual(positive(release.snapshot_traffic(publisher.state)), [('old', 100)])
 
     def test_lock_cas_conflict_is_re_read_instead_of_overwritten(self):
         publisher = FakePublisher()

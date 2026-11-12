@@ -7,6 +7,7 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 import time
 from urllib.error import HTTPError
 from urllib.parse import urlencode, urlsplit
@@ -35,6 +36,11 @@ RUNTIME_FIELDS = ('serviceAccount', 'vpcAccess', 'volumes', 'executionEnvironmen
                   'healthCheckDisabled', 'nodeSelector', 'serviceMesh', 'gpuZonalRedundancyDisabled')
 ORIGIN = 'LIFEWORLD_EXTERNAL_ORIGIN'
 HOSTS = 'LIFEWORLD_TRUSTED_HOSTS'
+# 2026-11-12 Jerry：本機連 life_world_e2e、Cloud Run 連 life_world_alpha；main 的 API 只發布連 alpha 的正式設定。
+API_DATABASE = {'LIFEWORLD_DB_BACKEND': 'postgresql', 'LIFEWORLD_PG_CONNECTION': 'cloud_sql',
+                'LIFEWORLD_DB_NAME': 'life_world_alpha', 'LIFEWORLD_DB_USER': 'lw_alpha_app',
+                'LIFEWORLD_INSTANCE_CONNECTION_NAME': PROJECT + ':' + REGION + ':lw-pg-staging-trial',
+                'LIFEWORLD_SECURE_COOKIES': 'true'}
 LOCK_WAIT_SECONDS = 900
 LOCK_POLL_SECONDS = 5
 
@@ -91,10 +97,10 @@ def runtime_config(template):
 
 
 def api_overrides(service, production, tag):
-    """正式流量 revision 才是 API 設定來源；latest 可能是 localhost hostfix。"""
-    current = service['template']
-    if len(production.get('containers', [])) != 1 or runtime_config(current) != runtime_config(production):
-        raise ValueError('API runtime differs from production; automatic release is blocked')
+    """正式流量 revision 才是 API 設定來源；服務範本不參與（同一服務也部署本機用的 e2e 標籤，範本常是 e2e 設定，
+    2026-11-05 起因此一直被擋）。候選照正式 revision 的完整設定部署（api_deploy_flags），部署後再逐項核對。"""
+    if len(production.get('containers', [])) != 1:
+        raise ValueError('API production revision must have exactly one container')
     env = {x['name']: x for x in production['containers'][0].get('env', [])}
     if len(env) != len(production['containers'][0].get('env', [])):
         raise ValueError('Duplicate API environment names')
@@ -108,14 +114,10 @@ def api_overrides(service, production, tag):
         raise ValueError('API production Origin/Hosts are not a verified HTTPS origin')
     if any(not re.fullmatch(r'[a-z0-9.-]+', h) or h in ('localhost', '127.0.0.1') for h in formal_hosts):
         raise ValueError('API production Trusted Hosts are unsafe')
-    if (values.get('LIFEWORLD_DB_BACKEND') != 'postgresql'
-            or values.get('LIFEWORLD_PG_CONNECTION') != 'cloud_sql'
-            or values.get('LIFEWORLD_DB_NAME') != 'life_world_dev'
-            or values.get('LIFEWORLD_INSTANCE_CONNECTION_NAME') != PROJECT + ':' + REGION + ':lw-pg-staging-trial'
-            or values.get('LIFEWORLD_SECURE_COOKIES') != 'true'
-            or not env.get('LIFEWORLD_DB_PASSWORD', {}).get('valueSource', {}).get('secretKeyRef')
+    if (any(values.get(k) != v for k, v in API_DATABASE.items())
+            or not (env.get('LIFEWORLD_DB_PASSWORD', {}).get('valueSource') or {}).get('secretKeyRef')
             or not production.get('vpcAccess')):
-        raise ValueError('API database/network/secret binding is not the existing approved configuration')
+        raise ValueError('API database/network/secret binding is not the approved alpha configuration')
     for name, item in env.items():
         if re.search(r'PASSWORD|SECRET|TOKEN|PRIVATE_KEY', name) and item.get('value'):
             raise ValueError('API credentials must remain Secret Manager references')
@@ -125,6 +127,37 @@ def api_overrides(service, production, tag):
     # 只移除本發布器的舊候選 Host，避免每次發布累積環境變數；不碰 hostfix revision。
     hosts = [h for h in formal_hosts if not re.fullmatch(r'c-[0-9a-f]{32}---' + re.escape(host), h)]
     return {ORIGIN: origin, HOSTS: ','.join(dict.fromkeys(hosts + [host, tag + '---' + host]))}
+
+
+def api_deploy_flags(production, overrides, env_file):
+    """把正式 revision 的執行設定轉成 gcloud run deploy 參數，不沿用服務範本。
+    一般環境變數（含 overrides）寫進 env_file；憑證只以 Secret 參照傳入，不寫進檔案。
+    沒有對應參數的欄位仍會沿用範本；部署後 run() 會逐項比對 runtime_config，不一致就不切流量。"""
+    container = production['containers'][0]
+    plain, secrets = {}, []
+    for item in container.get('env', []):
+        ref = (item.get('valueSource') or {}).get('secretKeyRef')
+        if ref:
+            secrets.append(item['name'] + '=' + ref['secret'] + ':' + str(ref.get('version', 'latest')))
+        else:
+            plain[item['name']] = item.get('value', '')
+    plain.update(overrides)
+    with open(env_file, 'w', encoding='utf-8') as handle:
+        json.dump(plain, handle, ensure_ascii=False)  # JSON 是合法的 YAML，gcloud 的 --env-vars-file 可直接讀
+    resources = container.get('resources', {})
+    limits = resources.get('limits', {})
+    scaling = production.get('scaling') or {}
+    network = production['vpcAccess']['networkInterfaces'][0]
+    return ['--env-vars-file=' + env_file, '--set-secrets=' + ','.join(secrets),
+            '--network=' + network['network'], '--subnet=' + network['subnetwork'],
+            '--vpc-egress=' + production['vpcAccess']['egress'].lower().replace('_', '-'),
+            '--timeout=' + str(production['timeout']).rstrip('s'),
+            '--cpu=' + limits['cpu'], '--memory=' + limits['memory'],
+            '--concurrency=' + str(production['maxInstanceRequestConcurrency']),
+            '--min-instances=' + str(scaling.get('minInstanceCount', 0)),
+            '--max-instances=' + str(scaling.get('maxInstanceCount', 'default')),
+            '--cpu-throttling' if resources.get('cpuIdle', True) else '--no-cpu-throttling',
+            '--cpu-boost' if resources.get('startupCpuBoost') else '--no-cpu-boost']
 
 
 def rollback_owned(service, build_id, revision):
@@ -385,9 +418,19 @@ class Publisher:
                     '--platform=managed', '--image=' + image + '@' + digest, '--no-traffic',
                     '--tag=' + self.tag, '--revision-suffix=' + self.tag, '--service-account=' + runtime_sa,
                     '--update-labels=commit-sha=' + self.commit, '--quiet']
-            if overrides:
+            env_file = None
+            if production is not None:
+                # API：候選完整照正式（alpha）revision 部署；暫存的環境變數檔用完即刪。
+                handle, env_file = tempfile.mkstemp(prefix='lw-release-env-', suffix='.json')
+                os.close(handle)
+                args += api_deploy_flags(production, overrides, env_file)
+            elif overrides:
                 args.append('--update-env-vars=^|^' + '|'.join(k + '=' + v for k, v in overrides.items()))
-            self.cloud.gcloud(*args, timeout=480)
+            try:
+                self.cloud.gcloud(*args, timeout=480)
+            finally:
+                if env_file:
+                    os.remove(env_file)
             candidate = self.cloud.json(self.url + '/revisions/' + self.revision)
             if candidate['containers'][0]['image'] != image + '@' + digest:
                 raise ReleaseError('Candidate does not use the verified image digest')

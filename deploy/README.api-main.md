@@ -1,6 +1,10 @@
 # LIFE WORLD API main 建置交接
 
-## 2026-11-05 自動發布（現行實作）
+## 2026-11-12 改為發布 alpha（現行）
+
+環境規則（Jerry 2026-11-12）：本機連 `life_world_e2e`，Cloud Run 連 `life_world_alpha`，Web 與 API 相同。`release.py` 只接受正式 revision 連 `life_world_alpha`／`lw_alpha_app`（`API_DATABASE`），dev、e2e 或其他資料庫一律拒絕。候選照正式 revision 的完整設定部署（`api_deploy_flags`：環境變數檔、Secret 參照、私有網路、逾時、CPU／記憶體、並行與執行個體數），不再沿用服務範本；同一服務也部署本機用的 `e2e` 標籤，範本常是 e2e 設定，2026-11-05 起因此一直 `RELEASE_BLOCKED`。部署後仍逐項比對 `runtime_config`，不一致就不切流量。第一次從 dev 切到 alpha 是手動完成的（`lw-api-main-alpha-11122230`），之後 main 的推送由本發布器接手。下文 2026-11-05 的 dev 綁定描述保留為歷史紀錄。
+
+## 2026-11-05 自動發布（歷史）
 
 `cloudbuild.api.yaml` 保留 SQLite／PG18.6 合成測試、容器驗證與明確 image push，最後使用共用 `release.py` 發布候選；不連 Cloud SQL 執行 migration、SQL 管理或合成資料寫入。候選 `/health`、`/ready` 使用 IAM ID token；通過後自動發布到明確 revision，正式網址檢查失敗自動回復。程序健康不能取代 `/ready`，也不把 readiness 當作業務 DML 授權證明。
 

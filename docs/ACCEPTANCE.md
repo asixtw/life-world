@@ -208,3 +208,7 @@ NOT RUN：Cloud Build 重新建置（觸發條件只有推到 main）、Cloud Ru
 | 測試庫結構與權限（`tests/test_pg_test_schema.py`） | 3 passed；實作前 3 failed |
 
 NOT RUN：Cloud Build、Cloud Run 部署、真實 alpha 的 011 與權限套用。
+
+## 2026-11-12 · release.py 改為發布 alpha
+
+`deploy/tests/test_release.py`：30 OK（新增只接受 alpha、範本漂移不再阻擋、部署參數照正式設定、dev 正式設定在部署前拒絕、候選設定不一致不切流量；修改前 6 項錯誤）。`tests/test_api_build_config.py`＋`deploy/tests/test_web_main.py`：14 passed。唯讀預檢對真實服務：新版 `PREFLIGHT_OK`（main 的舊版 `RELEASE_BLOCKED`）；以真實正式 revision 乾跑部署參數，與手動部署 `lw-api-main-alpha-11122230` 的設定一致。NOT RUN：經 main 觸發的實際 Step 8。
