@@ -1,0 +1,17 @@
+{
+  "product_commit": "5d4c564cdbd7978b805d047f968f10850d84e66c",
+  "app_tree": "7ad75a0b2ecf2124d27bb00a435e061b281a072b",
+  "widths": [
+    320,
+    390,
+    1440
+  ],
+  "flow_screenshots": 39,
+  "owner_entry_screenshots": 2,
+  "videos": 3,
+  "scope": "real_local_ui_api_restricted_pg18_synthetic_data",
+  "owner_ux_approved": false,
+  "real_google": "NOT RUN",
+  "real_gemini": "NOT RUN",
+  "cloud_modified": false
+}

@@ -1,0 +1,26 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_guest_upgrade_without_people_can_continue[390] ______________
+docs/experience/ux-v03-candidate/tests/test_candidate.py:250: in test_guest_upgrade_without_people_can_continue
+    expect(page.locator('[name=people-mode][value=none]')).to_be_checked()
+E   AssertionError: Locator expected to be checked
+E   Actual value: unchecked 
+E   Call log:
+E     - Expect "to_be_checked" with timeout 5000ms
+E     - waiting for locator("[name=people-mode][value=none]")
+E       9 × locator resolved to <input type="radio" value="none" name="people-mode"/>
+E         - unexpected value "unchecked"
+_____________ test_guest_upgrade_without_people_can_continue[1440] _____________
+docs/experience/ux-v03-candidate/tests/test_candidate.py:250: in test_guest_upgrade_without_people_can_continue
+    expect(page.locator('[name=people-mode][value=none]')).to_be_checked()
+E   AssertionError: Locator expected to be checked
+E   Actual value: unchecked 
+E   Call log:
+E     - Expect "to_be_checked" with timeout 5000ms
+E     - waiting for locator("[name=people-mode][value=none]")
+E       9 × locator resolved to <input type="radio" value="none" name="people-mode"/>
+E         - unexpected value "unchecked"
+=========================== short test summary info ============================
+FAILED docs/experience/ux-v03-candidate/tests/test_candidate.py::test_guest_upgrade_without_people_can_continue[390]
+FAILED docs/experience/ux-v03-candidate/tests/test_candidate.py::test_guest_upgrade_without_people_can_continue[1440]
+2 failed, 26 deselected in 11.69s

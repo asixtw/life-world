@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_normal_upsert_must_not_restore_revoked_fact_source ____________
+tests/test_fact_provenance_contract.py:68: in test_normal_upsert_must_not_restore_revoked_fact_source
+    assert row['revoked_at'] is not None,'一般upsert清空revoked_at，繞過明確恢復'
+E   AssertionError: 一般upsert清空revoked_at，繞過明確恢復
+E   assert None is not None
+=========================== short test summary info ============================
+FAILED tests/test_fact_provenance_contract.py::test_normal_upsert_must_not_restore_revoked_fact_source
+1 failed in 0.11s

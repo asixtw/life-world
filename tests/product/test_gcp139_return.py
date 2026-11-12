@@ -29,7 +29,5 @@ def test_returning_login_requires_explicit_guest_decision(setup):
         onboard(different)
         body=challenge(different,v,mode='login',subject='different-google',token='different',discard_guest=True)
         r=different.post('/api/auth/external/exchange',json=body)
-        assert r.status_code==200 and r.json()['owner_id']!=owner
-        assert different.get('/api/state').status_code==409
-        with app.state.service.db.connect() as c:
-            assert c.execute('SELECT count(*) FROM goals WHERE owner_id=?',(r.json()['owner_id'],)).fetchone()[0]==0
+        assert r.status_code==404
+        assert different.get('/api/auth/me').json()['status']=='guest'

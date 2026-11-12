@@ -15,14 +15,15 @@ def test_total_budget_survives_daily_window(prepared):
     assert provider.calls==[]
 
 
-def test_audio_segments_use_money_guard_not_daily_text_count(prepared):
+def test_audio_segments_share_one_bounded_work_and_each_reserve_budget(prepared):
     app,c,me,g,runtime,provider=prepared
     runtime.settings=replace(runtime.settings,max_owner_daily_calls=1,max_global_calls=1,max_total_budget_microusd=1000)
-    runtime.reserve(me['owner_id'],'media','segment-1')
-    runtime.reserve(me['owner_id'],'media','segment-2')
-    # 媒體仍消耗每日金額；不能用免次數限制繞過預算。
-    runtime.reserve(me['owner_id'],'media','segment-3')
-    with pytest.raises(Exception) as exc:runtime.reserve(me['owner_id'],'media','segment-4')
+    work=runtime.begin_media_work(me['owner_id'],'synthetic-audio','audio-work')
+    runtime.reserve(me['owner_id'],'media','segment-1',media_work=work)
+    runtime.reserve(me['owner_id'],'media','segment-2',media_work=work)
+    # 同一工作片段不重複計工作，但每段都消耗金額；下一工作仍受次數限制。
+    runtime.reserve(me['owner_id'],'media','segment-3',media_work=work)
+    with pytest.raises(Exception) as exc:runtime.reserve(me['owner_id'],'media','segment-4',media_work=work)
     assert exc.value.code=='ai_quota_reached'
 
 
@@ -50,7 +51,7 @@ def test_approved_requires_hard_cap_and_loads_env(monkeypatch):
     from app.ai_runtime import AISettings
     base={'provider':'gemini','model':'gemini-synthetic','approved':True,'reservation_microusd':100,'max_budget_microusd':1000}
     with pytest.raises(ValueError):AISettings(**base)
-    with pytest.raises(ValueError):AISettings(**base,max_total_budget_microusd=20_000_001)
+    assert AISettings(**base,max_total_budget_microusd=20_000_001).max_total_budget_microusd==20_000_001  # Owner新契約：有限上限可提高
     for key,value in {'LIFEWORLD_AI_PROVIDER':'gemini','LIFEWORLD_AI_MODEL':'gemini-synthetic','LIFEWORLD_AI_CALLS_APPROVED':'true','LIFEWORLD_AI_RESERVATION_MICROUSD':'100','LIFEWORLD_AI_DAILY_BUDGET_MICROUSD':'1000','LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD':'19000000','LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD':'1000000'}.items():monkeypatch.setenv(key,value)
     settings=AISettings.from_env();assert settings.max_total_budget_microusd==19_000_000 and settings.historical_reservation_microusd==1_000_000
 
@@ -59,5 +60,6 @@ def test_usage_reports_reserved_not_unknown_invoice_cost(prepared):
     app,c,me,g,runtime,provider=prepared
     runtime.reserve(me['owner_id'],'experience','usage-report')
     result=runtime.usage(me['owner_id'])
-    assert result['global_reserved_microusd']==100 and result['remaining_microusd']==9900
-    assert result['actual_invoice_cost_microusd'] is None and result['receipts']==[]
+    assert result['reserved_microusd']==100 and result['calls']==1
+    assert result['actual_invoice_cost_microusd'] is None and result['receipts'][0]['status']=='reserved'
+    assert 'remaining_microusd' not in result and 'global_reserved_microusd' not in result

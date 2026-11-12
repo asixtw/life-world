@@ -5,6 +5,8 @@ import json  # 序列化資料與還原資料庫中的清單
 import unicodedata  # 正規化搜尋與同值標籤的字寬
 
 from .errors import require  # 共用領域錯誤與條件檢查
+from . import relation_sources  # 010 關係來源關聯表的讀寫
+from .persons import is_profile_note, profile_receipts  # 正式人物設定的辨識（以保存回執為準）
 from .security import require_registered  # 共用密碼、工作階段與帳號權限檢查
 
 DIMENSIONS = ('interests', 'food', 'skills', 'habits')  # 準備固定四維度識別碼：興趣、飲食、專長及互動習慣
@@ -30,8 +32,9 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
 
     @staticmethod  # 此共用檢查不需要讀取物件狀態
     def _resource(c, table, owner, item_id):  # 限定人物事實與事件資料表並檢查所屬帳號
-        assert table in ('interaction_events', 'person_facts')  # 限制動態資料表或欄位名稱為程式內白名單
-        row = c.execute('SELECT * FROM ' + table + ' WHERE id=? AND owner_id=?', (item_id, owner)).fetchone()  # 依白名單資料表、識別碼與所屬帳號查詢資源
+        columns = {'interaction_events': 'id,owner_id,kind,occurred_at,revision',
+                   'person_facts': 'id,owner_id,person_id,dimension,value,normalized_value,description,status,conflict_group,revision,created_at'}[table]  # 白名單資料表的明確欄位
+        row = c.execute('SELECT ' + columns + ' FROM ' + table + ' WHERE id=? AND owner_id=?', (item_id, owner)).fetchone()  # 依白名單資料表、識別碼與所屬帳號查詢資源
         require(row is not None, 404, 'not_found', '找不到可存取的資料。')  # 驗證限制：找不到可存取的資料。
         return row  # 回傳限定人物事實與事件資料表並檢查所屬帳號的結果
 
@@ -104,18 +107,27 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             op = 'person:goal:' + person_id  # 準備分隔操作與人物的去重範圍
             cached, fingerprint = self._cached(c, owner, op, data.request_id, data.model_dump())  # 比較請求指紋，重送時回傳先前結果
             if cached: return cached  # 若為相同提交重送，沿用已保存結果
-            c.execute('''INSERT INTO person_goals VALUES (?,?,?,?) ON CONFLICT(person_id,goal_id)
+            c.execute('''INSERT INTO person_goals(person_id,goal_id,owner_id,label) VALUES (?,?,?,?) ON CONFLICT(person_id,goal_id)
                          DO UPDATE SET label=excluded.label''', (person_id, data.goal_id, owner, data.label))  # 新增人物與目標關聯；值以參數傳入
             result = {'person_id':person_id, 'goal_id':data.goal_id, 'label':data.label}  # 準備本次操作的回傳資料
             self._remember(c, owner, op, data.request_id, fingerprint, result)  # 把成功回應與去重提交代碼一起記入交易
             return result  # 回傳以可重送的提交建立人物與目標關聯的結果
 
-    def _source_experience(self, c, owner, experience_id, person_ids=None):  # 要求來源是同帳號且與人物相關的已確認經歷
+    def _experience_people(self, c, row):
+        """一筆已確認紀錄「與哪些人物有關」：故事已審閱時看逐筆參與者，否則看紀錄的主要人物（舊關聯不自動變成新事實）。"""
+        story = c.execute('SELECT reviewed FROM experience_stories WHERE experience_id=?', (row['id'],)).fetchone()
+        if story and story['reviewed']:
+            return [r[0] for r in c.execute('SELECT person_id FROM experience_participants WHERE experience_id=?', (row['id'],))]
+        return [row['person_id']]
+
+    def _source_experience(self, c, owner, experience_id, person_ids=None, *, allow_confirmed_mentions=False):  # 要求來源是同帳號且與人物相關的已確認經歷
         row = c.execute('SELECT * FROM experiences WHERE id=? AND owner_id=?', (experience_id, owner)).fetchone()  # 執行目前交易中的參數化查詢
         require(row is not None, 404, 'not_found', '找不到可引用的已確認經歷。')  # 驗證限制：找不到可引用的已確認經歷。
         if person_ids is not None:  # 依人物選擇或人物資料狀態套用限制
-            story = c.execute('SELECT reviewed FROM experience_stories WHERE experience_id=?', (experience_id,)).fetchone()  # 新故事以逐筆角色檢查來源
-            linked = [r[0] for r in c.execute('SELECT person_id FROM experience_participants WHERE experience_id=?', (experience_id,))] if story and story['reviewed'] else [row['person_id']]  # 舊關聯不自動變成新事實
+            linked = self._experience_people(c, row)  # 參與來源規則不因人物補充而放寬。
+            if allow_confirmed_mentions:
+                # 僅人物事實接受已人工配對且有效的提及；不改互動、關係或見面統計。
+                linked += [r[0] for r in c.execute("SELECT m.person_id FROM experience_mentions m JOIN experience_stories s ON s.experience_id=m.experience_id AND s.owner_id=m.owner_id WHERE m.owner_id=? AND m.experience_id=? AND m.status='matched' AND m.person_id IS NOT NULL AND s.reviewed=TRUE AND s.available=TRUE",(owner,experience_id))]
             require(any(pid in linked for pid in person_ids), 422, 'unrelated_source', '來源必須是與這位人物有關的已確認經歷。')  # 不能引用其他人的故事作本人陳述
         return row  # 回傳要求來源是同帳號且與人物相關的已確認經歷的結果
 
@@ -151,8 +163,8 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             event_id = uid()  # 準備互動或積分事件的唯一識別碼
             c.execute('INSERT INTO interaction_events(id,owner_id,kind,occurred_at) VALUES (?,?,?,?)',
                       (event_id, owner, data.interaction_type, occurred_at))  # 新增真實互動事件；值以參數傳入
-            c.execute('INSERT INTO interaction_people VALUES (?,?)', (event_id, person_id))  # 新增事件參與人物；值以參數傳入
-        c.execute('INSERT INTO interaction_experiences VALUES (?,?)', (experience_id, event_id))  # 新增事件與經歷關聯；值以參數傳入
+            c.execute('INSERT INTO interaction_people(event_id,person_id) VALUES (?,?)', (event_id, person_id))  # 新增事件參與人物；值以參數傳入
+        c.execute('INSERT INTO interaction_experiences(experience_id,event_id) VALUES (?,?)', (experience_id, event_id))  # 新增事件與經歷關聯；值以參數傳入
         return event_id  # 回傳將經歷加入已選事件，或建立指定類型的新事件的結果
 
     def edit_interaction(self, owner, event_id, data):  # 檢查版本後重新分類互動事件
@@ -175,7 +187,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
                     422, 'invalid_merge', '請選擇不同的來源互動。')  # 驗證限制：請選擇不同的來源互動。
             for source_id in data.source_event_ids:  # 逐項處理清單中的資料，保留目前交易或查詢條件
                 self._resource(c, 'interaction_events', owner, source_id)  # 限定人物事實與事件資料表並檢查所屬帳號
-                c.execute('INSERT INTO interaction_people SELECT ?,person_id FROM interaction_people WHERE event_id=? ON CONFLICT(event_id,person_id) DO NOTHING', (event_id, source_id))  # 明確指出允許去重的唯一鍵。
+                c.execute('INSERT INTO interaction_people(event_id,person_id) SELECT ?,person_id FROM interaction_people WHERE event_id=? ON CONFLICT(event_id,person_id) DO NOTHING', (event_id, source_id))  # 明確指出允許去重的唯一鍵。
                 c.execute('UPDATE interaction_experiences SET event_id=? WHERE event_id=?', (event_id, source_id))  # 更新事件與經歷關聯；值以參數傳入
                 c.execute('DELETE FROM interaction_people WHERE event_id=?', (source_id,))  # 刪除事件參與人物；值以參數傳入
                 c.execute('DELETE FROM interaction_events WHERE id=?', (source_id,))  # 刪除真實互動事件；值以參數傳入
@@ -196,7 +208,7 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
 
     def _write_fact(self, c, owner, person_id, data, source_ids):  # 正規化同值資訊、增加來源並保留使用者指定的衝突
         self._owned(c, 'people', person_id, owner)  # 限制查詢資料表並核對資源所屬帳號
-        for source_id in source_ids: self._source_experience(c, owner, source_id, [person_id])  # 逐項處理清單中的資料，保留目前交易或查詢條件
+        for source_id in source_ids: self._source_experience(c, owner, source_id, [person_id], allow_confirmed_mentions=True)  # 明確核對的人物資訊可源自提及，不推論出席。
         normalized = unicodedata.normalize('NFKC', data.value).strip().casefold()  # 統一字寬與大小寫後辨識同值人物資訊
         old = c.execute('SELECT * FROM person_facts WHERE person_id=? AND dimension=? AND normalized_value=?',
                         (person_id, data.dimension, normalized)).fetchone()  # 執行目前交易中的參數化查詢
@@ -207,6 +219,15 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
                     422, 'invalid_conflict', '衝突資訊需屬同一維度且內容不同。')  # 驗證限制：衝突資訊需屬同一維度且內容不同。
         fact_id = old['id'] if old else uid()  # 準備同值既有資訊或新資訊的識別碼
         require(old is None or old['status'] != 'archived', 409, 'archived_fact', '這項資訊已封存，請從人物資訊變更歷史明確重新採用。')  # 驗證限制：這項資訊已封存，請從人物資訊變更歷史明確重新採用。
+        # 所有來源先驗後寫：普通create/Confirm不能把明確撤回當作重新同意，
+        # 也不能在缺少來源History契約時靜默覆寫既有證據類型。恢復/更正須另走核准契約。
+        if old:
+            for source_id in set(source_ids):
+                prior=c.execute('SELECT evidence_type,revoked_at FROM fact_sources WHERE fact_id=? AND experience_id=?',(fact_id,source_id)).fetchone()
+                require(prior is None or prior['revoked_at'] is None,409,'source_restore_required',
+                        '這筆來源已由你撤回；一般新增不會恢復，請保留撤回狀態或選擇其他有效來源。')
+                require(prior is None or prior['evidence_type']==data.evidence_type,409,'source_correction_required',
+                        '這筆來源已有不同的得知依據；一般新增不會覆寫原證據，請保留後另行核對。')
         if not old:  # 依目前條件選擇下一步處理分支
             c.execute('''INSERT INTO person_facts(id,owner_id,person_id,dimension,value,normalized_value,description,status,created_at)
                          VALUES (?,?,?,?,?,?,?,'confirmed',?)''',
@@ -214,8 +235,8 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
         else:  # 處理前述條件不成立的替代流程
             c.execute("UPDATE person_facts SET revision=revision+1,status=CASE WHEN status='unavailable' THEN 'confirmed' ELSE status END WHERE id=?", (fact_id,))  # 更新已確認人物資訊；值以參數傳入
         for source_id in set(source_ids):  # 逐項處理清單中的資料，保留目前交易或查詢條件
-            c.execute('''INSERT INTO fact_sources VALUES (?,?,?,NULL) ON CONFLICT(fact_id,experience_id)
-                         DO UPDATE SET evidence_type=excluded.evidence_type,revoked_at=NULL''', (fact_id, source_id, data.evidence_type))  # 新增人物資訊來源；值以參數傳入
+            c.execute('''INSERT INTO fact_sources(fact_id,experience_id,evidence_type,revoked_at) VALUES (?,?,?,NULL) ON CONFLICT(fact_id,experience_id)
+                         DO NOTHING''', (fact_id, source_id, data.evidence_type))  # 新增人物資訊來源；值以參數傳入
         if other:  # 依目前條件選擇下一步處理分支
             group = other['conflict_group'] or other['id']  # 準備同組衝突資訊的穩定識別碼
             c.execute("UPDATE person_facts SET conflict_group=?,status='conflict',revision=revision+1 WHERE id=? OR (person_id=? AND conflict_group=? AND status<>'archived')",
@@ -267,26 +288,163 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             c.execute('UPDATE person_facts SET revision=revision+1,status=? WHERE id=?', (fact['status'] if has_sources else 'unavailable', fact_id))  # 更新已確認人物資訊；值以參數傳入
             return dict(self._fact(c, owner, person_id, fact_id))  # 回傳撤回來源；最後來源失效時將資訊改為不可用的結果
 
+    def _people_active(self, c, owner, person_ids):
+        """關係的新增、修改、封存與恢復都要求兩位人物都在使用中；任一端已封存就不允許（只在 Schema 010 之後呼叫）。"""
+        for person_id in person_ids:
+            row = c.execute('SELECT status FROM people WHERE id=? AND owner_id=?', (person_id, owner)).fetchone()
+            require(row is not None and row['status'] == 'active', 409, 'person_archived',
+                    '其中一位人物已封存，恢復人物後才能新增或調整這段關係。')
+
     def create_connection(self, owner, person_id, data):  # 核對兩端人物與來源後保存明確關係
+        """建立明確關係。
+
+        新格式（帶 relation_types 或 description，Schema 010 之後）：同一對人物已有關係（含已封存）回 409 connection_exists，
+        不覆蓋任何內容；關係類型只存 kind，描述由雙方共用，label 同步為描述的前 300 字供舊關係頁顯示；狀態為 confirmed。
+        舊格式（只有 label）：照舊 upsert——更新 label 與我的紀錄來源、revision 加 1；已封存的關係不接受覆蓋。
+        legacy_jsonb（010 之前）：行為不變；不能保存人物經歷來源、關係類型或描述；資料庫已有關聯表時拒絕寫入。
+        """
+        link = self.relation_source_store == relation_sources.LINK
+        new_format = data.relation_types is not None or data.description is not None
         with self.db.connect(write=True, owner=owner) as c:  # 開啟可回滾的寫入交易，相關修改一起提交
             self._people_user(c, owner)  # 要求完成初始旅程且已建立本機帳號
             self._owned(c, 'people', person_id, owner); self._owned(c, 'people', data.other_person_id, owner)  # 限制查詢資料表並核對資源所屬帳號
             require(person_id != data.other_person_id, 422, 'invalid_connection', '請選擇另一位人物。')  # 驗證限制：請選擇另一位人物。
-            for source_id in data.source_experience_ids: self._source_experience(c, owner, source_id, [person_id, data.other_person_id])  # 逐項處理清單中的資料，保留目前交易或查詢條件
+            pair = [person_id, data.other_person_id]
+            experience_ids = relation_sources.unique_ids(data.source_experience_ids)
+            person_experience_ids = relation_sources.unique_ids(data.source_person_experience_ids)
+            kinds = [item.kind for item in data.relation_types or []]
+            description = data.description or ''
+            if not link:
+                require(not person_experience_ids and not new_format, 409, 'relation_link_table_not_enabled',
+                        '人物經歷來源、關係類型與關係描述要等資料庫升級（010）完成後才能使用。')
+                require(not relation_sources.link_table_exists(c, self.db.backend), 503, 'relation_source_switch_pending',
+                        '關係來源正在切換到新資料表，暫停新增與修改關係，請稍後再試。')
+            if new_format:
+                require(bool(kinds) or bool(description), 422, 'empty_relation', '請至少選擇一種關係類型或填寫關係描述。')
+            for source_id in experience_ids: self._source_experience(c, owner, source_id, pair)  # 我的紀錄：同帳號且與兩端之一有關
+            for source_id in person_experience_ids or []: relation_sources.check_person_experience(c, owner, source_id, pair)
             op = 'person:connection:' + person_id  # 準備分隔操作與人物的去重範圍
-            cached, fingerprint = self._cached(c, owner, op, data.request_id, data.model_dump())  # 比較請求指紋，重送時回傳先前結果
+            # exclude_none：舊格式請求（沒有新欄位）的指紋與部署前相同，既有重送紀錄仍有效。
+            cached, fingerprint = self._cached(c, owner, op, data.request_id, data.model_dump(exclude_none=True))
             if cached: return cached  # 若為相同提交重送，沿用已保存結果
-            a, b = sorted([person_id, data.other_person_id])  # 保存「(a, b)」供後續驗證或回傳使用
-            c.execute('''INSERT INTO person_connections VALUES (?,?,?,?,?,?) ON CONFLICT(person_a,person_b)
-                         DO UPDATE SET label=excluded.label,source_experience_ids=excluded.source_experience_ids''',
-                      (uid(), owner, a, b, data.label, js(list(dict.fromkeys(data.source_experience_ids)))))  # 新增明確人物關係；值以參數傳入
-            result = dict(c.execute('SELECT * FROM person_connections WHERE person_a=? AND person_b=?', (a,b)).fetchone())  # 執行目前交易中的參數化查詢
+            a, b = sorted(pair)  # 保存「(a, b)」供後續驗證或回傳使用
+            if link:
+                self._people_active(c, owner, pair)
+                existing = self._connection_row(c, owner, a, b)
+                if new_format:
+                    # 防止覆蓋：已有關係一律拒絕，由畫面改為編輯（或恢復已封存的關係）。
+                    require(existing is None, 409, 'connection_exists', '這兩位人物已經有關係，請改為編輯原本的關係。')
+                    # 舊 JSONB 欄在 010 是 NOT NULL 且沒有預設值：新列放空陣列；正式來源只在關聯表。
+                    c.execute('INSERT INTO person_connections(id,owner_id,person_a,person_b,label,source_experience_ids,relation_types,description,confirmation_status) '
+                              "VALUES (?,?,?,?,?,'[]',?,?,'confirmed')",
+                              (uid(), owner, a, b, data.label if data.label is not None else description[:300],
+                               js([{'kind': kind} for kind in kinds]), description))
+                else:
+                    require(existing is None or existing['confirmation_status'] != relation_sources.ARCHIVED, 409, 'connection_archived',
+                            '這段關係已封存，請到人物頁恢復後再修改。')
+                    c.execute('''INSERT INTO person_connections(id,owner_id,person_a,person_b,label,source_experience_ids,confirmation_status) VALUES (?,?,?,?,?,'[]','confirmed') ON CONFLICT(person_a,person_b)
+                                 DO UPDATE SET label=excluded.label,revision=person_connections.revision+1''', (uid(), owner, a, b, data.label))
+                row = self._connection_row(c, owner, a, b)
+                relation_sources.replace(c, owner, row['id'], 'experience', experience_ids)
+                if person_experience_ids is not None:
+                    relation_sources.replace(c, owner, row['id'], 'person_experience', person_experience_ids)
+                result = self._connection_dto(c, owner, row)
+            else:
+                c.execute('''INSERT INTO person_connections(id,owner_id,person_a,person_b,label,source_experience_ids) VALUES (?,?,?,?,?,?) ON CONFLICT(person_a,person_b)
+                             DO UPDATE SET label=excluded.label,source_experience_ids=excluded.source_experience_ids''',
+                          (uid(), owner, a, b, data.label, js(experience_ids)))  # 新增明確人物關係；值以參數傳入
+                result = dict(c.execute('SELECT id,owner_id,person_a,person_b,label,source_experience_ids FROM person_connections WHERE person_a=? AND person_b=?', (a,b)).fetchone())  # 010 前的回應格式不變
             self._remember(c, owner, op, data.request_id, fingerprint, result)  # 把成功回應與去重提交代碼一起記入交易
             return result  # 回傳核對兩端人物與來源後保存明確關係的結果
+
+    def _connection_row(self, c, owner, a=None, b=None, connection_id=None):
+        """讀關係本身。link_table 讀 010 的欄位、不讀舊 JSONB；legacy_jsonb 讀 JSONB、沒有 010 的欄位。"""
+        columns = 'id,owner_id,person_a,person_b,label,' + ('revision,relation_types,description,confirmation_status'
+                                                           if self.relation_source_store == relation_sources.LINK else 'source_experience_ids')
+        if connection_id is not None:
+            return c.execute('SELECT ' + columns + ' FROM person_connections WHERE id=? AND owner_id=?', (connection_id, owner)).fetchone()
+        return c.execute('SELECT ' + columns + ' FROM person_connections WHERE owner_id=? AND person_a=? AND person_b=?', (owner, a, b)).fetchone()
+
+    def _connection_dto(self, c, owner, row, sources=None):
+        """關係回應：兩種來源都是 ID 陣列；010 之後另有關係類型（只呈現 kind）、描述與狀態。legacy_jsonb 只有 010 之前的欄位。"""
+        base = {'id': row['id'], 'owner_id': row['owner_id'], 'person_a': row['person_a'], 'person_b': row['person_b'], 'label': row['label']}
+        if self.relation_source_store != relation_sources.LINK:
+            return dict(base, source_experience_ids=json.loads(row['source_experience_ids']))
+        sources = sources or relation_sources.read(c, owner, [row['id']])[row['id']]
+        return dict(base, revision=row['revision'], relation_types=relation_sources.relation_types_view(row['relation_types']),
+                    description=row['description'], confirmation_status=row['confirmation_status'], **sources)
+
+    def get_connection(self, owner, connection_id):
+        """讀單一關係（只限本人帳號；他人的關係一律 404）。"""
+        with self.db.connect() as c:
+            self._people_user(c, owner)
+            row = self._connection_row(c, owner, connection_id=connection_id)
+            require(row is not None, 404, 'not_found', '找不到這段關係。')
+            return self._connection_dto(c, owner, row)
+
+    def patch_connection(self, owner, connection_id, data):
+        """編輯、封存或恢復關係（只在 link_table）：未提供的欄位維持原值，空陣列清空該類來源，陣列依順序替換。
+
+        - 已封存的關係唯讀：只接受單獨的恢復（confirmation_status='confirmed'）。封存用 confirmation_status='archived'，不刪除。
+        - 任一端人物已封存：不允許修改、封存或恢復。
+        - 描述（description）由雙方共用；寫入時 label 同步為前 300 字。只改其他欄位時，舊 label 原樣保留。
+        - 關係類型只處理 kind：仍被選取的 kind 保留已儲存的方向與起迄資料，沒選的才移除。
+        先在同一筆交易完整驗證（帳號、版本、狀態、來源），再更新；任何錯誤整筆回滾。
+        """
+        require(self.relation_source_store == relation_sources.LINK, 409, 'relation_link_table_not_enabled',
+                '關係編輯要等資料庫升級（010）完成後才開放。')
+        with self.db.connect(write=True, owner=owner) as c:
+            self._people_user(c, owner)
+            row = self._connection_row(c, owner, connection_id=connection_id)
+            require(row is not None, 404, 'not_found', '找不到這段關係。')
+            op = 'connection:patch:' + connection_id
+            payload = data.model_dump()
+            for key in ('relation_types', 'description', 'confirmation_status'):
+                if payload[key] is None:
+                    payload.pop(key)  # 只帶舊欄位的請求，指紋與部署前相同
+            cached, fingerprint = self._cached(c, owner, op, data.request_id, payload)
+            if cached: return cached  # 同代碼同內容的重送回原結果（即使 revision 已前進）
+            require(row['revision'] == data.expected_revision, 409, 'stale_revision', '這段關係已在其他地方更新，請重新整理後再修改。')
+            experience_ids = relation_sources.unique_ids(data.source_experience_ids)
+            person_experience_ids = relation_sources.unique_ids(data.source_person_experience_ids)
+            content = (data.label, experience_ids, person_experience_ids, data.relation_types, data.description)
+            require(any(value is not None for value in content) or data.confirmation_status is not None, 422, 'empty_patch', '請至少修改一個欄位。')
+            if row['confirmation_status'] == relation_sources.ARCHIVED:
+                require(data.confirmation_status == 'confirmed' and all(value is None for value in content), 409, 'connection_archived',
+                        '這段關係已封存；恢復後才能修改。')
+            pair = [row['person_a'], row['person_b']]
+            self._people_active(c, owner, pair)
+            for source_id in experience_ids or []: self._source_experience(c, owner, source_id, pair)
+            for source_id in person_experience_ids or []: relation_sources.check_person_experience(c, owner, source_id, pair)
+            updates = {}
+            if data.label is not None:
+                updates['label'] = data.label
+            if data.description is not None:
+                updates['description'] = data.description
+                updates.setdefault('label', data.description[:300])  # 舊關係頁顯示同一段文字
+            if data.relation_types is not None:
+                updates['relation_types'] = js(relation_sources.merge_relation_types(row['relation_types'], [item.kind for item in data.relation_types]))
+            if data.confirmation_status is not None:
+                updates['confirmation_status'] = data.confirmation_status
+            if any(key in updates for key in ('label', 'description', 'relation_types')):
+                kinds_left = json.loads(updates['relation_types']) if 'relation_types' in updates else relation_sources.stored_relation_types(row['relation_types'])
+                text_left = updates.get('description', row['description']) or updates.get('label', row['label'])
+                require(bool(kinds_left) or bool(text_left), 422, 'empty_relation', '請至少保留一種關係類型或關係描述。')
+            assignments = ''.join(key + '=?,' for key in updates)  # 欄位名稱只來自上面的固定清單
+            c.execute('UPDATE person_connections SET ' + assignments + 'revision=revision+1 WHERE id=? AND owner_id=?', (*updates.values(), connection_id, owner))
+            if experience_ids is not None:
+                relation_sources.replace(c, owner, connection_id, 'experience', experience_ids)
+            if person_experience_ids is not None:
+                relation_sources.replace(c, owner, connection_id, 'person_experience', person_experience_ids)
+            result = self._connection_dto(c, owner, self._connection_row(c, owner, connection_id=connection_id))
+            self._remember(c, owner, op, data.request_id, fingerprint, result)
+            return result
 
     def _notes(self, c, owner, person_id=None):  # 列出私人筆記及其引用來源
         rows = c.execute('SELECT * FROM notes WHERE owner_id=?' + (' AND person_id=?' if person_id else '') + ' ORDER BY created_at DESC,id',
                          (owner, person_id) if person_id else (owner,)).fetchall()  # 執行目前交易中的參數化查詢
+        receipts = profile_receipts(c, owner)
+        rows = [r for r in rows if not is_profile_note(r, receipts)]  # 只排除有正式回執的人物設定；同格式的私人筆記照常顯示
         return [dict(r, source_experience_ids=[s[0] for s in c.execute('SELECT experience_id FROM note_sources WHERE note_id=?', (r['id'],))]) for r in rows]  # 查詢私人筆記引用來源；值以參數傳入
 
     def person_overview(self, owner, person_id):  # 組合人物三分頁需要的事實、來源與互動資料
@@ -300,10 +458,20 @@ class PeopleMixin:  # 人物完整頁、事實來源與互動事件的服務擴�
             fact_history = [dict(r, sources=self._fact_sources(c, r['id'], owner)) for r in c.execute(
                 "SELECT * FROM person_facts WHERE person_id=? AND owner_id=? AND status IN ('archived','unavailable') ORDER BY created_at,id",
                 (person_id, owner)).fetchall()]  # 執行目前交易中的參數化查詢
-            for row in c.execute('SELECT * FROM person_connections WHERE owner_id=? AND (person_a=? OR person_b=?)', (owner, person_id, person_id)).fetchall():  # 執行目前交易中的參數化查詢
+            link = self.relation_source_store == relation_sources.LINK
+            columns = 'id,owner_id,person_a,person_b,label,' + ('revision' if link else 'source_experience_ids')  # link_table 不讀舊 JSONB
+            connection_rows = c.execute('SELECT ' + columns + ' FROM person_connections WHERE owner_id=? AND (person_a=? OR person_b=?)'
+                                        + (" AND confirmation_status<>'archived'" if link else ''),  # 010 之後：已封存的關係不在舊關係頁顯示
+                                        (owner, person_id, person_id)).fetchall()
+            linked = relation_sources.read(c, owner, [r['id'] for r in connection_rows]) if link else {}
+            for row in connection_rows:
                 other = row['person_b'] if row['person_a'] == person_id else row['person_a']  # 準備指定衝突項或關係另一端的資料
-                connections.append({'id':row['id'], 'label':row['label'], 'person':self._person(c, owner, other),
-                                    'source_experience_ids':json.loads(row['source_experience_ids'])})  # 將目前資料加入結果清單
+                item = {'id':row['id'], 'label':row['label'], 'person':self._person(c, owner, other)}
+                if link:
+                    item.update(revision=row['revision'], **linked[row['id']])  # 兩種來源都是 ID 陣列，依 source_position 排序
+                else:
+                    item['source_experience_ids'] = json.loads(row['source_experience_ids'])  # 010 前沿用舊 JSONB
+                connections.append(item)  # 將目前資料加入結果清單
             tasks = [dict(r) for r in c.execute('''SELECT t.* FROM tasks t JOIN experiences x ON x.id=t.experience_id
                        WHERE t.owner_id=? AND x.person_id=? ORDER BY t.id''', (owner, person_id))]  # 查詢下一步待辦；值以參數傳入
             story_ids = c.execute('''SELECT s.experience_id FROM experience_stories s JOIN experience_participants p ON p.experience_id=s.experience_id

@@ -1,0 +1,15 @@
+{
+  "scope": "existing_synthetic_account_on_isolated_local_pg18",
+  "username": "basic_0566fc0249a4",
+  "owner_fingerprint": "c82e65a7b794adc9",
+  "normal_ui_password_login": "PASS",
+  "missing_csrf_write_rejected": true,
+  "unauthenticated_read_rejected": true,
+  "new_person_birthday_employment_confirmed": true,
+  "adopt_exclude": "PASS",
+  "same_owner_after_logout_login": true,
+  "added_experiences": 1,
+  "added_rewards": 1,
+  "google_oauth": "NOT RUN",
+  "password_or_session_secrets_saved": false
+}

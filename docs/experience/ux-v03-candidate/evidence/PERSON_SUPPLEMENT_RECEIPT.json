@@ -1,0 +1,39 @@
+{
+  "status": "Gate A Candidate / NOT APPROVED",
+  "baseline": "68fdd0f664dda870f697d17c0ba5c8500c9ea47f",
+  "full_suite": {
+    "passed": 84,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 88.44
+  },
+  "additional_repeat_button_tests": {
+    "passed": 2,
+    "failed": 0,
+    "deselected": 26,
+    "seconds": 3.04
+  },
+  "total_executed_pass": 86,
+  "screenshots": 30,
+  "widths": [
+    320,
+    390,
+    1440
+  ],
+  "api_model_requests": 0,
+  "source_sha256": {
+    "demo.js": "4881b898504e3446229c89ed93497e4dcae6e02643de4dc74207ae901d4a59ac",
+    "demo.css": "f1e9a896f70f28d7582802cc7dc4e8cb6293006f9c3abd1b2c4ec15bf5278660",
+    "tests/test_candidate.py": "db3d73d7e7e2beab636ca5935b8aa9e566746981de3d97af81adedf59177adc1",
+    "tests/test_review_revision.py": "5422e4afb5413f067b39d7ac58e9cc3d2a11a986c6adb5686ebc76906b21f28c",
+    "tests/test_supplement.py": "3677cf2463068519798ef9d66c0b6c4038e782d63d55f2c14e06d6c883a2d204"
+  },
+  "not_run": [
+    "real API atomic transaction",
+    "Alpha",
+    "Google OAuth",
+    "AI provider",
+    "Safari/Android device"
+  ],
+  "formal_schema_changes": false
+}

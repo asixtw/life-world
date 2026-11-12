@@ -1,0 +1,307 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/auth/claim",
+    "handler": "claim"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/external/challenge",
+    "handler": "google_challenge"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/external/exchange",
+    "handler": "google_exchange"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/external/status",
+    "handler": "google_exchange_status"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/guest",
+    "handler": "guest"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "handler": "login"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/logout",
+    "handler": "logout"
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/me",
+    "handler": "me"
+  },
+  {
+    "method": "GET",
+    "path": "/api/capabilities",
+    "handler": "capabilities"
+  },
+  {
+    "method": "GET",
+    "path": "/api/connections",
+    "handler": "stories"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connections/mentions/{mention_id}/match",
+    "handler": "mention_match"
+  },
+  {
+    "method": "GET",
+    "path": "/api/connections/stories/{experience_id}",
+    "handler": "story"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connections/stories/{experience_id}/availability",
+    "handler": "story_availability"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/connections/stories/{experience_id}/people",
+    "handler": "story_people"
+  },
+  {
+    "method": "GET",
+    "path": "/api/connections/{connection_id}",
+    "handler": "get_connection"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/connections/{connection_id}",
+    "handler": "patch_connection"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/drafts/{draft_id}",
+    "handler": "delete_saved_draft"
+  },
+  {
+    "method": "GET",
+    "path": "/api/drafts/{draft_id}",
+    "handler": "get_draft"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/drafts/{draft_id}",
+    "handler": "edit_draft"
+  },
+  {
+    "method": "POST",
+    "path": "/api/drafts/{draft_id}/confirm",
+    "handler": "confirm"
+  },
+  {
+    "method": "POST",
+    "path": "/api/drafts/{draft_id}/suggest",
+    "handler": "suggest"
+  },
+  {
+    "method": "GET",
+    "path": "/api/evidence/{evidence_id}",
+    "handler": "evidence"
+  },
+  {
+    "method": "POST",
+    "path": "/api/experiences/drafts",
+    "handler": "create_draft"
+  },
+  {
+    "method": "POST",
+    "path": "/api/goals",
+    "handler": "create_goal"
+  },
+  {
+    "method": "GET",
+    "path": "/api/goals/{goal_id}",
+    "handler": "get_goal"
+  },
+  {
+    "method": "GET",
+    "path": "/api/goals/{goal_id}/calendar",
+    "handler": "calendar"
+  },
+  {
+    "method": "POST",
+    "path": "/api/goals/{goal_id}/complete",
+    "handler": "complete"
+  },
+  {
+    "method": "GET",
+    "path": "/api/goals/{goal_id}/dashboard",
+    "handler": "goal_dashboard"
+  },
+  {
+    "method": "POST",
+    "path": "/api/goals/{goal_id}/pending/{pending_id}/accept",
+    "handler": "accept_pending"
+  },
+  {
+    "method": "POST",
+    "path": "/api/goals/{goal_id}/review",
+    "handler": "review_goal"
+  },
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "handler": "health"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/interactions/{event_id}",
+    "handler": "edit_interaction"
+  },
+  {
+    "method": "POST",
+    "path": "/api/interactions/{event_id}/merge",
+    "handler": "merge_interactions"
+  },
+  {
+    "method": "GET",
+    "path": "/api/media/capabilities",
+    "handler": "media_capabilities"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notes",
+    "handler": "create_note"
+  },
+  {
+    "method": "GET",
+    "path": "/api/people",
+    "handler": "people"
+  },
+  {
+    "method": "POST",
+    "path": "/api/people",
+    "handler": "create_person"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/people/{person_id}",
+    "handler": "edit_person"
+  },
+  {
+    "method": "POST",
+    "path": "/api/people/{person_id}/connections",
+    "handler": "connection"
+  },
+  {
+    "method": "POST",
+    "path": "/api/people/{person_id}/facts",
+    "handler": "create_fact"
+  },
+  {
+    "method": "GET",
+    "path": "/api/people/{person_id}/facts/{fact_id}/evidence",
+    "handler": "fact_evidence"
+  },
+  {
+    "method": "POST",
+    "path": "/api/people/{person_id}/facts/{fact_id}/resolve",
+    "handler": "resolve_fact"
+  },
+  {
+    "method": "POST",
+    "path": "/api/people/{person_id}/facts/{fact_id}/sources/revoke",
+    "handler": "revoke_source"
+  },
+  {
+    "method": "POST",
+    "path": "/api/people/{person_id}/goals",
+    "handler": "link_goal"
+  },
+  {
+    "method": "GET",
+    "path": "/api/people/{person_id}/interactions",
+    "handler": "interactions"
+  },
+  {
+    "method": "GET",
+    "path": "/api/people/{person_id}/overview",
+    "handler": "person_overview"
+  },
+  {
+    "method": "GET",
+    "path": "/api/person-experiences",
+    "handler": "person_experiences_list"
+  },
+  {
+    "method": "POST",
+    "path": "/api/person-experiences",
+    "handler": "create_person_experience"
+  },
+  {
+    "method": "GET",
+    "path": "/api/person-experiences/{experience_id}",
+    "handler": "person_experience"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/person-experiences/{experience_id}",
+    "handler": "patch_person_experience"
+  },
+  {
+    "method": "GET",
+    "path": "/api/persons",
+    "handler": "persons"
+  },
+  {
+    "method": "POST",
+    "path": "/api/persons",
+    "handler": "create_unified_person"
+  },
+  {
+    "method": "GET",
+    "path": "/api/persons/{person_id}",
+    "handler": "unified_person"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/persons/{person_id}",
+    "handler": "edit_unified_person"
+  },
+  {
+    "method": "GET",
+    "path": "/api/persons/{person_id}/connection-sources",
+    "handler": "person_connection_sources"
+  },
+  {
+    "method": "GET",
+    "path": "/api/persons/{person_id}/experiences",
+    "handler": "person_experience_lists"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/persons/{person_id}/profile",
+    "handler": "save_unified_profile"
+  },
+  {
+    "method": "POST",
+    "path": "/api/persons/{person_id}/status",
+    "handler": "set_unified_person_status"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/profile",
+    "handler": "profile"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state",
+    "handler": "state"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/tasks/{task_id}",
+    "handler": "task"
+  }
+]

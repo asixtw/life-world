@@ -1,0 +1,28 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_birthday_roundtrip_correction_and_history ________________
+tests/test_person_basic_api.py:14: in test_birthday_roundtrip_correction_and_history
+    r=client.patch(url,json=body);assert r.status_code==200,r.text
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________ test_two_current_employments_and_patch_preserve_other_fields _________
+tests/test_person_basic_api.py:29: in test_two_current_employments_and_patch_preserve_other_fields
+    r=client.post(url,json=body);assert r.status_code==201,r.text
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"detail":"Not Found"}
+E   assert 404 == 201
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____________ test_details_cross_owner_and_unconfirmed_are_refused _____________
+tests/test_person_basic_api.py:45: in test_details_cross_owner_and_unconfirmed_are_refused
+    assert client.patch(url,json=body).status_code==422
+E   AssertionError: assert 404 == 422
+E    +  where 404 = <Response [404 Not Found]>.status_code
+E    +    where <Response [404 Not Found]> = patch('/api/people/6cff5c71-f253-47e3-b1f3-c527f0dafc48/basic-details', json={'confirmed': False, 'expected_revision': 0, 'request_id': 'birthday', 'source': {'source_kind': 'manual'}, ...})
+E    +      where patch = <starlette.testclient.TestClient object at 0x10b641810>.patch
+=========================== short test summary info ============================
+FAILED tests/test_person_basic_api.py::test_birthday_roundtrip_correction_and_history
+FAILED tests/test_person_basic_api.py::test_two_current_employments_and_patch_preserve_other_fields
+FAILED tests/test_person_basic_api.py::test_details_cross_owner_and_unconfirmed_are_refused
+3 failed in 0.23s

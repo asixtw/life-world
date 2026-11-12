@@ -80,3 +80,12 @@ def confirm_payload(d, request_id='confirm-1', **overrides):  # 建立攜帶版�
               'person_id': d.get('person_id'), 'contributions': d['contributions'], 'tasks': ['明天繼續練習']}  # 透過實際測試用戶端操作 API 並保留回應
     result.update(overrides)  # 合併本次明確設定的欄位
     return result  # 回傳後續測試步驟所需資料
+
+
+def grant_draft_ai_consent(client, request_id='draft-consent'):
+    """測試必須明確選用草稿AI；不以背景或其他用途授權代替。"""
+    policy=client.get('/api/ai/draft-consent')
+    assert policy.status_code==200,policy.text
+    response=client.post('/api/ai/draft-consent',json={'request_id':request_id,'policy_fingerprint':policy.json()['policy_fingerprint'],'confirmed':True})
+    assert response.status_code==200,response.text
+    return response.json()

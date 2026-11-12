@@ -120,6 +120,7 @@ class PostgresDatabase:
         self._slots = threading.BoundedSemaphore(settings.pool_size)
         self._mutex = threading.Lock()
         self._connector = None
+        self._connector_openers = 0
         self._connector_factory = connector_factory
         self._closed = False
 
@@ -134,14 +135,46 @@ class PostgresDatabase:
                                  timeout=s.pool_timeout, application_name='lifeworld-api')
         else:
             with self._mutex:
+                # shutdown 後不得再建立 Connector；與 close 共用同一判定鎖。
+                if self._closed:
+                    raise DomainError(503, 'database_unavailable', '資料服務已關閉。')
                 if self._connector is None:
                     if self._connector_factory is None:
                         from google.cloud.sql.connector import Connector
                         self._connector_factory = Connector
                     # 使用執行服務的 ADC；不接受 SA JSON、不切到 public IP。
                     self._connector = self._connector_factory(ip_type='private', refresh_strategy='lazy', timeout=s.pool_timeout)
-            raw = self._connector.connect(s.instance_connection_name, 'pg8000',
-                                          user=s.db_user, password=s.db_password, db=s.db_name)
+                # close 可摘除共享欄位，開啟中的操作仍持有明確的物件參照。
+                connector = self._connector
+                self._connector_openers += 1
+            raw, opening_failed = None, False
+            try:
+                raw = connector.connect(s.instance_connection_name, 'pg8000',
+                                        user=s.db_user, password=s.db_password, db=s.db_name)
+            except BaseException:
+                opening_failed = True
+                raise
+            finally:
+                # close 不等網路；最後一個 opener 在 provider 呼叫結束後接手清理。
+                cleanup = None
+                with self._mutex:
+                    self._connector_openers -= 1
+                    if self._closed and self._connector_openers == 0:
+                        cleanup, self._connector = self._connector, None
+                if cleanup is not None:
+                    try:
+                        cleanup.close()
+                    except BaseException:
+                        # 未返回的 raw 尚無外層 finally 負責，必須在此避免遺失。
+                        if raw is not None:
+                            try:
+                                raw.close()
+                            except BaseException:
+                                pass  # 保留較早的 Connector 清理錯誤。
+                        if not opening_failed:
+                            raise
+                        # provider 原始錯誤優先；不讓後續清理覆蓋它。
+
         try:
             raw.autocommit = True
             with closing(raw.cursor()) as cursor:
@@ -179,6 +212,10 @@ class PostgresDatabase:
                 except Exception:
                     # ADC／網路／TLS／版本錯誤也不把 provider detail 傳給呼叫端。
                     raise DomainError(503, 'database_unavailable', '資料服務連線尚未就緒。') from None
+            # 開連線可能阻塞；回來後重新確認是否仍接受新交易。
+            with self._mutex:
+                if self._closed:
+                    raise DomainError(503, 'database_unavailable', '資料服務已關閉。')
             c = Connection(raw)
             if write:
                 c.execute('SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
@@ -199,12 +236,19 @@ class PostgresDatabase:
                 raise translated_error(exc) from None
             raise
         finally:
-            if raw is not None:
-                if reusable and not self._closed:
-                    self._available.put(raw)
-                else:
-                    raw.close()
-            self._slots.release()
+            try:
+                if raw is not None:
+                    # 歸還與 shutdown 摘取共用短鎖，避免 close 返回後再入池。
+                    with self._mutex:
+                        returned = reusable and not self._closed
+                        if returned:
+                            self._available.put(raw)
+                    # driver 清理可能阻塞或回呼；不可持有 pool 鎖。
+                    if not returned:
+                        raw.close()
+            finally:
+                # 清理失敗仍須歸還名額；壞連線不可入pool，也不能讓close例外耗盡容量。
+                self._slots.release()
 
     @staticmethod
     def audit_column(table):
@@ -218,11 +262,26 @@ class PostgresDatabase:
             connection.execute('SELECT id FROM goals LIMIT 0')
 
     def close(self):
-        self._closed = True
-        while True:
+        # 只同步停止歸還及摘取 idle 資源；不等待 active 借用者退出。
+        with self._mutex:
+            self._closed = True
+            pending = []
+            while True:
+                try:
+                    pending.append(self._available.get_nowait())
+                except queue.Empty:
+                    break
+            if self._connector is not None and self._connector_openers == 0:
+                pending.append(self._connector)
+                # 在鎖內移交清理責任，重複／並行 close 不得重領同一資源。
+                self._connector = None
+        first_error = None
+        for resource in pending:
             try:
-                self._available.get_nowait().close()
-            except queue.Empty:
-                break
-        if self._connector is not None:
-            self._connector.close()
+                resource.close()
+            except BaseException as exc:
+                # 每個資源都嘗試清理；保留首錯，不讓後續錯誤遮蔽它。
+                if first_error is None:
+                    first_error = exc
+        if first_error is not None:
+            raise first_error

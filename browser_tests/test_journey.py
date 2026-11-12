@@ -87,7 +87,7 @@ def test_complete_browser_journey_with_upgrade_preserves_selected_goal_and_contr
     page.locator('#goal-id').select_option(goal['id'])  # 選擇此案例需要的表單選項
     page.locator('#raw-text').fill('這一份原文，需要在升級帳號後完整保留。')  # 填入此步驟的虛構表單內容
     in_period_time = page.locator('#occurred-at').input_value()  # 保存本場開始時的合法發生時間。
-    page.locator('#occurred-at').fill('2001-01-01T23:50')  # 填入此步驟的虛構表單內容
+    set_occurred(page,'2001-01-01T23:50')  # 填入此步驟的虛構表單內容
     page.locator('#quantity-' + action_id).fill('0.25')  # 填入此步驟的虛構表單內容
     page.get_by_role('button', name='新增人物').click()  # 依使用者動線點擊畫面入口
     page.locator('#username').fill('browser_' + uuid4().hex[:12])  # 填入此步驟的虛構表單內容
@@ -104,7 +104,7 @@ def test_complete_browser_journey_with_upgrade_preserves_selected_goal_and_contr
     page.get_by_role('button', name='保存人物').click()  # 依使用者動線點擊畫面入口
     expect(page.locator('#account-dialog')).not_to_be_visible()  # 等待保存與表單還原完成，避免在仍開啟的 modal 背後改值。
     expect(page.locator('#quantity-' + action_id)).to_have_value('0.25')  # 等待並核對目前畫面狀態
-    page.locator('#occurred-at').fill(in_period_time)  # 舊日期已驗證升級保留；正式採計前由使用者改為目標期間內。
+    set_occurred(page,in_period_time)  # 舊日期已驗證升級保留；正式採計前由使用者改為目標期間內。
     page.get_by_role('button', name='保存草稿並進入核對').click()  # 依使用者動線點擊畫面入口
     expect(page.locator('#review-form')).to_be_visible()  # 等待並核對目前畫面狀態
     page.locator('#summary').fill('由我確認的四分之一小時練習。')  # 填入此步驟的虛構表單內容
@@ -155,7 +155,7 @@ def test_out_of_period_credit_shows_error_and_can_save_without_credit(page):
     new_record(page)
     page.locator('#goal-id').select_option(goal['id'])
     page.locator('#raw-text').fill('這是很久以前的經歷，不是新目標的投入。')
-    page.locator('#occurred-at').fill('2001-01-01T12:00')
+    set_occurred(page,'2001-01-01T12:00')
     page.locator('#quantity-' + action_id).fill('0.5')
     page.get_by_role('button', name='保存草稿並進入核對').click()
     page.get_by_role('button', name='我已核對，確認保存').click()
@@ -211,3 +211,16 @@ def test_unsaved_record_can_be_saved_before_navigation(page):  # 驗證：切頁
     page.locator('#nav').get_by_role('link', name='紀錄', exact=True).click()  # 依使用者動線點擊畫面入口
     page.get_by_role('link', name='繼續核對').click()  # 依使用者動線點擊畫面入口
     expect(page.locator('.raw-source')).to_have_text('導覽離開前，這段原文需要先保存。')  # 等待並核對目前畫面狀態
+
+
+def set_occurred(page,value):
+    """R2發生時間採漸進揭露；測試先透過summary展開再填寫。"""
+    panel=page.locator('[data-moment-time]')
+    if panel.count() and panel.get_attribute('open') is None:panel.locator('summary').first.click()
+    page.locator('#occurred-at').fill(value)
+
+
+def supplement_source(card):
+    """透過與使用者相同的入口展開來源，不以force填隱藏欄位。"""
+    panel=card.locator('[data-supplement-source]')
+    if panel.count() and panel.get_attribute('open') is None:panel.locator('summary').first.click()

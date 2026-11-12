@@ -1,0 +1,89 @@
+FFFFF...                                                                 [100%]
+=================================== FAILURES ===================================
+_____________ test_login_unknown_google_never_creates_or_abandons ______________
+
+setup = (<fastapi.applications.FastAPI object at 0x10c9bba10>, <test_google_exchange.Verifier object at 0x10c9baf90>)
+
+    def test_login_unknown_google_never_creates_or_abandons(setup):
+        app,v=setup
+        with client_for(app) as c:
+            me,_=onboard(c);before=c.get('/api/state').json();old=c.cookies.get('lw_session');n=counts(app)
+            body=challenge(c,v,mode='login',subject='missing',discard_guest=True)
+>           r=c.post('/api/auth/external/exchange',json=body);assert r.status_code==404
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           assert 200 == 404
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/product/test_google_world_transition.py:24: AssertionError
+_____________ test_even_empty_guest_requires_consent_before_switch _____________
+
+setup = (<fastapi.applications.FastAPI object at 0x10d509940>, <test_google_exchange.Verifier object at 0x10d422e90>)
+
+    def test_even_empty_guest_requires_consent_before_switch(setup):
+        app,v=setup;owner,_=registered_world(app,v)
+        with client_for(app) as c:
+            me=guest(c);body=challenge(c,v,mode='login',token='no-consent')
+>           r=c.post('/api/auth/external/exchange',json=body);assert r.status_code==409
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           assert 200 == 409
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/product/test_google_world_transition.py:33: AssertionError
+_______ test_upgrade_snapshot_includes_drafts_profile_and_no_second_user _______
+
+setup = (<fastapi.applications.FastAPI object at 0x10d5c6e40>, <test_google_exchange.Verifier object at 0x10d52f110>)
+
+    def test_upgrade_snapshot_includes_drafts_profile_and_no_second_user(setup):
+        app,v=setup
+        with client_for(app) as c:
+            me,g=onboard(c);d=draft(c,g);c.post('/api/drafts/'+d['id']+'/confirm',json=confirm_payload(d));draft(c,g,raw_text='尚未確認的第二篇')
+            before=c.get('/api/state').json();n=counts(app);body=challenge(c,v);r=c.post('/api/auth/external/exchange',json=body)
+            assert r.status_code==200 and r.json()['owner_id']==me['owner_id']
+>           assert c.get('/api/state').json()==before
+E           AssertionError: assert {'drafts': [{...+00:00'}, ...} == {'drafts': [{...+00:00'}, ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Differing items:
+E             {'user': {'bio': '每天前進一點', 'lumi_hatched': True, 'name': '小光', 'owner_id': 'a069c1db-baa6-4b6b-a487-93cdb444bd1d', ...}} != {'user': {'bio': '每天前進一點', 'lumi_hatched': True, 'name': '小光', 'owner_id': 'a069c1db-baa6-4b6b-a487-93cdb444bd1d', ...}}
+E             Use -v to get more diff
+
+tests/product/test_google_world_transition.py:44: AssertionError
+________ test_committed_switch_receipt_can_reconcile_without_reexchange ________
+
+setup = (<fastapi.applications.FastAPI object at 0x10d710050>, <test_google_exchange.Verifier object at 0x10d6176f0>)
+
+    def test_committed_switch_receipt_can_reconcile_without_reexchange(setup):
+        app,v=setup;owner,saved=registered_world(app,v)
+        with client_for(app) as c:
+            source,g=onboard(c);body=challenge(c,v,mode='login',token='switch',discard_guest=True)
+            r=c.post('/api/auth/external/exchange',json=body);assert r.status_code==200
+            c.headers['X-CSRF-Token']=r.json()['csrf_token']
+            status=c.post('/api/auth/external/status',json={'challenge_id':body['challenge_id']})
+>           assert status.status_code==200,status.text
+E           AssertionError: {"detail":"Not Found"}
+E           assert 404 == 200
+E            +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/product/test_google_world_transition.py:55: AssertionError
+______________ test_reconcile_cannot_read_another_session_receipt ______________
+
+setup = (<fastapi.applications.FastAPI object at 0x10d72b770>, <test_google_exchange.Verifier object at 0x10d7615b0>)
+
+    def test_reconcile_cannot_read_another_session_receipt(setup):
+        app,v=setup
+        with client_for(app) as a,client_for(app) as b:
+            onboard(a);onboard(b);body=challenge(a,v);assert a.post('/api/auth/external/exchange',json=body).status_code==200
+>           assert b.post('/api/auth/external/status',json={'challenge_id':body['challenge_id']}).status_code==403
+E           AssertionError: assert 404 == 403
+E            +  where 404 = <Response [404 Not Found]>.status_code
+E            +    where <Response [404 Not Found]> = post('/api/auth/external/status', json={'challenge_id': 'd645038e-24a3-431c-8532-49780ffc7a3f'})
+E            +      where post = <starlette.testclient.TestClient object at 0x10d834160>.post
+
+tests/product/test_google_world_transition.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED tests/product/test_google_world_transition.py::test_login_unknown_google_never_creates_or_abandons
+FAILED tests/product/test_google_world_transition.py::test_even_empty_guest_requires_consent_before_switch
+FAILED tests/product/test_google_world_transition.py::test_upgrade_snapshot_includes_drafts_profile_and_no_second_user
+FAILED tests/product/test_google_world_transition.py::test_committed_switch_receipt_can_reconcile_without_reexchange
+FAILED tests/product/test_google_world_transition.py::test_reconcile_cannot_read_another_session_receipt
+5 failed, 3 passed in 0.67s

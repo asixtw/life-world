@@ -1,0 +1,74 @@
+[
+  {
+    "revision": "lw-api-main-b8030-11111349",
+    "imageDigest": "asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-core-e2e@sha256:a37a39c4ab1634b53cecd7792e76d5843232ed9c50d646e834c069c722f79dc2",
+    "labels": {
+      "cloud.googleapis.com/location": "asia-east1",
+      "commit-sha": "82d0925597aeb23b95023f102b1ca98c46666fe9",
+      "run.googleapis.com/startupProbeType": "Default",
+      "serving.knative.dev/configuration": "lw-api-main",
+      "serving.knative.dev/configurationGeneration": "57",
+      "serving.knative.dev/route": "lw-api-main",
+      "serving.knative.dev/service": "lw-api-main",
+      "serving.knative.dev/serviceUid": "2444748e-797e-4918-b6da-b23122cd181a"
+    },
+    "created": "2026-11-11T05:49:35.239563Z",
+    "runtime_sa": "lw-api-runtime@life-world-513506.iam.gserviceaccount.com",
+    "connection": {
+      "LIFEWORLD_PG_CONNECTION": "cloud_sql",
+      "LIFEWORLD_INSTANCE_CONNECTION_NAME": "life-world-513506:asia-east1:lw-pg-staging-trial",
+      "LIFEWORLD_DB_NAME": "life_world_e2e",
+      "LIFEWORLD_DB_SCHEMA": "lw_core_draft",
+      "LIFEWORLD_DB_USER": "lw_e2e_app",
+      "LIFEWORLD_EXPECTED_DB_MARKER": "LIFEWORLD_E2E_SYNTHETIC_ONLY_v1",
+      "LIFEWORLD_RELATION_SOURCE_STORE": "link_table",
+      "LIFEWORLD_ENVIRONMENT_ID": "e2e"
+    }
+  },
+  {
+    "revision": "lw-api-main-c-94975cd3a6854941b1705c5634c777b3",
+    "imageDigest": "asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api@sha256:e7cf92e11bde21704a824c56eea58a773c98c6491bc646849f1881a101607c21",
+    "labels": {
+      "cloud.googleapis.com/location": "asia-east1",
+      "commit-sha": "82d0925597aeb23b95023f102b1ca98c46666fe9",
+      "run.googleapis.com/startupProbeType": "Default",
+      "serving.knative.dev/configuration": "lw-api-main",
+      "serving.knative.dev/configurationGeneration": "5",
+      "serving.knative.dev/route": "lw-api-main",
+      "serving.knative.dev/service": "lw-api-main",
+      "serving.knative.dev/serviceUid": "2444748e-797e-4918-b6da-b23122cd181a"
+    },
+    "created": "2026-11-05T14:20:15.301994Z",
+    "runtime_sa": "lw-api-runtime@life-world-513506.iam.gserviceaccount.com",
+    "connection": {
+      "LIFEWORLD_PG_CONNECTION": "cloud_sql",
+      "LIFEWORLD_INSTANCE_CONNECTION_NAME": "life-world-513506:asia-east1:lw-pg-staging-trial",
+      "LIFEWORLD_DB_NAME": "life_world_dev",
+      "LIFEWORLD_DB_SCHEMA": "lw_core_draft",
+      "LIFEWORLD_DB_USER": "lw_app"
+    }
+  },
+  {
+    "revision": "lw-public-camera-8f377fa",
+    "imageDigest": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:68f072c973ab40075b1ba5533a55a6324d5c7a3cf71b00920b0dfc589e2e0e75",
+    "labels": {
+      "cloud.googleapis.com/location": "asia-east1",
+      "run.googleapis.com/startupProbeType": "Default",
+      "serving.knative.dev/configuration": "lw-public",
+      "serving.knative.dev/configurationGeneration": "12",
+      "serving.knative.dev/route": "lw-public",
+      "serving.knative.dev/service": "lw-public",
+      "serving.knative.dev/serviceUid": "7b9e7fa1-cd68-4908-8783-3b3cc94c554e"
+    },
+    "created": "2026-11-08T21:35:05.317050Z",
+    "runtime_sa": "lw-public-runtime@life-world-513506.iam.gserviceaccount.com",
+    "connection": {
+      "LIFEWORLD_DB_NAME": "life_world_alpha",
+      "LIFEWORLD_DB_USER": "lw_alpha_app",
+      "LIFEWORLD_DB_SCHEMA": "lw_core_draft",
+      "LIFEWORLD_ACCESS_MODE": "public_alpha",
+      "LIFEWORLD_PG_CONNECTION": "cloud_sql",
+      "LIFEWORLD_INSTANCE_CONNECTION_NAME": "life-world-513506:asia-east1:lw-pg-staging-trial"
+    }
+  }
+]

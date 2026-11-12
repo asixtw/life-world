@@ -1,0 +1,306 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_step4_relationship_preview_is_read_only_and_keeps_people_separate[320] __
+browser_tests/test_integration_person_details.py:259: in test_step4_relationship_preview_is_read_only_and_keeps_people_separate
+    expect(page.locator('[data-review-people-editor]')).not_to_have_attribute('open','')
+E   AssertionError: Locator expected not to have attribute ''
+E   Actual value: - main:
+E     - text: 我的小小宇宙 ／ 核對經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 合
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "04｜檢視並確認。" [level=1]
+E     - paragraph: 原始記錄保留不變。只把你確認的內容，放進真實經歷。
+E     - button "離開記錄"
+E     - heading "原始記錄" [level=3]
+E     - text: 甲談到：待建乙。
+E     - paragraph: 實際發生於 2026年10月27日 上午8:00
+E     - region "紀錄素材":
+E       - heading "從不同方式留下經歷" [level=2]
+E       - paragraph: 選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。
+E       - status: 已保存在此裝置；尚未同步至其他裝置。
+E       - paragraph: 尚未設定辨識服務，可先保留素材並手動輸入。相片原檔可至64 MiB，會先在裝置縮圖至 5.0 MiB 內再傳送；伺服器不留原圖。音訊 5.0 MiB。長音訊逐段辨識，額度不足時原素材仍保留。
+E       - paragraph: 此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。
+E     - text: 確認後的摘要
+E     - textbox "確認後的摘要": 甲談到：待建乙。
+E     - button "用原文建立整理候選"
+E     - paragraph: 目前使用手動原文整理，尚未連接外部 AI。
+E     - paragraph: 這次有和誰互動，或在原文提到誰嗎？沒有可直接略過。
+E     - button "選擇既有人物"
+E     - button "＋ 新增人物"
+E     - checkbox "整理這段故事的人物，加入交會（選填）" [checked]
+E     - text: 整理這段故事的人物，加入交會（選填） 故事標題（選填）
+E     - textbox "故事標題（選填）"
+E     - group "這次實際參與的人":
+E       - text: 這次實際參與的人
+E       - textbox "篩選參與人物":
+E         - /placeholder: 篩選人物稱呼
+E       - checkbox "人物小安" [checked]
+E       - text: 人物小安
+E       - checkbox "有直接互動"
+E       - text: 有直接互動
+E       - paragraph: 同場不代表彼此熟識，也不自動計入直接互動或見面。
+E     - group "另外提到的人（選填）":
+E       - text: 另外提到的人（選填）
+E       - button "新增提及"
+E       - paragraph: 先保存原文稱呼；同名人物需人工配對，提及不等於參與。
+E     - heading "確認後待建立的人物" [level=3]
+E     - article:
+E       - text: 待建立的稱呼
+E       - textbox "待建立的稱呼": 待建甲
+E       - text: 本次角色
+E       - combobox "本次角色":
+E         - option "請選擇本次角色"
+E         - option "實際參與並直接互動" [selected]
+E         - option "共同參與但未直接互動"
+E         - option "僅在原文中提及"
+E       - button "移除這位待建人物"
+E     - article:
+E       - text: 待建立的稱呼
+E       - textbox "待建立的稱呼": 待建乙
+E       - text: 本次角色
+E       - combobox "本次角色":
+E         - option "請選擇本次角色"
+E         - option "實際參與並直接互動"
+E         - option "共同參與但未直接互動"
+E         - option "僅在原文中提及" [selected]
+E       - text: 原文提及位置
+E       - combobox "原文提及位置":
+E         - option "請選取原文位置"
+E         - option "第 1 處 · 甲談到：待建乙。" [selected]
+E       - button "移除這位待建人物"
+E     - button "再加入一位人物"
+E     - paragraph: 只有最後核對並確認才會建立人物；提及不會計為見面或直接互動。
+E     - text: 直接互動類型
+E     - combobox "直接互動類型":
+E       - option "未分類" [selected]
+E       - option "實體見面"
+E       - option "電話"
+E       - option "訊息"
+E       - option "其他"
+E     - checkbox "我已核對參與者、直接互動及提及原文，知道配對不代表出席。"
+E     - text: 我已核對參與者、直接互動及提及原文，知道配對不代表出席。
+E     - paragraph: 本次沒有選擇人物，不會更新人物檔案。
+E     - paragraph: 本次不關聯目標，仍可保存真實經歷與積分。
+E     - text: 想留下的下一步（選填，每行一項）
+E     - textbox "想留下的下一步（選填，每行一項）":
+E       - /placeholder: 例如：明天再練習半小時
+E     - text: 貢獻與積分將由伺服器一次保存。相同提交重試不會重複入帳。開發設定：每筆確認經歷 1 分。
+E     - button "我已核對，確認保存"
+E     - button "返回修改原始草稿"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_have_attribute" with timeout 5000ms
+E     - waiting for locator("[data-review-people-editor]")
+_ test_step4_relationship_preview_is_read_only_and_keeps_people_separate[390] __
+browser_tests/test_integration_person_details.py:259: in test_step4_relationship_preview_is_read_only_and_keeps_people_separate
+    expect(page.locator('[data-review-people-editor]')).not_to_have_attribute('open','')
+E   AssertionError: Locator expected not to have attribute ''
+E   Actual value: - main:
+E     - text: 我的小小宇宙 ／ 核對經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 合
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "04｜檢視並確認。" [level=1]
+E     - paragraph: 原始記錄保留不變。只把你確認的內容，放進真實經歷。
+E     - button "離開記錄"
+E     - heading "原始記錄" [level=3]
+E     - text: 甲談到：待建乙。
+E     - paragraph: 實際發生於 2026年10月27日 上午8:00
+E     - region "紀錄素材":
+E       - heading "從不同方式留下經歷" [level=2]
+E       - paragraph: 選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。
+E       - status: 已保存在此裝置；尚未同步至其他裝置。
+E       - paragraph: 尚未設定辨識服務，可先保留素材並手動輸入。相片原檔可至64 MiB，會先在裝置縮圖至 5.0 MiB 內再傳送；伺服器不留原圖。音訊 5.0 MiB。長音訊逐段辨識，額度不足時原素材仍保留。
+E       - paragraph: 此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。
+E     - text: 確認後的摘要
+E     - textbox "確認後的摘要": 甲談到：待建乙。
+E     - button "用原文建立整理候選"
+E     - paragraph: 目前使用手動原文整理，尚未連接外部 AI。
+E     - paragraph: 這次有和誰互動，或在原文提到誰嗎？沒有可直接略過。
+E     - button "選擇既有人物"
+E     - button "＋ 新增人物"
+E     - checkbox "整理這段故事的人物，加入交會（選填）" [checked]
+E     - text: 整理這段故事的人物，加入交會（選填） 故事標題（選填）
+E     - textbox "故事標題（選填）"
+E     - group "這次實際參與的人":
+E       - text: 這次實際參與的人
+E       - textbox "篩選參與人物":
+E         - /placeholder: 篩選人物稱呼
+E       - checkbox "人物小安" [checked]
+E       - text: 人物小安
+E       - checkbox "有直接互動"
+E       - text: 有直接互動
+E       - paragraph: 同場不代表彼此熟識，也不自動計入直接互動或見面。
+E     - group "另外提到的人（選填）":
+E       - text: 另外提到的人（選填）
+E       - button "新增提及"
+E       - paragraph: 先保存原文稱呼；同名人物需人工配對，提及不等於參與。
+E     - heading "確認後待建立的人物" [level=3]
+E     - article:
+E       - text: 待建立的稱呼
+E       - textbox "待建立的稱呼": 待建甲
+E       - text: 本次角色
+E       - combobox "本次角色":
+E         - option "請選擇本次角色"
+E         - option "實際參與並直接互動" [selected]
+E         - option "共同參與但未直接互動"
+E         - option "僅在原文中提及"
+E       - button "移除這位待建人物"
+E     - article:
+E       - text: 待建立的稱呼
+E       - textbox "待建立的稱呼": 待建乙
+E       - text: 本次角色
+E       - combobox "本次角色":
+E         - option "請選擇本次角色"
+E         - option "實際參與並直接互動"
+E         - option "共同參與但未直接互動"
+E         - option "僅在原文中提及" [selected]
+E       - text: 原文提及位置
+E       - combobox "原文提及位置":
+E         - option "請選取原文位置"
+E         - option "第 1 處 · 甲談到：待建乙。" [selected]
+E       - button "移除這位待建人物"
+E     - button "再加入一位人物"
+E     - paragraph: 只有最後核對並確認才會建立人物；提及不會計為見面或直接互動。
+E     - text: 直接互動類型
+E     - combobox "直接互動類型":
+E       - option "未分類" [selected]
+E       - option "實體見面"
+E       - option "電話"
+E       - option "訊息"
+E       - option "其他"
+E     - checkbox "我已核對參與者、直接互動及提及原文，知道配對不代表出席。"
+E     - text: 我已核對參與者、直接互動及提及原文，知道配對不代表出席。
+E     - paragraph: 本次沒有選擇人物，不會更新人物檔案。
+E     - paragraph: 本次不關聯目標，仍可保存真實經歷與積分。
+E     - text: 想留下的下一步（選填，每行一項）
+E     - textbox "想留下的下一步（選填，每行一項）":
+E       - /placeholder: 例如：明天再練習半小時
+E     - text: 貢獻與積分將由伺服器一次保存。相同提交重試不會重複入帳。開發設定：每筆確認經歷 1 分。
+E     - button "我已核對，確認保存"
+E     - button "返回修改原始草稿"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_have_attribute" with timeout 5000ms
+E     - waiting for locator("[data-review-people-editor]")
+_ test_step4_relationship_preview_is_read_only_and_keeps_people_separate[1440] _
+browser_tests/test_integration_person_details.py:259: in test_step4_relationship_preview_is_read_only_and_keeps_people_separate
+    expect(page.locator('[data-review-people-editor]')).not_to_have_attribute('open','')
+E   AssertionError: Locator expected not to have attribute ''
+E   Actual value: - complementary:
+E     - link "Life World 首頁":
+E       - /url: "#world"
+E       - text: ✳ Life World 讓努力，有一個家。
+E     - navigation "主要導覽":
+E       - link "世界":
+E         - /url: "#world"
+E       - link "目標":
+E         - /url: "#goals"
+E       - link "紀錄":
+E         - /url: "#history"
+E       - link "關係":
+E         - /url: "#people"
+E     - text: Life World 測試版 你的世界，從真實的一小步開始。
+E   - main:
+E     - text: 我的小小宇宙 ／ 核對經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 合
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "04｜檢視並確認。" [level=1]
+E     - paragraph: 原始記錄保留不變。只把你確認的內容，放進真實經歷。
+E     - button "離開記錄"
+E     - heading "原始記錄" [level=3]
+E     - text: 甲談到：待建乙。
+E     - paragraph: 實際發生於 2026年10月27日 上午8:00
+E     - region "紀錄素材":
+E       - heading "從不同方式留下經歷" [level=2]
+E       - paragraph: 選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。
+E       - status: 已保存在此裝置；尚未同步至其他裝置。
+E       - paragraph: 尚未設定辨識服務，可先保留素材並手動輸入。相片原檔可至64 MiB，會先在裝置縮圖至 5.0 MiB 內再傳送；伺服器不留原圖。音訊 5.0 MiB。長音訊逐段辨識，額度不足時原素材仍保留。
+E       - paragraph: 此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。
+E     - text: 確認後的摘要
+E     - textbox "確認後的摘要": 甲談到：待建乙。
+E     - button "用原文建立整理候選"
+E     - paragraph: 目前使用手動原文整理，尚未連接外部 AI。
+E     - paragraph: 這次有和誰互動，或在原文提到誰嗎？沒有可直接略過。
+E     - button "選擇既有人物"
+E     - button "＋ 新增人物"
+E     - checkbox "整理這段故事的人物，加入交會（選填）" [checked]
+E     - text: 整理這段故事的人物，加入交會（選填） 故事標題（選填）
+E     - textbox "故事標題（選填）"
+E     - group "這次實際參與的人":
+E       - text: 這次實際參與的人
+E       - textbox "篩選參與人物":
+E         - /placeholder: 篩選人物稱呼
+E       - checkbox "人物小安" [checked]
+E       - text: 人物小安
+E       - checkbox "有直接互動"
+E       - text: 有直接互動
+E       - paragraph: 同場不代表彼此熟識，也不自動計入直接互動或見面。
+E     - group "另外提到的人（選填）":
+E       - text: 另外提到的人（選填）
+E       - button "新增提及"
+E       - paragraph: 先保存原文稱呼；同名人物需人工配對，提及不等於參與。
+E     - heading "確認後待建立的人物" [level=3]
+E     - article:
+E       - text: 待建立的稱呼
+E       - textbox "待建立的稱呼": 待建甲
+E       - text: 本次角色
+E       - combobox "本次角色":
+E         - option "請選擇本次角色"
+E         - option "實際參與並直接互動" [selected]
+E         - option "共同參與但未直接互動"
+E         - option "僅在原文中提及"
+E       - button "移除這位待建人物"
+E     - article:
+E       - text: 待建立的稱呼
+E       - textbox "待建立的稱呼": 待建乙
+E       - text: 本次角色
+E       - combobox "本次角色":
+E         - option "請選擇本次角色"
+E         - option "實際參與並直接互動"
+E         - option "共同參與但未直接互動"
+E         - option "僅在原文中提及" [selected]
+E       - text: 原文提及位置
+E       - combobox "原文提及位置":
+E         - option "請選取原文位置"
+E         - option "第 1 處 · 甲談到：待建乙。" [selected]
+E       - button "移除這位待建人物"
+E     - button "再加入一位人物"
+E     - paragraph: 只有最後核對並確認才會建立人物；提及不會計為見面或直接互動。
+E     - text: 直接互動類型
+E     - combobox "直接互動類型":
+E       - option "未分類" [selected]
+E       - option "實體見面"
+E       - option "電話"
+E       - option "訊息"
+E       - option "其他"
+E     - checkbox "我已核對參與者、直接互動及提及原文，知道配對不代表出席。"
+E     - text: 我已核對參與者、直接互動及提及原文，知道配對不代表出席。
+E     - paragraph: 本次沒有選擇人物，不會更新人物檔案。
+E     - paragraph: 本次不關聯目標，仍可保存真實經歷與積分。
+E     - text: 想留下的下一步（選填，每行一項）
+E     - textbox "想留下的下一步（選填，每行一項）":
+E       - /placeholder: 例如：明天再練習半小時
+E     - text: 貢獻與積分將由伺服器一次保存。相同提交重試不會重複入帳。開發設定：每筆確認經歷 1 分。
+E     - button "我已核對，確認保存"
+E     - button "返回修改原始草稿"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_have_attribute" with timeout 5000ms
+E     - waiting for locator("[data-review-people-editor]")
+=========================== short test summary info ============================
+FAILED browser_tests/test_integration_person_details.py::test_step4_relationship_preview_is_read_only_and_keeps_people_separate[320]
+FAILED browser_tests/test_integration_person_details.py::test_step4_relationship_preview_is_read_only_and_keeps_people_separate[390]
+FAILED browser_tests/test_integration_person_details.py::test_step4_relationship_preview_is_read_only_and_keeps_people_separate[1440]
+3 failed, 18 deselected in 16.50s

@@ -1,0 +1,32 @@
+..............................................ssssssssss................ [ 13%]
+.........s........s..................................................... [ 26%]
+........................................................................ [ 39%]
+........................................................................ [ 52%]
+........................................................................ [ 65%]
+........................................................................ [ 78%]
+................ssssssssssssss...............s.......................... [ 91%]
+.............................................                            [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/product/test_google_transition_pg.py:94: requires dedicated local Google transition PG18 fixture
+SKIPPED [2] tests/product/test_google_transition_pg.py:110: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:121: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:133: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:140: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:150: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:159: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:168: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:179: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/test_alpha_deployment_contract.py:35: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_alpha_prebuilt_login.py:113: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_postgres_integration.py:34: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [4] tests/test_postgres_integration.py:119: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:134: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:153: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [2] tests/test_postgres_integration.py:171: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:198: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:216: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
+522 passed, 27 skipped in 15.68s

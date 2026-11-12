@@ -1,0 +1,105 @@
+{
+  "package_sha256": "1de6ebd8b1c244ed55f4954de94084b29cb3b07faadb988fc9396fee07a0abca",
+  "environment": "read-only source inspection; no import/model/GCP writes",
+  "schema010": {
+    "life_world_e2e": {
+      "snapshot_date": "2026-11-11 Owner supplied, not live GCP",
+      "tables": 42,
+      "columns": 326,
+      "column_differences": [],
+      "fk_count": 81,
+      "fk_differences": []
+    },
+    "life_world_alpha": {
+      "snapshot_date": "2026-11-11 Owner supplied, not live GCP",
+      "tables": 42,
+      "columns": 326,
+      "column_differences": [],
+      "fk_count": 81,
+      "fk_differences": []
+    }
+  },
+  "schema011": {
+    "package_tables": [
+      "person_basic_detail_history",
+      "person_basic_details",
+      "person_employment_history",
+      "person_employments"
+    ],
+    "package_columns": 63,
+    "cloud_snapshot_deployed": false,
+    "local_catalog": "localhost marker PG18 only",
+    "column_differences": [],
+    "fk_count": 9,
+    "fk_differences": [],
+    "review_sql_sha256": "a767838a9990dddfb4b0180c05576fcd8c9394dab9dc7cf39d5461dbf19d1a27",
+    "review_sql_matches_package_base": true
+  },
+  "workbook": {
+    "sheets": 10,
+    "formulas": 0,
+    "schema010_csv_equal": true,
+    "schema011_csv_equal": true,
+    "fk010_rows": 81,
+    "fk011_rows": 9,
+    "fk010_compact_equal": true,
+    "fk011_compact_equal": true
+  },
+  "content": {
+    "row_counts": {
+      "people": 0,
+      "birthdays": 0,
+      "employments": 0,
+      "events": 0,
+      "goals": 0,
+      "actions": 0,
+      "notes": 0,
+      "person_facts": 0,
+      "relationships": 0,
+      "tasks": 0
+    },
+    "status": "TEMPLATES_ONLY_NOT_IMPORT_READY",
+    "key_array_encoding": "CSV semicolon lists per workbook 07; not JSON text in CSV cells",
+    "errors": [],
+    "unresolved_person_keys": [
+      "P-A",
+      "P-B"
+    ],
+    "missing_base_event_keys": [
+      "E-001",
+      "E-002",
+      "E-003",
+      "E-004",
+      "E-005",
+      "E-006",
+      "E-007",
+      "E-008"
+    ]
+  },
+  "hidden": {
+    "counts": {
+      "scenarios": 10,
+      "gold": 7,
+      "blocked": 8,
+      "steps": 9
+    },
+    "gold_scopes": [
+      "Context",
+      "Person",
+      "Relationship",
+      "User"
+    ],
+    "errors": [],
+    "actual_model_execution": "NOT RUN",
+    "actual_output_rows": 0
+  },
+  "based_on_commit": "6d4ba0a3ea3d895678ad733cde2c42f773154f4f",
+  "manifest_counts_match": true,
+  "unresolved_before_import": [
+    "base content templates are empty; person/event keys require a complete owner-scoped world",
+    "CSV semicolon lists are documented; timezone, contribution quantities and explicit review intents still require mapping contract",
+    "S07 no-reward expectation conflicts with unconditional personal Confirm reward; do not change product rule silently",
+    "S08 simulation is a negative contamination fixture, not an approved theatre feature",
+    "actual model template lacks cost/reservation/source-version provenance; no actual AI run is proved"
+  ]
+}

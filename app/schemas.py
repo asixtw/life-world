@@ -3,7 +3,7 @@ from decimal import Decimal, InvalidOperation  # 以精確十進位處理貢獻�
 from typing import List, Optional, Literal  # 宣告可選欄位、清單與受限字串型別
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError  # 使用 IANA 時區轉換日期與時間
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator, model_validator  # 定義輸入模型、型別、長度與跨欄位驗證
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictBool, field_validator, field_serializer, model_validator  # 定義輸入模型、型別、長度與跨欄位驗證
 
 
 def decimal_string(value):  # 驗證正數、上限與小數位數，避免浮點誤差
@@ -127,7 +127,21 @@ class StoryMention(Model):  # 尚未配對或已人工指定的原文提及
     person_id: Optional[str] = Field(default=None, min_length=1, max_length=128)  # 只有使用者選定才保存人物身分
 
 
+class PendingPerson(Model):
+    """待確認人物，不在草稿階段建立正式紀錄。"""
+    name: str = Field(min_length=1, max_length=100)
+    relation: Literal['participant', 'interaction', 'mention']
+    start: Optional[StrictInt] = Field(default=None, ge=0, exclude_if=lambda v: v is None)
+
+
+class PendingTargetPerson(PendingPerson):
+    """待建立人物在單次請求中的穩定識別，不依姓名合併。"""
+    client_ref: str = Field(min_length=1, max_length=128)
+
+
 class StoryInput(Model):  # 草稿與正式人物核對共用資料
+    pending_person: Optional[PendingPerson] = Field(default=None, exclude_if=lambda v: v is None)  # 只存候選；最終確認才建人
+    pending_people: List[PendingTargetPerson] = Field(default_factory=list,max_length=100,exclude_if=lambda v:not v)
     title: str = Field(default='', max_length=160)  # 可另取故事標題
     participants: List[StoryParticipant] = Field(default_factory=list, max_length=100)  # 每筆經歷最多一百位參與者
     mentions: List[StoryMention] = Field(default_factory=list, max_length=100)  # 每個原文位置獨立配對
@@ -136,6 +150,22 @@ class StoryInput(Model):  # 草稿與正式人物核對共用資料
     def distinct_links(self):  # 拒絕重複人物與重複提及位置
         ids = [p.person_id for p in self.participants]  # 取得固定人物識別碼
         spans = [(m.start, m.end) for m in self.mentions]  # 取得原文範圍
+        if self.pending_person and self.pending_people:
+            raise ValueError('單人與多人待建立契約不可混用')
+        refs=[p.client_ref for p in self.pending_people]
+        if len(refs)!=len(set(refs)):
+            raise ValueError('待建立人物代碼不可重複')
+        pending_spans=[(p.start,(p.start or 0)+len(p.name)) for p in self.pending_people if p.relation=='mention']
+        if len(ids)+sum(p.relation!='mention' for p in self.pending_people)>100 or len(spans)+len(pending_spans)>100:
+            raise ValueError('人物參與或提及總數超過上限')
+        if len(spans+pending_spans)!=len(set(spans+pending_spans)):
+            raise ValueError('待建立人物提及位置重複')
+        if self.pending_person:
+            pending = self.pending_person
+            if pending.relation == 'mention' and ((pending.start, (pending.start or 0) + len(pending.name)) in spans or len(spans) >= 100):
+                raise ValueError('新增人物的提及位置不能重複或超過上限')
+            if pending.relation != 'mention' and len(ids) >= 100:
+                raise ValueError('參與人物已達上限')
         if len(ids) != len(set(ids)) or len(spans) != len(set(spans)):  # 重複輸入不能默默覆寫
             raise ValueError('參與者與提及位置不可重複')  # 讓介面要求人工修正
         return self  # 回傳唯一且合法的角色資料
@@ -149,6 +179,7 @@ class DraftCreate(WithContributions):
     goal_id: Optional[str] = Field(default=None, max_length=128)  # 設定關聯目標識別碼的型別、預設值與輸入限制
     person_id: Optional[str] = Field(default=None, max_length=128)  # 設定關聯人物識別碼的型別、預設值與輸入限制
     story: Optional[StoryInput] = None  # 保存未審閱的多人整理，舊用戶端可省略
+    review: Optional['DraftReview'] = Field(default=None,exclude_if=lambda v:v is None)  # 草稿核對資料獨立於人物是否關聯。
 
     @field_validator('raw_text')  # 將下方驗證函式綁定到指定輸入欄位
     @classmethod  # 以模型類別呼叫欄位驗證
@@ -178,7 +209,237 @@ class PersonUpdateCandidate(Model):  # 必須逐項勾選的人物資訊候選
     conflicts_with: Optional[str] = None  # 設定使用者指定的衝突資訊識別碼的型別、預設值與輸入限制
 
 
+class BirthdayValue(Model):
+    birth_year: Optional[StrictInt] = Field(default=None, ge=1, le=9999)
+    birth_month: Optional[StrictInt] = Field(default=None, ge=1, le=12)
+    birth_day: Optional[StrictInt] = Field(default=None, ge=1, le=31)
+
+    @model_validator(mode='after')
+    def actual_date(self):
+        """未知年只用閏年驗月日合法性，絕不把此年寫入生日或推算年齡。"""
+        if (self.birth_month is None) != (self.birth_day is None):
+            raise ValueError('生日的月與日必須同時存在或同時為空')
+        if self.birth_year is not None and self.birth_month is None:
+            raise ValueError('不能只保存出生年份而沒有月日')
+        if self.birth_month is not None:
+            date(self.birth_year if self.birth_year is not None else 2000, self.birth_month, self.birth_day)
+        return self
+
+
+class EmploymentValue(Model):
+    company_name: str = Field(default='', max_length=300)
+    job_title: str = Field(default='', max_length=300)
+    employment_status: Literal['current', 'past', 'unknown'] = 'unknown'
+    valid_from: Optional[date] = None
+    valid_to: Optional[date] = None
+
+    @model_validator(mode='after')
+    def meaningful_entry(self):
+        """一筆至少公司或職稱，空日期保持NULL；不自動結束另一筆工作。"""
+        if not self.company_name and not self.job_title:
+            raise ValueError('公司與職稱至少填寫一項')
+        if self.valid_from and self.valid_to and self.valid_to < self.valid_from:
+            raise ValueError('任職結束日期不得早於開始日期')
+        return self
+
+
+class PersonDetailSource(Model):
+    """輸入管道與得知依據分開；自行記錄可以不知道證據，不假造經歷ID。"""
+    source_kind: Literal['manual', 'raw']
+    source_experience_id: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    evidence_type: Optional[Literal['stated_by_person', 'observed_by_user', 'documented_source']] = None
+    quote: Optional[str] = Field(default=None, max_length=20000)
+
+    @model_validator(mode='after')
+    def explicit_experience_source(self):
+        # Confirm中的新經歷尚未產生ID，可由交易在確認後綁定；獨立人物編輯需服務層檢查ID與Owner。
+        if self.source_kind == 'raw' and (self.evidence_type is None or not self.quote):
+            raise ValueError('經歷來源須有引用與明確得知依據')
+        return self
+
+
+class PersonUpdateTarget(Model):
+    person_id: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    client_ref: Optional[str] = Field(default=None, min_length=1, max_length=128)
+
+    @model_validator(mode='after')
+    def exactly_one(self):
+        if bool(self.person_id) == bool(self.client_ref):
+            raise ValueError('人物目標必須且只能指定person_id或client_ref')
+        return self
+
+
+class TargetedPersonUpdate(PersonUpdateCandidate):
+    """每項更新明確攜帶人物、來源版本與得知依據，禁止第一人預設。"""
+    target: PersonUpdateTarget
+    expected_person_revision: Optional[StrictInt] = Field(default=None, ge=1)
+    source_kind: Literal['manual', 'raw']
+    source_revision: StrictInt = Field(ge=1)
+    quote: Optional[str] = Field(default=None, max_length=20000)
+
+
+class BirthdayWrite(Model):
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=0)
+    confirmed: StrictBool
+    value: BirthdayValue
+    source: PersonDetailSource
+
+
+class EmploymentPatchValue(Model):
+    company_name: Optional[str] = Field(default=None, max_length=300)
+    job_title: Optional[str] = Field(default=None, max_length=300)
+    employment_status: Optional[Literal['current','past','unknown']] = None
+    valid_from: Optional[date] = None
+    valid_to: Optional[date] = None
+
+    @model_validator(mode='after')
+    def no_null_identity(self):
+        if any(getattr(self,k) is None for k in self.model_fields_set if k in ('company_name','job_title','employment_status')):
+            raise ValueError('公司、職稱與任職狀態不能傳null；未知日期可用null')
+        return self
+
+
+class EmploymentCreate(Model):
+    request_id: str = Field(min_length=1, max_length=128)
+    confirmed: StrictBool
+    value: EmploymentValue
+    source: PersonDetailSource
+
+
+class EmploymentPatch(Model):
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=1)
+    confirmed: StrictBool
+    value: EmploymentPatchValue
+    source: PersonDetailSource
+
+
+class PersonDetailSourceWithdrawal(Model):
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=1)
+    confirmed: StrictBool
+
+
+class TargetBirthdayUpdate(Model):
+    target: PersonUpdateTarget
+    expected_revision: StrictInt = Field(ge=0)
+    source_revision: StrictInt = Field(ge=1)
+    selected: StrictBool = False
+    value: BirthdayValue
+    source: PersonDetailSource
+
+
+class TargetEmploymentUpdate(Model):
+    target: PersonUpdateTarget
+    employment_id: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    client_ref: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(default=0, ge=0)
+    source_revision: StrictInt = Field(ge=1)
+    selected: StrictBool = False
+    value: EmploymentPatchValue
+    source: PersonDetailSource
+
+
+class DraftPersonCandidate(Model):
+    """可未填完的逐人草稿，與正式事實DTO分離；selected不代表已正式寫入。"""
+    model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
+    candidate_ref: str = Field(min_length=1,max_length=128)
+    target: PersonUpdateTarget
+    expected_person_revision: Optional[StrictInt] = Field(default=None,ge=1)
+    dimension: Optional[Literal['interests','food','skills','habits']] = None
+    value: str = Field(default='',max_length=160)
+    description: str = Field(default='',max_length=2000)
+    evidence_type: Optional[Literal['stated_by_person','observed_by_user','documented_source']] = None
+    source_kind: Literal['manual','raw']
+    source_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$')
+    quote: Optional[str] = Field(default=None,max_length=2000)
+    selected: StrictBool = False
+    excluded: StrictBool = False
+    needs_review: StrictBool = False
+
+    @model_validator(mode='after')
+    def distinct_decision(self):
+        if self.selected and self.excluded:raise ValueError('候選不可同時採用及排除')
+        return self
+
+
+class DraftBasicCandidate(Model):
+    """基本資料候選的來源與決定；與已確認DTO分開，不提前創建人物或來源。"""
+    model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
+    candidate_ref: str = Field(min_length=1,max_length=128)
+    target: PersonUpdateTarget
+    expected_revision: StrictInt = Field(default=0,ge=0)
+    source_kind: Literal['manual','raw']
+    source_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$')
+    quote: Optional[str] = Field(default=None,max_length=2000)
+    evidence_type: Optional[Literal['stated_by_person','observed_by_user','documented_source']] = None
+    selected: StrictBool = False
+    excluded: StrictBool = False
+    needs_review: StrictBool = False
+
+    @model_validator(mode='after')
+    def distinct_decision(self):
+        if self.selected and self.excluded:raise ValueError('候選不可同時採用及排除')
+        return self
+
+
+class DraftBirthdayValue(Model):
+    """草稿可保留尚未填完的月日；正式日期驗證在核對/確認時使用BirthdayValue。"""
+    birth_year: Optional[StrictInt] = Field(default=None,ge=1,le=9999)
+    birth_month: Optional[StrictInt] = Field(default=None,ge=1,le=12)
+    birth_day: Optional[StrictInt] = Field(default=None,ge=1,le=31)
+
+
+class DraftBirthdayCandidate(DraftBasicCandidate):
+    clear: StrictBool = Field(default=False,exclude_if=lambda v:not v)
+    value: DraftBirthdayValue = Field(default_factory=DraftBirthdayValue)
+
+
+class DraftEmploymentCandidate(DraftBasicCandidate):
+    employment_id: Optional[str] = Field(default=None,min_length=1,max_length=128)
+    value: EmploymentPatchValue = Field(default_factory=EmploymentPatchValue)
+
+    @field_serializer('value')
+    def preserve_patch_presence(self,value,info):
+        # 保存/讀回不能把未填欄位補成顯式null，否則PATCH語意被改變且下一次驗證失敗。
+        return value.model_dump(mode=info.mode,exclude_unset=True)
+
+
+class DraftReview(Model):
+    model_config=ConfigDict(extra='forbid',str_strip_whitespace=False)
+    summary: Optional[str] = Field(default=None,max_length=20000)
+    summary_source_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$')
+    summary_needs_review: StrictBool = False
+    tasks: List[str] = Field(default_factory=list,max_length=20)
+    person_candidates: List[DraftPersonCandidate] = Field(default_factory=list,max_length=100)
+
+    birthday_candidates: List[DraftBirthdayCandidate] = Field(default_factory=list,max_length=100,exclude_if=lambda v:not v)
+    employment_candidates: List[DraftEmploymentCandidate] = Field(default_factory=list,max_length=100,exclude_if=lambda v:not v)
+
+    @model_validator(mode='after')
+    def unique_candidates(self):
+        candidates=[*self.person_candidates,*self.birthday_candidates,*self.employment_candidates]
+        if len(candidates)>100:raise ValueError('本次人物補充候選合計最多100項')
+        refs=[p.candidate_ref for p in candidates]
+        if len(refs)!=len(set(refs)):raise ValueError('人物候選代碼不可重複')
+        if any(not t.strip() or len(t)>300 for t in self.tasks):raise ValueError('任務需有內容且最多300字')
+        return self
+
+
+class DraftDelete(Model):
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=1)
+
+
 class Confirm(WithContributions):  # 將草稿正式確認為經歷的輸入
+    review: Optional[DraftReview] = Field(default=None,exclude_if=lambda v:v is None)
+    use_saved_review: StrictBool = Field(default=False,exclude_if=lambda v:not v)
+    reviewed_summary_sha256: Optional[str] = Field(default=None,pattern=r'^[0-9a-f]{64}$',exclude_if=lambda v:v is None)
+    birthday_updates: List[TargetBirthdayUpdate] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
+    employment_updates: List[TargetEmploymentUpdate] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
+    pending_people: List[PendingTargetPerson] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
+    targeted_person_updates: List[TargetedPersonUpdate] = Field(default_factory=list, max_length=100, exclude_if=lambda v: not v)
     request_id: str = Field(min_length=1, max_length=128)  # 設定重送去重用的提交代碼的型別、預設值與輸入限制
     expected_revision: StrictInt = Field(ge=1)  # 設定修改者已讀取的版本號的型別、預設值與輸入限制
     summary: str = Field(min_length=1, max_length=20000)  # 設定使用者核對後的經歷摘要的型別、預設值與輸入限制
@@ -281,11 +542,57 @@ class GoalLink(Model):  # 人物與目標的明確關聯輸入
     label: str = Field(default='', max_length=300)  # 設定關聯說明的型別、預設值與輸入限制
 
 
+RelationKind = Literal['family', 'partner', 'friend', 'colleague', 'classmate', 'mentor', 'client', 'business', 'neighbor', 'rival', 'enemy', 'other']
+
+
+class RelationTypeItem(Model):  # 關係類型（010）：本階段只接受 kind；方向與起迄日期尚未開放，多給的欄位會被拒絕
+    kind: RelationKind
+
+
+def distinct_relation_kinds(values):  # 同一段關係的類型不可重複
+    if values is not None and len({item.kind for item in values}) != len(values):
+        raise ValueError('關係類型不可重複')
+    return values
+
+
 class ConnectionCreate(Model):  # 兩位人物間的明確關係輸入
     request_id: str = Field(min_length=1, max_length=128)  # 設定重送去重用的提交代碼的型別、預設值與輸入限制
     other_person_id: str = Field(min_length=1, max_length=128)  # 設定關係另一端的人物識別碼的型別、預設值與輸入限制
-    label: str = Field(min_length=1, max_length=300)  # 設定關聯說明的型別、預設值與輸入限制
+    # 舊格式（只有 label）必填；新格式（帶 relation_types 或 description）可省略，由伺服器用描述的前 300 字填入。
+    label: Optional[str] = Field(default=None, min_length=1, max_length=300)
     source_experience_ids: List[str] = Field(default_factory=list, max_length=30)  # 設定引用的已確認經歷識別碼清單的型別、預設值與輸入限制
+    # 010：人物經歷來源（關聯表）。None＝沒有提供，維持原值；[]＝清空。Migration 前只接受 None 或 []。
+    source_person_experience_ids: Optional[List[str]] = Field(default=None, max_length=30)
+    # 010 新格式：關係類型（選填、可複選、最多 10 種）與雙方共用的關係描述。帶其中之一就是新格式：已有關係時回 409，不覆蓋。
+    relation_types: Optional[List[RelationTypeItem]] = Field(default=None, max_length=10)
+    description: Optional[str] = Field(default=None, max_length=2000)
+
+    @field_validator('relation_types')
+    @classmethod
+    def distinct_kinds(cls, values):
+        return distinct_relation_kinds(values)
+
+    @model_validator(mode='after')
+    def legacy_format_needs_label(self):
+        if self.relation_types is None and self.description is None and self.label is None:
+            raise ValueError('請填寫關係說明')
+        return self
+
+
+class ConnectionPatch(Model):  # 010：編輯、封存或恢復既有關係（Migration 010 後開放）
+    request_id: str = Field(min_length=1, max_length=128)  # 重送去重用的提交代碼
+    expected_revision: StrictInt = Field(ge=1)  # 修改者讀到的關係版本；不符回 409 stale_revision
+    label: Optional[str] = Field(default=None, min_length=1, max_length=300)  # 舊欄位；未提供就維持原值
+    source_experience_ids: Optional[List[str]] = Field(default=None, max_length=30)  # None＝維持；[]＝清空；陣列＝依順序替換
+    source_person_experience_ids: Optional[List[str]] = Field(default=None, max_length=30)  # 同上，人物經歷來源
+    relation_types: Optional[List[RelationTypeItem]] = Field(default=None, max_length=10)  # None＝維持；陣列＝替換（只處理 kind）
+    description: Optional[str] = Field(default=None, max_length=2000)  # 雙方共用的關係描述；None＝維持
+    confirmation_status: Optional[Literal['archived', 'confirmed']] = None  # archived＝封存；confirmed＝恢復（或確認）
+
+    @field_validator('relation_types')
+    @classmethod
+    def distinct_kinds(cls, values):
+        return distinct_relation_kinds(values)
 
 
 class Complete(Model):  # 附佐證與人工確認的目標完成輸入
@@ -416,3 +723,133 @@ class GoogleExchange(Model):
     """ID token僅作交換，不接受前端自報owner/email。"""
     challenge_id: str = Field(pattern=r'^[0-9a-f-]{36}$')
     credential: str = Field(min_length=1,max_length=16384)
+
+
+class GoogleExchangeStatus(Model):
+    """只核對已驗證Session的交換收據，不接收token或自報owner。"""
+    challenge_id: str = Field(pattern=r'^[0-9a-f-]{36}$')
+
+
+# 選取Jerry Schema010資料DTO；不引入新AI/作品入口。
+class PersonsCreate(Model):  # 新人物系統的新增輸入：類型與分類全部選填，同名可並存
+    request_id: str = Field(min_length=1, max_length=128)  # 重送去重用的提交代碼
+    name: str = Field(min_length=1, max_length=100)
+    aliases: List[str] = Field(default_factory=list, max_length=20)  # 別名（010 people.aliases，最多 20 個）
+    person_type: Optional[Literal['real', 'fictional']] = None  # 未指定時用 Schema 010 預設 real
+    person_subtype: Optional[Literal['historical', 'original']] = None  # historical 屬 real；original 屬 fictional
+    description: str = Field(default='', max_length=2000)  # 人物簡介（010 people.description）
+    roles: List[str] = Field(default_factory=list, max_length=20)
+    tags: List[str] = Field(default_factory=list, max_length=30)
+    category: Literal['business', 'life', 'learning', 'other'] = 'other'
+    # 承接舊人物主檔欄位（2.0 P2）：people.notes 是人物備註，和 notes 資料表（人物設定版本）不同。
+    notes: str = Field(default='', max_length=4000)
+    common_context: str = Field(default='', max_length=1000)
+    followed: bool = False
+    profile: Optional['PersonProfileFields'] = None  # 單頁一次儲存：同一交易建立第 1 版人物設定（全部空白則不建立）
+
+    @field_validator('aliases', 'roles', 'tags')
+    @classmethod
+    def valid_labels(cls, values):  # 去空白、去重、每項 1～100 字
+        return PersonCreate.valid_labels(values)
+
+
+class PersonsEdit(Model):  # 只修改明確送出的欄位；person_subtype 可送 null 清空，其他欄位不可為 null
+    expected_revision: StrictInt = Field(ge=1)
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    aliases: Optional[List[str]] = Field(default=None, max_length=20)
+    person_type: Optional[Literal['real', 'fictional']] = None
+    person_subtype: Optional[Literal['historical', 'original']] = None
+    description: Optional[str] = Field(default=None, max_length=2000)
+    roles: Optional[List[str]] = Field(default=None, max_length=20)
+    tags: Optional[List[str]] = Field(default=None, max_length=30)
+    category: Optional[Literal['business', 'life', 'learning', 'other']] = None
+    notes: Optional[str] = Field(default=None, max_length=4000)  # 承接舊人物主檔欄位
+    common_context: Optional[str] = Field(default=None, max_length=1000)
+    followed: Optional[bool] = None
+
+    @field_validator('aliases', 'roles', 'tags')
+    @classmethod
+    def valid_labels(cls, values):
+        return PersonCreate.valid_labels(values) if values is not None else values
+
+    @model_validator(mode='after')
+    def no_explicit_null(self):
+        if any(getattr(self, field) is None for field in self.model_fields_set if field != 'person_subtype'):
+            raise ValueError('更新欄位不可為 null')
+        return self
+
+
+class PersonsStatus(Model):  # 封存或恢復人物（不刪除）
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=1)
+    status: Literal['active', 'archived']
+
+
+class PersonProfileFields(Model):  # 人物設定欄位（取代原 AI 角色卡的設定欄位）；未送出的欄位視為空白
+    background: str = Field(default='', max_length=3000)  # 背景
+    personality: str = Field(default='', max_length=2000)  # 性格
+    motivation: str = Field(default='', max_length=1500)  # 動機
+    stance: str = Field(default='', max_length=1500)  # 立場
+    abilities: str = Field(default='', max_length=1500)  # 能力
+    expression: str = Field(default='', max_length=2000)  # 表達方式（2026-11-11 放寬：完整的說話方式加示範台詞約 1500 字）
+    behavior: str = Field(default='', max_length=2000)  # 行為
+    knowledge_boundary: str = Field(default='', max_length=1000)  # 知識界線
+    restrictions: str = Field(default='', max_length=1500)  # 禁止事項及其他限制
+
+
+class PersonProfileSave(Model):  # 保存一版人物設定（只新增；expected_profile_id 是目前最新版，第一次為 null）
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_profile_id: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    fields: PersonProfileFields
+    origin: Literal['manual', 'ai', 'ai_edited'] = 'manual'  # 第三階段：AI 產生或 AI 產生後修改
+    generation_id: Optional[str] = Field(default=None, min_length=1, max_length=128)  # origin 為 ai／ai_edited 時必填
+
+    @model_validator(mode='after')
+    def generation_matches_origin(self):
+        if (self.origin == 'manual') != (self.generation_id is None):
+            raise ValueError('AI 產生的設定必須附上生成紀錄；人工填寫不可附生成紀錄')
+        return self
+
+
+class PersonExperienceCreate(Model):  # 人物經歷（人物自己的經歷，使用者不必參與）；建立者就是登入帳號，不另外填
+    request_id: str = Field(min_length=1, max_length=128)  # 重送去重用的提交代碼
+    subject_person_id: str = Field(min_length=1, max_length=128)  # 經歷主體：這筆經歷主要屬於誰
+    participant_ids: List[str] = Field(default_factory=list, max_length=50)  # 其他參與人物（選填，最多 50 位）
+    title: str = Field(default='', max_length=200)  # 選填；空白時畫面顯示內容開頭
+    content: str = Field(min_length=1, max_length=20000)
+    experience_type: Literal['real', 'historical', 'fictional']  # 性質：建立後不能更改（資料庫權限）
+    occurred_precision: Literal['unknown', 'year', 'month', 'day'] = 'unknown'  # 發生時間的精度；unknown＝不知道
+    occurred_on: Optional[str] = Field(default=None, max_length=10)  # 依精度：'208'、'208-12'、'208-12-01'；格式由服務層檢查
+    occurred_label: str = Field(default='', max_length=120)  # 時間描述，例如「建安十三年冬」
+
+    @model_validator(mode='after')
+    def distinct_people(self):
+        if len(set(self.participant_ids)) != len(self.participant_ids) or self.subject_person_id in self.participant_ids:
+            raise ValueError('參與人物不可重複，也不必包含主體人物')
+        return self
+
+
+class PersonExperiencePatch(Model):  # 編輯、封存或恢復人物經歷；未送出（或 null）的欄位維持原值。性質與主體不能改
+    request_id: str = Field(min_length=1, max_length=128)
+    expected_revision: StrictInt = Field(ge=1)  # 修改者讀到的版本；不符回 409 stale_revision
+    title: Optional[str] = Field(default=None, max_length=200)
+    content: Optional[str] = Field(default=None, min_length=1, max_length=20000)
+    occurred_precision: Optional[Literal['unknown', 'year', 'month', 'day']] = None  # 修改時間時必填；unknown＝改成不知道
+    occurred_on: Optional[str] = Field(default=None, max_length=10)
+    occurred_label: Optional[str] = Field(default=None, max_length=120)
+    participant_ids: Optional[List[str]] = Field(default=None, max_length=50)  # 送出時整份替換；[]＝清空
+    status: Optional[Literal['active', 'archived']] = None  # archived＝封存；active＝恢復
+
+    @field_validator('participant_ids')
+    @classmethod
+    def distinct_participants(cls, values):
+        if values is not None and len(set(values)) != len(values):
+            raise ValueError('參與人物不可重複')
+        return values
+
+
+PersonsCreate.model_rebuild()
+
+# DraftCreate使用前向參照，於全部DTO定義完成後明確凍結模型。
+DraftCreate.model_rebuild()
+DraftEdit.model_rebuild()

@@ -1,0 +1,33 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": {
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "592.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "1",
+        "run.googleapis.com/operation-id": "53d882c0-13d2-406c-bd51-ff93ad34e026",
+        "run.googleapis.com/urls": "[\"https://lw-public-162310640466.asia-east1.run.app\",\"https://lw-public-u5py2jttpa-de.a.run.app\"]",
+        "serving.knative.dev/creator": "asixtw@gmail.com",
+        "serving.knative.dev/lastModifier": "asixtw@gmail.com"
+      },
+      "generation": 23,
+      "name": "lw-public"
+    },
+    "status": {
+      "latestCreatedRevisionName": "lw-public-camera-8f377fa",
+      "latestReadyRevisionName": "lw-public-camera-8f377fa",
+      "traffic": [
+        {
+          "percent": 100,
+          "revisionName": "lw-public-camera-8f377fa",
+          "tag": "alpha-guest-review",
+          "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+        }
+      ],
+      "url": "https://lw-public-u5py2jttpa-de.a.run.app"
+    }
+  }
+}

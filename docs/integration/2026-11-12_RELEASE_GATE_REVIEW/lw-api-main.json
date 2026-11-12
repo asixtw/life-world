@@ -1,0 +1,49 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": {
+    "metadata": {
+      "annotations": {
+        "lifeworld.dev/release-commit": "82d0925597aeb23b95023f102b1ca98c46666fe9",
+        "lifeworld.dev/release-created": "2026-11-05T14:14:44.881271Z",
+        "lifeworld.dev/release-previous": "[{\"type\": \"TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION\", \"revision\": \"lw-api-main-00002-gh8\", \"percent\": 100}, {\"type\": \"TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION\", \"revision\": \"lw-api-main-00004-yiv\", \"tag\": \"hostfix\"}]",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "592.0.0",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "3",
+        "run.googleapis.com/operation-id": "ed7e311b-8b2c-4f93-b1c9-a1cb1952a7d0",
+        "run.googleapis.com/urls": "[\"https://lw-api-main-162310640466.asia-east1.run.app\",\"https://lw-api-main-u5py2jttpa-de.a.run.app\"]",
+        "serving.knative.dev/creator": "jerrychien1031@gmail.com",
+        "serving.knative.dev/lastModifier": "jerrychien1031@gmail.com"
+      },
+      "generation": 80,
+      "name": "lw-api-main"
+    },
+    "status": {
+      "latestCreatedRevisionName": "lw-api-main-b8030-11121105",
+      "latestReadyRevisionName": "lw-api-main-b8030-11121105",
+      "traffic": [
+        {
+          "revisionName": "lw-api-main-00004-yiv",
+          "tag": "hostfix",
+          "url": "https://hostfix---lw-api-main-u5py2jttpa-de.a.run.app"
+        },
+        {
+          "revisionName": "lw-api-main-00007-4b5",
+          "tag": "prestable",
+          "url": "https://prestable---lw-api-main-u5py2jttpa-de.a.run.app"
+        },
+        {
+          "revisionName": "lw-api-main-b8030-11121105",
+          "tag": "e2e",
+          "url": "https://e2e---lw-api-main-u5py2jttpa-de.a.run.app"
+        },
+        {
+          "percent": 100,
+          "revisionName": "lw-api-main-c-94975cd3a6854941b1705c5634c777b3"
+        }
+      ],
+      "url": "https://lw-api-main-u5py2jttpa-de.a.run.app"
+    }
+  }
+}

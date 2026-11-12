@@ -6,7 +6,7 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
   const query = () => new URLSearchParams(location.hash.split('?')[1] || ''); // 以 URL 保存目前故事與焦點
   const button = (action, label, attrs = '', style = 'secondary') => `<button type="button" class="${style}" data-cx="${action}" ${attrs}>${label}</button>`; // 將交會事件與舊人物按鈕隔離
   const dialog = () => document.querySelector('#source-dialog'); // 來源使用獨立原生對話框
-  function initialize(context) { c = context; } // 注入原 App 的 API、路由及狀態
+  function initialize(context) { c = context;window.ExperiencePeopleUI?.initialize({...context,pending:pendingPeopleSummary,mention:mentionRow,spans,raw:rawForEditor,collectPending:collectPendingTargets}); } // 注入原 App 的 API、路由及狀態
   function entries(form) { return [...form.elements].filter(n=>n.name&&!['submit','button','file','reset'].includes(n.type)&&(!['checkbox','radio'].includes(n.type)||n.checked)).flatMap(n=>n.multiple?[...n.selectedOptions].map(o=>[n.name,o.value]):[[n.name,n.value]]); } // 切頁鎖住控制項後仍能保留值，不使用會排除 disabled 的 FormData
   function ensureOwner() { // 帳號切換時不保留前一人的來源與路徑
     const next = c.state.me?.owner_id || null; // 不依人物名稱辨識帳號
@@ -32,10 +32,95 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
   } // 完成提及輸入列
   function editor(story = null, mode = 'record') { // 草稿與更正共用人物整理元件
     if(c.state.me?.status==='guest') return '<p class="small muted">建立帳號後，可選填整理人物參與與提及；無人物經歷仍可正常保存。</p>'; // 不要求所有人都建立人物
+    if(mode==='record'&&window.ExperiencePeopleUI)return window.ExperiencePeopleUI.editor(story);
     const selected = new Map((story?.participants||[]).map(p=>[p.person_id,p.interacted])); // 保留使用者的明確選擇
-    return `<section class="story-editor" data-story-editor data-mode="${mode}"><label class="check-line"><input id="include-story" name="include_story" type="checkbox" ${story?'checked':''}>整理這段故事的人物，加入交會（選填）</label><div class="story-editor-body" ${story?'':'hidden'}><div class="field"><label for="story-title">故事標題（選填）</label><input id="story-title" name="story_title" maxlength="160" value="${h(story?.title||'')}"></div><fieldset><legend>這次實際參與的人</legend><input class="participant-filter" placeholder="篩選人物稱呼" aria-label="篩選參與人物"><div class="participant-options">${c.state.world.people.map(p=>`<div class="participant-option" data-name="${h(p.name)}"><label class="check-line"><input type="checkbox" name="story_participant" value="${h(p.id)}" ${selected.has(p.id)?'checked':''}>${h(p.name)} <small>${h(p.roles.join('、'))}</small></label><label class="check-line small"><input type="checkbox" name="story_interacted" value="${h(p.id)}" ${selected.get(p.id)?'checked':''} ${selected.has(p.id)?'':'disabled'}>有直接互動</label></div>`).join('')||'<p class="small muted">尚未有人物，可先用上方新增人物入口。</p>'}</div><p class="small muted">同場不代表彼此熟識，也不自動計入直接互動或見面。</p></fieldset><fieldset><legend>另外提到的人（選填）</legend><div class="story-mention-rows">${(story?.mentions||[]).map(mentionRow).join('')}</div>${button('add-mention','新增提及')}<p class="small muted">先保存原文稱呼；同名人物需人工配對，提及不等於參與。</p></fieldset>${mode==='review'?`<div class="field"><label for="story-interaction-kind">直接互動類型</label><select id="story-interaction-kind" name="story_interaction_type"><option value="unknown">未分類</option><option value="in_person">實體見面</option><option value="call">電話</option><option value="message">訊息</option><option value="other">其他</option></select></div>`:''}${mode!=='record'?'<label class="check-line"><input type="checkbox" id="story-reviewed" name="story_reviewed">我已核對參與者、直接互動及提及原文，知道配對不代表出席。</label>':''}</div></section>`; // 候選與正式接受在最後核對時分開
+    return `<section class="story-editor" data-story-editor data-pending-people="${h(JSON.stringify(story?.pending_people||[]))}" data-mode="${mode}"><label class="check-line"><input id="include-story" name="include_story" type="checkbox" ${story?'checked':''}>整理這段故事的人物，加入交會（選填）</label><div class="story-editor-body" ${story?'':'hidden'}><div class="field"><label for="story-title">故事標題（選填）</label><input id="story-title" name="story_title" maxlength="160" value="${h(story?.title||'')}"></div><fieldset><legend>這次實際參與的人</legend><input class="participant-filter" placeholder="篩選人物稱呼" aria-label="篩選參與人物"><div class="participant-options">${c.state.world.people.map(p=>`<div class="participant-option" data-name="${h(p.name)}"><label class="check-line"><input type="checkbox" name="story_participant" value="${h(p.id)}" ${selected.has(p.id)?'checked':''}>${h(p.name)} <small>${h(p.roles.join('、'))}</small></label><label class="check-line small"><input type="checkbox" name="story_interacted" value="${h(p.id)}" ${selected.get(p.id)?'checked':''} ${selected.has(p.id)?'':'disabled'}>有直接互動</label></div>`).join('')||'<p class="small muted">尚未有人物，可先用上方新增人物入口。</p>'}</div><p class="small muted">同場不代表彼此熟識，也不自動計入直接互動或見面。</p></fieldset><fieldset><legend>另外提到的人（選填）</legend><div class="story-mention-rows">${(story?.mentions||[]).map(mentionRow).join('')}</div>${button('add-mention','新增提及')}<p class="small muted">先保存原文稱呼；同名人物需人工配對，提及不等於參與。</p></fieldset>${mode!=='manage'?(story?.pending_people?.length?pendingPeopleSummary(story.pending_people):pendingEditor(story?.pending_person)):''}${mode==='review'?`<div class="field"><label for="story-interaction-kind">直接互動類型</label><select id="story-interaction-kind" name="story_interaction_type"><option value="unknown">未分類</option><option value="in_person">實體見面</option><option value="call">電話</option><option value="message">訊息</option><option value="other">其他</option></select></div>`:''}${mode!=='record'?'<label class="check-line"><input type="checkbox" id="story-reviewed" name="story_reviewed">我已核對參與者、直接互動及提及原文，知道配對不代表出席。</label>':''}</div></section>`; // 候選與正式接受在最後核對時分開
   } // 完成共用整理元件
+  function pendingTargetRow(p){
+    const roles={interaction:'實際參與並直接互動',participant:'共同參與但未直接互動',mention:'僅在原文中提及'};
+    return `<article class="card pending-target-row" data-pending-target data-client-ref="${h(p.client_ref)}"><label>待建立的稱呼<input data-target-name maxlength="100" value="${h(p.name||'')}"></label><label>本次角色<select data-target-role><option value="">請選擇本次角色</option>${Object.entries(roles).map(([v,t])=>`<option value="${v}" ${p.relation===v?'selected':''}>${h(t)}</option>`).join('')}</select></label><label data-target-source ${p.relation==='mention'?'':'hidden'}>原文提及位置<select data-target-start data-start="${p.start??''}"></select></label><label class="check-line small" data-target-duplicate hidden><input type="checkbox" data-target-distinct>我確認這是另一位同名人物，不合併。</label>${button('remove-pending-target','移除這位待建人物','','text-button')}</article>`;
+  }
+  function pendingPeopleSummary(people){
+    // 逐人編輯，不建立正式人物；client_ref與DOM卡片同生命週期保留，不依姓名合併。
+    return '<section class="pending-people-summary"><input type="hidden" id="workflow-pending-people" name="workflow_pending_people"><h3>確認後待建立的人物</h3><div data-pending-target-list>'+people.map(pendingTargetRow).join('')+'</div>'+button('add-pending-person','再加入一位人物','','text-button')+'<p class="small">只有最後核對並確認才會建立人物；提及不會計為見面或直接互動。</p></section>';
+  }
+  function updatePendingTargets(root){
+    if(!root)return;
+    const rows=[...root.querySelectorAll('[data-pending-target]')];
+    const names=rows.map(row=>row.querySelector('[data-target-name]').value.trim());
+    rows.forEach((row,i)=>{
+      const role=row.querySelector('[data-target-role]').value,select=row.querySelector('[data-target-start]');
+      const previous=select.value||select.dataset.start;
+      select.innerHTML='<option value="">請選取原文位置</option>'+spans(rawForEditor(root),names[i]).map(s=>`<option value="${s.start}" ${String(s.start)===String(previous)?'selected':''}>${h(s.label)}</option>`).join('');
+      delete select.dataset.start;
+      row.querySelector('[data-target-source]').hidden=role!=='mention';
+      row.querySelector('[data-target-duplicate]').hidden=!names[i]||!(c.state.world.people.some(p=>p.name.trim()===names[i])||names.filter(n=>n===names[i]).length>1);
+    });
+  }
+  function collectPendingTargets(root,validate){
+    updatePendingTargets(root);
+    return [...root.querySelectorAll('[data-pending-target]')].map(row=>{
+      const name=row.querySelector('[data-target-name]').value.trim(),relation=row.querySelector('[data-target-role]').value;
+      if(validate&&(!name||!['interaction','participant','mention'].includes(relation)))throw new Error('請填寫每位待建人物的稱呼與角色，或移除不保留的候選。');
+      if(validate&&!row.querySelector('[data-target-duplicate]').hidden&&!row.querySelector('[data-target-distinct]').checked)throw new Error('請逐人確認同名人物是不同的人，不會自動合併。');
+      const p={client_ref:row.dataset.clientRef,name,relation};
+      if(relation==='mention'){
+        const start=row.querySelector('[data-target-start]').value;p.start=start===''?null:Number(start);
+        if(validate&&(p.start===null||[...rawForEditor(root)].slice(p.start,p.start+[...name].length).join('')!==name))throw new Error('請核對每位待建人物的原文提及位置。');
+      }
+      return p;
+    });
+  }
+  function addPendingPerson(root){
+    const list=root.querySelector('[data-pending-target-list]');
+    if(list&&list.querySelectorAll('[data-pending-target]').length>=100)throw new Error('每段經歷最多100位待建人物；現有輸入保留，請先移除不需要的候選。');
+    const next={client_ref:crypto.randomUUID(),name:'',relation:''};
+    if(list)list.insertAdjacentHTML('beforeend',pendingTargetRow(next));
+    else{
+      const current=collectEditor(root.closest('form'))?.pending_person;
+      // 第一位舊式待建人物沿用補充候選的草稿內穩定鍵，新增第二人不能改寫其target。
+      const people=current?[{...current,client_ref:'legacy'},next]:[next];
+      const legacy=root.querySelector('[name=pending_person_enabled]')?.closest('details');
+      if(!legacy)throw new Error('目前無法加入人物，請保留草稿並重新載入。');
+      legacy.outerHTML=pendingPeopleSummary(people);
+    }
+    root.querySelector('#include-story').checked=true;root.querySelector('.story-editor-body').hidden=false;
+    updatePendingTargets(root);window.ExperiencePeopleUI?.hydrate(root);root.querySelector('[data-pending-target]:last-child [data-target-name]').focus();c.state.dirty=true;root.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  function persistPendingDraftState(form){
+    // 存到既有Owner/草稿scope的本機快照，允許角色未選完；不送正式DB或建人。
+    const root=form?.querySelector('[data-story-editor]'),field=root?.querySelector('#workflow-pending-people');
+    if(!field)return;
+    if(!root.querySelector('[data-pending-target-list]')){field.value='';return;}
+    const people=collectPendingTargets(root,false).map((p,i)=>({...p,distinctConfirmed:root.querySelectorAll('[data-target-distinct]')[i].checked}));
+    field.value=JSON.stringify({related:root.querySelector('#include-story').checked,people});
+  }
+  function restorePendingDraftState(form){
+    const root=form?.querySelector('[data-story-editor]'),field=root?.querySelector('#workflow-pending-people');
+    if(!field?.value)return;
+    let saved,people;
+    try{saved=JSON.parse(field.value);people=saved.people;}catch{c.toast('本機人物草稿格式無法讀取，原文仍保留；請勿覆蓋原素材。');return;}
+    const valid=saved&&typeof saved.related==='boolean'&&Array.isArray(people)&&people.length<=100&&people.every(p=>p&&typeof p.client_ref==='string'&&p.client_ref.length>0&&p.client_ref.length<=128&&typeof p.name==='string'&&p.name.length<=100&&['','participant','interaction','mention'].includes(p.relation)&&(p.start==null||Number.isSafeInteger(p.start)&&p.start>=0));
+    if(!valid){c.toast('本機人物草稿格式不符，原文仍保留；請重新核對人物。');return;}
+    const anchor=root.querySelector('.pending-people-summary')||root.querySelector('[name=pending_person_enabled]')?.closest('details');
+    if(!anchor)return;
+    anchor.outerHTML=pendingPeopleSummary(people);
+    root.querySelectorAll('[data-target-distinct]').forEach((input,i)=>input.checked=people[i].distinctConfirmed===true);
+    root.querySelector('#include-story').checked=saved.related;root.querySelector('.story-editor-body').hidden=!saved.related;
+    updatePendingTargets(root);c.state.dirty=true;
+  }
+  function pendingEditor(p) { // 姓名只暫存在同一份草稿，沒有獨立建人 API 呼叫。
+    return `<details class="space-top" ${p?'open':''}><input type="hidden" id="workflow-pending-people" name="workflow_pending_people"><summary>＋ 新增人物（確認前不建檔）</summary><label class="check-line"><input type="checkbox" name="pending_person_enabled" ${p?'checked':''}>本次新增一位人物</label><div class="field"><label for="pending-person-name">稱呼／姓名</label><input id="pending-person-name" name="pending_person_name" maxlength="100" value="${h(p?.name||'')}"></div><div class="field"><label for="pending-person-relation">這位人物在本次經歷的角色</label><select id="pending-person-relation" name="pending_person_relation">${[['participant','實際參與，未直接互動'],['interaction','實際參與並直接互動'],['mention','只有原文提及']].map(([v,t])=>`<option value="${v}" ${p?.relation===v?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label for="pending-person-start">只有提及時，請選原文片段</label><select id="pending-person-start" name="pending_person_start" data-start="${p?.start??''}"></select></div><label class="check-line" data-pending-duplicate hidden><input type="checkbox" name="pending_person_distinct">已有同名人物；我確認這是另一位人物，不合併。</label><p class="small muted">待新增人物只在最後確認建立。若與既有人物同名，請檢查名單；姓名相同不會自動合併。</p>${button('add-pending-person','再加入一位人物','','text-button')}</details>`;
+  }
+  function updatePending(root) { // 只提供原文實際出現的片段，不靠姓名自動配對。
+    const name=root.querySelector('[name=pending_person_name]')?.value.trim(),select=root.querySelector('[name=pending_person_start]');if(!select)return;
+    const previous=select.value||select.dataset.start;
+    select.innerHTML='<option value="">請選擇原文位置</option>'+spans(rawForEditor(root),name).map(s=>`<option value="${s.start}" ${String(s.start)===String(previous)?'selected':''}>${h(s.label)}</option>`).join('');delete select.dataset.start;
+    const duplicate=c.state.world.people.some(p=>p.name.trim()===name),line=root.querySelector('[data-pending-duplicate]');line.hidden=!duplicate;if(!duplicate)line.querySelector('input').checked=false;
+    select.closest('.field').hidden=root.querySelector('[name=pending_person_relation]').value!=='mention';
+  }
   function updateSpans(row) { // 名字或原文更動後重新核對位置
+    if(row.closest('[data-compact]')){window.ExperiencePeopleUI.updateMention(row);return;}
     const input=row.querySelector('[name=mention_name]'), select=row.querySelector('[name=mention_start]'), root=row.closest('[data-story-editor]'); // 取得該處線索
     const previous=select.value||select.dataset.start, found=spans(rawForEditor(root),input.value); // 保留舊位置但重新驗證原文
     select.innerHTML=found.length?found.map(s=>`<option value="${s.start}" ${String(s.start)===String(previous)?'selected':''}>${h(s.label)}</option>`).join(''):'<option value="">原文找不到此名字，請修正</option>'; // 不容許失效片段直接保存
@@ -43,20 +128,42 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
   } // 完成提及位置更新
   function collectEditor(form, validate=true) { // 只取得使用者指定的角色，不推論名字
     const root=form.querySelector('[data-story-editor]'); if(!root || !root.querySelector('#include-story').checked) return null; // 未選擇整理時維持舊 API
+    if(root.dataset.compact)return window.ExperiencePeopleUI.collect(root,validate);
     const participants=[...root.querySelectorAll('[name=story_participant]:checked')].map(n=>({person_id:n.value,interacted:!![...root.querySelectorAll('[name=story_interacted]:checked')].find(x=>x.value===n.value)})); // 參與與互動獨立保存
     const mentions=[...root.querySelectorAll('.story-mention-editor')].map(row=>{updateSpans(row); const name=row.querySelector('[name=mention_name]').value, value=row.querySelector('[name=mention_start]').value; if(validate && (!name||value==='')) throw new Error('提及名字必須出現在原文，請選取正確位置。'); return {name,start:value===''?-1:Number(value),end:value===''?-1:Number(value)+[...name].length,person_id:row.querySelector('[name=mention_person]').value||null};}); // 逐處保留配對身分與精確來源
-    return {title:root.querySelector('#story-title').value,participants,mentions}; // 不混入積分、進度或 owner
+    if(validate)updatePending(root);
+    const result={title:root.querySelector('#story-title').value,participants,mentions};
+    if(root.querySelector('[name=pending_person_enabled]')?.checked){
+      const name=root.querySelector('[name=pending_person_name]').value.trim(),relation=root.querySelector('[name=pending_person_relation]').value;
+      if(validate&&!name)throw new Error('請填寫待新增人物的稱呼，或取消新增。');
+      if(validate&&c.state.world.people.some(p=>p.name.trim()===name)&&!root.querySelector('[name=pending_person_distinct]').checked)throw new Error('請確認同名人物確實為不同人，或改選既有人物。');
+      const p={name,relation};if(relation==='mention'){const start=root.querySelector('[name=pending_person_start]').value;p.start=start===''?null:Number(start);if(validate&&(p.start===null||[...rawForEditor(root)].slice(p.start,p.start+[...name].length).join('')!==name))throw new Error('請核對新增人物的原文提及位置。');}
+      result.pending_person=p;
+    }
+    const pendingPeople=root.querySelector('[data-pending-target-list]')?collectPendingTargets(root,validate):JSON.parse(root.dataset.pendingPeople||'[]');
+    if(pendingPeople.length)result.pending_people=pendingPeople; // 版本相容保留；來源、Owner與去重由後端再驗證。
+    return result; // 不混入積分、進度或 owner
   } // 完成人工資料收集
-  function hydrateEditors() { document.querySelectorAll('.story-mention-editor').forEach(updateSpans); const old=document.querySelector('#interaction-type'), input=document.querySelector('#include-story'); if(old&&input) old.closest('.field').hidden=input.checked; } // 使用新故事時隱藏重複的舊互動類型，保留同次事件入口
+  function hydrateEditors() { document.querySelectorAll('[data-story-editor]').forEach(root=>{root.querySelector('.story-editor-body').hidden=!root.querySelector('#include-story').checked;updatePending(root);updatePendingTargets(root);window.ExperiencePeopleUI?.hydrate(root);}); document.querySelectorAll('.story-mention-editor').forEach(updateSpans); const old=document.querySelector('#interaction-type'), input=document.querySelector('#include-story'); if(old&&input) old.closest('.field').hidden=input.checked; } // 使用新故事時隱藏重複的舊互動類型，保留同次事件入口
   function remember(route, y) { // 保存探索位置與核對修改，避免返回時重設
     ensureOwner(); // 先清除跨帳號暫存
     if(route.startsWith('people')) { positions.set(route,{y,open:[...document.querySelectorAll('#connections-explorer details[open]')].map(n=>n.dataset.keep)}); if(new URLSearchParams(route.split('?')[1]||'').get('view')==='cards') lastCollection=route; else lastExplore=route; } // 兩種入口分別保留條件
-    if(route.startsWith('review/') && c.state.draft?.id && !discardedReviews.has(c.state.draft.id) && document.querySelector('#review-form')) { const form=document.querySelector('#review-form'); reviewEdits.set(c.state.draft.id,{values:entries(form),story:collectEditor(form,false),dirty:c.state.dirty||reviewEdits.get(c.state.draft.id)?.dirty||false}); } // 返回原文不代表摘要已正式保存
+    if(route.startsWith('review/') && c.state.draft?.id && !discardedReviews.has(c.state.draft.id) && document.querySelector('#review-form')) { const form=document.querySelector('#review-form'); reviewEdits.set(c.state.draft.id,{revision:c.state.draft.revision,values:entries(form),story:collectEditor(form,false),dirty:c.state.dirty||reviewEdits.get(c.state.draft.id)?.dirty||false}); } // 返回原文不代表摘要已正式保存
   } // 完成路由暫存
   function restore(route) { // 恢復展開與核對內容，不將暫存冒充伺服器保存
     const saved=positions.get(route); if(saved) { document.querySelectorAll('#connections-explorer details').forEach(n=>n.open=saved.open.includes(n.dataset.keep)); window.scrollTo(0,saved.y); } // 回到相同探索閱讀位置
     const edit=route.startsWith('review/')?reviewEdits.get(c.state.draft?.id):null, form=document.querySelector('#review-form'); // 只還原同一草稿
-    if(edit && form) { if(edit.story) { const root=form.querySelector('[data-story-editor]'); root.outerHTML=editor(edit.story,'review'); } for(const [name,value] of edit.values) { const nodes=[...form.elements].filter(n=>n.name===name); for(const n of nodes) { if(n.type==='checkbox') n.checked=edit.values.some(([key,v])=>key===name&&v===n.value); else if(n.type!=='file'&&!name.startsWith('mention_')) n.value=value; } } c.state.dirty=edit.dirty; } // 還原明確輸入，不把載入當成修改
+    if(edit && form) {
+      const sameRevision=edit.revision===c.state.draft?.revision;
+      // 返回原文已產生新版時，以伺服器新角色/活動量為準，舊快取不得覆蓋使用者剛改的內容。
+      if(sameRevision&&edit.story){const root=form.querySelector('[data-story-editor]');if(root)root.outerHTML=editor(edit.story,'review');}
+      const values=sameRevision?edit.values:edit.values.filter(([name])=>['summary','tasks','story_reviewed','story_interaction_type','interaction_type','interaction_event_id'].includes(name));
+      for(const [name,value] of values){
+        const nodes=[...form.elements].filter(n=>n.name===name);
+        for(const n of nodes){if(n.type==='checkbox')n.checked=values.some(([key,v])=>key===name&&v===n.value);else if(n.type!=='file'&&!name.startsWith('mention_'))n.value=value;}
+      }
+      c.state.dirty=edit.dirty;
+    } // 還原明確輸入，不把載入當成修改
     hydrateEditors(); // 完成精確來源位置選項
     if(form && route.startsWith('review/')) discardedReviews.delete(c.state.draft?.id); // 重新開始核對後可再追蹤新的修改
   } // 完成返回恢復
@@ -80,7 +187,7 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
     const sourceButton=s?button('source','查看完整來源',`data-id="${h(s.id)}"`,'primary'):''; // 來源入口固定可見
     // 核心CRM需能先建人物再記錄經歷；直接沿用既有人物表單與權限檢查。
     const header=`${c.heading('沿著故事，重新遇見。','從真實經歷出發，看見人與故事之間的交集。',c.button('new-person','＋ 新增人物','secondary'))}${tabs('explore')}<div class="connection-toolbar">${trail.length?button('back','上一步'):''}${focus?button('reset','從最近故事開始'):''}<label>故事順序<select id="connection-sort"><option value="recent" ${sort==='recent'?'selected':''}>最近的經歷</option><option value="oldest" ${sort==='oldest'?'selected':''}>較早的經歷</option></select></label></div>${p?`<p class="small">正在探索：${h(p.name)} · ${c.link('person/'+p.id+'?return='+encodeURIComponent(location.hash.slice(1)),'查看人物完整頁','text-button')}</p>`:''}${via?'<div class="connection-origin">從提及來源而來；不代表參與原故事。</div>':''}`; // 說明探索路徑，不宣稱人物私人關係
-    const pending=legacy.total?`<section class="card space-top"><h2>等待核對的舊經歷</h2><p class="small muted">舊人物關聯尚未確認參與或提及，不直接進入探索。</p>${legacy.items.map(x=>`<div class="list-item"><span>${h(x.title)}</span>${button('manage','核對這段故事',`data-id="${h(x.id)}"`)}</div>`).join('')}</section>`:''; // 不遺失舊內容或假定已參與
+    const pending=legacy.total?`<section class="card space-top"><h2>等待核對的人物經歷</h2><p class="small muted">舊人物關聯尚未確認參與或提及，不直接進入探索。</p>${legacy.items.map(x=>`<div class="list-item"><span>${h(x.title)}</span>${button('manage','核對人物關聯，加入交會',`data-id="${h(x.id)}"`)}</div>`).join('')}</section>`:''; // 不遺失舊內容或假定已參與
     if(!s) return `<div id="connections-explorer">${header}${c.empty(p?'還沒有這位人物實際參與的故事。可以查看人物卡的已核對提及，或返回上一段。':'從一段真實經歷開始，人物與故事會慢慢連起來。',c.link('record','記錄一段經歷','primary'))}${pending}</div>`; // 無下一段也有可理解退路
     const participants=s.participants.map(x=>personTile(x,x.id===focus)), title=focus?`${p?.name||'此人物'}的其他故事`:'接著探索另一段故事'; // 不載入全部人物網絡
     return `<div id="connections-explorer">${header}<article id="connection-story" class="connection-story"><div class="connection-scene"><span class="tag">${h(c.time(s.occurred_at))}</span><span class="tag">使用者已審閱</span><div class="connection-scene-people">${s.participants.slice(0,2).map(x=>`<span class="person-avatar category-${h(x.category)}">${h([...x.name][0])}</span>`).join('')}</div><div class="memory-card"><span aria-hidden="true">✳</span><h2>${h(s.title)}</h2><small>${s.participants.length} 位實際參與者 · ${s.mentions.length} 處提及</small></div></div><div class="connection-copy"><div class="eyebrow">THIS MOMENT · 故事片刻</div><p class="record-content">${h(s.summary)}</p>${sourceButton}</div></article><section class="space-top"><h2>實際參與人物</h2><div class="connection-people">${participants.slice(0,3).join('')}</div>${participants.length>3?`<details data-keep="participants"><summary>還有 ${participants.length-3} 位</summary><div class="connection-people">${participants.slice(3).join('')}</div></details>`:''}<p class="small muted">同場不代表彼此熟識；只有明確核對的直接互動才計入互動統計。</p>${s.participants.length?'':c.empty('這段故事沒有記錄共同參與者。')}</section><section class="space-top"><h2>活動中提及的人物</h2>${s.mentions.map(m=>`<button type="button" class="mention-row" data-cx="mention-source" data-id="${h(s.id)}" data-mention="${h(m.id)}" aria-label="查看${h(m.name)}的提及來源"><span class="mention-symbol">@</span><span><strong>${h(m.name)}</strong><small>${m.status==='matched'?'已人工配對':m.status==='rejected'?'已拒絕配對':'待核對人物'} · 未記錄出席</small></span><span>↗</span></button>`).join('')||'<p class="small muted">這段經歷沒有另外提及其他人物。</p>'}</section><section class="space-top"><h2>${h(title)}</h2>${others.map(x=>`<button type="button" class="connection-story-row card" data-cx="story" data-id="${h(x.id)}"><span><strong>${h(x.title)}</strong><small>${h(c.time(x.occurred_at))} · ${x.participants.length} 位參與</small></span><span>→</span></button>`).join('')||'<p class="small muted">目前沒有其他參與故事，可沿著另一位參與者繼續。</p>'}<div class="button-row">${offset?button('page','上一頁',`data-offset="${Math.max(0,offset-8)}"`):''}${offset+list.items.length<list.total?button('page','更多故事',`data-offset="${offset+8}"`):''}</div></section><div class="callout space-top">連結來自使用者已審閱的紀錄，不代表第三人獨立證實，也不代表人物之間有私人關係。</div>${pending}</div>`; // 分層呈現當前故事與下一段方向
@@ -127,6 +234,8 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
     if(action==='unmatch'||action==='reject-match') { const m=source.mentions.find(m=>m.id===target.dataset.mention), body={expected_revision:m.revision,person_id:null,status:action==='unmatch'?'unmatched':'rejected',confirmed:true}; await c.api('/connections/mentions/'+m.id+'/match',{method:'POST',body:{...body,request_id:c.requestId('mention:'+m.id,body)}}); await openSource(source.id,m.id,true); } // 可以取消或拒絕，不刪原文
     if(action==='availability') { const body={expected_revision:source.revision,available:target.dataset.available==='true'}; await c.api('/connections/stories/'+source.id+'/availability',{method:'POST',body:{...body,request_id:c.requestId('availability:'+source.id,body)}}); await openSource(source.id,null,true); } // 管理退路保留原始經歷
     if(action==='edit-source') { const s=await c.api('/connections/stories/'+source.id+'?manage=true'); source={...s,manage:true}; const story={title:s.title,participants:s.participants.map(p=>({person_id:p.id,interacted:p.interacted})),mentions:s.mentions.map(m=>({name:m.name,start:m.start,end:m.end,person_id:m.person_id}))}; document.querySelector('#source-content').innerHTML=`<h2>核對／更正故事人物</h2><div class="raw-source">${h(s.raw_text)}</div><form id="story-people-form">${editor(story,'manage')}<p class="small muted">不更改原文或積分。新增互動先保留未分類，可到人物時間線分類。</p><button class="primary">確認保存人物整理</button></form>${button('retry-source','取消更正')}`; hydrateEditors(); } // 舊資料由使用者明確分類
+    if(action==='add-pending-person'){addPendingPerson(target.closest('[data-story-editor]'));return true;}
+    if(action==='remove-pending-target'){const root=target.closest('[data-story-editor]');target.closest('[data-pending-target]').remove();updatePendingTargets(root);window.ExperiencePeopleUI?.hydrate(root);c.state.dirty=true;root.dispatchEvent(new Event('change',{bubbles:true}));return true;}
     if(action==='add-mention') { const root=target.closest('[data-story-editor]'); root.querySelector('.story-mention-rows').insertAdjacentHTML('beforeend',mentionRow()); hydrateEditors(); markEditorDirty(root); } // 新增未配對原文線索
     if(action==='remove-mention') { const root=target.closest('[data-story-editor]'); target.closest('.story-mention-editor').remove(); markEditorDirty(root); } // 明確移除此處線索
     return true; // 交會事件已處理
@@ -138,9 +247,9 @@ window.ConnectionsUI = (() => { // 封裝故事探索、來源與人工配對
     if(target.name==='mention_name') { target.closest('.story-mention-editor').querySelector('[name=mention_person]').value=''; updateSpans(target.closest('.story-mention-editor')); } // 名字更正不沿用舊身分
     return false; // 保留現有表單事件
   } // 完成欄位變更
-  document.addEventListener('input',event=>{ if(event.target.matches('.participant-filter')) event.target.closest('fieldset').querySelectorAll('.participant-option').forEach(row=>row.hidden=!row.dataset.name.includes(event.target.value)); }); // 避免長人物清單難找，篩選不改勾選
+  document.addEventListener('input',event=>{if(event.target.matches('[data-target-name],[data-target-role]')){if(event.target.matches('[data-target-name]'))event.target.closest('[data-pending-target]').querySelector('[data-target-distinct]').checked=false;updatePendingTargets(event.target.closest('[data-story-editor]'));}if(['pending_person_name','pending_person_relation'].includes(event.target.name))updatePending(event.target.closest('[data-story-editor]')); if(event.target.matches('.participant-filter')) event.target.closest('fieldset').querySelectorAll('.participant-option').forEach(row=>row.hidden=!row.dataset.name.includes(event.target.value)); }); // 避免長人物清單難找，篩選不改勾選
   document.addEventListener('input',event=>{const root=event.target.closest('#source-dialog [data-story-editor]'); if(root&&!event.target.matches('.participant-filter')) markEditorDirty(root);}); // 來源編輯不污染主畫面的草稿旗標
   window.addEventListener('beforeunload',event=>{if(source?.editDirty){event.preventDefault();event.returnValue='';}}); // 刷新也保護未保存的角色更正
   document.addEventListener('DOMContentLoaded',()=>{dialog().addEventListener('cancel',event=>{event.preventDefault();closeSource();}); dialog().addEventListener('close',()=>{sourceRequest++; if(c?.state.route.startsWith('people')) {if(source?.available===false) c.navigate('people'); else c.render().catch(error=>c.toast(error.message));}});}); // 關閉後更新已配對標示與撤回路徑，Esc 也遵守未保存保護
-  return {initialize,ensureOwner,tabs,worldMini,render,editor,collectEditor,hydrateEditors,remember,restore,clearReview,snapshotEditor,restoreEditor,click,submit,change,closeSource,go}; // 對 App 暴露必要介面
+  return {initialize,ensureOwner,tabs,worldMini,render,editor,collectEditor,hydrateEditors,remember,restore,clearReview,snapshotEditor,restoreEditor,persistPendingDraftState,restorePendingDraftState,addPendingPerson,click,submit,change,closeSource,go}; // 對 App 暴露必要介面
 })(); // 不把角色或來源寫入 localStorage

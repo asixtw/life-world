@@ -21,7 +21,7 @@ def pcm_segments(stream):
         yield out.getvalue()
 
 
-def transcribe(runtime,owner,file,mime,max_bytes,cancelled):
+def transcribe(runtime,owner,file,mime,max_bytes,cancelled,request_id=None):
     """有界暫存後用ffmpeg解碼；每段各自預留預算，取消後不新增模型呼叫。"""
     runtime.authorize(owner)
     require(runtime.enabled,503,'ai_not_configured','辨識服務尚未設定；素材仍保留。')
@@ -44,11 +44,14 @@ def transcribe(runtime,owner,file,mime,max_bytes,cancelled):
                 raise DomainError(503,'audio_decoder_unavailable','音訊解碼服務尚未就緒；素材仍保留。') from None
             # 容量/工作逾時是系統保護，不按錄音時長或日轉錄次數收費。
             timer=threading.Timer(240,process.kill);timer.start();started=time.monotonic()
-            texts=[];receipts=[]
+            texts=[];receipts=[];work=None
             for chunk in pcm_segments(process.stdout):
                 require(not cancelled.is_set(),499,'media_cancelled','辨識已取消；素材仍保留。')
                 require(time.monotonic()-started<240,504,'media_recognition_timeout','辨識逾時；素材保留，可分段重試。')
-                result=runtime.recognize(owner,'audio','audio/wav',chunk)
+                # 首段通過取消檢查才啟動工作；後續片段只扣成本，不重複扣工作次數。
+                if work is None and hasattr(runtime,'begin_media_work'):work=runtime.begin_media_work(owner,digest.hexdigest(),request_id)
+                if work is None:result=runtime.recognize(owner,'audio','audio/wav',chunk)
+                else:result=runtime.recognize(owner,'audio','audio/wav',chunk,media_work=work,request_id=work[3]+':'+str(len(receipts)))
                 texts.append(result['text']);receipts.append({'request_id':result.get('request_id'),'usage':result.get('usage')})
                 require(sum(map(len,texts))<=20000,413,'transcript_review_capacity','校對文字超過目前單筆經歷容量；原音檔保留，請分段整理。')
             require(process.wait(timeout=5)==0 and bool(texts),415,'invalid_audio','無法解碼音軌；素材仍保留。')

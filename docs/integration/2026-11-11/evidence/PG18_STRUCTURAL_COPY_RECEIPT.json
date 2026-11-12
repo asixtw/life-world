@@ -1,0 +1,45 @@
+{
+  "environment": "local synthetic PG18.0 / 127.0.0.1:57518",
+  "cloud_sql_modified": false,
+  "business_rows_copied": 0,
+  "migration_receipts_copied": 0,
+  "baseline_structure_comparison": {
+    "views": "equal",
+    "columns": "equal",
+    "indexes": "equal",
+    "policies": "equal",
+    "triggers": "equal",
+    "functions": "equal",
+    "relations": "equal",
+    "constraints": "equal"
+  },
+  "counts": {
+    "relations": 44,
+    "columns_including_sequence_internal": 332,
+    "constraints": 512,
+    "indexes": 88
+  },
+  "migration": "011_person_basic_details.review.sql",
+  "migration_applied": "local synthetic copy only",
+  "api_suite": {
+    "passed": 16,
+    "failed": 0
+  },
+  "runtime_permissions": "SELECT/INSERT current, UPDATE value/source/version columns only; owner/subject/id UPDATE denied; history SELECT/INSERT only; local proposal, no GCP grants",
+  "limitations": [
+    "PG18.0 vs Cloud SQL18.6",
+    "source sequence parameters omitted in original snapshot",
+    "not a backup restore",
+    "not real GCP E2E or Alpha",
+    "new local DML proposal needs review"
+  ],
+  "tested_migration_sha256": "82cbd2801ed273a7bd875fb94f479201453e80578eaa84d0d582969557ccc72e",
+  "delivered_migration_sha256": "a767838a9990dddfb4b0180c05576fcd8c9394dab9dc7cf39d5461dbf19d1a27",
+  "post_test_change": "header comment only; tested SQL logic unchanged",
+  "coverage_additions": [
+    "targeted fact updates",
+    "saved draft delete owner/revision/retry",
+    "missing drafts DELETE returns503 and rolls back draft_stories deletion",
+    "same request succeeds after local-only permission restoration"
+  ]
+}

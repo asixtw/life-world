@@ -1,0 +1,17 @@
+[
+  {
+    "file": "world-bgm.wav",
+    "sha256": "0c851a6a6176bd37261d6582c0853e4f2552924c71467f8df617e067663c0403",
+    "equal_existing": true
+  },
+  {
+    "file": "goals-bgm.wav",
+    "sha256": "1ae116ee90928f2344373656444dd6ff3868953a8cb15646349c5586f16b4d61",
+    "equal_existing": true
+  },
+  {
+    "file": "login-bgm.wav",
+    "sha256": "4a3edf07dfb5a2dfc9500f11bac92c7042774a54bfb9b1ab5e6065b04fa2a85a",
+    "equal_existing": true
+  }
+]

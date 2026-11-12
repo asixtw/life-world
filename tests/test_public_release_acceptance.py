@@ -1,6 +1,6 @@
 """隔離公開模式驗收：無IAP替身、無模型呼叫；不冒充線上Product PG。"""
 from dataclasses import replace
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime,timezone
 from uuid import uuid4
 from fastapi.testclient import TestClient
 from app.main import create_app
@@ -13,7 +13,8 @@ ORIGIN='https://testserver'
 
 def test_public_password_core_journey_and_owner_isolation(tmp_path):
     settings=replace(RuntimeSettings(),access_mode='public_alpha',auth_source_mode='shared',auth_rate_enabled=True,auth_rate_secret='synthetic-only-public-limit-key-'*3,registration_enabled=False,password_login_enabled=False,test_login_usernames=('synthetic_a','synthetic_b'),external_origin=ORIGIN,secure_cookies=True)
-    app=create_app(tmp_path,settings=settings)
+    # 固定台北午後測試時鐘，避免凌晨執行時今天09:00被正確判為未來事件。
+    app=create_app(tmp_path,settings=settings,clock=lambda:datetime(2026,11,9,4,0,tzinfo=timezone.utc))
     # 僅隔離測試資料；正式環境由受控啟動配置建立一個測試帳號。
     with app.state.service.db.connect(write=True) as db:
         for username in settings.test_login_usernames:

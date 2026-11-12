@@ -1,5 +1,6 @@
 """本機評測入口與外部gateway邊界；HTTP transport全部為明示替身。"""
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -9,6 +10,7 @@ from model_eval.gateway import JsonGatewayProvider
 from test_model_eval import case
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_cli_prepares_and_shows_without_network(tmp_path, capsys):
     source = tmp_path / 'case.json'; source.write_text(json.dumps(case()))
     directory = tmp_path / 'private-eval'
@@ -19,6 +21,7 @@ def test_cli_prepares_and_shows_without_network(tmp_path, capsys):
     assert json.loads(capsys.readouterr().out)['case']['synthetic_only']
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_cli_unapproved_run_is_blocked_and_does_not_read_key(tmp_path, capsys, monkeypatch):
     source = tmp_path / 'case.json'; source.write_text(json.dumps(case()))
     args = ['--directory', str(tmp_path / 'store')]
@@ -57,6 +60,7 @@ def test_gateway_does_not_rotate_keys_on_failure():
     assert len(calls) == len(keys) == 1
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX storage contract; Windows product storage is disabled, POSIX functionality is tested separately")
 def test_prepared_gateway_cannot_change_endpoint(tmp_path):
     def transport(*args): return {'text': '合成'}
     first = JsonGatewayProvider('gateway', 'model', 'https://example.test/a', key_supplier=lambda: 'synthetic', transport=transport)

@@ -32,11 +32,25 @@ class FeatureStore:
         if not pref['enabled']:return {'enabled':False,'features':[],'training_opt_in':False}
         with self.db.connect() as c:
             self.service._onboarded(c,owner)
-            records=[dict(r) for r in c.execute('SELECT id,summary,occurred_at FROM experiences WHERE owner_id=? ORDER BY occurred_at DESC,id DESC LIMIT 100',(owner,)).fetchall()]
+            # 撤回交會派生來源不刪正式經歷，但不可繞道一般經歷重新納入記憶。
+            records=[dict(r) for r in c.execute('''SELECT x.id,x.summary,x.occurred_at FROM experiences x
+                WHERE x.owner_id=? AND NOT EXISTS (
+                    SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id
+                    AND s.owner_id=x.owner_id AND s.available=FALSE)
+                ORDER BY x.occurred_at DESC,x.id DESC LIMIT 100''',(owner,)).fetchall()]
         facts=[]
         if person:
             overview=self.service.person_overview(owner,person)
-            facts=[{'fact_id':f['id'],'value':f['value'],'source_experience_ids':[s['id'] for s in f['sources']]} for group in overview['facts'].values() for f in group if f['status']=='confirmed' and f['sources']]
+            with self.db.connect() as c:
+                for group in overview['facts'].values():
+                    for f in group:
+                        if f['status']!='confirmed':continue
+                        # 人物事實保留原始證據；記憶用途另驗來源可用性，不修改正式事實。
+                        refs=[source['id'] for source in f['sources'] if c.execute('''SELECT 1 FROM experiences x
+                            WHERE x.id=? AND x.owner_id=? AND NOT EXISTS (
+                                SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id
+                                AND s.owner_id=x.owner_id AND s.available=FALSE)''',(source['id'],owner)).fetchone()]
+                        if refs:facts.append({'fact_id':f['id'],'value':f['value'],'source_experience_ids':refs})
         # 四類都是有限情境，禁止把觀察議題當成絕對人格；矛盾資訊不選邊。
         refs=sorted({r['id'] for r in records});candidate=[]
         def add(kind,subject,key,value,sources,status):
@@ -47,11 +61,50 @@ class FeatureStore:
         for f in derived['user_features']:add('user',owner,f['tag'],{'topic':f['tag'].split('.')[-1]},f['source_refs'],'recorded_context_not_personality')
         if person:
             for f in facts:add('person',person,'fact:'+f['fact_id'],{'reported':f['value']},f['source_experience_ids'],'user_confirmed_report_not_external_truth')
-            valid=sorted({s for f in facts for s in f['source_experience_ids']})
+            # 事實可由提及或共同參與來源取得；不能把有來源誤稱直接互動。
+            with self.db.connect() as c:
+                valid=sorted({source for f in facts for source in f['source_experience_ids'] if c.execute('''
+                    SELECT 1 FROM experience_participants p
+                    JOIN experience_stories s ON s.experience_id=p.experience_id
+                    JOIN experiences x ON x.id=p.experience_id
+                    WHERE p.experience_id=? AND p.person_id=? AND p.interacted=TRUE
+                    AND s.owner_id=? AND x.owner_id=? AND s.reviewed=TRUE AND s.available=TRUE
+                    ''',(source,person,owner,owner)).fetchone()})
             if valid:add('relationship',person,'confirmed_interaction',{'source_count':len(valid)},valid,'limited_observation')
         if refs:add('context',person or owner,'source_window',{'latest_recorded_at':max(r['occurred_at'] for r in records),'uncertainty':'incomplete_user_records'},refs,'recorded_time_only')
         with self.db.connect(write=True,owner=owner) as c:
             self.service._onboarded(c,owner)
+            # 構建快照時不持有遠端呼叫/寫鎖；發布前在Owner交易鎖內重驗設定與來源，
+            # 避免較慢的舊請求把停用/撤回後的特徵重新寫回或送給下一個AI請求。
+            current=c.execute('SELECT enabled,revision FROM relationship_memory_preferences WHERE owner_id=?',(owner,)).fetchone()
+            require(current is not None and bool(current['enabled']) and current['revision']==pref['revision'],
+                    409,'memory_settings_changed','個人化設定已變更；未使用舊記憶，請重新確認後再試。')
+            for record in records:
+                live=c.execute('''SELECT x.summary,x.occurred_at FROM experiences x WHERE x.id=? AND x.owner_id=?
+                    AND NOT EXISTS(SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id
+                        AND s.owner_id=x.owner_id AND s.available=FALSE)''',(record['id'],owner)).fetchone()
+                require(live is not None and live['summary']==record['summary'] and live['occurred_at']==record['occurred_at'],
+                        409,'memory_source_changed','人物或經歷來源已變更；未使用舊記憶，請重試。')
+            for fact in facts:
+                live=c.execute('SELECT value,status FROM person_facts WHERE id=? AND owner_id=? AND person_id=?',(fact['fact_id'],owner,person)).fetchone()
+                require(live is not None and live['status']=='confirmed' and live['value']==fact['value'],
+                        409,'memory_source_changed','人物資訊已變更；未使用舊記憶，請重試。')
+                for source_id in fact['source_experience_ids']:
+                    valid=c.execute('''SELECT 1 FROM fact_sources f JOIN experiences x ON x.id=f.experience_id
+                        WHERE f.fact_id=? AND f.experience_id=? AND f.revoked_at IS NULL AND x.owner_id=?
+                        AND NOT EXISTS(SELECT 1 FROM experience_stories s WHERE s.experience_id=x.id
+                            AND s.owner_id=x.owner_id AND s.available=FALSE)''',(fact['fact_id'],source_id,owner)).fetchone()
+                    require(valid is not None,409,'memory_source_changed','人物來源已撤回；未使用舊記憶，請重試。')
+            for feature in candidate:
+                if feature['subject_type']!='relationship':continue
+                for source_id in feature['source_refs']:
+                    require(c.execute('''SELECT 1 FROM experience_participants p
+                        JOIN experience_stories s ON s.experience_id=p.experience_id
+                        JOIN experiences x ON x.id=p.experience_id
+                        WHERE p.experience_id=? AND p.person_id=? AND p.interacted=TRUE
+                        AND s.owner_id=? AND x.owner_id=? AND s.reviewed=TRUE AND s.available=TRUE''',
+                        (source_id,person,owner,owner)).fetchone() is not None,
+                        409,'memory_source_changed','人物互動來源已變更；未使用舊記憶，請重試。')
             # 先撤回舊值再重建當下有效快照；每次AI使用只拿本次重驗後的active集合。
             scope=(owner,) if not person else (owner,person,owner)
             where='owner_id=?' if not person else 'owner_id=? AND subject_id IN (?,?)'

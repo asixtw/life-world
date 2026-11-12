@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_category_change_preserves_visible_unadded_input_and_can_add_next _____
+browser_tests/test_moment_integration.py:52: in test_category_change_preserves_visible_unadded_input_and_can_add_next
+    category.select_option('birthday');expect(category).to_have_value('interests')
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Locator expected to have Value 'interests'
+E   Actual value: birthday 
+E   Call log:
+E     - Expect "to_have_value" with timeout 5000ms
+E     - waiting for locator("[data-supplement-person]").locator("[data-supplement-input=dimension]")
+E       14 × locator resolved to <select data-supplement-input="dimension">…</select>
+E          - unexpected value "birthday"
+=========================== short test summary info ============================
+FAILED browser_tests/test_moment_integration.py::test_category_change_preserves_visible_unadded_input_and_can_add_next
+1 failed in 5.72s

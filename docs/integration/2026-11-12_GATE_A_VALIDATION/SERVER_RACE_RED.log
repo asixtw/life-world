@@ -1,0 +1,58 @@
+F
+=================================== FAILURES ===================================
+________ test_server_race_rejection_always_has_visible_return_to_step2 _________
+browser_tests/test_early_validation.py:105: in test_server_race_rejection_always_has_visible_return_to_step2
+    button=page.get_by_role('button',name='返回第二步修正目標與數量',exact=True);expect(button).to_be_visible();button.click()
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Locator expected to be visible
+E   Actual value: - complementary:
+E     - link "Life World 首頁":
+E       - /url: "#world"
+E       - text: ✳ Life World 讓努力，有一個家。
+E     - navigation "主要導覽":
+E       - link "世界":
+E         - /url: "#world"
+E       - link "目標":
+E         - /url: "#goals"
+E       - link "紀錄":
+E         - /url: "#history"
+E       - link "關係":
+E         - /url: "#people"
+E     - text: Life World 測試版 你的世界，從真實的一小步開始。
+E   - main:
+E     - text: 我的小小宇宙 ／ 核對經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 合
+E     - status: 這段經歷不在目標挑戰期間；請移除貢獻後保存經歷。
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "04｜檢視並確認。" [level=1]
+E     - paragraph: 原始記錄保留不變。只把你確認的內容，放進真實經歷。
+E     - button "離開記錄"
+E     - group: 查看原始經歷與來源
+E     - text: 確認後的摘要
+E     - textbox "確認後的摘要": 保留這段人工摘要
+E     - group: 整理方式 · 手動／AI（選用）
+E     - heading "目標與進度" [level=3]
+E     - paragraph: 隔離測試目標
+E     - paragraph: 閱讀 0.5 次
+E     - heading "人物關聯" [level=3]
+E     - paragraph: 沒有相關人物，不建立或修改人物資料。
+E     - checkbox "我已核對參與者、直接互動及提及原文，知道配對不代表出席。"
+E     - text: 我已核對參與者、直接互動及提及原文，知道配對不代表出席。
+E     - group: 修改本次人物關聯
+E     - group: 修改活動量
+E     - group: 新增或修改後續任務（選填）
+E     - text: 只有最後確認才正式保存與計分。這次依目前規則可獲得 1 積分；失敗後重試不重複計分。
+E     - button "我已核對，確認保存"
+E     - button "返回修改原始草稿"
+E     - button "保存核對草稿並離開"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for get_by_role("button", name="返回第二步修正目標與數量", exact=True)
+=========================== short test summary info ============================
+FAILED browser_tests/test_early_validation.py::test_server_race_rejection_always_has_visible_return_to_step2
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 5.94s

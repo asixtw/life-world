@@ -1,0 +1,17 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": [
+    {
+      "approval": {
+        "state": "PENDING"
+      },
+      "buildTriggerId": "6ffa2066-8edd-4406-9f3f-31f967da57dc",
+      "createTime": "2026-11-09T06:00:14.911927408Z",
+      "id": "3b71f171-045d-4d49-a12b-2226102441bf",
+      "status": "PENDING",
+      "substitutions": {
+        "COMMIT_SHA": "68102f230aa947a434286ba9260e1ae75f6634b0"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": {
+    "databaseVersion": "POSTGRES_18",
+    "name": "lw-pg-staging-trial",
+    "region": "asia-east1",
+    "settings": {
+      "availabilityType": "ZONAL",
+      "backupConfiguration": {
+        "backupRetentionSettings": {
+          "retainedBackups": 15,
+          "retentionUnit": "COUNT"
+        },
+        "backupTier": "STANDARD",
+        "enabled": false,
+        "kind": "sql#backupConfiguration",
+        "pointInTimeRecoveryEnabled": false,
+        "replicationLogArchivingEnabled": false,
+        "startTime": "20:00",
+        "transactionLogRetentionDays": 14,
+        "transactionalLogStorageState": "TRANSACTIONAL_LOG_STORAGE_STATE_UNSPECIFIED"
+      },
+      "deletionProtectionEnabled": false
+    },
+    "state": "RUNNABLE"
+  }
+}

@@ -41,7 +41,7 @@ def test_google_challenge_on_exact_tag(tmp_path,origin,expected):
     app=create_app(data_dir=tmp_path,settings=settings)
     # 僅在本測試可丟棄SQLite建立Google表；不連Product、不執行正式Migration。
     with app.state.service.db.connect(write=True) as c:
-        c.execute('CREATE TABLE external_identities(provider TEXT,issuer TEXT,subject TEXT,owner_id TEXT,created_at TEXT)')
+        c.execute('CREATE TABLE IF NOT EXISTS external_identities(provider TEXT,issuer TEXT,subject TEXT,owner_id TEXT,created_at TEXT)')
     with TestClient(app,base_url=TAG) as client:
         guest=client.post('/api/auth/guest',headers={'Origin':TAG}).json()
         result=client.post('/api/auth/external/challenge',json={'mode':'upgrade'},headers={'Origin':origin,'X-CSRF-Token':guest['csrf_token']})

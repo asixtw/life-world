@@ -42,6 +42,8 @@ def test_registered_owner_cannot_suggest_other_owner_draft(app,client):
 def test_fixture_candidate_does_not_claim_real_model(app,client):
     """測試Provider回應必須明示替身，不能在介面冒稱真實AI。"""
     enable(app);_,g=onboard(client);register(client,'rc_fixture_label');d=draft(client,g)
+    from conftest import grant_draft_ai_consent as grant
+    grant(client)  # 明確草稿授權後才測試Provider標示。
     response=client.post('/api/drafts/'+d['id']+'/suggest')
     assert response.status_code==200
     assert '測試替身' in response.json()['notice']

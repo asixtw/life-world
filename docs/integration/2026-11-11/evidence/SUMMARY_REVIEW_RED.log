@@ -1,0 +1,63 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_manual_summary_survives_return_and_requires_review_when_raw_changes[True] _
+browser_tests/test_integration_person_details.py:128: in test_manual_summary_survives_return_and_requires_review_when_raw_changes
+    expect(review).to_be_visible()
+E   AssertionError: Locator expected to be visible
+E   Actual value: - complementary:
+E     - link "Life World 首頁":
+E       - /url: "#world"
+E       - text: ✳ Life World 讓努力，有一個家。
+E     - navigation "主要導覽":
+E       - link "世界":
+E         - /url: "#world"
+E       - link "目標":
+E         - /url: "#goals"
+E       - link "紀錄":
+E         - /url: "#history"
+E       - link "關係":
+E         - /url: "#people"
+E     - text: Life World 測試版 你的世界，從真實的一小步開始。
+E   - main:
+E     - text: 我的小小宇宙 ／ 核對經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 合
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "04｜檢視並確認。" [level=1]
+E     - paragraph: 原始記錄保留不變。只把你確認的內容，放進真實經歷。
+E     - heading "原始記錄" [level=3]
+E     - text: 今天閱讀了兩章，仍有問題待釐清。
+E     - paragraph: 實際發生於 2026年10月27日 上午8:00
+E     - region "紀錄素材":
+E       - heading "從不同方式留下經歷" [level=2]
+E       - paragraph: 選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。
+E       - status: 已保存在此裝置；尚未同步至其他裝置。
+E       - paragraph: 尚未設定辨識服務，可先保留素材並手動輸入。相片原檔可至64 MiB，會先在裝置縮圖至 5.0 MiB 內再傳送；伺服器不留原圖。音訊 5.0 MiB。長音訊逐段辨識，額度不足時原素材仍保留。
+E       - paragraph: 此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。
+E     - text: 確認後的摘要
+E     - textbox "確認後的摘要": 這是我手動整理的摘要。
+E     - button "用原文建立整理候選"
+E     - paragraph: 目前使用手動原文整理，尚未連接外部 AI。
+E     - paragraph: 這次有和誰互動，或在原文提到誰嗎？沒有可直接略過。
+E     - button "選擇既有人物"
+E     - button "＋ 新增人物"
+E     - checkbox "整理這段故事的人物，加入交會（選填）"
+E     - text: 整理這段故事的人物，加入交會（選填）
+E     - paragraph: 本次沒有選擇人物，不會更新人物檔案。
+E     - paragraph: 本次不關聯目標，仍可保存真實經歷與積分。
+E     - text: 想留下的下一步（選填，每行一項）
+E     - textbox "想留下的下一步（選填，每行一項）":
+E       - /placeholder: 例如：明天再練習半小時
+E     - text: 貢獻與積分將由伺服器一次保存。相同提交重試不會重複入帳。開發設定：每筆確認經歷 1 分。
+E     - button "我已核對，確認保存"
+E     - button "返回修改原始草稿"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for locator("[data-summary-source-review]")
+=========================== short test summary info ============================
+FAILED browser_tests/test_integration_person_details.py::test_manual_summary_survives_return_and_requires_review_when_raw_changes[True]
+1 failed, 1 passed, 7 deselected in 6.46s

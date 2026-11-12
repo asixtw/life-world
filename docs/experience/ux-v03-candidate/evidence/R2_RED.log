@@ -1,0 +1,72 @@
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+________ test_raw_change_marks_summary_without_losing_manual_text[390] _________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:12: in test_raw_change_marks_summary_without_losing_manual_text
+    assert page.evaluate('UX.getState().summaryNeedsReview') is True
+E   AssertionError: assert None is True
+E    +  where None = evaluate('UX.getState().summaryNeedsReview')
+E    +    where evaluate = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step4'>.evaluate
+________ test_raw_change_marks_summary_without_losing_manual_text[1440] ________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:12: in test_raw_change_marks_summary_without_losing_manual_text
+    assert page.evaluate('UX.getState().summaryNeedsReview') is True
+E   AssertionError: assert None is True
+E    +  where None = evaluate('UX.getState().summaryNeedsReview')
+E    +    where evaluate = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step4'>.evaluate
+_________ test_person_sheet_has_separate_scroll_and_fixed_actions[390] _________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:18: in test_person_sheet_has_separate_scroll_and_fixed_actions
+    assert page.locator('#sheet .sheet-body').count()==1
+E   AssertionError: assert 0 == 1
+E    +  where 0 = count()
+E    +    where count = <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=newPreview'> selector='#sheet .sheet-body'>.count
+E    +      where <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=newPreview'> selector='#sheet .sheet-body'> = locator('#sheet .sheet-body')
+E    +        where locator = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=newPreview'>.locator
+________ test_person_sheet_has_separate_scroll_and_fixed_actions[1440] _________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:18: in test_person_sheet_has_separate_scroll_and_fixed_actions
+    assert page.locator('#sheet .sheet-body').count()==1
+E   AssertionError: assert 0 == 1
+E    +  where 0 = count()
+E    +    where count = <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=newPreview'> selector='#sheet .sheet-body'>.count
+E    +      where <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=newPreview'> selector='#sheet .sheet-body'> = locator('#sheet .sheet-body')
+E    +        where locator = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=newPreview'>.locator
+__________ test_mobile_focus_hides_nav_and_restores_after_leave[390] ___________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:27: in test_mobile_focus_hides_nav_and_restores_after_leave
+    assert not page.locator('.sidebar').is_visible()
+E   AssertionError: assert not True
+E    +  where True = is_visible()
+E    +    where is_visible = <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='.sidebar'>.is_visible
+E    +      where <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='.sidebar'> = locator('.sidebar')
+E    +        where locator = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'>.locator
+__________ test_mobile_focus_hides_nav_and_restores_after_leave[1440] __________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:27: in test_mobile_focus_hides_nav_and_restores_after_leave
+    assert not page.locator('.sidebar').is_visible()
+E   AssertionError: assert not True
+E    +  where True = is_visible()
+E    +    where is_visible = <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='.sidebar'>.is_visible
+E    +      where <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='.sidebar'> = locator('.sidebar')
+E    +        where locator = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'>.locator
+_____________ test_ai_has_one_explicit_choice_default_manual[390] ______________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:35: in test_ai_has_one_explicit_choice_default_manual
+    assert page.locator('[name=organize-mode]').count()==2
+E   AssertionError: assert 0 == 2
+E    +  where 0 = count()
+E    +    where count = <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='[name=organize-mode]'>.count
+E    +      where <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='[name=organize-mode]'> = locator('[name=organize-mode]')
+E    +        where locator = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'>.locator
+_____________ test_ai_has_one_explicit_choice_default_manual[1440] _____________
+docs/experience/ux-v03-candidate/tests/test_review_revision.py:35: in test_ai_has_one_explicit_choice_default_manual
+    assert page.locator('[name=organize-mode]').count()==2
+E   AssertionError: assert 0 == 2
+E    +  where 0 = count()
+E    +    where count = <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='[name=organize-mode]'>.count
+E    +      where <Locator frame=<Frame name= url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'> selector='[name=organize-mode]'> = locator('[name=organize-mode]')
+E    +        where locator = <Page url='file:///private/tmp/lw-people-fixes/docs/experience/ux-v03-candidate/index.html?scene=step1'>.locator
+=========================== short test summary info ============================
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_raw_change_marks_summary_without_losing_manual_text[390]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_raw_change_marks_summary_without_losing_manual_text[1440]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_person_sheet_has_separate_scroll_and_fixed_actions[390]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_person_sheet_has_separate_scroll_and_fixed_actions[1440]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_mobile_focus_hides_nav_and_restores_after_leave[390]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_mobile_focus_hides_nav_and_restores_after_leave[1440]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_ai_has_one_explicit_choice_default_manual[390]
+FAILED docs/experience/ux-v03-candidate/tests/test_review_revision.py::test_ai_has_one_explicit_choice_default_manual[1440]
+8 failed in 4.35s

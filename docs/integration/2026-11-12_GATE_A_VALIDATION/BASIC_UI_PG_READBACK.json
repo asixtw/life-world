@@ -1,0 +1,130 @@
+{
+  "late_version_conflict_rollback": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "4c9f0424b5e6d1b5",
+    "counts": {
+      "people": 2,
+      "experiences": 1,
+      "person_basic_details": 1,
+      "person_basic_detail_history": 1,
+      "person_employments": 1,
+      "person_employment_history": 2,
+      "reward_ledger": 1
+    }
+  },
+  "two_new_people_320": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "55831330b7a0aee5",
+    "counts": {
+      "people": 3,
+      "experiences": 1,
+      "person_basic_details": 2,
+      "person_basic_detail_history": 2,
+      "person_employments": 3,
+      "person_employment_history": 3,
+      "reward_ledger": 1
+    }
+  },
+  "two_new_people_390": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "d7835e4923322fdd",
+    "counts": {
+      "people": 3,
+      "experiences": 1,
+      "person_basic_details": 2,
+      "person_basic_detail_history": 2,
+      "person_employments": 3,
+      "person_employment_history": 3,
+      "reward_ledger": 1
+    }
+  },
+  "two_new_people_1440": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "88cf1c42aa867159",
+    "counts": {
+      "people": 3,
+      "experiences": 1,
+      "person_basic_details": 2,
+      "person_basic_detail_history": 2,
+      "person_employments": 3,
+      "person_employment_history": 3,
+      "reward_ledger": 1
+    }
+  },
+  "raw_source_recheck": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "65e3b571f77abf55",
+    "counts": {
+      "people": 1,
+      "experiences": 1,
+      "person_basic_details": 1,
+      "person_basic_detail_history": 1,
+      "person_employments": 1,
+      "person_employment_history": 1,
+      "reward_ledger": 1
+    }
+  },
+  "lost_confirm_response_retry": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "b37a21825224b508",
+    "counts": {
+      "people": 1,
+      "experiences": 1,
+      "person_basic_details": 1,
+      "person_basic_detail_history": 1,
+      "person_employments": 0,
+      "person_employment_history": 0,
+      "reward_ledger": 1
+    }
+  },
+  "draft_save_503_timeout_recovery": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "3b16d5cb4a27eb5f",
+    "counts": {
+      "people": 1,
+      "experiences": 1,
+      "person_basic_details": 1,
+      "person_basic_detail_history": 1,
+      "person_employments": 0,
+      "person_employment_history": 0,
+      "reward_ledger": 1
+    }
+  },
+  "late_conflict_before_retry": {
+    "environment": "localhost marker PG18 only; not GCP",
+    "database": "life_world_e2e",
+    "server_version": "18.0",
+    "runtime_role": "lw_e2e_app",
+    "owner_fingerprint": "4c9f0424b5e6d1b5",
+    "counts": {
+      "people": 1,
+      "experiences": 0,
+      "person_basic_details": 0,
+      "person_basic_detail_history": 0,
+      "person_employments": 1,
+      "person_employment_history": 2,
+      "reward_ledger": 0
+    }
+  }
+}

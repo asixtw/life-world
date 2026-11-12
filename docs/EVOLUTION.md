@@ -1,5 +1,9 @@
 # Life World｜App 與原型功能演進
 
+## 2026-11-11 PR26整合候選（未部署）
+
+延續多人交易、AI可配置有限預算與本人用量隔離，加入DraftReview摘要/任務及逐人四維候選保存契約；跨Session、Owner隔離、來源失效與回滾已在本機SQLite/PG18驗證。核對頁可保存後重新整理讀回，來源未核對不因保存而解除；第四步四維候選可逐人採用/排除、選證據類型、查看原有事實與來源，最終同Confirm交易保存。第三步已能逐人加入四維候選並保存/核對；僅提及者明確事實來源不再誤當無關，但不增加互動。人物選擇區已改精簡卡片/明確角色與精確來源，保留舊同人多角色與Owner隔離；整體UX仍未核准。草稿AI後端另加入Provider/範圍綁定的可撤回同意，未授權不預留/傳送；缺欄位權限停用，單一手動/AI選擇、首次告知、同意重用/撤回與失敗保留UI已在本機接上；新版候選綁定草稿revision/hash，避免錯套其他版本。四步舊套件已依現行卡片/導覽更新，並補320px AI單選版面檢查；生日/任職候選已納入同一伺服器草稿JSON、跨Session與同交易Confirm；保留未完成資料、部分PATCH語意及來源/Owner/版本防護。人物基本資料候選UI已完成本機PG閉環：逐人補充、重登草稿、差異核對、同交易確認與詳情讀回；停止功能擴充，轉Integration QA。Owner UX核准、正式Schema/發布Gate未完成。完整結果與限制見[整合報告](integration/2026-11-11/INTEGRATION_RELEASE_REPORT.md)，不將本機PASS視為Alpha已套用。
+
 ## 2026-11-07 GCP-144 三階段孵化候選
 
 加入三次明確輸入、防連點及reduced-motion的前端孵化呈現，沿用既有CSS Lumi；25筆候選PNG inventory保留來源與alpha/SHA。4項隔離Chromium測試通過；未部署，未替換正式角色。詳見[美術接入候選](art/README.md)。
@@ -204,3 +208,35 @@ Google challenge/exchange沿用既有WRITE_ORIGINS及Host同源限制；不能�
 ### 2026-11-08：v5.5 登出、登入管道與產品能力解耦
 
 修正dirty停用登出與本機IndexedDB先於Session撤銷的卡住；加入可取消清理與HTTP重試。帳密管道政策、受限測試名單及一般註冊政策與Google Client分離，registered Owner共用AI/劇場授權。加入保守公開shared總額來源與不覆寫的單一測試Owner Seed。設定、安全限制與證據分類見[本輪契約](LOGIN_AND_PUBLIC_V55.md)。
+
+## 2026-11-10｜四步經歷與人物關聯（Draft）
+
+原文／媒體 → 目標活動量 → 人物角色 → 人工確認；同 Owner 角色、標籤與共同場合複用。待新增人物與經歷在確認交易內建立，普通日記不進交會，提及不計參與或見面。仍待 Code Review，未部署／未改 Alpha；[契約、限制與驗收](experience/2026-11-10/README.md)。
+## 2026-11-09｜連線池歸還與 shutdown 定點修補
+
+在68102f2獨立分支修正close後再入池競態、清理例外洩漏名額及首個資源close失敗中止其餘清理。維持非等待式shutdown，不改runtime或資料模型；完整生命週期競態仍列限制。見[驗證紀錄](testing/POOL_SHUTDOWN_REVIEW_20261109.md)。
+
+## 2026-11-09 音訊／孵化生命週期增量
+
+保留既有採用素材與三次孵化，補齊音效／BGM 停用、離頁、晚到播放取消、失敗重試、場景缺檔無聲退路及同一 DOM mount 去重。沒有新增媒體、資料模型或部署；[22 項前端契約與驗收界線](art/AUDIO_LIFECYCLE_20261109.md)。
+
+## 2026-11-09 pool 生命週期隔離修補候選
+
+以 66fd8d4 為基底，新增四個失敗重現，再以 mutex 內 Connector 清理責任移交、closed 檢查與局部參照修復；完整離線回歸 536 passed／17 skipped。這是未發布候選，不提升為真 PG、Cloud SQL 或部署驗收。詳細語義及保留風險見 [pool 審查](testing/POOL_SHUTDOWN_REVIEW_20261109.md)。
+
+同日再加入 opener 計數與延後清理責任移交，保留 close 非等待語義；provider 錯誤與清理錯誤皆有合成覆蓋。最新完整離線回歸 540 passed／17 skipped，取代中間版本536結果；仍未發布。
+
+
+### 2026-11-09 整合證據補充（取代上文「最新」的時間性敘述）
+
+完整整合版離線回歸為 **549 passed、17 PG skipped、13 warnings**。上文540屬歷史pool階段結果。OSSANG先前專用PG18執行17必測全通過，但該次整體542 passed、2 failed、13 Node skipped，且早於最後整合；不能當成本head完整Windows回歸。新core在Windows實機記憶體載入的constructor及6個CLI拒絕probe已通過，僅證明fail-closed路徑，不是Windows全功能或ACL驗收。詳見 `CORE_SAFETY_INTEGRATION_20261109.md`（位於 docs/testing）。三線完整驗收仍未完成。
+
+### 2026-11-12 v1.1資料契約稽核（只讀）
+
+010快照與011本機候選的欄位/FK對照無差異；模板為空、Gold是人工預期，真背景AI NOT RUN。已分離輸入/輸出/正式採納，列出S07獎勵衝突、背景來源失效與九項profile寫入API相容性阻擋；不新增產品或模型呼叫。詳[v1.1稽核](integration/2026-11-12_DATA_CONTRACT_AUDIT/README.md)，維持Draft/NO-GO。
+
+## 2026-11-12 · PR26 Soft Life 視覺候選
+
+在 PR26 `804f3f4` 上適配已核實的 Soft Life 3D Lumi 主圖與獨立 CSS 主題，保留四主分頁、四步紀錄、登入及資料契約；未將展示站的多願望行為移入 App。初次程式測試通過；後續依授權保留新提交並接續 PR26 審查，不提升 App 版本，未合併或部署。[範圍、素材來源與驗證界線](SOFTLIFE_VISUAL_CANDIDATE_20261112.md)。
+
+後續按既有 PR26 推送授權，在新基準 `846f250d` 乾淨套入相同視覺候選，保留生日／目標期間防呆與交接證據，沒有重寫原三個提交。

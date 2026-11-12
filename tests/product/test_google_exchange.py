@@ -28,9 +28,9 @@ def setup(tmp_path):
     app=create_app(data_dir=tmp_path/'isolated-google',settings=RuntimeSettings(google_client_id=CLIENT_ID,password_login_enabled=False,registration_enabled=False),google_verifier=verifier,clock=lambda:datetime(2026,10,27,7,tzinfo=timezone.utc))
     # 只在本fixture新建且可丟棄的DB初始化新表；未寫入app/migrations。
     with app.state.service.db.connect(write=True) as c:
-        c.execute("CREATE TABLE external_identities(provider TEXT NOT NULL,issuer TEXT NOT NULL,subject TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL,PRIMARY KEY(provider,issuer,subject))")
+        c.execute("CREATE TABLE IF NOT EXISTS external_identities(provider TEXT NOT NULL,issuer TEXT NOT NULL,subject TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL,PRIMARY KEY(provider,issuer,subject))")
     with app.state.service.db.connect(write=True) as c:
-        c.execute("CREATE TABLE guest_abandonments(owner_id TEXT PRIMARY KEY,abandoned_at TEXT NOT NULL,purge_after TEXT NOT NULL,status TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,last_error_code TEXT,completed_at TEXT,media_state TEXT NOT NULL DEFAULT 'pending',media_attempts INTEGER NOT NULL DEFAULT 0)")
+        c.execute("CREATE TABLE IF NOT EXISTS guest_abandonments(owner_id TEXT PRIMARY KEY,abandoned_at TEXT NOT NULL,purge_after TEXT NOT NULL,status TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,last_error_code TEXT,completed_at TEXT,media_state TEXT NOT NULL DEFAULT 'pending',media_attempts INTEGER NOT NULL DEFAULT 0)")
     return app,verifier
 
 
@@ -67,7 +67,7 @@ def test_normal_login_returns_google_owner_not_same_email_local_account(setup):
         me,_=onboard(first);body=challenge(first,v);r=first.post('/api/auth/external/exchange',json=body);assert r.status_code==200
         owner=r.json()['owner_id']
     with client_for(app) as second:
-        guest(second);body=challenge(second,v,mode='login',token='second-token')
+        guest(second);body=challenge(second,v,mode='login',token='second-token',discard_guest=True)
         r=second.post('/api/auth/external/exchange',json=body);assert r.status_code==200 and r.json()['owner_id']==owner
     with client_for(app) as local:
         me,_=onboard(local)
@@ -76,7 +76,8 @@ def test_normal_login_returns_google_owner_not_same_email_local_account(setup):
         # 前端自報email/user_id一律422，不參與任何帳號合併。
         assert local.post('/api/auth/external/exchange',json={**body,'email':'same@example.invalid','user_id':owner}).status_code==422
         body=challenge(local,v,subject='brand-new-subject',mode='login',token='new-token')
-        r=local.post('/api/auth/external/exchange',json=body);assert r.status_code==200 and r.json()['owner_id']!=me['owner_id']
+        r=local.post('/api/auth/external/exchange',json=body);assert r.status_code==404
+        assert local.get('/api/auth/me').json()['owner_id']==me['owner_id']
 
 
 def test_different_owner_conflict_and_no_automatic_data_merge(setup):

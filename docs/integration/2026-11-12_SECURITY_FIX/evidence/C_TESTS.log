@@ -1,0 +1,5 @@
+.x.x                                                                     [100%]
+=========================== short test summary info ============================
+XFAIL tests/test_fact_provenance_contract.py::test_formal_fact_provenance_requires_reviewed_schema_contract - F5正式fact_sources缺source_kind/source_revision/quote；僅契約審查，本輪不執行Schema變更
+XFAIL tests/test_fact_provenance_contract.py::test_normal_upsert_must_not_restore_revoked_fact_source - F5狀態機待審：既有_write_fact upsert會清空revoked_at，普通寫入不可冒充明確恢復
+2 passed, 2 xfailed in 0.36s

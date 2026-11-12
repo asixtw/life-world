@@ -1,0 +1,131 @@
+..............................................ssssssssss................ [  9%]
+.........s........s..................................................... [ 19%]
+........................................................................ [ 28%]
+........................................................................ [ 38%]
+........................................................................ [ 48%]
+........................................................................ [ 57%]
+.................sssssss................................................ [ 67%]
+........................................................................ [ 76%]
+........FFF................................ssssssssssssss............... [ 86%]
+s....................................................................... [ 96%]
+.............................                                            [100%]
+=================================== FAILURES ===================================
+______________ test_frontend_pages_50_50_1_and_links_keep_filters ______________
+tests/test_persons_fixes.py:215: in test_frontend_pages_50_50_1_and_links_keep_filters
+    run_node(r"""
+tests/test_persons_fixes.py:211: in run_node
+    assert result.returncode == 0, result.stderr
+E   AssertionError: node:internal/modules/cjs/loader:1423
+E       throw err;
+E       ^
+E     
+E     Error: Cannot find module './app/static/persons.js'
+E     Require stack:
+E     - /private/tmp/lw-integration-20261111/[eval]
+E         at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+E         at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+E         at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+E         at Module._load (node:internal/modules/cjs/loader:1226:37)
+E         at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+E         at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+E         at Module.require (node:internal/modules/cjs/loader:1503:12)
+E         at require (node:internal/modules/helpers:152:16)
+E         at [eval]:6:1
+E         at runScriptInThisContext (node:internal/vm:219:10) {
+E       code: 'MODULE_NOT_FOUND',
+E       requireStack: [ '/private/tmp/lw-integration-20261111/[eval]' ]
+E     }
+E     
+E     Node.js v24.11.0
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node', '-e', '\nconst assert =...code: 'MODULE_NOT_FOUND',\n  requireStack: [ '/private/tmp/lw-integration-20261111/[eval]' ]\n}\n\nNode.js v24.11.0\n").returncode
+__________ test_frontend_out_of_range_offset_returns_to_a_valid_page ___________
+tests/test_persons_fixes.py:241: in test_frontend_out_of_range_offset_returns_to_a_valid_page
+    run_node(r"""
+tests/test_persons_fixes.py:211: in run_node
+    assert result.returncode == 0, result.stderr
+E   AssertionError: node:internal/modules/cjs/loader:1423
+E       throw err;
+E       ^
+E     
+E     Error: Cannot find module './app/static/persons.js'
+E     Require stack:
+E     - /private/tmp/lw-integration-20261111/[eval]
+E         at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+E         at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+E         at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+E         at Module._load (node:internal/modules/cjs/loader:1226:37)
+E         at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+E         at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+E         at Module.require (node:internal/modules/cjs/loader:1503:12)
+E         at require (node:internal/modules/helpers:152:16)
+E         at [eval]:6:1
+E         at runScriptInThisContext (node:internal/vm:219:10) {
+E       code: 'MODULE_NOT_FOUND',
+E       requireStack: [ '/private/tmp/lw-integration-20261111/[eval]' ]
+E     }
+E     
+E     Node.js v24.11.0
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node', '-e', '\nconst assert =...code: 'MODULE_NOT_FOUND',\n  requireStack: [ '/private/tmp/lw-integration-20261111/[eval]' ]\n}\n\nNode.js v24.11.0\n").returncode
+___ test_frontend_archived_edit_url_has_no_submittable_form_and_type_wording ___
+tests/test_persons_fixes.py:254: in test_frontend_archived_edit_url_has_no_submittable_form_and_type_wording
+    run_node(r"""
+tests/test_persons_fixes.py:211: in run_node
+    assert result.returncode == 0, result.stderr
+E   AssertionError: node:internal/modules/cjs/loader:1423
+E       throw err;
+E       ^
+E     
+E     Error: Cannot find module './app/static/persons.js'
+E     Require stack:
+E     - /private/tmp/lw-integration-20261111/[eval]
+E         at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+E         at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+E         at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+E         at Module._load (node:internal/modules/cjs/loader:1226:37)
+E         at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+E         at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+E         at Module.require (node:internal/modules/cjs/loader:1503:12)
+E         at require (node:internal/modules/helpers:152:16)
+E         at [eval]:6:1
+E         at runScriptInThisContext (node:internal/vm:219:10) {
+E       code: 'MODULE_NOT_FOUND',
+E       requireStack: [ '/private/tmp/lw-integration-20261111/[eval]' ]
+E     }
+E     
+E     Node.js v24.11.0
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/private/tmp/lw-integration-node/node-v24.11.0-darwin-arm64/bin/node', '-e', '\nconst assert =...code: 'MODULE_NOT_FOUND',\n  requireStack: [ '/private/tmp/lw-integration-20261111/[eval]' ]\n}\n\nNode.js v24.11.0\n").returncode
+=========================== short test summary info ============================
+SKIPPED [1] tests/product/test_google_transition_pg.py:94: requires dedicated local Google transition PG18 fixture
+SKIPPED [2] tests/product/test_google_transition_pg.py:110: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:121: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:133: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:140: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:150: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:159: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:168: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:179: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/test_alpha_deployment_contract.py:35: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_alpha_prebuilt_login.py:113: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_model_eval_platform.py:35: Native unsupported-platform rejection only; POSIX storage success is tested separately
+SKIPPED [6] tests/test_model_eval_platform.py:48: Native unsupported-platform rejection only; POSIX CLI storage success is tested separately
+SKIPPED [1] tests/test_postgres_integration.py:34: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [4] tests/test_postgres_integration.py:119: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:134: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:153: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [2] tests/test_postgres_integration.py:171: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:198: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:216: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
+FAILED tests/test_persons_fixes.py::test_frontend_pages_50_50_1_and_links_keep_filters
+FAILED tests/test_persons_fixes.py::test_frontend_out_of_range_offset_returns_to_a_valid_page
+FAILED tests/test_persons_fixes.py::test_frontend_archived_edit_url_has_no_submittable_form_and_type_wording
+3 failed, 712 passed, 34 skipped in 30.98s

@@ -1,0 +1,14 @@
+{
+  "product_commit": "a0bd5985d50881d0123db358e6ec2b88a5a940fb",
+  "entry": "http://127.0.0.1:8198",
+  "normal_ui_password_login": "PASS",
+  "existing_account_reused": true,
+  "same_owner_fingerprint": "c82e65a7b794adc9",
+  "photo_two_actions": true,
+  "person_search_rows": true,
+  "business_state_unchanged": true,
+  "csrf_additional_probe": "NOT RUN; invalid diagnostic payload, no further PUT; covered separately by API suite",
+  "javascript_errors": [],
+  "real_google": "NOT RUN",
+  "gcp_modified": false
+}

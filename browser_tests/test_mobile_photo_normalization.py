@@ -30,6 +30,7 @@ def test_large_camera_photo_is_optimized_before_upload(page,width,tmp_path):
         with Image.open(BytesIO(payload)) as image:assert max(image.size)<=2400
         uploads.append(len(payload));route.fulfill(json={'text':'手機相片合成辨識候選','applied':False,'server_retention':'none','source':{'kind':'image','mime':'image/jpeg','size':len(payload),'sha256':'a'*64}})
     page.route('**/api/media/recognize',recognition)
+    if page.get_by_role('tab',name='拍照／影像',exact=True).count():page.get_by_role('tab',name='拍照／影像',exact=True).click()
     page.locator('[data-media-file="camera"]').set_input_files(str(photo))
     expect(page.locator('.media-item h3')).to_contain_text(photo.name,timeout=15000)
     page.get_by_role('button',name='上傳並辨識文字',exact=True).click();expect(page.get_by_label('校對文字')).to_have_value('手機相片合成辨識候選')

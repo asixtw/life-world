@@ -1,0 +1,1638 @@
+{
+  "structure_equal": true,
+  "fingerprints_sha256": {
+    "alpha": "0e3d04411e843b509e120d9e4dd073f304c03f39317cc57958b4c6b78a0f2e8e",
+    "e2e": "0e3d04411e843b509e120d9e4dd073f304c03f39317cc57958b4c6b78a0f2e8e"
+  },
+  "structure_diff": {
+    "columns": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "constraints": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "functions": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "indexes": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "policies": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "relations": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "triggers": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    },
+    "views": {
+      "equal": true,
+      "only_alpha": [],
+      "only_e2e": []
+    }
+  },
+  "runtime_table_privileges_equal": true,
+  "runtime_table_privileges": {
+    "alpha": {
+      "actions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "ai_generations": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "auth_rate_buckets": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "completions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "contributions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "data_consents": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "draft_stories": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": true
+      },
+      "drafts": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "evidence": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "experience_mentions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": true
+      },
+      "experience_participants": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "experience_stories": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "experiences": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "external_identities": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "fact_sources": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "goal_reviews": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "goals": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "guest_abandonments": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "habit_quantity_versions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "interaction_events": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": true
+      },
+      "interaction_experiences": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "interaction_people": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "note_sources": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "notes": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "pending_contributions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "people": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "person_connection_experience_sources": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "person_connections": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "person_facts": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "person_goals": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "requests": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "reward_ledger": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "schema_migrations": {
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      "session_turns": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "sessions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "story_history": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "subject_experience_people": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "subject_experiences": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "tasks": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "users": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "work_versions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "works": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      }
+    },
+    "e2e": {
+      "actions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "ai_generations": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "auth_rate_buckets": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "completions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "contributions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "data_consents": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "draft_stories": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": true
+      },
+      "drafts": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "evidence": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "experience_mentions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": true
+      },
+      "experience_participants": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "experience_stories": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "experiences": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "external_identities": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "fact_sources": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "goal_reviews": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "goals": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "guest_abandonments": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "habit_quantity_versions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "interaction_events": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": true
+      },
+      "interaction_experiences": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "interaction_people": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "note_sources": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "notes": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "pending_contributions": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "people": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "person_connection_experience_sources": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "person_connections": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "person_facts": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "person_goals": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "requests": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "reward_ledger": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "schema_migrations": {
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      "session_turns": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "sessions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "story_history": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "subject_experience_people": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": true
+      },
+      "subject_experiences": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "tasks": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "users": {
+        "select": true,
+        "insert": true,
+        "update": true,
+        "delete": false
+      },
+      "work_versions": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      },
+      "works": {
+        "select": true,
+        "insert": true,
+        "update": false,
+        "delete": false
+      }
+    }
+  },
+  "metadata_diff": {
+    "database_metadata": {
+      "equal": false,
+      "alpha": {
+        "acl": "{lw_alpha_owner=CTc/lw_alpha_owner,lw_migration_role=C/lw_alpha_owner,lw_alpha_app_role=c/lw_alpha_owner,postgres=c/lw_alpha_owner}",
+        "owner": "lw_alpha_owner",
+        "marker": "LIFEWORLD_PUBLIC_ALPHA_GCP144_V1"
+      },
+      "e2e": {
+        "acl": "{lw_e2e_owner=CTc/lw_e2e_owner,lw_e2e_app=c/lw_e2e_owner,lw_migrator=c/lw_e2e_owner}",
+        "owner": "lw_e2e_owner",
+        "marker": "LIFEWORLD_E2E_SYNTHETIC_ONLY_v1"
+      }
+    },
+    "schema_metadata": {
+      "equal": false,
+      "alpha": {
+        "acl": "{lw_alpha_owner=UC/lw_alpha_owner,lw_alpha_app_role=U/lw_alpha_owner,postgres=U/lw_alpha_owner,lw_migrator=U/lw_alpha_owner}",
+        "owner": "lw_alpha_owner"
+      },
+      "e2e": {
+        "acl": "{lw_e2e_owner=UC/lw_e2e_owner,lw_e2e_app=U/lw_e2e_owner,lw_migrator=U/lw_e2e_owner}",
+        "owner": "lw_e2e_owner"
+      }
+    },
+    "migration_receipts": {
+      "equal": false,
+      "alpha": "<row xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <version>010_alpha_unification.sql</version>\n</row>\n\n<row xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <version>product_pg_007_sha256:e96ff6a81b4d6dcd5a25a16650369c7173746e3d69ce6dfd5c29284eb160d390</version>\n</row>\n\n<row xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <version>product_pg_008_sha256:88cb73a8ed8ec2c8eb72417ac843d6f72d250faacdcdaf8b060a17d86a3a23af</version>\n</row>\n\n<row xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <version>product_pg_core_sha256:4521c963084dedfeb250d95945f8258dccf677e8db8cb7272cfa7251381a7492</version>\n</row>\n\n<row xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <version>public_pg_006_sha256:a0115bf9d8b84b9c71145dc5ae315060979d98a64ea52b3d2270b62777aaac4e</version>\n</row>\n\n",
+      "e2e": "<row xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <version>010_alpha_unification.sql</version>\n</row>\n\n"
+    },
+    "relation_acl": {
+      "equal": false,
+      "alpha": [
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "actions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "ai_generations",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "auth_rate_buckets",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "completions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "contributions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "data_consents",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arwd/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "draft_stories",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "drafts",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "evidence",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arwd/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "experience_mentions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ard/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "experience_participants",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "experience_stories",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "experiences",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=r/lw_alpha_owner}",
+          "name": "external_identities",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "fact_sources",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "goal_reviews",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=rwU/lw_alpha_owner,postgres=r/lw_alpha_owner,cloudsqlimportexport=r/lw_alpha_owner}",
+          "name": "goal_reviews_audit_seq_seq",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "goals",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=r/lw_alpha_owner}",
+          "name": "guest_abandonments",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "habit_quantity_versions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arwd/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "interaction_events",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "interaction_experiences",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ard/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "interaction_people",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "note_sources",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "notes",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "pending_contributions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "people",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ard/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "person_connection_experience_sources",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "person_connections",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "person_facts",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "person_goals",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "requests",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "reward_ledger",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "schema_migrations",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "session_turns",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ard/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "sessions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "story_history",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=rwU/lw_alpha_owner,postgres=r/lw_alpha_owner,cloudsqlimportexport=r/lw_alpha_owner}",
+          "name": "story_history_audit_seq_seq",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ard/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "subject_experience_people",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "subject_experiences",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "tasks",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=arw/lw_alpha_owner,postgres=r/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner}",
+          "name": "users",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "work_versions",
+          "owner": "lw_alpha_owner"
+        },
+        {
+          "acl": "{lw_alpha_owner=arwdDxtm/lw_alpha_owner,lw_alpha_app_role=ar/lw_alpha_owner,lw_migrator=rd/lw_alpha_owner,postgres=r/lw_alpha_owner}",
+          "name": "works",
+          "owner": "lw_alpha_owner"
+        }
+      ],
+      "e2e": [
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "actions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner}",
+          "name": "ai_generations",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner}",
+          "name": "auth_rate_buckets",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "completions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "contributions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner}",
+          "name": "data_consents",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arwd/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "draft_stories",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "drafts",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "evidence",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arwd/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "experience_mentions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ard/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "experience_participants",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "experience_stories",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "experiences",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=r/lw_e2e_owner}",
+          "name": "external_identities",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "fact_sources",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "goal_reviews",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=rwU/lw_e2e_owner}",
+          "name": "goal_reviews_audit_seq_seq",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "goals",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=r/lw_e2e_owner}",
+          "name": "guest_abandonments",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "habit_quantity_versions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arwd/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "interaction_events",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "interaction_experiences",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ard/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "interaction_people",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "note_sources",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "notes",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "pending_contributions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "people",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ard/lw_e2e_owner}",
+          "name": "person_connection_experience_sources",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "person_connections",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "person_facts",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "person_goals",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "requests",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "reward_ledger",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner}",
+          "name": "schema_migrations",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner}",
+          "name": "session_turns",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ard/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "sessions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "story_history",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=rwU/lw_e2e_owner}",
+          "name": "story_history_audit_seq_seq",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ard/lw_e2e_owner}",
+          "name": "subject_experience_people",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner}",
+          "name": "subject_experiences",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "tasks",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=arw/lw_e2e_owner,lw_migrator=rd/lw_e2e_owner}",
+          "name": "users",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner}",
+          "name": "work_versions",
+          "owner": "lw_e2e_owner"
+        },
+        {
+          "acl": "{lw_e2e_owner=arwdDxtm/lw_e2e_owner,lw_e2e_app=ar/lw_e2e_owner}",
+          "name": "works",
+          "owner": "lw_e2e_owner"
+        }
+      ]
+    },
+    "column_acl": {
+      "equal": false,
+      "alpha": [
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "data_consents",
+          "column": "revoked_at"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_alpha_owner}",
+          "table": "guest_abandonments",
+          "column": "attempts"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_alpha_owner}",
+          "table": "guest_abandonments",
+          "column": "completed_at"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_alpha_owner}",
+          "table": "guest_abandonments",
+          "column": "last_error_code"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_alpha_owner}",
+          "table": "guest_abandonments",
+          "column": "media_attempts"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_alpha_owner}",
+          "table": "guest_abandonments",
+          "column": "media_state"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_alpha_owner}",
+          "table": "guest_abandonments",
+          "column": "status"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "occurred_at"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "occurred_label"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "occurred_precision"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "raw_text"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "revision"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "status"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "summary"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "title"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "subject_experiences",
+          "column": "updated_at"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "works",
+          "column": "current_version"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "works",
+          "column": "revision"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "works",
+          "column": "status"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "works",
+          "column": "title"
+        },
+        {
+          "acl": "{lw_alpha_app_role=w/lw_alpha_owner}",
+          "table": "works",
+          "column": "updated_at"
+        }
+      ],
+      "e2e": [
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "data_consents",
+          "column": "revoked_at"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_e2e_owner}",
+          "table": "guest_abandonments",
+          "column": "attempts"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_e2e_owner}",
+          "table": "guest_abandonments",
+          "column": "completed_at"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_e2e_owner}",
+          "table": "guest_abandonments",
+          "column": "last_error_code"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_e2e_owner}",
+          "table": "guest_abandonments",
+          "column": "media_attempts"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_e2e_owner}",
+          "table": "guest_abandonments",
+          "column": "media_state"
+        },
+        {
+          "acl": "{lw_migrator=w/lw_e2e_owner}",
+          "table": "guest_abandonments",
+          "column": "status"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "occurred_at"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "occurred_label"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "occurred_precision"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "raw_text"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "revision"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "status"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "summary"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "title"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "subject_experiences",
+          "column": "updated_at"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "works",
+          "column": "current_version"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "works",
+          "column": "revision"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "works",
+          "column": "status"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "works",
+          "column": "title"
+        },
+        {
+          "acl": "{lw_e2e_app=w/lw_e2e_owner}",
+          "table": "works",
+          "column": "updated_at"
+        }
+      ]
+    },
+    "roles": {
+      "equal": true,
+      "alpha": [
+        {
+          "name": "lw_alpha_app",
+          "login": true,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_alpha_app_role",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_alpha_owner",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_app",
+          "login": true,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_app_role",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_e2e_app",
+          "login": true,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_e2e_login",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_e2e_owner",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_migration_role",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_migrator",
+          "login": true,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_product_staging_app",
+          "login": true,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_product_staging_migrator",
+          "login": false,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_product_staging_owner",
+          "login": false,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        }
+      ],
+      "e2e": [
+        {
+          "name": "lw_alpha_app",
+          "login": true,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_alpha_app_role",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_alpha_owner",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_app",
+          "login": true,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_app_role",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_e2e_app",
+          "login": true,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_e2e_login",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_e2e_owner",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_migration_role",
+          "login": false,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_migrator",
+          "login": true,
+          "inherit": true,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_product_staging_app",
+          "login": true,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_product_staging_migrator",
+          "login": false,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        },
+        {
+          "name": "lw_product_staging_owner",
+          "login": false,
+          "inherit": false,
+          "createdb": false,
+          "bypassrls": false,
+          "superuser": false,
+          "createrole": false,
+          "replication": false
+        }
+      ]
+    },
+    "memberships": {
+      "equal": true,
+      "alpha": [
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_alpha_app",
+          "parent": "lw_alpha_app_role",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "postgres",
+          "parent": "lw_alpha_owner",
+          "inherit": false
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_app",
+          "parent": "lw_app_role",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "postgres",
+          "parent": "lw_e2e_owner",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_migrator",
+          "parent": "lw_migration_role",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "postgres",
+          "parent": "lw_product_staging_migrator",
+          "inherit": false
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_product_staging_migrator",
+          "parent": "lw_product_staging_owner",
+          "inherit": false
+        }
+      ],
+      "e2e": [
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_alpha_app",
+          "parent": "lw_alpha_app_role",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "postgres",
+          "parent": "lw_alpha_owner",
+          "inherit": false
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_app",
+          "parent": "lw_app_role",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "postgres",
+          "parent": "lw_e2e_owner",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_migrator",
+          "parent": "lw_migration_role",
+          "inherit": true
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "postgres",
+          "parent": "lw_product_staging_migrator",
+          "inherit": false
+        },
+        {
+          "set": true,
+          "admin": false,
+          "member": "lw_product_staging_migrator",
+          "parent": "lw_product_staging_owner",
+          "inherit": false
+        }
+      ]
+    },
+    "default_acl": {
+      "equal": true,
+      "alpha": [],
+      "e2e": []
+    }
+  },
+  "not_proven": [
+    "sequence properties/effective privileges not included in original query",
+    "DB network/CLI reachability",
+    "migration execution/restore",
+    "application read/write compatibility"
+  ]
+}

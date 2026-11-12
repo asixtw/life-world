@@ -17,6 +17,7 @@ def flag(name, default=False):
 
 @dataclass(frozen=True)
 class RuntimeSettings:
+    relation_source_store: str = ''  # 010驗收後才可對PG設link_table；空值沿用舊模式。
     backend: str = 'sqlite'
     connection_mode: str = 'tcp'
     db_host: str = '127.0.0.1'
@@ -61,6 +62,8 @@ class RuntimeSettings:
         return bool(self.test_login_usernames) or (self.alpha_login_enabled if self.access_mode=='public_alpha' else self.password_login_enabled)
 
     def __post_init__(self):
+        if self.relation_source_store not in ('','legacy_jsonb','link_table'):
+            raise ValueError('Unknown relation source store')
         if self.public_gate_closed and (self.business_enabled or self.google_client_id or self.test_login_usernames):
             raise ValueError('Closed public gate cannot enable business or authentication')
         if any(not re.fullmatch(r"[a-z0-9_]{3,30}",x) for x in self.test_login_usernames):
@@ -152,7 +155,7 @@ class RuntimeSettings:
         port = int(os.environ.get('LIFEWORLD_DB_PORT', '5432'))
         if not 1 <= size <= 32 or not 1 <= port <= 65535:
             raise ValueError('Invalid PostgreSQL pool/port configuration')
-        return cls(backend=backend, connection_mode=mode,
+        return cls(backend=backend, connection_mode=mode, relation_source_store=os.environ.get('LIFEWORLD_RELATION_SOURCE_STORE',''),
                    db_host=os.environ.get('LIFEWORLD_DB_HOST', '127.0.0.1'), db_port=port,
                    pg_tls=os.environ.get('LIFEWORLD_PG_TLS', 'auto'),
                    db_name=os.environ.get('LIFEWORLD_DB_NAME', 'life_world_dev'), db_schema=schema,

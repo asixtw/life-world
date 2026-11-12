@@ -78,6 +78,8 @@ def test_story_editor_draft_correction_withdrawal_and_restore(page):  # 邊界�
     people, receipts = seed_stories(page)  # 使用既有人物與真實來源
     page.goto(BASE + '/#record')  # 新經歷沿用既有表單
     page.locator('#raw-text').fill('🌱今天與小安散步，提到怡君。')  # 包含 emoji 的原文
+    page.get_by_role('button', name='下一步', exact=True).click()
+    page.get_by_role('button', name='下一步', exact=True).click()
     page.locator('#include-story').check()  # 明確選擇整理故事人物
     page.locator('[name=story_participant][value="' + people[0]['id'] + '"]').check()  # 選參與者
     page.locator('[name=story_interacted][value="' + people[0]['id'] + '"]').check()  # 分開確認直接互動
@@ -85,7 +87,10 @@ def test_story_editor_draft_correction_withdrawal_and_restore(page):  # 邊界�
     page.get_by_role('button', name='新增提及', exact=True).click()  # 保留尚未配對的原名
     page.locator('[name=mention_name]').fill('怡君')  # 指定原文出現名字
     page.locator('[name=mention_name]').blur()  # 產生可選原文位置
-    page.get_by_role('button', name='保存草稿並進入核對').click()  # 草稿需真的保存
+    if page.locator('[data-experience-next]').is_visible():
+        page.get_by_role('button', name='下一步', exact=True).click()
+        page.get_by_role('button', name='下一步', exact=True).click()
+    page.get_by_role('button', name='檢視並確認 →', exact=True).click()  # 草稿需真的保存
     expect(page.locator('#story-title')).to_have_value('午後散步')  # 候選資料可回讀
     page.locator('#story-reviewed').check()  # 角色需明確審閱後才入正式探索
     page.get_by_role('button', name='我已核對，確認保存', exact=True).click()  # 原子保存原文與角色
@@ -107,12 +112,18 @@ def test_review_edits_survive_return_and_slow_source_failure(page):  # 體驗：
     people, receipts = seed_stories(page)  # 建立來源與帳號
     page.goto(BASE + '/#record')  # 新增原文
     page.locator('#raw-text').fill('核對返回測試原文。')  # 保存待確認內容
-    page.get_by_role('button', name='保存草稿並進入核對').click()  # 進入人工核對
+    if page.locator('[data-experience-next]').is_visible():
+        page.get_by_role('button', name='下一步', exact=True).click()
+        page.get_by_role('button', name='下一步', exact=True).click()
+    page.get_by_role('button', name='檢視並確認 →', exact=True).click()  # 進入人工核對
     page.locator('#summary').fill('我改過的摘要')  # 人工修改不能因返回丟失
     page.locator('#followups').fill('我留下的下一步')  # 任務也應保存暫存
     page.get_by_role('button', name='返回修改原始草稿', exact=True).click()  # 允許回頭檢查原始文字
     expect(page.locator('#raw-text')).to_have_value('核對返回測試原文。')  # 原文仍在
-    page.get_by_role('button', name='保存草稿並進入核對').click()  # 回到核對
+    if page.locator('[data-experience-next]').is_visible():
+        page.get_by_role('button', name='下一步', exact=True).click()
+        page.get_by_role('button', name='下一步', exact=True).click()
+    page.get_by_role('button', name='檢視並確認 →', exact=True).click()  # 回到核對
     expect(page.locator('#summary')).to_have_value('我改過的摘要')  # 不允許重設成人工修改前內容
     expect(page.locator('#followups')).to_have_value('我留下的下一步')  # 下一步不應被清空
     page.locator('#nav').get_by_role('link', name='關係', exact=True).click()  # 測試未保存導覽保護

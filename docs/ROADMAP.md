@@ -6,6 +6,10 @@
 
 同日最新協作基準：三人、沒有專職前端；[協作入口](team/README.md)與[看板](team/TASK_BOARD.md)已建立。React＋TypeScript、保留 Python／FastAPI、PostgreSQL、前後端皆 GCP 是暫定目標；當前仍為 SQLite／原生前端。早前協作文件交付只建立文件與來源快照；其後單一目標已另行實作，React／PG／部署仍未完成。
 
+目前整合候選與未完成Gate以[PR26整合報告](integration/2026-11-11/INTEGRATION_RELEASE_REPORT.md)為準：基本資料閉環已在本機受限PG18驗證並轉QA；UX人工核准、Feature Store來源失效審查、GuestPurger FK審查及GCP E2E仍待完成；Jerry進階劇場/人物作品/完整角色創作未核准，不列已承諾下一版。AI單一選用/可撤回授權已在本機驗證，未發布。保持Draft，不自行Merge或發布。
+
+資料製作者與Hidden AI的[v1.1只讀契約盤點](integration/2026-11-12_DATA_CONTRACT_AUDIT/README.md)已交付；模板未成完整世界，來源/授權/語意衝突與未核准API隔離仍屬QA阻擋，不藉資料包擴充產品。
+
 ## 產品規則
 
 1. 確認正式貢獻單位、部分完成粒度、歷史更正及撤銷規則；目前支援使用者輸入正數，最多六位小數。
@@ -32,3 +36,20 @@ GCP 暫定分工為 Cloud Run Web 同源前端／API、Cloud SQL PostgreSQL、�
 ## 每次接續作業
 
 先列需求與正常／異常／邊界、確認架構與必要介面，再寫 pytest 並確認有效紅燈；之後實作、修正、重跑及必要回歸，將真實命令、結果與限制記入 `ACCEPTANCE.md`，功能變化更新 `EVOLUTION.md`。不偷偷降低需求或測試標準；無法執行就明說。新增／修改程式與測試採關鍵邏輯中文註解，說明用途與設計原因、保留有價值的既有註解，不為刪註解擴大 Diff，涉及前端補流程與畫面驗收，細節依[八點開發紀律](PRODUCT_GUIDE.md)。純文件工作檢查內容、連結及差異，不額外建立無產品用途的程式。
+
+## 2026-11-10 經歷四步／人物關聯候選
+
+- 實作：四步文字流程、同 Owner 人物選項複用、交會角色過濾、確認交易內建立待新增人物。
+- 本機驗收與限制：[交付入口](experience/2026-11-10/README.md)。Draft PR／人工審查階段，不代表正式 Alpha 或真模型驗收。
+- PR #22 獨立；背景 AI／特徵演算法、伺服器草稿刪除、正式發布不納入本批。
+
+## 2026-11-10｜PR24 UX 設計關卡
+
+- 狀態：UX v0.3 Candidate／Changes Requested／NOT APPROVED。
+- 本輪只有[獨立互動設計與審查素材](experience/ux-v03-candidate/README.md)，沒有修改產品 app／API。
+- 合併前新增：人物變更與來源預覽、草稿安全刪除、第三步簡化、第四步摘要化、多人定向一致性；PR22第三步同Owner升級後局部解鎖並保留輸入，取消／失敗維持Guest。
+- Owner 回覆「UX v0.3 核准」後才進入資料契約與產品串接；真 Google／Alpha 聯合驗收仍 NOT RUN。
+
+### UX v0.3 Candidate R2｜方向同意，整體待核准
+
+依Owner審查修正A-01～A-04與AI單一選擇：抽屜固定操作、能力分區、來源重核對、手機專注模式、首次範圍授權。設計測試56通過，R2新圖99張；R1原圖保留。產品app／API沒有變更，Gate B/C保持未完成。入口：[R2審核封面](experience/ux-v03-candidate/REVIEW_COVER.md)。

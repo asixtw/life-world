@@ -4,16 +4,30 @@ from uuid import uuid4
 from fastapi import Request
 from pydantic import BaseModel,ConfigDict,Field,field_validator
 from .ai_runtime import AIRuntime
+from .ai_draft_consent import DraftAIConsent
 from .errors import require
 
 class ConfirmedInput(BaseModel):
     model_config=ConfigDict(extra='forbid',strict=True)
+    request_id:str|None=Field(default=None,min_length=1,max_length=128,pattern=r'^[A-Za-z0-9_.:-]+$')
     consent:Literal[True]
     @field_validator('consent',mode='before')
     @classmethod
     def explicit_consent(cls,value):
         if value is not True:raise ValueError('請明確同意傳送所選來源給模型')
         return value
+
+class DraftConsentGrant(BaseModel):
+    model_config=ConfigDict(extra='forbid',strict=True)
+    request_id:str=Field(min_length=1,max_length=128,pattern=r'^[A-Za-z0-9_.:-]+$')
+    policy_fingerprint:str=Field(pattern=r'^[0-9a-f]{64}$')
+    confirmed:Literal[True]
+    @field_validator('confirmed',mode='before')
+    @classmethod
+    def explicit_confirmation(cls,value):
+        if value is not True:raise ValueError('請明確同意所列提供者與草稿範圍')
+        return value
+
 
 class DialogueTurn(BaseModel):
     """歷史只接受有限對話內容，不能注入system角色或任意技術欄位。"""
@@ -47,6 +61,7 @@ class TasksConfirm(BaseModel):
 def install(app):
     """不啟用 Provider、不讀 key；只有 backend 環境批准才組裝真實 Adapter。"""
     service=app.state.service;app.state.ai_runtime=AIRuntime(service)
+    app.state.draft_ai_consent=DraftAIConsent(service,lambda:app.state.ai_runtime)
     def owner(request):
         return service.session(request.cookies.get('lw_session'),request.headers.get('X-CSRF-Token'),True)[0]['id']
     def experience(who,experience_id):
@@ -56,6 +71,19 @@ def install(app):
             require(row is not None,404,'not_found','找不到可存取的經歷。')
             return dict(row)
 
+    @app.get('/api/ai/draft-consent',tags=['AI drafts'])
+    def draft_consent(request:Request):
+        who=service.session(request.cookies.get('lw_session'))[0]['id']
+        return app.state.draft_ai_consent.metadata(who)
+
+    @app.post('/api/ai/draft-consent',tags=['AI drafts'])
+    def grant_draft_consent(request:Request,data:DraftConsentGrant):
+        return app.state.draft_ai_consent.grant(owner(request),data)
+
+    @app.delete('/api/ai/draft-consent',tags=['AI drafts'])
+    def revoke_draft_consent(request:Request):
+        return app.state.draft_ai_consent.revoke(owner(request))
+
     @app.get('/api/ai/usage',tags=['AI drafts'])
     def ai_usage(request:Request):
         who=service.session(request.cookies.get('lw_session'))[0]['id']
@@ -64,7 +92,7 @@ def install(app):
     @app.post('/api/experiences/{experience_id}/task-suggestions',tags=['AI drafts'])
     def task_suggestions(experience_id:str,request:Request,data:ConfirmedInput):
         who=owner(request);source=experience(who,experience_id)
-        return app.state.ai_runtime.generate(who,'tasks',{'confirmed_experience':source})
+        return app.state.ai_runtime.generate(who,'tasks',{'confirmed_experience':source},request_id=data.request_id)
 
     @app.post('/api/experiences/{experience_id}/tasks',status_code=201,tags=['AI drafts'])
     def confirm_tasks(experience_id:str,request:Request,data:TasksConfirm):
@@ -85,16 +113,5 @@ def install(app):
     @app.post('/api/people/{person_id}/simulation',tags=['AI drafts'])
     def simulation(person_id:str,request:Request,data:SimulationInput):
         who=owner(request);app.state.ai_runtime.authorize(who)
-        overview=service.person_overview(who,person_id)
-        available={fact['id']:fact for group in overview['facts'].values() for fact in group if fact['status']=='confirmed' and fact['sources']}
-        require(all(f in available for f in data.fact_ids),422,'confirmed_sources_required','只可使用本人已確認且仍有來源的人物資訊。')
-        facts=[{'fact_id':f,'value':available[f]['value'],'source_experience_ids':[s['id'] for s in available[f]['sources']]} for f in dict.fromkeys(data.fact_ids)]
-        from .relationship_engine import build_context
-        source_ids=sorted({ref for fact in facts for ref in fact['source_experience_ids']})
-        # 來源摘要必須再次限定Owner，內部提示每次重算，撤回／刪除即不沿用。
-        with service.db.connect() as db:
-            records=[dict(row) for ref in source_ids for row in db.execute('SELECT id,summary,occurred_at FROM experiences WHERE id=? AND owner_id=?',(ref,who)).fetchall()]
-        context=build_context(facts,records,data.message,service.now().isoformat())
-        result=app.state.ai_runtime.generate(who,'simulation',{'person_id':person_id,'confirmed_facts':facts,'internal_context':context,'behavior':context['behavior'],'history':[turn.model_dump() for turn in data.history],'message':data.message})
-        # 一般人物卡／對話UI不暴露內部雙端標籤；只回可解釋的來源與有限行為。
-        return {**result,'simulation':True,'behavior':context['behavior'],'behavior_source':'rules','source_experience_ids':source_ids,'uncertainty':'simulation_not_prediction','notice':result['notice']+' 私人模擬，不是對真人反應的預測；不寫入人物事實。'}
+        # 發布範圍未核准人物角色演出，必須在讀取來源及模型外呼之前後端封鎖。
+        require(False,422,'simulation_not_released','人物 AI 模擬尚未開放；私人筆記仍可使用。')

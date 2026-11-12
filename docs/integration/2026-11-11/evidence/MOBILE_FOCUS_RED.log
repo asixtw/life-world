@@ -1,0 +1,26 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_mobile_record_focus_has_explicit_exit_and_restores_navigation[320] ____
+browser_tests/test_integration_person_details.py:226: in test_mobile_record_focus_has_explicit_exit_and_restores_navigation
+    expect(page.locator('#nav')).not_to_be_visible()
+E   AssertionError: Locator expected not to be visible
+E   Actual value: visible 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for locator("#nav")
+E       14 × locator resolved to <nav id="nav" aria-label="主要導覽">…</nav>
+E          - unexpected value "visible"
+___ test_mobile_record_focus_has_explicit_exit_and_restores_navigation[390] ____
+browser_tests/test_integration_person_details.py:226: in test_mobile_record_focus_has_explicit_exit_and_restores_navigation
+    expect(page.locator('#nav')).not_to_be_visible()
+E   AssertionError: Locator expected not to be visible
+E   Actual value: visible 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for locator("#nav")
+E       14 × locator resolved to <nav id="nav" aria-label="主要導覽">…</nav>
+E          - unexpected value "visible"
+=========================== short test summary info ============================
+FAILED browser_tests/test_integration_person_details.py::test_mobile_record_focus_has_explicit_exit_and_restores_navigation[320]
+FAILED browser_tests/test_integration_person_details.py::test_mobile_record_focus_has_explicit_exit_and_restores_navigation[390]
+2 failed, 14 deselected in 11.19s

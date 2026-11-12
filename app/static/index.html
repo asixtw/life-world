@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 以裝置寬度呈現手機與桌面版面 -->
   <link rel="icon" type="image/png" href="/static/art/app-icon.png">
   <script src="/static/art.js" defer></script>
-  <meta name="theme-color" content="#edf3e9"> <!-- 設定瀏覽器工具列的品牌背景色 -->
+  <meta name="theme-color" content="#fffdf8"> <!-- 柔和暖白與正式頁面背景一致。 -->
   <title>Life World · 把每一步，種成自己的世界</title> <!-- 設定瀏覽器分頁標題 -->
   <link rel="stylesheet" href="/static/styles.css"> <!-- 載入共用或人物流程樣式 -->
   <link rel="stylesheet" href="/static/relationships.css"> <!-- 載入共用或人物流程樣式 -->
   <link rel="stylesheet" href="/static/connections.css"> <!-- 載入故事探索與底部來源抽屜樣式 -->
   <link rel="stylesheet" href="/static/goals.css"> <!-- 載入單一挑戰與日期編輯樣式。 -->
+  <script src="/static/person_details.js" defer></script>
+  <script src="/static/persons.js" defer></script>
   <script src="/static/relationships.js" defer></script> <!-- 延後執行，先載入人物模組再啟動 App -->
   <script src="/static/connections.js" defer></script> <!-- 在主程式前載入交會模組 -->
   <script src="/static/schedule-model.js" defer></script>
@@ -24,8 +26,18 @@
   <script src="/static/birth.js" defer></script>
   <link rel="stylesheet" href="/static/art.css">
   <script src="/static/audio.js" defer></script>
+  <script src="/static/drafts.js" defer></script>
+  <script src="/static/experience_people.js" defer></script>
+  <script src="/static/experience_basic.js" defer></script>
+  <script src="/static/experience_supplements.js" defer></script>
+  <script src="/static/draft_ai.js" defer></script>
+  <script src="/static/experience_validation.js" defer></script>
+  <script src="/static/experience_quantity.js" defer></script>
+  <script src="/static/experience_moment.js" defer></script>
+  <script src="/static/experience.js" defer></script>
   <script src="/static/app.js" defer></script> <!-- 先載入各模組再啟動 App。 -->
   <link rel="stylesheet" href="/static/birth.css">
+  <link rel="stylesheet" href="/static/softlife.css"> <!-- 僅接入視覺主題，保留 PR26 的路由、表單及資料行為。 -->
 </head> <!-- 結束此頁面結構區塊 -->
 <body> <!-- 建立頁面結構容器 -->
   <div class="app-shell"> <!-- 包住桌面側欄與主內容的應用程式外殼 -->
@@ -44,6 +56,7 @@
   </div> <!-- 結束此頁面結構區塊 -->
   <dialog id="account-dialog" aria-labelledby="account-heading"><div id="account-content"></div><button class="text-button close-dialog" data-action="close-account">關閉</button></dialog> <!-- 帳號與人物編輯共用的原生模態對話框 -->
   <dialog id="source-dialog" aria-label="查看故事來源"><button type="button" class="text-button source-close" data-cx="close-source">關閉來源</button><div id="source-content"></div><p id="source-error" role="alert"></p></dialog> <!-- 來源不覆蓋帳號表單，保留原故事位置 -->
+  <dialog id="experience-person-preview" aria-labelledby="experience-preview-title"><div class="experience-preview-shell"><div class="experience-preview-head"><h2 id="experience-preview-title" tabindex="-1"></h2><button type="button" class="text-button" data-experience-preview-close aria-label="關閉人物預覽">關閉</button></div><div class="experience-preview-body" tabindex="0" aria-label="人物預覽內容"></div><div class="experience-preview-footer"><button type="button" class="primary" data-experience-preview-close>完成檢視</button></div></div></dialog>
   <div id="toast" role="status" aria-live="polite"></div> <!-- 顯示短暫操作結果並供輔助工具朗讀 -->
 </body> <!-- 結束此頁面結構區塊 -->
 </html> <!-- 結束此頁面結構區塊 -->

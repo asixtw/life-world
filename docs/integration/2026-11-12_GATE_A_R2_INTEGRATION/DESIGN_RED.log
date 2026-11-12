@@ -1,0 +1,53 @@
+F
+=================================== FAILURES ===================================
+___________ test_moment_tabs_keep_text_media_and_time_feedback[320] ____________
+browser_tests/test_moment_integration.py:16: in test_moment_tabs_keep_text_media_and_time_feedback
+    expect(page.get_by_role('heading',name='記錄這一刻。',exact=True)).to_be_visible()
+E   AssertionError: Locator expected to be visible
+E   Actual value: - main:
+E     - text: 我的小小宇宙 ／ 記錄經歷
+E     - group: 聲音設定
+E     - button "帳號設定": 合
+E     - status
+E     - text: YOUR LITTLE UNIVERSE
+E     - heading "把這一刻，記下來。" [level=1]
+E     - paragraph: 今天的小事、昨天的努力，都值得有一個位置。
+E     - button "離開記錄"
+E     - status: 1 / 4 · 記錄經歷 → 目標活動數量 → 人物關聯 → 檢視並確認
+E     - heading "記錄經歷" [level=2]
+E     - text: 發生了什麼？
+E     - textbox "發生了什麼？":
+E       - /placeholder: 用自己的話記下真實經過…
+E     - region "紀錄素材":
+E       - heading "從不同方式留下經歷" [level=2]
+E       - paragraph: 選取素材不會自動上傳。文字須自行校對；確認前不增加進度或獎勵。
+E       - status: 已保存在此裝置；尚未同步至其他裝置。
+E       - group "新增紀錄素材":
+E         - text: 圖片
+E         - button "圖片"
+E         - text: 截圖
+E         - button "截圖"
+E         - text: 拍照
+E         - button "拍照"
+E         - text: 名片
+E         - button "名片"
+E         - text: 音檔
+E         - button "音檔"
+E       - group: 語音轉文字
+E       - paragraph: 尚未設定辨識服務，可先保留素材並手動輸入。相片原檔可至64 MiB，會先在裝置縮圖至 5.0 MiB 內再傳送；伺服器不留原圖。音訊 5.0 MiB。長音訊逐段辨識，額度不足時原素材仍保留。
+E       - paragraph: 此裝置尚無連結素材；其他裝置的素材不會自動出現在這裡。
+E     - text: 實際發生時間 · Asia/Taipei
+E     - textbox "實際發生時間 · Asia/Taipei": 2026-11-12T06:20
+E     - text: 可以補記過去的經歷。發生時間與現在的提交時間會分別保存。
+E     - button "下一步"
+E     - button "保存草稿並離開"
+E     - text: 透過現實中的努力，打造一個屬於自己的世界。 你可以暫時離開，這裡永遠歡迎你回來。
+E   - status
+E   Error: element(s) not found 
+E   Call log:
+E     - Expect "to_be_visible" with timeout 5000ms
+E     - waiting for get_by_role("heading", name="記錄這一刻。", exact=True)
+=========================== short test summary info ============================
+FAILED browser_tests/test_moment_integration.py::test_moment_tabs_keep_text_media_and_time_feedback[320]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 5.72s

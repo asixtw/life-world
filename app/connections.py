@@ -7,11 +7,18 @@ from .security import require_registered  # 正式人物整理仍受帳號門檻
 
 class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
     def _validate_story(self, c, owner, raw, story):  # 核對人物所有權與精確來源位置
-        if story.participants or story.mentions: require_registered(self._onboarded(c, owner))  # 純提及也不能繞過升級
-        for p in story.participants: self._owned(c, 'people', p.person_id, owner)  # 每位參與者都須屬於本人
+        if story.participants or story.mentions or story.pending_person or story.pending_people: require_registered(self._onboarded(c, owner))  # 純提及也不能繞過升級
+        if story.pending_person and story.pending_person.relation == 'mention':
+            p = story.pending_person
+            require(p.start is not None and raw[p.start:p.start + len(p.name)] == p.name, 422, 'invalid_source_span', '新增人物的提及位置須與原文一致。')
+        for candidate in story.pending_people:
+            if candidate.relation=='mention':
+                require(candidate.start is not None and raw[candidate.start:candidate.start+len(candidate.name)]==candidate.name,
+                        422,'invalid_source_span','待新增人物的提及位置須與原文一致。')
+        for p in story.participants: self._require_recordable_person(c, owner, p.person_id)  # 每位參與者都須屬於本人
         for m in story.mentions:  # 每處原文人名獨立核對
             require(0 <= m.start < m.end <= len(raw) and raw[m.start:m.end] == m.name, 422, 'invalid_source_span', '提及位置與原始文字不符，請重新選取。')  # Unicode 位移與原句完全一致
-            if m.person_id: self._owned(c, 'people', m.person_id, owner)  # 正式配對必須是可存取人物
+            if m.person_id: self._require_recordable_person(c, owner, m.person_id, mention=True)  # 正式配對必須是可存取人物
 
     def _store_draft_story(self, c, owner, draft_id, raw, story):  # 在原草稿交易內保存尚未確認資料
         if story is None:  # 明確不整理人物時移除草稿延伸，不影響原文
@@ -48,6 +55,10 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             self._onboarded(c, owner)  # 拒絕未完成旅程存取
             if person_id: self._owned(c, 'people', person_id, owner)  # 人物焦點也核對所屬帳號
             clauses, args = ['s.owner_id=?', 'x.owner_id=?', 's.available=TRUE', 's.reviewed=?'], [owner, owner, involvement != 'legacy']  # 未審閱來源只在管理清單
+            if involvement == 'legacy':
+                clauses.append('x.person_id IS NOT NULL')  # 舊版主要人物是待核對線索；普通日記不進交會
+            elif involvement == 'participant':
+                clauses.append('EXISTS(SELECT 1 FROM experience_participants p WHERE p.experience_id=x.id)')  # 提及與空故事不能冒充參與
             if person_id:  # 依明確關聯角色分流
                 if involvement == 'legacy': clauses.append('x.person_id=?')  # 不推測舊關聯是參與
                 elif involvement == 'mention': clauses.append("EXISTS(SELECT 1 FROM experience_mentions m WHERE m.experience_id=x.id AND m.person_id=? AND m.status='matched')")  # 未配對姓名不歸到人物
@@ -61,6 +72,7 @@ class ConnectionsMixin:  # 將故事來源與互動統計邊界集中管理
             return {'items': [self._story_detail(c, owner, r[0], involvement == 'legacy') for r in ids], 'total': total, 'limit': limit, 'offset': offset}  # 只組合當頁來源
 
     def _write_story(self, c, owner, experience_id, raw, story):  # 在同一確認／修正交易保存角色
+        require(story.pending_person is None, 422, 'pending_person_requires_confirm', '新人物只能在經歷最終確認時建立。')
         self._validate_story(c, owner, raw, story)  # 先核對全部輸入才改資料
         c.execute('DELETE FROM experience_participants WHERE experience_id=?', (experience_id,))  # 更正只影響這一份來源
         c.execute('DELETE FROM experience_mentions WHERE experience_id=?', (experience_id,))  # 舊線索 ID 失效，歷史仍保留

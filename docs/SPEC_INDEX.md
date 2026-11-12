@@ -1,5 +1,9 @@
 # 共同規格入口
 
+- [UX v0.3 Candidate 設計審核](experience/ux-v03-candidate/README.md)：NOT APPROVED，Owner 明確核准前停止產品串接；[互動 Demo](experience/ux-v03-candidate/index.html)／[合併關卡](experience/ux-v03-candidate/MERGE_GATES.md)。
+
+- [2026-11-10 經歷四步與人物關聯修復候選](experience/2026-11-10/README.md)：未合併／未部署，v0.2 UX、待新增人物交易及交會顯示邊界。
+
 > 2026-11-08 Owner最新範圍：首次公開版包含核心人物理解／劇場、美術核准接入、聲音v0.2規劃及獨立開關。先讀[公開完成矩陣](testing/PUBLIC_RELEASE_MATRIX.md)，不再沿用先凍結核心劇場的發布範圍。RC v3保留；新程式為本機候選，不能當已公開／已部署。
 
 > **2026-11-05 最新共同基準：**[Public Alpha工程交付](RELEASE_PUBLIC_ALPHA_20261105.md)。預建登入獨立開關、無自由註冊；積分保留但無兌換，優先於下方歷史敘述。工程與雲端交付狀態分開驗收。
@@ -69,3 +73,5 @@ App 儲存庫外的原型與完整工作區沒有隨這次提交上傳；共同�
 - [本批發布審查與未驗證事項](RELEASE_HOME_HABITS_20261103.md)。
 
 - [公開候選統一進度](PUBLIC_RELEASE_ROADMAP.md)／[Alpha 02單一交易探針與執行指引](database/alpha-02-rehearsal-2026-11-08/02_EXECUTION_GUIDE.md)（2026-11-08最新Owner決策）：保留原始02，先探針、ROLLBACK與快照驗證，再同一Studio正式COMMIT；不重跑已PASS的01/01B或OAuth Origin。
+
+- [訪客／Google世界轉換修復候選與維護審查](auth/google-world-transition-2026-11-10/README.md)：2026-11-10，獨立修復分支；未部署、未啟用Alpha清除。

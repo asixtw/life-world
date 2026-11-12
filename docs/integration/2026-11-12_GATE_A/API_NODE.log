@@ -1,0 +1,90 @@
+..........................sssssssssssssss............................... [  8%]
+.........ssssssssss.........................s........s.................. [ 16%]
+........................................................................ [ 25%]
+........................................................................ [ 33%]
+........................................................................ [ 42%]
+........................................................................ [ 50%]
+......................................................................ss [ 58%]
+sssss................................................................... [ 67%]
+.....................................................................sss [ 75%]
+sssssssssssssssssssssssssssssssssss................................sssss [ 84%]
+sssssssss...............s............................................... [ 92%]
+.................................................................        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/ai/test_usage_isolation.py:17: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:35: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:47: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:63: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:75: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_usage_isolation.py:99: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_ai_runtime.py:183: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:8: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:22: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:34: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:45: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:58: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:67: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_draft_ai_consent.py:78: 需要明確本機PG18合成副本
+SKIPPED [1] tests/ai/test_pg_ai_usage.py:41: 需要明確本機PG18合成副本
+SKIPPED [1] tests/product/test_google_transition_pg.py:94: requires dedicated local Google transition PG18 fixture
+SKIPPED [2] tests/product/test_google_transition_pg.py:110: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:121: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:133: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:140: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:150: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:159: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:168: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/product/test_google_transition_pg.py:179: requires dedicated local Google transition PG18 fixture
+SKIPPED [1] tests/test_alpha_deployment_contract.py:35: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_alpha_prebuilt_login.py:113: dedicated synthetic PG18 required
+SKIPPED [1] tests/test_model_eval_platform.py:35: Native unsupported-platform rejection only; POSIX storage success is tested separately
+SKIPPED [6] tests/test_model_eval_platform.py:48: Native unsupported-platform rejection only; POSIX CLI storage success is tested separately
+SKIPPED [1] tests/test_person_basic_api.py:11: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:26: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:42: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:52: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:71: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:83: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:94: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_person_basic_api.py:116: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_pg_integration_person_details.py:44: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_pg_integration_person_details.py:52: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:7: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:27: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:36: 需要明確本機PG18合成副本
+SKIPPED [2] tests/test_integration_confirm_targets.py:50: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:61: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:70: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:83: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_integration_confirm_targets.py:92: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_pg_integration_person_details.py:72: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_pg_integration_person_details.py:95: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:16: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:30: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:47: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:54: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:71: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:81: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:89: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:113: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_review.py:122: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_basic_review.py:25: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_basic_review.py:42: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_basic_review.py:57: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_basic_review.py:71: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_basic_review.py:86: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_draft_basic_review.py:103: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_role_profile_boundary.py:5: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_role_profile_boundary.py:19: 需要明確本機PG18合成副本
+SKIPPED [1] tests/test_postgres_integration.py:34: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [4] tests/test_postgres_integration.py:119: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:134: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:153: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [2] tests/test_postgres_integration.py:171: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:198: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:216: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:233: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:244: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_postgres_integration.py:254: requires dedicated synthetic PostgreSQL 18 container
+SKIPPED [1] tests/test_public_alpha.py:163: dedicated synthetic PG18 required
+770 passed, 87 skipped in 35.67s

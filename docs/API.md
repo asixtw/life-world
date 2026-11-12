@@ -4,6 +4,16 @@
 
 人物標記介面於 2026-10-29 改稱「星標」；`followed`／`followed_only` API 欄位與既有排序語意保持相容，沒有通知對方或追蹤動態能力。
 
+### 經歷四步候選：待新增人物（未部署）
+
+`DraftCreate.story`／`DraftEdit.story`／`Confirm.story` 向後相容增加可選 `pending_person`：
+`{"name":"小安","relation":"participant|interaction|mention","start":2}`。
+`start` 只在原文提及時必須指定，按 Unicode 字元對應原文；name 1–100 字，最多一位待新增人物，不依同名合併。
+草稿只保存候選 JSON，不建人物；Confirm 必須 `story_reviewed=true`，在原確認交易建立人物與來源、經歷、任務、進度及獎勵；重送相同 request_id 回同收據。Guest 拒絕人物操作。更正既有故事的 API 不接受待新增人物，避免繞過最終確認。
+`GET /connections?involvement=participant` 只列已審閱且具有參與者的故事；`mention` 僅已配對提及；`legacy` 僅有舊主要人物線索而尚未核對者。原始紀錄始終留在 `/state.experiences`。
+
+[本輪狀態、限制與證據](experience/2026-11-10/README.md)
+
 ## v0.4 單一目標與習慣
 
 2026-10-29 增量：`schedules[]` 可選 `title`（名稱更正）、`per_occurrence`（正數用量字串）、`expected_effective_from`（畫面確認的 ISO 生效日）。單位及行動 ID 不可更換；省略新增欄位維持原值。
@@ -145,3 +155,9 @@ HabitScheduleDisclosure v0.3沿用calendar端點，每次明確請求當月與�
 後端每次由有效來源重算User／Person／Relationship／Context提示及有限Behavior；內部雙端標籤不回傳一般人物卡。回應保留utterance／provider／model／request_id／applied=false，另帶`behavior`（action=ask_question|share_context|acknowledge、tone=supportive、reason_codes、simulation=true）、`behavior_source=rules`、`source_experience_ids`、`uncertainty=simulation_not_prediction`。Provider替身notice不得覆蓋成真實AI。未啟用回503、Guest403、來源不存在／撤回422、跨Owner拒絕；不寫人物事實、經歷、進度或獎勵。
 
 `ai_result_v1`私有收據新增Provider／Model／可為null的Provider Request ID；Token用量與未知成本null不變，不存來源／輸出全文。這些候選變更不代表Staging API已部署。
+
+## 2026-11-10 Google世界轉換契約（修復候選，未部署）
+
+`upgrade`保留來源Owner；`login`只登入既有Google映射，未知映射404 `google_world_not_found`，不建立新世界。Guest切換不同Owner需明確`discard_guest=true`，成功提交後才啟動既有14天待清除；同Owner不建立待清除紀錄。
+
+新增 `POST /api/auth/external/status`，輸入`{challenge_id}`，同源／當前Session／CSRF驗證。已提交時回`{status:"committed",mode,source_owner_id,owner_id,guest_abandoned}`；未提交回`{status:"not_committed",owner_id,expired}`。只核對既有收據與owner交易鎖，不重送交換或新增清除。不同Session／Owner無權查詢。完整邊界及驗收見[修復包](auth/google-world-transition-2026-11-10/README.md)。

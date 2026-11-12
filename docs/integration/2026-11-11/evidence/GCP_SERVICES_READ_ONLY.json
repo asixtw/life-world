@@ -1,0 +1,292 @@
+[
+  {
+    "name": "lw-api-main",
+    "traffic": [
+      {
+        "revisionName": "lw-api-main-00004-yiv",
+        "tag": "hostfix",
+        "url": "https://hostfix---lw-api-main-u5py2jttpa-de.a.run.app"
+      },
+      {
+        "revisionName": "lw-api-main-00007-4b5",
+        "tag": "prestable",
+        "url": "https://prestable---lw-api-main-u5py2jttpa-de.a.run.app"
+      },
+      {
+        "revisionName": "lw-api-main-b8030-11111349",
+        "tag": "e2e",
+        "url": "https://e2e---lw-api-main-u5py2jttpa-de.a.run.app"
+      },
+      {
+        "percent": 100,
+        "revisionName": "lw-api-main-c-94975cd3a6854941b1705c5634c777b3"
+      }
+    ],
+    "latest_ready": "lw-api-main-b8030-11111349",
+    "service_account": "lw-api-runtime@life-world-513506.iam.gserviceaccount.com",
+    "annotations": {
+      "run.googleapis.com/network-interfaces": "[{\"network\":\"lw-vpc-staging\",\"subnetwork\":\"lw-subnet-staging\"}]",
+      "run.googleapis.com/vpc-access-egress": "private-ranges-only"
+    },
+    "containers": [
+      {
+        "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-core-e2e@sha256:a37a39c4ab1634b53cecd7792e76d5843232ed9c50d646e834c069c722f79dc2",
+        "env_names": [
+          "LIFEWORLD_DB_BACKEND",
+          "LIFEWORLD_PG_CONNECTION",
+          "LIFEWORLD_INSTANCE_CONNECTION_NAME",
+          "LIFEWORLD_DB_NAME",
+          "LIFEWORLD_DB_SCHEMA",
+          "LIFEWORLD_DB_USER",
+          "LIFEWORLD_EXPECTED_DB_MARKER",
+          "LIFEWORLD_DB_POOL_SIZE",
+          "LIFEWORLD_TRUSTED_HOSTS",
+          "LIFEWORLD_EXTERNAL_ORIGIN",
+          "LIFEWORLD_SECURE_COOKIES",
+          "LIFEWORLD_RELATION_SOURCE_STORE",
+          "LIFEWORLD_ENABLE_BUSINESS_API",
+          "LIFEWORLD_REGISTRATION_ENABLED",
+          "LIFEWORLD_PASSWORD_LOGIN_ENABLED",
+          "LIFEWORLD_AI_PROVIDER",
+          "LIFEWORLD_AI_MODEL",
+          "LIFEWORLD_AI_LIVE_APPROVED",
+          "LIFEWORLD_AI_MAX_OUTPUT_TOKENS",
+          "LIFEWORLD_AI_RESERVATION_MICROUSD",
+          "LIFEWORLD_AI_DAILY_BUDGET_MICROUSD",
+          "LIFEWORLD_AI_INPUT_MICROUSD_PER_MTOK",
+          "LIFEWORLD_AI_OUTPUT_MICROUSD_PER_MTOK",
+          "LIFEWORLD_ENVIRONMENT_ID",
+          "LIFEWORLD_TASKS_QUEUE",
+          "LIFEWORLD_TASKS_WORKER_URL",
+          "LIFEWORLD_TASKS_INVOKER_SA",
+          "LIFEWORLD_TASKS_AUDIENCE",
+          "LIFEWORLD_DB_PASSWORD",
+          "LIFEWORLD_AI_API_KEY"
+        ],
+        "safe_env": {
+          "LIFEWORLD_DB_BACKEND": "postgresql",
+          "LIFEWORLD_DB_SCHEMA": "lw_core_draft"
+        },
+        "secret_refs": {
+          "LIFEWORLD_DB_PASSWORD": {
+            "secretKeyRef": {
+              "key": "2",
+              "name": "lw-pg-e2e-password"
+            }
+          },
+          "LIFEWORLD_AI_API_KEY": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "gemini_free_llm_1"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "lw-product-staging",
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "lw-product-staging-00002-4jh"
+      },
+      {
+        "revisionName": "lw-product-staging-gcp144-v55-06f3a0f",
+        "tag": "gcp144-review",
+        "url": "https://gcp144-review---lw-product-staging-u5py2jttpa-de.a.run.app"
+      }
+    ],
+    "latest_ready": "lw-product-staging-gcp144-v55-06f3a0f",
+    "service_account": "lw-product-staging-runtime@life-world-513506.iam.gserviceaccount.com",
+    "annotations": {
+      "run.googleapis.com/network-interfaces": "[{\"network\":\"lw-vpc-staging\",\"subnetwork\":\"lw-subnet-staging\"}]",
+      "run.googleapis.com/vpc-access-egress": "private-ranges-only"
+    },
+    "containers": [
+      {
+        "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:53f6265df5696b485bbcf597a4b9eb59601b169ddc5cb08facb1f6db4dc994eb",
+        "env_names": [
+          "LIFEWORLD_DB_BACKEND",
+          "LIFEWORLD_PG_CONNECTION",
+          "LIFEWORLD_INSTANCE_CONNECTION_NAME",
+          "LIFEWORLD_DB_NAME",
+          "LIFEWORLD_DB_USER",
+          "LIFEWORLD_DB_SCHEMA",
+          "LIFEWORLD_DB_POOL_SIZE",
+          "LIFEWORLD_TRUSTED_HOSTS",
+          "LIFEWORLD_EXTERNAL_ORIGIN",
+          "LIFEWORLD_SECURE_COOKIES",
+          "LIFEWORLD_ACCESS_MODE",
+          "LIFEWORLD_ENABLE_BUSINESS_API",
+          "LIFEWORLD_AUTH_RATE_ENABLED",
+          "LIFEWORLD_AUTH_SOURCE_MODE",
+          "LIFEWORLD_AUTH_TRUSTED_PROXIES",
+          "LIFEWORLD_FORWARDED_ALLOW_IPS",
+          "LIFEWORLD_DB_PASSWORD",
+          "LIFEWORLD_AUTH_RATE_SECRET",
+          "LIFEWORLD_WRITE_ORIGINS",
+          "LIFEWORLD_REGISTRATION_ENABLED",
+          "LIFEWORLD_PASSWORD_LOGIN_ENABLED",
+          "LIFEWORLD_TEST_LOGIN_USERNAMES",
+          "LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD",
+          "LIFEWORLD_TEST_ACCOUNT_SEED"
+        ],
+        "safe_env": {
+          "LIFEWORLD_DB_BACKEND": "postgresql",
+          "LIFEWORLD_DB_SCHEMA": "lw_core_draft",
+          "LIFEWORLD_AUTH_SOURCE_MODE": "shared"
+        },
+        "secret_refs": {
+          "LIFEWORLD_DB_PASSWORD": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "lw-product-staging-db-password"
+            }
+          },
+          "LIFEWORLD_AUTH_RATE_SECRET": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "lw-product-staging-rate-hmac"
+            }
+          },
+          "LIFEWORLD_TEST_ACCOUNT_SEED": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "lw-product-test-account-seed"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "lw-public",
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "lw-public-camera-8f377fa",
+        "tag": "alpha-guest-review",
+        "url": "https://alpha-guest-review---lw-public-u5py2jttpa-de.a.run.app"
+      }
+    ],
+    "latest_ready": "lw-public-camera-8f377fa",
+    "service_account": "lw-public-runtime@life-world-513506.iam.gserviceaccount.com",
+    "annotations": {
+      "run.googleapis.com/network-interfaces": "[{\"network\":\"lw-vpc-staging\",\"subnetwork\":\"lw-subnet-staging\"}]",
+      "run.googleapis.com/vpc-access-egress": "private-ranges-only"
+    },
+    "containers": [
+      {
+        "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-product-candidates/lw-product@sha256:68f072c973ab40075b1ba5533a55a6324d5c7a3cf71b00920b0dfc589e2e0e75",
+        "env_names": [
+          "LIFEWORLD_DB_PASSWORD",
+          "LIFEWORLD_AUTH_RATE_SECRET",
+          "LIFEWORLD_AI_API_KEY",
+          "LIFEWORLD_DB_BACKEND",
+          "LIFEWORLD_DB_NAME",
+          "LIFEWORLD_DB_USER",
+          "LIFEWORLD_DB_SCHEMA",
+          "LIFEWORLD_PUBLIC_GATE_CLOSED",
+          "LIFEWORLD_ENABLE_BUSINESS_API",
+          "LIFEWORLD_ACCESS_MODE",
+          "LIFEWORLD_EXTERNAL_ORIGIN",
+          "LIFEWORLD_TRUSTED_HOSTS",
+          "LIFEWORLD_SECURE_COOKIES",
+          "LIFEWORLD_REGISTRATION_ENABLED",
+          "LIFEWORLD_PASSWORD_LOGIN_ENABLED",
+          "LIFEWORLD_AI_CALLS_APPROVED",
+          "LIFEWORLD_PG_CONNECTION",
+          "LIFEWORLD_INSTANCE_CONNECTION_NAME",
+          "LIFEWORLD_DB_POOL_SIZE",
+          "LIFEWORLD_AUTH_RATE_ENABLED",
+          "LIFEWORLD_AUTH_SOURCE_MODE",
+          "LIFEWORLD_ALPHA_LOGIN_ENABLED",
+          "LIFEWORLD_TEST_LOGIN_USERNAMES",
+          "LIFEWORLD_WRITE_ORIGINS",
+          "LIFEWORLD_AI_PROVIDER",
+          "LIFEWORLD_AI_MODEL",
+          "LIFEWORLD_AI_MAX_INPUT_BYTES",
+          "LIFEWORLD_AI_MAX_MEDIA_BYTES",
+          "LIFEWORLD_AI_MAX_OUTPUT_TOKENS",
+          "LIFEWORLD_AI_OWNER_DAILY_CALLS",
+          "LIFEWORLD_AI_GLOBAL_DAILY_CALLS",
+          "LIFEWORLD_AI_RESERVATION_MICROUSD",
+          "LIFEWORLD_AI_DAILY_BUDGET_MICROUSD",
+          "LIFEWORLD_AI_TOTAL_BUDGET_MICROUSD",
+          "LIFEWORLD_AUDIO_MAX_BYTES",
+          "LIFEWORLD_GOOGLE_CLIENT_ID",
+          "LIFEWORLD_ALPHA_WORLDS_TOTAL",
+          "LIFEWORLD_ALPHA_WORLDS_DAILY",
+          "LIFEWORLD_AI_HISTORICAL_RESERVATION_MICROUSD"
+        ],
+        "safe_env": {
+          "LIFEWORLD_DB_BACKEND": "postgresql",
+          "LIFEWORLD_DB_SCHEMA": "lw_core_draft",
+          "LIFEWORLD_AUTH_SOURCE_MODE": "shared"
+        },
+        "secret_refs": {
+          "LIFEWORLD_DB_PASSWORD": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "lw-public-alpha-db-password"
+            }
+          },
+          "LIFEWORLD_AUTH_RATE_SECRET": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "lw-public-auth-rate-secret"
+            }
+          },
+          "LIFEWORLD_AI_API_KEY": {
+            "secretKeyRef": {
+              "key": "1",
+              "name": "gemini_free_llm_1"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "lw-web-main",
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "lw-web-main-c-13023a4b4ed8448bab94ca3502269eda"
+      }
+    ],
+    "latest_ready": "lw-web-main-c-13023a4b4ed8448bab94ca3502269eda",
+    "service_account": "lw-web-runtime@life-world-513506.iam.gserviceaccount.com",
+    "annotations": {},
+    "containers": [
+      {
+        "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web@sha256:704d712bf84d236716a9e50ddfaf80c6fe329fed19f1e522dbb4a1346d478ba1",
+        "env_names": [],
+        "safe_env": {},
+        "secret_refs": {}
+      }
+    ]
+  },
+  {
+    "name": "lw-web-staging",
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "lw-web-staging-00003-vvv"
+      }
+    ],
+    "latest_ready": "lw-web-staging-00003-vvv",
+    "service_account": "lw-web-runtime@life-world-513506.iam.gserviceaccount.com",
+    "annotations": {},
+    "containers": [
+      {
+        "image": "asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-web@sha256:e4a3863c38e7bc6aa3c0d5d1c4d7a4ffd3fa39dc2554694935e9a2639a89a6b8",
+        "env_names": [],
+        "safe_env": {},
+        "secret_refs": {}
+      }
+    ]
+  }
+]

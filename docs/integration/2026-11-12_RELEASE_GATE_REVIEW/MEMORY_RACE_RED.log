@@ -1,0 +1,11 @@
+F
+=================================== FAILURES ===================================
+___________ test_disabled_during_snapshot_cannot_republish_features ____________
+tests/ai/test_memory_snapshot_races.py:23: in test_disabled_during_snapshot_cannot_republish_features
+    with pytest.raises(DomainError) as error:store.context(owner,person)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'app.errors.DomainError'>
+=========================== short test summary info ============================
+FAILED tests/ai/test_memory_snapshot_races.py::test_disabled_during_snapshot_cannot_republish_features
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.13s

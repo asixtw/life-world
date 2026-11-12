@@ -1,0 +1,9 @@
+{
+  "python": "3.14",
+  "requirements": "requirements.api-test.lock (unmodified)",
+  "pg8000": "1.31.6",
+  "node": "24.11.0",
+  "node_source": "https://nodejs.org/dist/v24.11.0/",
+  "node_sha256": "0be2ab2816a4fa02d1acff014a434f29f56d8d956f5af6a98b70ced6c5f4d201",
+  "release_runtime_equivalence": "NOT RUN"
+}

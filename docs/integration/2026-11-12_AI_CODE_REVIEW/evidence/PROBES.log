@@ -1,0 +1,30 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________ test_unrelated_person_source_rejected _____________________
+../lw-pr26-ai-review/test_probes.py:22: in test_unrelated_person_source_rejected
+    assert r.status_code==422, f'unrelated source accepted: HTTP {r.status_code}'
+E   AssertionError: unrelated source accepted: HTTP 200
+E   assert 200 == 422
+E    +  where 200 = <Response [200 OK]>.status_code
+________________ test_withdrawn_story_invalidates_basic_source _________________
+../lw-pr26-ai-review/test_probes.py:30: in test_withdrawn_story_invalidates_basic_source
+    assert d['birthday']['source_status']!='active', 'withdrawn story still exported as active birthday source'
+E   AssertionError: withdrawn story still exported as active birthday source
+E   assert 'active' != 'active'
+_______________ test_media_respects_owner_and_global_call_quota ________________
+../lw-pr26-ai-review/test_probes.py:37: in test_media_respects_owner_and_global_call_quota
+    with pytest.raises(Exception) as e:r.generate(me['owner_id'],'media',{'kind':'image'})
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'Exception'>
+________________ test_simulation_does_not_send_withdrawn_story _________________
+../lw-pr26-ai-review/test_probes.py:52: in test_simulation_does_not_send_withdrawn_story
+    assert out.status_code==422 and not p.calls, f'withdrawn source sent: HTTP {out.status_code}, provider calls={len(p.calls)}'
+E   AssertionError: withdrawn source sent: HTTP 200, provider calls=1
+E   assert (200 == 422)
+E    +  where 200 = <Response [200 OK]>.status_code
+=========================== short test summary info ============================
+FAILED ../lw-pr26-ai-review/test_probes.py::test_unrelated_person_source_rejected
+FAILED ../lw-pr26-ai-review/test_probes.py::test_withdrawn_story_invalidates_basic_source
+FAILED ../lw-pr26-ai-review/test_probes.py::test_media_respects_owner_and_global_call_quota
+FAILED ../lw-pr26-ai-review/test_probes.py::test_simulation_does_not_send_withdrawn_story
+4 failed in 0.52s

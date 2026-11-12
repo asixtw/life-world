@@ -1,0 +1,26 @@
+[
+  {
+    "file": "320-flow.webm",
+    "width": 320,
+    "height": 900,
+    "duration_seconds": 16,
+    "error": null,
+    "chromium_metadata_and_three_seeks": "PASS"
+  },
+  {
+    "file": "390-flow.webm",
+    "width": 390,
+    "height": 900,
+    "duration_seconds": 16.12,
+    "error": null,
+    "chromium_metadata_and_three_seeks": "PASS"
+  },
+  {
+    "file": "1440-flow.webm",
+    "width": 1440,
+    "height": 900,
+    "duration_seconds": 16.4,
+    "error": null,
+    "chromium_metadata_and_three_seeks": "PASS"
+  }
+]

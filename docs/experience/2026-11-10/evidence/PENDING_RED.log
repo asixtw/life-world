@@ -1,0 +1,45 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_pending_person_atomic_confirm_and_retry[participant] ___________
+tests/test_pending_person.py:13: in test_pending_person_atomic_confirm_and_retry
+    d = draft(client, goal, raw_text='提到小安閱讀', story=story, contributions=[])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/conftest.py:74: in draft
+    assert response.status_code == 201, response.text  # 核對 HTTP 狀態，避免失敗請求被當成成功
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story.pending_person"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+__________ test_pending_person_atomic_confirm_and_retry[interaction] ___________
+tests/test_pending_person.py:13: in test_pending_person_atomic_confirm_and_retry
+    d = draft(client, goal, raw_text='提到小安閱讀', story=story, contributions=[])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/conftest.py:74: in draft
+    assert response.status_code == 201, response.text  # 核對 HTTP 狀態，避免失敗請求被當成成功
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story.pending_person"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+____________ test_pending_person_atomic_confirm_and_retry[mention] _____________
+tests/test_pending_person.py:13: in test_pending_person_atomic_confirm_and_retry
+    d = draft(client, goal, raw_text='提到小安閱讀', story=story, contributions=[])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/conftest.py:74: in draft
+    assert response.status_code == 201, response.text  # 核對 HTTP 狀態，避免失敗請求被當成成功
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: {"error":{"code":"validation_error","message":"請檢查欄位內容與格式。","fields":["story.pending_person"]}}
+E   assert 422 == 201
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+___________________ test_pending_invalid_guest_and_rollback ____________________
+tests/test_pending_person.py:31: in test_pending_invalid_guest_and_rollback
+    assert client.post('/api/experiences/drafts', json=payload).status_code == 403
+E   AssertionError: assert 422 == 403
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+E    +    where <Response [422 Unprocessable Entity]> = post('/api/experiences/drafts', json={'occurred_at': '2026-01-01T00:00:00Z', 'raw_text': '提到小安', 'story': {'pending_person': {'name': '小安', 'relation': 'participant'}}})
+E    +      where post = <starlette.testclient.TestClient object at 0x10d93e060>.post
+=========================== short test summary info ============================
+FAILED tests/test_pending_person.py::test_pending_person_atomic_confirm_and_retry[participant]
+FAILED tests/test_pending_person.py::test_pending_person_atomic_confirm_and_retry[interaction]
+FAILED tests/test_pending_person.py::test_pending_person_atomic_confirm_and_retry[mention]
+FAILED tests/test_pending_person.py::test_pending_invalid_guest_and_rollback
+4 failed in 0.22s

@@ -1,4 +1,5 @@
 """本機隔離Alpha實際Chromium操作；不是外部run.app驗收。"""
+from test_journey import set_occurred
 from datetime import datetime,timezone
 import socket,threading,time
 import pytest,uvicorn
@@ -64,7 +65,7 @@ def test_alpha_real_browser_goal_record_refresh_and_quota(alpha_url,width,tmp_pa
             state=page.request.get(alpha_url+'/api/state').json();goal=state['goals'][0]
             page.locator('#goal-id').select_option(goal['id'])
             page.locator('#raw-text').fill('今天閱讀合成文件並整理重點。')
-            page.locator('#occurred-at').fill('2026-10-27T14:00')
+            set_occurred(page,'2026-10-27T14:00')
             page.locator('#quantity-'+goal['actions'][0]['id']).fill('1')
             page.get_by_role('button',name='保存草稿並進入核對').click()
             expect(page.locator('#review-form')).to_be_visible()

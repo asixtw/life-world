@@ -1,0 +1,22 @@
+{
+  "status": "READ_ONLY_OK",
+  "data": {
+    "metadata": {
+      "creationTimestamp": "2026-11-05T14:20:15.301994Z",
+      "labels": {
+        "cloud.googleapis.com/location": "asia-east1",
+        "commit-sha": "82d0925597aeb23b95023f102b1ca98c46666fe9",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "lw-api-main",
+        "serving.knative.dev/configurationGeneration": "5",
+        "serving.knative.dev/route": "lw-api-main",
+        "serving.knative.dev/service": "lw-api-main",
+        "serving.knative.dev/serviceUid": "2444748e-797e-4918-b6da-b23122cd181a"
+      },
+      "name": "lw-api-main-c-94975cd3a6854941b1705c5634c777b3"
+    },
+    "status": {
+      "imageDigest": "asia-east1-docker.pkg.dev/life-world-513506/lw-containers/lw-api@sha256:e7cf92e11bde21704a824c56eea58a773c98c6491bc646849f1881a101607c21"
+    }
+  }
+}

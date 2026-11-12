@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 import json
+from os import name as _OS_NAME
 from pathlib import Path
 import sqlite3
 import time
@@ -65,6 +66,9 @@ class Provider(Protocol):
 class EvaluationStore:
     """獨立SQLite庫；所有共用額度預留在BEGIN IMMEDIATE內，不依賴程序鎖。"""
     def __init__(self, directory, budget_microusd=1_000_000, max_attempts=10):
+        # chmod is not a Windows ACL policy. Refuse before any path or DB access.
+        if _OS_NAME != "posix":
+            raise EvalError("private_storage_platform_unsupported")
         if not isinstance(budget_microusd, int) or not 1 <= budget_microusd <= 100_000_000:
             raise EvalError('invalid_budget')
         if not isinstance(max_attempts, int) or not 1 <= max_attempts <= 100:

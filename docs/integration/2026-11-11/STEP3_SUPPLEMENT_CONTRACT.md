@@ -1,0 +1,15 @@
+# 第三步逐人補充｜本機整合候選
+
+2026-11-12。延伸DraftReview既有契約，不新增步驟、資料庫或AI。不是Owner UX核准。
+
+每位已選人物的資訊可選填，預設收合；資訊類別為interests/food/skills/habits、birthday及employment；基本資料另存清單，不混入四維事實。輸入管道manual/raw與evidence_type本人告知/使用者觀察/文件記載分開，新增輸入不預設來源或證據。raw需手動提供存在於當前原文的片段；保存到伺服器後第四步依來源hash重核對。候選逐項確認前selected=false。每次加入後清空本次輸入並收合，不刪已加入項。
+
+module只改flow.personCandidates、birthdayCandidates、employmentCandidates與supplementInputs。本機保存在既有Owner/草稿IndexedDB，復原驗Owner及資料形狀，無新儲存服務；伺服器使用既有DraftReview JSON。未加入候選的有意義文字會阻擋保存，提示加入或清空；離開可保留本機草稿。候選target不在關聯中時需重新關聯或明確移除，不自動刪資料或轉移到第一位人物。
+
+新人物仍為pending，只有最終Confirm建立。舊單人表單如有補充，以草稿內穩定client_ref=legacy轉成story.pending_people；加入第二位人物沿用第一人的鍵。server同交易處理事實、來源、經歷、進度、任務、獎勵及冪等收據。保存/取消經歷不建人；同名不合併。Guest仍不開人物補充，原地升級只解鎖能力。
+
+已人工配對且reviewed/available的提及可作明確人物事實的來源；不改來源的角色、不增互動或見面，也不放寬其他API的參與或關係來源規則。跨Owner、無效來源與版本由原後端再次驗證。raw/manual目前保存在草稿review；fact_sources對外API仍只投影傳統證據類型，完整來源瀏覽仍待整合。
+
+公司/職稱/生日的經歷候選介面已接既有DraftReview與Confirm；不以notes/tags/skills替代。每一人物卡可選填、收合；任職可新增或明確選一筆既有紀錄更正，保留其他工作與異動歷史。未加入及切換類別的輸入須明確加入/清空，不會默默遺失。人物選擇已依COMPACT_PEOPLE_CONTRACT.md改為精簡卡片，但整體Candidate仍待Owner核准；這不是完整UX驗收。沒有呼叫外部AI或GCP寫入，發布與Migration Gate不變。測試收據見INTEGRATION_RELEASE_REPORT.md。
+
+基本資料候選第四步顯示原值→本次值、來源/證據、採用/排除與來源重核對。原值GET晚回應依Owner/草稿/人物key丟棄；版本衝突不自動改expected_revision。抽屜查看/勾選皆不DB寫入。基本資料日期驗證、草稿格式與回復限制見DRAFT_REVIEW_CONTRACT.md。

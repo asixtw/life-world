@@ -699,3 +699,63 @@ dialog::backdrop{
 footer{
   color:#68725f
 } /* 設定頁尾文字、間距與手機底部避讓 */
+
+/* UX v0.3：手機四步專注記錄；表單有明確離開入口，不以隱藏導覽困住使用者。 */
+@media(max-width:680px){
+  body.experience-focus .sidebar{display:none;}
+}
+
+/* 第四步只讀預覽：固定標題/完成操作，中間內容獨立捲動；不重建正式確認表單。 */
+.experience-person-preview{width:100%;text-align:left;display:grid;gap:8px;}
+#experience-person-preview{padding:0;width:min(640px,calc(100% - 32px));max-height:90dvh;overflow:hidden;}
+.experience-preview-shell{display:flex;flex-direction:column;max-height:90dvh;}
+.experience-preview-head,.experience-preview-footer{flex:none;padding:18px 24px;}
+.experience-preview-head{display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.experience-preview-head h2{margin:0;overflow-wrap:anywhere;}
+.experience-preview-body{overflow:auto;min-height:0;padding:0 24px 24px;overscroll-behavior:contain;overflow-wrap:anywhere;}
+.experience-preview-footer{border-top:1px solid var(--line);padding-bottom:max(18px,env(safe-area-inset-bottom));}
+@media(max-width:680px){
+ #experience-person-preview{inset:auto 0 0;margin:0;width:100%;max-width:100%;border-radius:24px 24px 0 0;}
+}
+
+.experience-person-preview{min-width:0;overflow-wrap:anywhere;}
+.experience-preview-body .raw-source{max-height:none;overflow:visible;}
+
+.experience-person-preview{padding:18px;}
+.experience-person-preview .tag{justify-self:start;}
+
+/* 草稿AI狀態由JS切換；共用inline-flex按鈕不可覆蓋hidden語意。 */
+[data-draft-ai] [hidden]{display:none!important}
+/* AI單選維持小型原生控制項；整行label保留44px觸控範圍，避免擠壓手機文字。 */
+[data-draft-ai]{min-width:0}
+[data-draft-ai] .check-line{min-height:44px;align-items:center;margin:8px 0}
+[data-draft-ai] input[type=radio]{width:18px;height:18px;min-height:18px;padding:0;flex:0 0 18px;margin:0;accent-color:var(--green)}
+
+/* R2記錄這一刻：只改輸入揭露，不建立第二套資料表單。 */
+.moment-tabs{display:flex;gap:4px;padding:5px;background:#edf2eb;border-radius:16px;margin:0 0 22px}
+.moment-tabs button{flex:1;min-width:0;padding:10px 5px;border:0;background:transparent;font-size:14px}
+.moment-tabs [aria-selected=true]{background:white;box-shadow:0 2px 6px #273b2518;border-radius:12px;font-weight:700}
+.moment-text textarea{min-height:200px}.moment-sources{font-size:12px;color:var(--muted);padding:12px 0;line-height:1.8}
+[data-moment-time]{margin:12px 0 22px;border-top:1px solid #e4e9df;padding-top:14px}
+[data-moment-time-error],[data-supplement-status]{color:#924b43;font-size:14px;line-height:1.7}
+.moment-organize{border:1px solid #e4e9df;border-radius:16px;padding:16px;margin:18px 0}
+.moment-organize .choice{display:block;padding:10px 0}.moment-organize .choice span{display:block;font-size:12px;color:var(--muted);padding-left:24px}
+[data-experience-step="1"] #media-panel .media-panel>h2{display:none}
+[data-experience-step="1"] #media-panel{margin-bottom:16px}[data-experience-step="1"] .media-inputs{gap:8px}
+.moment-flow-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}.moment-flow-head p{margin:0}
+#experience-step-track{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 24px}#experience-step-track span{height:5px;border-radius:4px;background:#e7ece5}#experience-step-track .done{background:#86ac9a}
+.moment-organize input[type=radio]{width:18px;height:18px;min-height:18px;display:inline-block;padding:0;margin:0 8px 0 0;accent-color:var(--green);vertical-align:middle}
+.moment-tabs button{white-space:nowrap}.media-transcript{margin-top:12px}.media-transcript>summary{font-size:13px}
+@media(max-width:360px){.moment-tabs button{font-size:13px;padding:10px 2px}}
+/* R3：常用數量增減與原值輸入分離，仍可手動填部分完成。 */
+.quantity-entry{display:flex;gap:8px;align-items:center}.quantity-entry input{flex:1;min-width:0}.quantity-entry button{flex:0 0 44px;min-width:44px;padding:8px}
+
+/* 人物搜尋是逐列選擇，保留同名識別與44px以上點擊範圍。 */
+[data-workflow-options]{display:grid;gap:8px;margin-block:12px}
+.person-search-row{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:12px;border:1px solid var(--line,#d8e3dc);border-radius:12px;background:var(--surface,#fff);text-align:left;color:inherit}
+.person-search-avatar{flex:0 0 36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#e7f1ec}
+.person-search-copy{flex:1;min-width:0;display:grid;gap:4px;overflow-wrap:anywhere}
+.person-search-copy small{color:#596e64;font-size:.8rem}
+.person-search-row:focus-visible{outline:3px solid #6d9e8b;outline-offset:2px}
+.person-search-row [data-person-selected]{font-size:.75rem;flex-shrink:0}
+.person-search-row[hidden]{display:none}

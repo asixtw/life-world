@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_partial_multi_person_local_draft_survives_leaving_and_new_page ______
+browser_tests/test_integration_person_details.py:210: in test_partial_multi_person_local_draft_survives_leaving_and_new_page
+    rows=restored.locator('[data-pending-target]');expect(rows).to_have_count(2)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Locator expected to have count '2'
+E   Actual value: 0 
+E   Call log:
+E     - Expect "to_have_count" with timeout 5000ms
+E     - waiting for locator("[data-pending-target]")
+E       14 × locator resolved to 0 elements
+E          - unexpected value "0"
+=========================== short test summary info ============================
+FAILED browser_tests/test_integration_person_details.py::test_partial_multi_person_local_draft_survives_leaving_and_new_page
+1 failed, 12 deselected in 6.22s
