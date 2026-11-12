@@ -29,6 +29,13 @@ def test_withdrawn_story_invalidates_basic_source(client):
  d=client.get('/api/people/'+a+'/details').json()
  assert d['birthday']['source_status']!='active', 'withdrawn story still exported as active birthday source'
 
+def test_media_respects_owner_and_global_call_quota(prepared):
+ app,c,me,g,r,p=prepared
+ r.settings=replace(r.settings,max_owner_daily_calls=1,max_global_calls=1,max_budget_microusd=10000)
+ p.text='{"text":"synthetic"}'
+ r.generate(me['owner_id'],'media',{'kind':'image'})
+ with pytest.raises(Exception) as e:r.generate(me['owner_id'],'media',{'kind':'image'})
+ assert e.value.code=='ai_quota_reached'
 
 def test_simulation_does_not_send_withdrawn_story(prepared):
  app,c,me,g,r,p=prepared;app.state.ai_runtime=r

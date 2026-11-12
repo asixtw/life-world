@@ -232,7 +232,7 @@ const MediaUI = (() => {
     requests.set(item.id,controller); item.error=''; draw();
     try {
       const body=new FormData(); body.append('kind',item.kind); body.append('file',item.blob,item.uploadName||item.name);
-      const response=await fetch('/api/media/recognize',{method:'POST',headers:{'X-CSRF-Token':ctx.state.csrf},body,signal:controller.signal,credentials:'same-origin'});
+      const response=await fetch('/api/media/recognize',{method:'POST',headers:{'X-CSRF-Token':ctx.state.csrf,'Idempotency-Key':crypto.randomUUID()},body,signal:controller.signal,credentials:'same-origin'});
       const data=await response.json();
       if(!response.ok) throw new Error(data.error?.message||'辨識未完成，請保留素材並重試。');
       if(typeof data.text!=='string'||!data.text.trim()||data.text.length>20000||data.applied!==false) throw new Error('辨識回應不完整，請重試或手動校對。');

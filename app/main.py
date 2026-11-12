@@ -221,7 +221,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
                         await asyncio.sleep(.25)
                 watcher=asyncio.create_task(watch_disconnect())
                 try:
-                    return await run_in_threadpool(transcribe,app.state.ai_runtime,user['id'],file.file,mime,audio_max_bytes,cancelled)
+                    return await run_in_threadpool(transcribe,app.state.ai_runtime,user['id'],file.file,mime,audio_max_bytes,cancelled,request.headers.get('Idempotency-Key'))
                 finally:
                     cancelled.set();watcher.cancel()
             image_limit=min(policy.max_upload_bytes,app.state.ai_runtime.settings.max_media_bytes) if app.state.ai_runtime.enabled else policy.max_upload_bytes
@@ -229,7 +229,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
             mime = media.validate_media(kind, file.filename, file.content_type, content, image_limit)
             try:
                 if app.state.ai_runtime.enabled:
-                    return await asyncio.wait_for(run_in_threadpool(app.state.ai_runtime.recognize,user['id'],kind,mime,content),timeout=30)
+                    return await asyncio.wait_for(run_in_threadpool(app.state.ai_runtime.recognize,user['id'],kind,mime,content,request_id=request.headers.get('Idempotency-Key')),timeout=30)
                 return await asyncio.wait_for(run_in_threadpool(
                     media.recognize, app.state.media_provider, kind, mime, content), timeout=30)
             except asyncio.TimeoutError:

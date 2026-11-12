@@ -15,14 +15,15 @@ def test_total_budget_survives_daily_window(prepared):
     assert provider.calls==[]
 
 
-def test_audio_segments_use_money_guard_not_daily_text_count(prepared):
+def test_audio_segments_share_one_bounded_work_and_each_reserve_budget(prepared):
     app,c,me,g,runtime,provider=prepared
     runtime.settings=replace(runtime.settings,max_owner_daily_calls=1,max_global_calls=1,max_total_budget_microusd=1000)
-    runtime.reserve(me['owner_id'],'media','segment-1')
-    runtime.reserve(me['owner_id'],'media','segment-2')
-    # 媒體仍消耗每日金額；不能用免次數限制繞過預算。
-    runtime.reserve(me['owner_id'],'media','segment-3')
-    with pytest.raises(Exception) as exc:runtime.reserve(me['owner_id'],'media','segment-4')
+    work=runtime.begin_media_work(me['owner_id'],'synthetic-audio','audio-work')
+    runtime.reserve(me['owner_id'],'media','segment-1',media_work=work)
+    runtime.reserve(me['owner_id'],'media','segment-2',media_work=work)
+    # 同一工作片段不重複計工作，但每段都消耗金額；下一工作仍受次數限制。
+    runtime.reserve(me['owner_id'],'media','segment-3',media_work=work)
+    with pytest.raises(Exception) as exc:runtime.reserve(me['owner_id'],'media','segment-4',media_work=work)
     assert exc.value.code=='ai_quota_reached'
 
 

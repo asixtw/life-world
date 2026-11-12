@@ -105,7 +105,34 @@ class AIRuntime:
         calls=int(totals['calls']);known=int(tokens['known_cost_calls'])
         return {'calls':calls,'reserved_microusd':int(totals['reserved']),'input_tokens':int(tokens['input_tokens']),'output_tokens':int(tokens['output_tokens']),'reported_cost_microusd':int(tokens['reported_cost']) if known else None,'unknown_cost_calls':max(0,calls-known),'actual_invoice_cost_microusd':None,'receipts':receipts,'notice':'僅含本人已知Tokens與預留。預留及供應商回報費用均非實際帳單；未回報用量/費用不代表零，失敗不釋放預留。'}
 
-    def reserve(self,owner,operation,fingerprint,request_id=None):
+    def _daily_jobs(self,c,owner,now):
+        """照片/一般模型一次一工作；音訊只計父工作，每段預留費用仍保留於attempt。"""
+        created="response::jsonb->>'created_at'" if self.service.db.backend=='postgresql' else "json_extract(response,'$.created_at')"
+        rows=c.execute(f"SELECT owner_id,operation,response FROM requests WHERE operation IN ('ai_attempt_v1','ai_media_work_v1') AND ({created}) > ?",((now-timedelta(days=1)).isoformat(),)).fetchall()
+        jobs=[r for r in rows if r['operation']=='ai_media_work_v1' or not json.loads(r['response']).get('media_work_id')]
+        require(sum(r['owner_id']==owner for r in jobs)<self.settings.max_owner_daily_calls and len(jobs)<self.settings.max_global_calls,
+                429,'ai_quota_reached','最近24小時 AI 工作額度已達上限；素材保留，可稍後明確重試。')
+
+    def begin_media_work(self,owner,fingerprint,request_id=None):
+        """內部媒體工作收據；跨worker以DB全域鎖計次，失敗/取消不自動返還已啟動工作。"""
+        self.authorize(owner)
+        require(self.enabled,503,'ai_not_configured','辨識服務尚未開放。')
+        request_id=request_id or str(uuid4())
+        require(isinstance(request_id,str) and bool(re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}',request_id)),422,'invalid_request_id','辨識請求識別格式錯誤。')
+        with self.service.db.connect(write=True,owner=owner) as c:
+            if self.service.db.backend=='postgresql':c.execute('SELECT pg_advisory_xact_lock(?)',(143001001,))
+            previous=c.execute("SELECT fingerprint FROM requests WHERE owner_id=? AND operation='ai_media_work_v1' AND request_id=?",(owner,request_id)).fetchone()
+            if previous:
+                require(previous['fingerprint']==fingerprint,409,'request_conflict','相同辨識請求不可改變素材。')
+                raise DomainError(409,'ai_request_already_reserved','此素材已啟動辨識；請核對原收據，不會重複送出。')
+            self._daily_jobs(c,owner,self.service.now())
+            work_id=str(uuid4())
+            receipt={'created_at':self.service.now().isoformat(),'work_id':work_id}
+            c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_media_work_v1',request_id,fingerprint,json.dumps(receipt)))
+        # 只供本Runtime內部傳給片段辨識；HTTP不接受客戶端指定父工作來繞過次數。
+        return (self,owner,request_id,work_id)
+
+    def reserve(self,owner,operation,fingerprint,request_id=None,media_work=None):
         now=self.service.now();s=self.settings
         with self.service.db.connect(write=True,owner=owner) as c:
             require_registered(self.service._onboarded(c,owner))
@@ -122,27 +149,32 @@ class AIRuntime:
             created_at="response::jsonb->>'created_at'" if self.service.db.backend=='postgresql' else "json_extract(response,'$.created_at')"
             rows=c.execute(f"SELECT owner_id,response FROM requests WHERE operation='ai_attempt_v1' AND ({created_at}) > ?",(cutoff,)).fetchall()
             receipts=[(r['owner_id'],json.loads(r['response'])) for r in rows]
-            daily=sum(who==owner for who,_ in receipts)
+            if media_work is not None:
+                require(operation=='media' and isinstance(media_work,tuple) and len(media_work)==4 and media_work[0] is self and media_work[1]==owner,403,'media_work_owner','辨識工作不屬於此帳號。')
+                job=c.execute("SELECT response FROM requests WHERE owner_id=? AND operation='ai_media_work_v1' AND request_id=?",(owner,media_work[2])).fetchone()
+                require(job is not None and json.loads(job['response'])['work_id']==media_work[3],403,'media_work_owner','辨識工作不存在。')
+            else:self._daily_jobs(c,owner,now)
             used=sum(row['reservation_microusd'] for _,row in receipts)
-            require((operation=='media' or (daily<s.max_owner_daily_calls and len(receipts)<s.max_global_calls)) and used+s.reservation_microusd<=s.max_budget_microusd,429,'ai_quota_reached','最近24小時 AI 額度已達上限；請稍後再試，原始紀錄仍可手動編輯。')
+            require(used+s.reservation_microusd<=s.max_budget_microusd,429,'ai_quota_reached','最近24小時 AI 預算已達上限；原始素材保留。')
             if s.max_total_budget_microusd:
                 # 僅加總成本預留metadata，包含失敗/費用未知；與滾動24h次數額度分開。
                 value="(response::jsonb->>'reservation_microusd')::bigint" if self.service.db.backend=='postgresql' else "json_extract(response,'$.reservation_microusd')"
                 total=c.execute(f"SELECT COALESCE(sum({value}),0) AS used FROM requests WHERE operation='ai_attempt_v1'").fetchone()['used']
                 require(int(total)+s.historical_reservation_microusd+s.reservation_microusd<=s.max_total_budget_microusd,429,'ai_total_budget_reached','測試期 AI 總預算已達上限，請聯絡管理者；原始紀錄仍可手動編輯。')
             request_id=request_id or str(uuid4());receipt={'operation':operation,'created_at':now.isoformat(),'reservation_microusd':s.reservation_microusd}
+            if media_work is not None:receipt['media_work_id']=media_work[3]
             c.execute('INSERT INTO requests(owner_id,operation,request_id,fingerprint,response) VALUES (?,?,?,?,?)',(owner,'ai_attempt_v1',request_id,fingerprint,json.dumps(receipt)))
         return request_id
 
-    def generate(self,owner,operation,case,inline_media=None,request_id=None):
+    def generate(self,owner,operation,case,inline_media=None,request_id=None,media_work=None):
         self.authorize(owner)
         # 人物AI角色演出未核准發布；阻擋服務層，不能只隱藏前端入口。私人筆記不受影響。
         require(operation!='simulation',422,'simulation_not_released','人物 AI 模擬尚未開放；可使用私人筆記，不會傳送人物來源。')
         require(self._inflight.acquire(blocking=False),429,'ai_busy','AI服務正在處理其他請求，請稍後再試；本次尚未預留費用。')
-        try:return self._generate(owner,operation,case,inline_media,request_id)
+        try:return self._generate(owner,operation,case,inline_media,request_id,media_work)
         finally:self._inflight.release()
 
-    def _generate(self,owner,operation,case,inline_media=None,request_id=None):
+    def _generate(self,owner,operation,case,inline_media=None,request_id=None,media_work=None):
         self.authorize(owner)
         require(self.enabled,503,'ai_not_configured','真實 AI 尚未設定或未獲呼叫核准；可繼續手動處理。')
         require(operation in ('experience','tasks','media'),422,'invalid_ai_operation','不支援的 AI 操作。')
@@ -159,7 +191,8 @@ class AIRuntime:
             from .relationship_memory import FeatureStore
             prompt['case']={**case,'personalization_memory':FeatureStore(self.service).context(owner,case.get('person_id'))}
             require(len(json.dumps(prompt['case'],ensure_ascii=False).encode())<=self.settings.max_input_bytes,413,'ai_input_too_large','有效記憶與本次資料超過容量；請縮小所選來源。')
-        fingerprint=hashlib.sha256((operation+'\0'+encoded).encode()).hexdigest();request_id=self.reserve(owner,operation,fingerprint,request_id)
+        # 媒體去重必須綁實際內容；非媒體維持既有請求指紋相容。
+        fingerprint=hashlib.sha256((operation+'\0'+encoded+('\0'+json.dumps(inline_media,sort_keys=True) if inline_media else '')).encode()).hexdigest();request_id=self.reserve(owner,operation,fingerprint,request_id,media_work)
         try:
             result=self.provider.generate(prompt,self.settings.max_output_tokens)
             raw=json.loads(result.text);schema=Simulation if operation=='simulation' else Extraction if operation=='media' else Candidate
@@ -181,9 +214,13 @@ class AIRuntime:
         notice='真實模型候選，尚未套用；請編輯並人工確認。' if getattr(self.provider,'live',False) else '測試替身候選，非真實模型輸出；仍需編輯並人工確認。'
         return {**candidate,'provider':self.provider.name,'model':self.provider.model,'applied':False,'request_id':request_id,'notice':notice,'usage':{'http_status':200,'input_tokens':result.input_tokens,'output_tokens':result.output_tokens,'cost_microusd':result.cost_microusd,'reserved_microusd':self.settings.reservation_microusd,'provider_request_id':result.provider_request_id}}
 
-    def recognize(self,owner,kind,mime,content):
+    def recognize(self,owner,kind,mime,content,media_work=None,request_id=None):
         import base64
         self.authorize(owner)
         require(len(content)<=self.settings.max_media_bytes,413,'ai_media_too_large','AI 素材超過本輪傳輸額度。')
-        result=self.generate(owner,'media',{'kind':kind},inline_media={'mime_type':mime,'data':base64.b64encode(content).decode()})
+        if media_work is None:
+            fingerprint=hashlib.sha256((kind+'\0'+mime+'\0').encode()+content).hexdigest()
+            media_work=self.begin_media_work(owner,fingerprint,request_id)
+            request_id=media_work[3]+':0'
+        result=self.generate(owner,'media',{'kind':kind},inline_media={'mime_type':mime,'data':base64.b64encode(content).decode()},media_work=media_work,request_id=request_id)
         return {'text':result['text'],'applied':False,'server_retention':'none','source':{'kind':kind,'mime':mime,'size':len(content),'sha256':hashlib.sha256(content).hexdigest()},'notice':result['notice'],'request_id':result['request_id'],'usage':result['usage']}
