@@ -1,6 +1,6 @@
 # PR #26 發布前審查｜NO-GO（2026-11-12）
 
-本輪已完成可在本機執行的修復、測試與唯讀雲端盤點；**尚未達 Merge Ready**。Gate A須Owner親自核准；正式備份/還原、011/權限、完整來源契約與受控GCP E2E仍有阻擋。沒有執行正式Migration、GRANT、Build、Deploy、切流或正式資料匯入/刪除。
+本輪已完成可在本機執行的修復、測試與唯讀雲端盤點；**尚未達 Merge Ready**。Gate A已由Owner正式核准（僅a2eb363的UX）；正式備份/還原、011/權限、完整來源契約與受控GCP E2E仍有阻擋。沒有執行正式Migration、GRANT、Build、Deploy、切流或正式資料匯入/刪除。
 
 ## 固定候選與操作
 
@@ -13,10 +13,10 @@
 
 | Gate | 結果 | 未放行原因 |
 |---|---|---|
-| A UX | Changes Requested／待Owner | 四步/防呆已交付；Owner未明確核准，測試不能代替設計簽核 |
+| A UX | **UX APPROVED** | Owner 2026-11-12明確核准a2eb363；範圍僅POC UX/四步，凍結非必要UX變更 |
 | B 資料/安全/相容 | PARTIAL／BLOCKED | 本輪修復兩項安全缺口；正式011與最小權限、Purger新FK、完整來源契約、備份還原/混合Revision演練尚未完成 |
 | C 固定SHA/Digest GCP E2E | NOT RUN | 未獲Build/部署/Migration/GRANT授權；不能用本機PG或替身當GCP/真Google/Gemini |
-| D main／Alpha | NO-GO | A/B/C與獨立Code Review未通過，Owner未授權Merge或部署 |
+| D main／Alpha | NO-GO | B/C與獨立Code Review未通過，Owner未授權Merge或部署 |
 
 ## 本輪修復與Code Review結果
 
@@ -25,7 +25,7 @@
 3. **011草案目標防護**：加上已知DB Marker核對；不能只憑同名Database套用。新增最小權限審查稿，沒有執行。來源名稱/版號/收據仍須正式審查凍結。
 4. 前輪生日/任職、目標時區/期間、錯誤轉譯與數量保留已提交。保留人工確認、來源Hash、Owner、CSRF、冪等與獎勵；不擴充Jerry功能。
 
-本次為工程自審/測試，**不是獨立Code Review批准**。GitHub即時讀回PR26 Open + Draft，正式reviews空清單（PR26_REVIEWS.json）。需由Reviewer審查下列差異：
+本次為工程自審/測試，**不是獨立Code Review批准**。GitHub即時讀回PR26 Open + Draft，正式reviews空清單（PR26_REVIEWS.json）。Owner已指定**Boyi**為獨立人工Reviewer，尚未收到Code Review結論。見[專用審查包](CODE_REVIEW_FOR_BOYI.md)，不把實作者自審或UX核准當Code Review通過。需審查下列差異：
 
 | 審查區 | 主要檔案 | 必看斷言 |
 |---|---|---|
@@ -87,7 +87,7 @@ FORMAT_RED.log、MEMORY_RACE_RED.log保留修正前真紅燈；設定停用/來�
 
 ## 精確的下一階段操作順序（方案，NOT EXECUTED）
 
-1. Owner核准固定候選UX；獨立Reviewer按上述分區與收據Code Review。若Commit變動，重新核對受影響測試，不沿用不相干綠燈。
+1. Owner已核准a2eb363的UX；Boyi按上述分區與收據做獨立人工Code Review。若Commit變動，重新核對受影響測試，不沿用不相干綠燈。
 2. 先完成來源/011/最小權限/Purger/回復審查與完整備份演練。Owner逐項批准E2E Migration/GRANT，指定既有可用DBA角色；先E2E，不動Alpha。前置DB/Marker/PG/Owner/表指紋不符即停止。
 3. **取得Build授權後**，由固定Commit建立不可變Image，收錄Git SHA/Tree、Build ID、VCS_REF、SBOM/掃描結果及registry digest；不把tag當digest，不批准待核准的舊main Build。此刻新Digest尚不存在，不能填假值。
 4. **取得E2E部署授權後**，使用既有受控E2E入口。現有`lw-api-main`的e2e tag可供審查，但部署前必須核對該Revision的DB/Marker/SA/Secret references與主服務配置隔離；若無法證明不影響main，停止請Owner核准精確隔離目標，不臨時建立新服務。候選固定Digest、`--no-traffic`，不得切三個main/public的100%。保存原tag/Revision/Digest作路由回復收據。
@@ -98,7 +98,7 @@ FORMAT_RED.log、MEMORY_RACE_RED.log保留修正前真紅燈；設定停用/來�
 
 ## 現在需Owner決定／仍不可代辦
 
-1. Gate A人工核准及指定獨立Reviewer。
+1. Gate A已核准；Boyi已指定，等待具名Code Review結果。
 2. 備份與隔離恢復的執行授權/保留責任；是否啟用自動備份/PITR。
 3. 011/最小權限、完整來源持久契約、Purger/相容Rollback審查通過後，另批E2E Migration/GRANT；**現在不要求直接執行SQL**。
 4. 固定Image Build、E2E部署與真Google/付費AI驗收各自授權；main Merge/Alpha發布仍另批。
@@ -107,4 +107,12 @@ FORMAT_RED.log、MEMORY_RACE_RED.log保留修正前真紅燈；設定停用/來�
 
 ## 遠端並行提交處理
 
-第一次普通Push被拒（遠端由846f250進到8c82c49）。唯讀Fetch確認新提交只改Soft Life視覺、Lumi圖及測試/文件，沒有覆蓋本輪service.py/relationship_memory.py。使用正常分支Merge a2eb363保留雙方提交，沒有force/rebase或Merge main。新視覺仍為Candidate，需Owner對合併後畫面做Gate A，不能拿舊截圖自動核准。合併後26項UI/PG、5項視覺Node與原入口驗收均PASS，沒有重新冒稱跑完整788項。
+第一次普通Push被拒（遠端由846f250進到8c82c49）。唯讀Fetch確認新提交只改Soft Life視覺、Lumi圖及測試/文件，沒有覆蓋本輪service.py/relationship_memory.py。使用正常分支Merge a2eb363保留雙方提交，沒有force/rebase或Merge main。新視覺仍為Candidate，原交付時需Owner對合併後畫面做Gate A；Owner於2026-11-12已明確核准a2eb363，不是工程自行判定。合併後26項UI/PG、5項視覺Node與原入口驗收均PASS，沒有重新冒稱跑完整788項。
+
+## Gate A正式核准與後續優先順序
+
+[GATE_A_APPROVAL.json](GATE_A_APPROVAL.json)記錄Owner明確核准，綁定a2eb363及app/static tree；318b4bd只增加文件/證據，與候選產品完全一致。後續產品變更須先做UX影響判斷；本批不改任何app檔案。凍結非必要UX調整，不重跑產品套件來代替人工審查。
+
+接續順序：Boyi獨立人工Code Review → Gate B剩餘契約/權限/回復審查 → [Cloud SQL正式備份/隔離還原操作方案](CLOUD_SQL_BACKUP_RESTORE_PLAN.md)另行核准 → 阻擋解除後提交受控E2E執行計畫。備份方案附命令模板、前後指紋/Sequence補件、固定generation與停止條件；全部NOT EXECUTED，不要求Owner現在執行SQL。
+
+PR建立者是asixtw；若Boyi以同帳號審查，人工簽核和GitHub非作者Approval需分開，詳專用審查包。沒有代簽Review、寄信或改權限。**整體仍NO-GO**；此次只有Gate A核准，無任何正式操作授權。

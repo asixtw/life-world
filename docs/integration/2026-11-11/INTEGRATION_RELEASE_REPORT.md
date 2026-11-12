@@ -1,10 +1,10 @@
 # PR #26 Integration QA／Release Gate｜NO-GO
 
-**最新狀態以第11節發布前審查為準；Gate A防呆細節見第10節。先前PASS只證明資料閉環，不代表「記錄這一刻」設計已整合或Owner已核准。**
+**最新狀態以第12節Gate A核准紀錄為準。Owner已正式核准a2eb363的UX；B/C/D與Code Review不因此通過。較早未核准狀態保留為歷史。**
 
 2026-11-12。分支`integration/pr24-first-unified-schema010-20261111`，[Draft PR #26](https://github.com/asixtw/life-world/pull/26)。本輪基準`6d4ba0a3ea3d895678ad733cde2c42f773154f4f`，精確交付Head/Tree見PR收據。遠端main唯讀核對仍`68102f230aa947a434286ba9260e1ae75f6634b0`。沒有Merge、Build、Deploy、正式Migration/GRANT、IAM/Secret、Alpha匯入或切流。
 
-**人物基本資料閉環已完成本機驗證，停止功能擴充，轉QA。** 不表示Owner UX Approved或GCP可發布。Jerry進階劇場、人物作品、AI角色演出、完整角色創作未核准，不列R+1或必做未來功能；既有相容表/API不得因此擴充、刪除資料或執行非必要Migration。私人筆記、現實情境準備、Lumi互動與此類角色劇場分開。
+**人物基本資料閉環已完成本機驗證，停止功能擴充，轉QA。** Owner已在第12節正式核准固定候選UX，仍不表示GCP可發布。Jerry進階劇場、人物作品、AI角色演出、完整角色創作未核准，不列R+1或必做未來功能；既有相容表/API不得因此擴充、刪除資料或執行非必要Migration。私人筆記、現實情境準備、Lumi互動與此類角色劇場分開。
 
 ## 1. 本輪變更與操作入口
 
@@ -214,3 +214,14 @@ Diff審查追加：修正API競態拒絕後隱藏按鈕抑制返回第二步的�
 普通Push發現遠端8c82c49新增已授權推送的Soft Life視覺候選。已正常整合到同分支，保留雙方提交，未強推/未Merge main。最新產品Commit `a2eb3632037726b93f3bea82b395fa7e5d010aa6`，App tree `c823bdde84ae8ab90c75a45d557cb6cd9e9c0623`。
 
 合併後26項防呆/三尺寸完整四步UI→API→本機PG PASS（63.07秒），視覺Node 5 PASS；36張圖/3段錄影與來源SHA見發布審查包。原8198登入、同Owner/業務資料不變/零JS錯誤已補驗。788 PASS/87 SKIP是同後端1bbca75的完整API/Node收據，不冒稱合併後重跑全套。Gate A仍待Owner核准新合併畫面，正式Code Review無批准，其他Gate仍NO-GO。
+
+
+## 12. Owner正式核准Gate A／UX凍結（2026-11-12）
+
+Owner明確回覆「正式核准 Gate A（UX Approved）」。綁定已審查產品 `a2eb3632037726b93f3bea82b395fa7e5d010aa6`、App tree `c823bdde84ae8ab90c75a45d557cb6cd9e9c0623`、static tree `c817cc38ba08c79bd013ad699b7337b91f57e8ac`；核准當時Head318b4bd與候選app無差異。詳[GATE_A_APPROVAL.json](../2026-11-12_RELEASE_GATE_REVIEW/GATE_A_APPROVAL.json)。停止非必要UX變更；後續產品改動需先檢查UX影響，文件變動不擴大核准範圍。
+
+Owner指定Boyi為獨立人工Reviewer，尚無Code Review結論；[Boyi審查包](../2026-11-12_RELEASE_GATE_REVIEW/CODE_REVIEW_FOR_BOYI.md)已備妥。不代簽、不代寄信。PR作者asixtw若也是審查登入帳號，GitHub作者自批限制與人工審查需分開，不繞過平台規則。
+
+[Cloud SQL備份/隔離還原正式操作方案](../2026-11-12_RELEASE_GATE_REVIEW/CLOUD_SQL_BACKUP_RESTORE_PLAN.md)及Sequence唯讀補件已準備；列明既有兩庫/Marker/Owner、既有私有Bucket的新Export、同時點metadata、固定generation/hash、隔離PG18.6、資料/權限/Sequence驗證及失敗停止/回復方案。命令模板與SQL均NOT EXECUTED。
+
+**Gate A UX APPROVED；Gate B PARTIAL/BLOCKED；Gate C NOT RUN；Gate D NO-GO。** 本次核准不含Merge、Migration、GRANT、Build、Deploy或切流；沒有執行正式操作。本批僅文件與核准紀錄，產品tree不變。

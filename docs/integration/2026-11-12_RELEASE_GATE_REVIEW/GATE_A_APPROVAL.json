@@ -1,0 +1,18 @@
+{
+  "gate": "A",
+  "status": "UX_APPROVED",
+  "approval_date": "2026-11-12",
+  "timezone": "Asia/Taipei",
+  "authority": "Owner explicit reply to candidate review request",
+  "statement": "正式核准 Gate A（UX Approved）。",
+  "reviewed_product_commit": "a2eb3632037726b93f3bea82b395fa7e5d010aa6",
+  "reviewed_app_tree": "c823bdde84ae8ab90c75a45d557cb6cd9e9c0623",
+  "reviewed_static_tree": "c817cc38ba08c79bd013ad699b7337b91f57e8ac",
+  "delivery_head_at_approval": "318b4bd18150ac4cc11351d46877720389b9c20e",
+  "delivery_app_tree_matches_candidate": true,
+  "scope": "POC UX design and four-step experience workflow only",
+  "nonessential_ux_changes_frozen": true,
+  "future_change_rule": "Compare code, contracts and rendered behavior against approved candidate; changes affecting UX require impact review and Owner confirmation. Documentation-only commits do not change the approved product.",
+  "not_authorized": ["main merge", "migration", "grant", "cloud build", "deploy", "traffic change", "formal data deletion or import"],
+  "other_gates_approved": false
+}
