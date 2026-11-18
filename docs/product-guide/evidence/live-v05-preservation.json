@@ -1,0 +1,27 @@
+[
+  {
+    "path": "app/static/intro/index.html",
+    "sha256": "2eb26b1adacd519c89920c55a8636cfcaa02b969b4298ca4f6a5f45e229041ca",
+    "source": "https://lw-public-162310640466.asia-east1.run.app/static/intro/index.html"
+  },
+  {
+    "path": "app/static/intro/preview.js",
+    "sha256": "795246e1c550a2f49ad5d934a11289778794ef440c092d83576f2f6bfdf8dcbc",
+    "source": "https://lw-public-162310640466.asia-east1.run.app/static/intro/preview.js"
+  },
+  {
+    "path": "app/static/intro/hatch-timing.js",
+    "sha256": "ec9aa3b3a0677b4cf5e7a674da6b6eb6a47f6b93fed7cb9080d08b24629cea46",
+    "source": "https://lw-public-162310640466.asia-east1.run.app/static/intro/hatch-timing.js"
+  },
+  {
+    "path": "app/static/intro/preview-v1.css",
+    "sha256": "a8d1278ebd3c0886727a0cfb920f126a794fbf9356a76da245553899c1dec2ca",
+    "source": "https://lw-public-162310640466.asia-east1.run.app/static/intro/preview-v1.css"
+  },
+  {
+    "path": "app/static/intro/entry-bridge.js",
+    "sha256": "75f60a3935aa9f110196b2d93bbcb95686b7c4f54ebd18c0e61e236478a66f3d",
+    "source": "https://lw-public-162310640466.asia-east1.run.app/static/intro/entry-bridge.js"
+  }
+]

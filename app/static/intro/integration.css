@@ -1,0 +1,4 @@
+/* 接入頁補充；其餘構圖與破殼完全沿用獨立原型。 */
+.lw-preview .lw-header-actions{gap:16px;flex-wrap:wrap;justify-content:flex-end;}
+.lw-preview .lw-header-actions .lw-link{display:flex;align-items:center;}
+@media(max-width:760px){.lw-preview .lw-header{flex-wrap:wrap;}.lw-preview .lw-header-actions{margin-left:auto;gap:8px;}}
