@@ -25,7 +25,7 @@ const GuestLocalCleanup = (()=>{
 })();
 window.addEventListener('online',()=>GuestLocalCleanup.retry());
 window.addEventListener('focus',()=>GuestLocalCleanup.retry());
-const names = {world:'我的世界', goals:'目標花園', record:'記錄經歷', history:'經歷收藏', people:'我的關係', notes:'私人小劇場', profile:'認識你', 'goal-new':'建立目標', birth:'新的開始', welcome:'歡迎'}; // 定義主頁面顯示名稱
+const names = {intro:'認識 Life World',tutorial:'使用教學',world:'我的世界', goals:'目標花園', record:'記錄經歷', history:'經歷收藏', people:'我的關係', notes:'私人小劇場', profile:'認識你', 'goal-new':'建立目標', birth:'新的開始', welcome:'歡迎'}; // 定義主頁面顯示名稱
 const dayNames = ['一','二','三','四','五','六','日']; // 以週一到週日的順序顯示星期
 let renderSequence = 0; // 用本次渲染序號拒絕較舊非同步回應覆蓋畫面
 const renderControls = new Map(); // 保存切頁前各表單控制項原本的停用狀態
@@ -208,7 +208,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   try { // 包住可能失敗的讀寫並交由錯誤分支處理
   ScheduleUI.leave();
   MediaUI.leave(); // 切頁前保存裝置草稿並停止麥克風，取消舊辨識回應。
-  let route = location.hash.slice(1) || 'world'; // 取得目前 hash 指定的目的頁面
+  let route = location.hash.slice(1) || (location.pathname.replace(/\/$/,'')==='/intro'?'intro':'world'); // 取得目前 hash 指定的目的頁面
   if(!options.localGoalEdit && state.me && /^(world|goals|goal-new|goal\/)/.test(route)) {try{await refresh();}catch(error){if(route==='world'&&state.me&&![401,403].includes(error.status)){state.worldReadError=true;}else if(!(route==='goals'||route.startsWith('goal/'))||!state.me||!state.world||[401,403].includes(error.status))throw error;}if(sequence!==renderSequence)return;} // 跨日與另一視窗更新後，重新核對目標狀態。
   let params = new URLSearchParams(route.split('?')[1] || ''); // 解析目前路由的查詢參數
   if (route.startsWith('history?') && params.get('person')) { // 依目前選項或狀態進入對應處理分支
@@ -216,15 +216,18 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   } else if (route.split('?')[0] === 'notes') { // 依目前選項或狀態進入對應處理分支
     route = params.get('person') ? 'theater/' + params.get('person') : 'private-notes'; history.replaceState(null, '', '#' + route); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
   } // 結束目前回呼、區塊或模組定義
-  if (!state.me) route = 'welcome'; // 依目前選項或狀態進入對應處理分支
-  else if (!state.me.lumi_hatched && !['profile','goal-new'].includes(route)) route = state.me.bio ? 'goal-new' : 'profile'; // 依目前選項或狀態進入對應處理分支
+  if(!state.me&&!['intro','tutorial','welcome'].includes(route))route=ProductGuideUI.shouldIntroduce()?'intro':'welcome';
+  if (!state.me&&!['intro','tutorial'].includes(route)) route = 'welcome'; // 依目前選項或狀態進入對應處理分支
+  else if (state.me && !state.me.lumi_hatched && !['profile','goal-new','intro','tutorial'].includes(route)) route = state.me.bio ? 'goal-new' : 'profile'; // 依目前選項或狀態進入對應處理分支
   if (state.me && state.me.lumi_hatched && route === 'welcome') route = 'world'; // 依目前選項或狀態進入對應處理分支
   const path = route.split('?')[0]; params = new URLSearchParams(route.split('?')[1] || ''); // 從路由分離出頁面路徑
   if (path !== 'record') state.editingDraft = false; // 依目前選項或狀態進入對應處理分支
   if (state.route) { PeopleUI.remember(state.route, window.scrollY); ConnectionsUI.remember(state.route, window.scrollY); } // 依目前選項或狀態進入對應處理分支
   ConnectionsUI.ensureOwner(); state.route = route; navigation(path); window.WorldAudio?.route(path); // 執行「依路由載入頁面，以序號防止舊回應覆蓋新畫面」的目前處理步驟
   let html; // 保存目前路由產生的頁面標記
-  if (path === 'welcome') html = welcomeView(); // 依目前選項或狀態進入對應處理分支
+  if(path==='intro')html=ProductGuideUI.intro();
+  else if(path==='tutorial')html=ProductGuideUI.tutorial();
+  else if (path === 'welcome') html = welcomeView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'profile') html = profileView(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'goal-new') html = goalForm(); // 依目前選項或狀態進入對應處理分支
   else if (path === 'birth') html = BirthUI.view(lumi('welcome')); // 三次明確互動後才揭露既有 Lumi 呈現。
@@ -254,6 +257,7 @@ async function render(options={}) { // 依路由載入頁面，以序號防止�
   if ((path === 'record' || path.startsWith('review/')) && state.returnTo) html=link(state.returnTo,'返回人物頁','text-button')+html; // 依目前選項或狀態進入對應處理分支
   if (sequence === renderSequence) {
     $('#app').innerHTML = html;
+    ProductGuideUI.mount(path);
     BirthUI.mount(); // 只為孵化頁綁定互動，不改寫伺服器的目標狀態。
     if(state.guestSaveNoticePending){guestSaveNotice();state.guestSaveNoticePending=false;}
     ExperienceUI.mount();DraftAIUI.mount(); ScheduleUI.mount(); state.dirty = false; PeopleUI.restore(route); ConnectionsUI.restore(route);ExperienceUI.refreshReviewSummary();
@@ -594,6 +598,7 @@ document.addEventListener('submit', async event => { // 監聽表單提交
       if(body.story) { if(body.person_id&&!body.story.participants.some(p=>p.person_id===body.person_id)) throw new Error('主要關聯人物不在參與清單，請調整主要人物或參與者；提及者請在提及區核對。'); body.person_id=body.person_id||body.story.participants[0]?.person_id||null; body.interaction_type=f.get('story_interaction_type')||'unknown'; } // 不將原人物資訊候選誤套到另一位參與者
       const result = await api('/drafts/' + state.draft.id + '/confirm',{method:'POST',body:{...body,request_id:requestId('confirm:' + state.draft.id,body)}}); // 等待伺服器完成讀取或保存，再進入下一步
       ConnectionsUI.clearReview(state.draft.id); // 確認成功後清除核對暫存
+      ProductGuideUI.confirmed();
       state.draft = null; state.candidate = null; state.aiPeople=[]; const destination=state.returnTo||'history'; state.returnTo=null; await refresh(); navigate(destination); toast(`已確認保存，本次增加 ${result.points_awarded} 積分。`); // 重新讀取伺服器確認的資料，再更新畫面
     } // 結束目前回呼、區塊或模組定義
     if (form.id === 'claim-form') { // 依目前選項或狀態進入對應處理分支
@@ -659,6 +664,7 @@ function showStartupError(error) {
   // 只替換首次載入佔位，不碰已存在的私人資料或未保存表單。
   if($('#app').querySelector('.boot-skeleton')) $('#app').innerHTML='<section role="status"><h1>暫時無法打開世界</h1><p>請檢查連線後重試；尚未變更你的資料。</p><button type="button" class="primary" data-shell-retry>重新載入</button></section>';
 }
+ProductGuideUI.initialize({state,esc,navigate:route=>{if(state.dirty){leaveDialog(route);return;}navigate(route);}});
 start().catch(showStartupError); // 啟動 App，未處理錯誤交由共用提示呈現
 
 // 使用委派事件以符合既有 CSP，不允許內嵌腳本。

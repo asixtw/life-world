@@ -1,0 +1,135 @@
+{
+  "base_sha": "75f2a79c281db4f7e880f3ae44135b0a28152849",
+  "branch": "feat/product-guide-integration-20261118",
+  "fingerprint": "cb90fd7638a8181cc79f11a8b878151c3f0723b7307ff085cb2b226720d44867",
+  "files": [
+    {
+      "path": "app/main.py",
+      "sha256": "8340a3beb7627557d7edfc38cbadce99093cbd600a56906a3a67be599145e865"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "2d438776731af8de1f982e2940a3ddf02c206b860adc21774dbe1ccfe1d960d7"
+    },
+    {
+      "path": "app/static/index.html",
+      "sha256": "5d83bfedf136b6db000a1d065f455c056295e951865ae04a6c5660cb47835314"
+    },
+    {
+      "path": "app/static/intro-preference.js",
+      "sha256": "28c08969dc56bb27f7df741d942f9aa53be075460f5bf89e7af729c2e2cf84e9"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-deep-512.png",
+      "sha256": "20c0275f7482c9ff82a5f4418ec1dbe4b3b7a3072db3d0486ceee23301ed4161"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-fine-512.png",
+      "sha256": "60f5224cb981ccf2c3f7cb1a5fceeacfc058452f0c3ca0ee3ff4cfb3caaa4dce"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-open-512.png",
+      "sha256": "8a8a8781f0056b476b24fac9e517abf84e77c194b5e3f1f5f3af5b8cdbcd9c4b"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/egg-rest-512.png",
+      "sha256": "432ca59d3bf92cf7330a005e738f311327aefa670eb7698669c4c4693cdb6744"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/lumi-hatch-closed-512.png",
+      "sha256": "c7275f15ff57f042f5e9e80441f58f88cf27ff1b91c656215a2345182f96258f"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/lumi-hatch-peek-512.png",
+      "sha256": "8c4c73782be4946d18c2c7f780af775d8ef2d8afa46005d781a62dd08fa22df9"
+    },
+    {
+      "path": "app/static/intro/assets/art/v1/lumi-welcome-512.png",
+      "sha256": "4ef4ae1c87966318bba6da1385443a39d2a785f0c86fc823ea712d452066440c"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/egg-deep-v1.wav",
+      "sha256": "c9314dc3768d8c693f7dddcd123ea0356cf0b52c5556674e8618148b9630a478"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/egg-fine-v1.wav",
+      "sha256": "f67b6cc72d71fd99f971ccc40f486aab982afd4df64410f72d55f20c27e7e768"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/first-hatch-v1.wav",
+      "sha256": "a02624c1c6647e06265a32a4cf9cc5ba11de3e8d0be49fad79d72a2f9ac5d416"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/login-v1.wav",
+      "sha256": "254450d29a67dc3162b2233395a910719e58f58c5662b2ac690f4d5f74828782"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/shell-open-v1.wav",
+      "sha256": "4c652e9250154ef685ea12bdb2627cd2a0f1d0df3030d23caa3a691ec72f00e2"
+    },
+    {
+      "path": "app/static/intro/assets/audio/v1/ui-tap-v1.wav",
+      "sha256": "b6c34420dab172c832c136bdbbcf288761c1efa2229a6181457c6f6262d4afd3"
+    },
+    {
+      "path": "app/static/intro/assets/icon.svg",
+      "sha256": "76ddfc7a7b2405f02ae7a84ada31777ff195104eed5fbee75473e878987c8a87"
+    },
+    {
+      "path": "app/static/intro/config.js",
+      "sha256": "aa93e684f2ed247dc8e1854f26baf6f01ace24db04931691f7b758fc22e31bbb"
+    },
+    {
+      "path": "app/static/intro/design-tokens.css",
+      "sha256": "7a5062a14a3d78b8edd3747bbd8dbdf1651993e5980444659ba305859af1a9d8"
+    },
+    {
+      "path": "app/static/intro/entry-bridge.js",
+      "sha256": "75f60a3935aa9f110196b2d93bbcb95686b7c4f54ebd18c0e61e236478a66f3d"
+    },
+    {
+      "path": "app/static/intro/hatch-timing.js",
+      "sha256": "ec9aa3b3a0677b4cf5e7a674da6b6eb6a47f6b93fed7cb9080d08b24629cea46"
+    },
+    {
+      "path": "app/static/intro/index.html",
+      "sha256": "2eb26b1adacd519c89920c55a8636cfcaa02b969b4298ca4f6a5f45e229041ca"
+    },
+    {
+      "path": "app/static/intro/integration.css",
+      "sha256": "dc19af7812ab5da4812026e03b2e2ec3e4595cab8e826375da0e9bd0e3d80838"
+    },
+    {
+      "path": "app/static/intro/preview-v1.css",
+      "sha256": "a8d1278ebd3c0886727a0cfb920f126a794fbf9356a76da245553899c1dec2ca"
+    },
+    {
+      "path": "app/static/intro/preview.css",
+      "sha256": "3c888ab3ce322fed818731b0d90c56c48425c7e76f6391f0914ab781f5bb969a"
+    },
+    {
+      "path": "app/static/intro/preview.js",
+      "sha256": "795246e1c550a2f49ad5d934a11289778794ef440c092d83576f2f6bfdf8dcbc"
+    },
+    {
+      "path": "app/static/product-guide.css",
+      "sha256": "8537d8753804f353cdb3f284af32cef7b20c0983a1db24ea002d73adcc27d2f3"
+    },
+    {
+      "path": "app/static/product-guide.js",
+      "sha256": "7c046e32a7e035ed98fad453e20192ba751f6e50d53b6553f353f67c8bf71df2"
+    },
+    {
+      "path": "app/static/pwa-install.js",
+      "sha256": "5374f6d805edada3b1ef9a6120b656d88aaeba473457b410fba8750c24ff3827"
+    },
+    {
+      "path": "browser_tests/test_product_guide_integration.py",
+      "sha256": "3fe561e3c2c4c066594c3bb2db747863eccd8501dbdb7b5f0fe007af7e2117ca"
+    },
+    {
+      "path": "tests/test_product_guide_integration.py",
+      "sha256": "8d99159cd6d87960c65b9ee33cf38d66f3faefefb522498709c8563caba55ed0"
+    }
+  ]
+}

@@ -110,7 +110,7 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
     async def security_headers(request, call_next):  # 檢查寫入來源並加入安全與快取標頭
         if settings.public_gate_closed:
             # 在限流、身分或業務處理之前封閉，確保公開請求不會連接DB。
-            safe=request.method in ('GET','HEAD') and (request.url.path in ('/','/health','/ready','/api/health','/api/capabilities') or request.url.path.startswith('/static/'))
+            safe=request.method in ('GET','HEAD') and (request.url.path in ('/','/intro','/intro/','/intro/v05','/intro/v05/','/health','/ready','/api/health','/api/capabilities') or request.url.path.startswith('/static/'))
             if request.url.path=='/api/auth/me' and request.method=='GET':
                 return JSONResponse({'error':{'code':'unauthenticated','message':'尚未登入。'}},status_code=401,headers={'Cache-Control':'no-store'})
             if not safe:
@@ -624,6 +624,19 @@ def create_app(data_dir=None, policy=None, clock=None, database=None, settings=N
 
     static = Path(__file__).parent / 'static'  # 準備實際 App 靜態資源目錄
     app.mount('/static', StaticFiles(directory=static), name='static')  # 執行此模組的共用工具操作
+
+    @app.api_route('/intro', methods=['GET','HEAD'], include_in_schema=False)
+    @app.api_route('/intro/', methods=['GET','HEAD'], include_in_schema=False)
+    def intro_entry():
+        # 共用正式 App 外殼，介紹本身不觸發帳號建立或資料寫入。
+        return FileResponse(static / 'index.html', headers={'Cache-Control': 'no-store'})
+
+    @app.api_route('/intro/v05', methods=['GET','HEAD'], include_in_schema=False)
+    @app.api_route('/intro/v05/', methods=['GET','HEAD'], include_in_schema=False)
+    def preserved_intro():
+        # 保留原 v05 的動畫／音效與無 API 寫入邊界，不用新流程覆蓋歷史資產。
+        csp="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+        return FileResponse(static / 'intro' / 'index.html', headers={'Cache-Control':'no-store','Content-Security-Policy':csp})
 
     @app.get('/', include_in_schema=False)  # 註冊此 HTTP 路由、例外處理器或中介層
     def index():  # 提供 App 的 HTML 外殼

@@ -42,6 +42,7 @@
   <script src="/static/experience_quantity.js" defer></script>
   <script src="/static/experience_moment.js" defer></script>
   <script src="/static/experience.js" defer></script>
+  <script src="/static/product-guide.js" defer></script>
   <script src="/static/app.js" defer></script> <!-- 先載入各模組再啟動 App。 -->
   <link rel="stylesheet" href="/static/birth.css">
   <link rel="stylesheet" href="/static/softlife.css"> <!-- 僅接入視覺主題，保留 PR26 的路由、表單及資料行為。 -->
@@ -49,6 +50,7 @@
   <script src="/static/pwa-install-model.js" defer></script>
   <script src="/static/pwa-install.js" defer></script>
   <link rel="stylesheet" href="/static/app-shell.css">
+  <link rel="stylesheet" href="/static/product-guide.css">
 </head> <!-- 結束此頁面結構區塊 -->
 <body class="app-booting"> <!-- 建立頁面結構容器 -->
   <div class="app-shell"> <!-- 包住桌面側欄與主內容的應用程式外殼 -->
@@ -58,7 +60,7 @@
       <div class="sidebar-bottom"><span class="status-dot"></span> Life World 測試版<span>你的世界，從真實的一小步開始。</span></div> <!-- 顯示不依賴部署位置的測試版標籤 -->
     </aside> <!-- 結束此頁面結構區塊 -->
     <main> <!-- 宣告頁面主要內容區域 -->
-      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><details id="audio-preferences"><summary>聲音設定</summary></details><details class="intro-menu"><summary>關於</summary><button type="button" data-pwa-open>加到主畫面</button></details><span id="public-account-code" hidden aria-hidden="true"></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
+      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><details id="audio-preferences"><summary>聲音設定</summary></details><details class="intro-menu"><summary>關於</summary><div class="help-menu-items"><button type="button" data-guide-open="intro">認識 Life World</button><button type="button" data-guide-open="tutorial">使用教學</button><button type="button" data-pwa-open>加到手機主畫面</button></div></details><span id="public-account-code" hidden aria-hidden="true"></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
       <div id="notice" role="status" aria-live="polite"></div> <!-- 以無障礙即時區域顯示錯誤與狀態 -->
       <div id="app-loading" role="status" aria-live="polite" hidden>正在載入，請稍候…</div> <!-- 較慢切頁保留可理解回饋 -->
       <div id="app" class="content" aria-busy="true"><div class="boot-skeleton" role="status"><p>正在打開你的世界…</p><div class="skeleton-line" aria-hidden="true"></div><div class="skeleton-panel" aria-hidden="true"></div></div></div> <!-- 依目前路由置換的主內容容器 -->

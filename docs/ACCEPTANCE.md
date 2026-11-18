@@ -1,5 +1,9 @@
 # TDD 與實際驗收紀錄
 
+## 2026-11-18 產品導覽候選本機驗收
+
+API52／Chrome19／Node48 通過；固定示例動畫另1項，佐證獨立疊合 API21／Chrome5 通過。真機、PG、GCP 新版導覽與正式 AI：NOT RUN。 詳見[候選報告](product-guide/README.md)；等待 Owner 審查，不代表已發布。
+
 ## 2026-11-07 GCP-144 孵化互動
 
 隔離Chromium `browser_tests/test_birth_interaction.py -q --tb=short`：4 passed（桌面／觸控，各含reduced motion）。驗證三次點擊、動畫鎖及第三階段揭露。完整後端旅程未重跑；線上與DB驗收不在此證據範圍。詳見[盤點與限制](art/README.md)。
