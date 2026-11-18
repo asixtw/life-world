@@ -135,7 +135,8 @@ function goalCard(goal) { // 產生目標摘要卡與詳情入口
 } // 結束目前回呼、區塊或模組定義
 function navigation(route) { // 產生四主分頁並更新頁面標題
   $('#account-button').hidden=false; // 資料服務未開放也保留入口，明示降級而不是整個隱藏。
-  $('.sidebar').classList.toggle('before-world',!state.me?.lumi_hatched); // 手機首次引導不顯示空白底部導覽。
+  $('.sidebar').classList.toggle('before-world',!state.me?.lumi_hatched);
+  document.body.classList.toggle('before-world',!state.me?.lumi_hatched); // 手機首次引導不顯示空白底部導覽。
   const active = /^(person\/|theater\/|source\/|people)/.test(route)?'people':/^(record|review|history|private-notes)/.test(route)?'history':route.startsWith('goal/')||route==='goal-new'?'goals':route; // 找出目前有效分頁或進行中目標
   $('#nav').innerHTML = state.me?.lumi_hatched ? [['world','⌂','世界'],['goals','♧','目標'],['history','▤','紀錄'],['people','◌','關係']].map(([key,icon,title]) => `<a class="nav-link ${active === key?'active':''}" href="#${key}"><span class="nav-icon" aria-hidden="true">${icon}</span>${title}</a>`).join('') : ''; // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
   $('#page-label').textContent = names[route] || (route.startsWith('person/')?'人物檔案':route.startsWith('source/')?'資訊來源':route.startsWith('theater/')?'人物小劇場':route.startsWith('goal/')?'目標詳情':route==='private-notes'?'私人草稿箱':'核對經歷'); // 執行「產生四主分頁並更新頁面標題」的目前處理步驟
@@ -629,11 +630,17 @@ $('#account-dialog').addEventListener('close', () => {if(!state.googleAttempt?.e
 window.addEventListener('beforeunload', event => {if (state.dirty) {event.preventDefault(); event.returnValue = '';}}); // 監聽關閉頁面以保護未保存內容
 window.addEventListener('offline', () => {$('#notice').innerHTML = '<div class="callout error-message">目前離線；尚未送出的內容沒有保存成功。請保留此頁，連線後再試。</div>';}); // 監聽離線狀態並提示保留輸入
 async function start() { // 讀取既有身分後啟動畫面
-  try {await refresh();} // 重新讀取伺服器確認的資料，再更新畫面
-  catch (error) {if (error.status !== 401) showError(error);} // 顯示失敗原因，讓使用者保留內容並重試
-  await GuestLocalCleanup.retry();
-  await DraftsUI.retryLocalCleanup();
-  await render(); // 執行「讀取既有身分後啟動畫面」的目前處理步驟
+  try {
+    try {await refresh();} // 重新讀取伺服器確認的資料，再更新畫面
+    catch (error) {if (error.status !== 401) throw error;} // 讀取失敗不能當成已確認的未登入身分。
+    await GuestLocalCleanup.retry();
+    await DraftsUI.retryLocalCleanup();
+    await render(); // 執行「讀取既有身分後啟動畫面」的目前處理步驟
+  } finally {
+    document.body.classList.remove('app-booting');
+    $('#app').setAttribute('aria-busy','false');
+    clearTimeout(loadingTimer);loadingTimer=null;$('#app-loading').hidden=true;
+  }
 } // 結束目前回呼、區塊或模組定義
 DraftAIUI.initialize({state,api,esc,id:newId,onCandidate:showDraftAICandidate});
 ExperienceUI.initialize({state,toast,esc,api,inputISO,personControls:story=>experiencePersonField()+ConnectionsUI.editor(story,'record')});
@@ -645,7 +652,18 @@ DraftsUI.initialize({state,api,esc,dialog,newId,refresh,render,toast}); // 將�
 ConnectionsUI.initialize({state,api,esc,link,button,heading,empty,time,options,toast,dialog,requestId,refresh,render,navigate,refreshKeepingForm}); // 交會與收藏冊共用 API 及帳號資料
 document.addEventListener('click',async event=>{const target=event.target.closest('[data-cx]'); if(!target) return; target.disabled=true; try { await ConnectionsUI.click(target); } catch(error) { showError(error); } finally { if(target.isConnected) target.disabled=false; }}); // 防止來源／配對重複點擊並保留失敗內容
 document.addEventListener('keydown', event => {if(event.target.matches('[data-person]') && ['Enter',' '].includes(event.key)) {event.preventDefault(); event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}); // 監聽鍵盤操作，讓星點支援 Enter 與空白鍵
-start().catch(showError); // 啟動 App，未處理錯誤交由共用提示呈現
+function showStartupError(error) {
+  showError(error);
+  // 未取得導覽資料時不顯示空白底列；重試後仍由真實 Session 重算。
+  if(!$('#nav').children.length){$('.sidebar').classList.add('before-world');document.body.classList.add('before-world');}
+  // 只替換首次載入佔位，不碰已存在的私人資料或未保存表單。
+  if($('#app').querySelector('.boot-skeleton')) $('#app').innerHTML='<section role="status"><h1>暫時無法打開世界</h1><p>請檢查連線後重試；尚未變更你的資料。</p><button type="button" class="primary" data-shell-retry>重新載入</button></section>';
+}
+start().catch(showStartupError); // 啟動 App，未處理錯誤交由共用提示呈現
 
 // 使用委派事件以符合既有 CSP，不允許內嵌腳本。
 document.addEventListener("click",event=>{if(event.target.closest("[data-home-retry]"))render().catch(showError);});
+
+
+// 首次連線的重試仍走原 Session 與 capabilities，不建立替代登入。
+document.addEventListener('click',async event=>{const target=event.target.closest('[data-shell-retry]');if(!target)return;target.disabled=true;try{await start();}catch(error){showStartupError(error);}finally{if(target.isConnected)target.disabled=false;}});

@@ -33,3 +33,8 @@
 
 /* 首頁只保留緊湊摘要，長內容仍可換行，手機不產生橫向捲動。 */
 .home-overview{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}.home-lumi{display:flex;flex-direction:column;min-width:0}.home-goal{min-width:0}.home-habit-rows{display:grid;gap:10px}.home-habit-row{display:grid;gap:5px;text-align:left;padding:14px;border:1px solid #cbd9cc;border-radius:14px;background:#fffefb;color:#334431;text-decoration:none;overflow-wrap:anywhere;min-height:44px;width:100%;box-sizing:border-box}.home-habit-row:focus-visible{outline:3px solid #526f4d;outline-offset:3px}.home-habit-row small{color:#52634e}@media(max-width:760px){.home-overview{grid-template-columns:minmax(0,1fr)}}
+
+/* 草稿原文可以很長；允許連結換行及 grid 收縮，不能靠裁切隱藏內容。 */
+.dashboard{grid-template-columns:minmax(0,1fr);min-width:0}
+.dashboard > *{min-width:0}
+.dashboard a.text-button{white-space:normal;max-width:100%;text-align:left;justify-content:flex-start}

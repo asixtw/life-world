@@ -2,8 +2,15 @@
 <html lang="zh-Hant"> <!-- 宣告頁面語言，供瀏覽器與輔助工具辨識 -->
 <head> <!-- 建立頁面結構容器 -->
   <meta charset="utf-8"> <!-- 使用 UTF-8 正確顯示中文 -->
-  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 以裝置寬度呈現手機與桌面版面 -->
-  <link rel="icon" type="image/png" href="/static/art/app-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"> <!-- 以裝置寬度呈現手機與桌面版面 -->
+  <!-- 手機主畫面圖示使用版本化路徑，保留原有角色與業務流程。 -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/art/mobile-web-v1/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/static/art/mobile-web-v1/favicon.ico">
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/art/mobile-web-v1/icon-152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/static/art/mobile-web-v1/icon-167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/art/mobile-web-v1/icon-180.png">
+  <link rel="manifest" href="/static/mobile-manifest-v1.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="Life World">
   <script src="/static/art.js" defer></script>
   <meta name="theme-color" content="#fffdf8"> <!-- 柔和暖白與正式頁面背景一致。 -->
   <title>Life World · 把每一步，種成自己的世界</title> <!-- 設定瀏覽器分頁標題 -->
@@ -38,8 +45,12 @@
   <script src="/static/app.js" defer></script> <!-- 先載入各模組再啟動 App。 -->
   <link rel="stylesheet" href="/static/birth.css">
   <link rel="stylesheet" href="/static/softlife.css"> <!-- 僅接入視覺主題，保留 PR26 的路由、表單及資料行為。 -->
+  <link rel="stylesheet" href="/static/pwa-install.css">
+  <script src="/static/pwa-install-model.js" defer></script>
+  <script src="/static/pwa-install.js" defer></script>
+  <link rel="stylesheet" href="/static/app-shell.css">
 </head> <!-- 結束此頁面結構區塊 -->
-<body> <!-- 建立頁面結構容器 -->
+<body class="app-booting"> <!-- 建立頁面結構容器 -->
   <div class="app-shell"> <!-- 包住桌面側欄與主內容的應用程式外殼 -->
     <aside class="sidebar"> <!-- 桌面側欄，手機改為底部主導覽 -->
       <a href="#world" class="brand" aria-label="Life World 首頁"><span class="brand-symbol">✳</span><span>Life World<small>讓努力，有一個家。</small></span></a> <!-- 可返回世界首頁的品牌連結 -->
@@ -47,10 +58,10 @@
       <div class="sidebar-bottom"><span class="status-dot"></span> Life World 測試版<span>你的世界，從真實的一小步開始。</span></div> <!-- 顯示不依賴部署位置的測試版標籤 -->
     </aside> <!-- 結束此頁面結構區塊 -->
     <main> <!-- 宣告頁面主要內容區域 -->
-      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><details id="audio-preferences"></details><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
+      <header class="topbar"><span class="breadcrumb">我的小小宇宙 <span>／</span> <b id="page-label">歡迎</b></span><details id="audio-preferences"><summary>聲音設定</summary></details><details class="intro-menu"><summary>關於</summary><button type="button" data-pwa-open>加到主畫面</button></details><span id="public-account-code" hidden aria-hidden="true"></span><button id="account-button" class="avatar" data-action="account" aria-label="帳號設定">○</button></header> <!-- 顯示頁面路徑與帳號設定入口 -->
       <div id="notice" role="status" aria-live="polite"></div> <!-- 以無障礙即時區域顯示錯誤與狀態 -->
       <div id="app-loading" role="status" aria-live="polite" hidden>正在載入，請稍候…</div> <!-- 較慢切頁保留可理解回饋 -->
-      <div id="app" class="content"><p>正在打開你的世界…</p></div> <!-- 依目前路由置換的主內容容器 -->
+      <div id="app" class="content" aria-busy="true"><div class="boot-skeleton" role="status"><p>正在打開你的世界…</p><div class="skeleton-line" aria-hidden="true"></div><div class="skeleton-panel" aria-hidden="true"></div></div></div> <!-- 依目前路由置換的主內容容器 -->
       <footer>透過現實中的努力，打造一個屬於自己的世界。<span>你可以暫時離開，這裡永遠歡迎你回來。</span></footer> <!-- 頁尾陪伴文字與底部留白 -->
     </main> <!-- 結束此頁面結構區塊 -->
   </div> <!-- 結束此頁面結構區塊 -->
