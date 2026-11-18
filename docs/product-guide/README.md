@@ -41,6 +41,9 @@
 執行指令（隔離候選根目錄）：
 ```sh
 export LIFEWORLD_DB_BACKEND=sqlite LIFEWORLD_AUTH_SOURCE_MODE=direct LIFEWORLD_AI_CALLS_APPROVED=false
+export PLAYWRIGHT_BROWSERS_PATH=/private/tmp/lw-guide-video-tools
+# 首次重現錄影時只安裝測試工具，不修改正式依賴。
+/private/tmp/lw-operations-venv/bin/python -m playwright install ffmpeg
 export LIFEWORLD_NODE=/private/tmp/lw-operations-venv/lib/python3.14/site-packages/playwright/driver/node
 export PYTHONPATH="/private/tmp/lw-evidence-pillow113:$PWD:$PWD/tests"
 /private/tmp/lw-operations-venv/bin/python -m pytest tests/test_product_guide_integration.py tests/test_pwa_install.py tests/test_identity_goals.py tests/test_draft_review.py tests/test_owner_boundary_matrix.py tests/ai/test_draft_ai_consent.py -q --tb=short
